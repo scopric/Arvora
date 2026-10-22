@@ -1,0 +1,40 @@
+@import "tailwindcss";
+@import "@fontsource-variable/playfair-display";
+@import "@fontsource-variable/inter";
+
+/* Hex aproximados do deck (22/10/2026); confirmar com o contratante. */
+@theme {
+  --color-fundo: #112019;
+  --color-creme: #f4f4ef;
+  --color-destaque: #9db58a;
+  --color-superficie: #3f5e3f; /* nunca como cor de texto: contraste 2,32 */
+  --color-dourado: #c9a24a;
+  --color-fundo-ba: #151719;
+
+  --font-titulo: "Playfair Display Variable", Georgia, serif;
+  --font-corpo: "Inter Variable", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-fundo text-creme font-corpo antialiased;
+  }
+}
+
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+@utility animate-subir {
+  animation: subir 900ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation-delay: var(--atraso, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-subir {
+    animation: none;
+  }
+}
