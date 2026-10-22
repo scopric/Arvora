@@ -1,7 +1,7 @@
 -- RLS da F1 (identidade): setores, perfis, equipe. Roda com `supabase test db`, tudo dentro de uma
 -- transacao desfeita. Sem dbdev/helpers: o papel e o aal do JWT sao simulados com set_config.
 begin;
-select plan(61);
+select plan(65);
 
 create schema tt;
 grant usage on schema tt to public;
@@ -34,7 +34,7 @@ insert into public.equipe (perfil_id, papel) values
   ('00000000-0000-0000-0000-0000000000d2', 'editor'),
   ('00000000-0000-0000-0000-0000000000d3', 'super_admin'),
   ('00000000-0000-0000-0000-0000000000d4', 'auditor');
-insert into public.setores (nome, slug) values ('Tecnologia', 'tecnologia');
+insert into public.setores (nome, slug) values ('Setor de teste', 'tt-setor');
 
 -- 1) estrutura -------------------------------------------------------------------------------
 select ok((select relrowsecurity from pg_class where oid = 'public.setores'::regclass), 'RLS ligado em setores');
@@ -66,7 +66,7 @@ select throws_ok($$insert into auth.users (id, email, raw_user_meta_data)
 
 -- 3) perfis: dono e terceiros ----------------------------------------------------------------
 select tt.como('00000000-0000-0000-0000-00000000000a');
-select is((select count(*)::int from public.perfis), 1, 'membro ve so o proprio perfil (outros sao privados)');
+select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 1, 'membro ve so o proprio perfil (outros sao privados)');
 select lives_ok($$update public.perfis set cidade = 'Dublin', pais = 'IE', bio = 'ola'
                   where id = '00000000-0000-0000-0000-00000000000a'$$, 'dono edita o proprio perfil');
 select is((select tt.afeta($q$update public.perfis set nome = 'Hack'
@@ -97,7 +97,7 @@ select lives_ok($$update public.perfis set visibilidade = 'publico', slug = 'bia
                 'B torna o perfil publico');
 reset role;
 select tt.anonimo();
-select is((select count(*)::int from public.perfis), 0, 'anon nao ve perfil publico ainda nao aprovado');
+select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 0, 'anon nao ve perfil publico ainda nao aprovado');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d1', 'aal1');
 select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b')$$,
@@ -118,7 +118,7 @@ select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000
                  'P0002', 'perfil_nao_aprovavel', 'perfil privado nao e aprovavel');
 reset role;
 select tt.anonimo();
-select is((select count(*)::int from public.perfis), 1, 'anon ve o perfil publico aprovado');
+select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 1, 'anon ve o perfil publico aprovado');
 select is((select nome from public.perfis where slug = 'bia'), 'Bia', 'anon le as colunas publicas');
 select throws_ok($$select maior_18_em from public.perfis$$, '42501', null, 'anon nao le maior_18_em');
 select throws_ok($$select suspenso_em from public.perfis$$, '42501', null, 'anon nao le suspenso_em');
@@ -130,7 +130,7 @@ reset role;
 select ok((select publico_aprovado_em is null from public.perfis where id = '00000000-0000-0000-0000-00000000000b'),
          'editar campo publico derruba a aprovacao');
 select tt.anonimo();
-select is((select count(*)::int from public.perfis), 0, 'anon deixa de ver o perfil ate nova aprovacao');
+select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 0, 'anon deixa de ver o perfil ate nova aprovacao');
 reset role;
 -- reaprova, depois suspende (suspender_perfil entra na F4; aqui a coluna e escrita pelo dono do banco)
 select tt.como('00000000-0000-0000-0000-0000000000d1', 'aal2');
@@ -138,7 +138,7 @@ select lives_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-
 reset role;
 update public.perfis set suspenso_em = now() where id = '00000000-0000-0000-0000-00000000000b';
 select tt.anonimo();
-select is((select count(*)::int from public.perfis), 0, 'perfil suspenso some para o publico');
+select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 0, 'perfil suspenso some para o publico');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d1', 'aal2');
 select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b')$$,
@@ -147,10 +147,10 @@ reset role;
 
 -- 5) equipe le tudo, mas so com 2FA ------------------------------------------------------------
 select tt.como('00000000-0000-0000-0000-0000000000d4', 'aal2');
-select is((select count(*)::int from public.perfis), 6, 'equipe com 2FA le todos os perfis');
+select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 6, 'equipe com 2FA le todos os perfis');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d4', 'aal1');
-select is((select count(*)::int from public.perfis), 1, 'equipe sem 2FA le so o proprio perfil');
+select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 1, 'equipe sem 2FA le so o proprio perfil');
 select is((select private.papel_atual()), null, 'papel_atual e nulo em aal1');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d4', 'aal2');
@@ -159,12 +159,12 @@ reset role;
 
 -- 6) equipe (tabela) ---------------------------------------------------------------------------
 select tt.como('00000000-0000-0000-0000-00000000000a');
-select is((select count(*)::int from public.equipe), 0, 'membro comum nao ve ninguem da equipe');
+select is((select count(*)::int from public.equipe where perfil_id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 0, 'membro comum nao ve ninguem da equipe');
 select throws_ok($$insert into public.equipe (perfil_id, papel) values ('00000000-0000-0000-0000-00000000000a', 'super_admin')$$,
                  '42501', null, 'membro nao se promove');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d2', 'aal2');
-select is((select count(*)::int from public.equipe), 1, 'equipe nao-super ve so a propria linha');
+select is((select count(*)::int from public.equipe where perfil_id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 1, 'equipe nao-super ve so a propria linha');
 select throws_ok($$insert into public.equipe (perfil_id, papel) values ('00000000-0000-0000-0000-00000000000a', 'editor')$$,
                  '42501', null, 'editor nao concede papel');
 select is((select tt.afeta($q$update public.equipe set papel = 'super_admin'
@@ -178,14 +178,14 @@ reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d3', 'aal2');
 select lives_ok($$insert into public.equipe (perfil_id, papel) values ('00000000-0000-0000-0000-00000000000a', 'corretor')$$,
                 'super_admin com 2FA concede papel');
-select is((select count(*)::int from public.equipe), 5, 'super_admin com 2FA le toda a equipe');
+select is((select count(*)::int from public.equipe where perfil_id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 5, 'super_admin com 2FA le toda a equipe');
 select lives_ok($$delete from public.equipe where perfil_id = '00000000-0000-0000-0000-00000000000a'$$,
                 'super_admin com 2FA retira papel');
 reset role;
 
 -- 7) setores -----------------------------------------------------------------------------------
 select tt.anonimo();
-select is((select count(*)::int from public.setores), 1, 'anon le setores');
+select is((select count(*)::int from public.setores where slug like 'tt-%'), 1, 'anon le setores');
 select throws_ok($$insert into public.setores (nome, slug) values ('X', 'x')$$, '42501', null, 'anon nao escreve em setores');
 reset role;
 select tt.como('00000000-0000-0000-0000-00000000000a');
@@ -195,8 +195,25 @@ select tt.como('00000000-0000-0000-0000-0000000000d2', 'aal1');
 select throws_ok($$insert into public.setores (nome, slug) values ('X', 'x')$$, '42501', null, 'editor sem 2FA nao escreve em setores');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d2', 'aal2');
-select lives_ok($$insert into public.setores (nome, slug) values ('Saude', 'saude')$$, 'editor com 2FA escreve em setores');
-select throws_ok($$insert into public.setores (nome, slug) values ('Dup', 'saude')$$, '23505', null, 'slug de setor e unico');
+select lives_ok($$insert into public.setores (nome, slug) values ('Saude', 'tt-saude')$$, 'editor com 2FA escreve em setores');
+select throws_ok($$insert into public.setores (nome, slug) values ('Dup', 'tt-saude')$$, '23505', null, 'slug de setor e unico');
+reset role;
+
+-- 8) politica restritiva de 2FA vale mesmo que uma permissiva seja afrouxada por engano ------------
+create policy tt_frouxa_i on public.equipe for insert to authenticated with check (true);
+create policy tt_frouxa_u on public.equipe for update to authenticated using (true) with check (true);
+create policy tt_frouxa_d on public.equipe for delete to authenticated using (true);
+select tt.como('00000000-0000-0000-0000-00000000000b', 'aal1');
+select throws_ok($$insert into public.equipe (perfil_id, papel) values ('00000000-0000-0000-0000-00000000000b', 'super_admin')$$,
+                 '42501', null, 'com politica frouxa, escrita em equipe sem aal2 continua negada');
+select is((select tt.afeta($q$update public.equipe set papel = 'super_admin' where perfil_id = '00000000-0000-0000-0000-0000000000d2'$q$)),
+          0, 'com politica frouxa, update em equipe sem aal2 afeta 0 linhas');
+select is((select tt.afeta($q$delete from public.equipe where perfil_id = '00000000-0000-0000-0000-0000000000d2'$q$)),
+          0, 'com politica frouxa, delete em equipe sem aal2 afeta 0 linhas');
+reset role;
+select tt.como('00000000-0000-0000-0000-00000000000b', 'aal2');
+select lives_ok($$insert into public.equipe (perfil_id, papel) values ('00000000-0000-0000-0000-00000000000b', 'moderador')$$,
+                'controle: a politica frouxa esta ativa, so o aal2 libera a escrita');
 reset role;
 
 select * from finish();

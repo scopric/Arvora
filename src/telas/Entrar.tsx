@@ -11,7 +11,9 @@ import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } fro
 export function Entrar() {
   const { sessao } = useAuth()
   const navegar = useNavigate()
-  const origem = (useLocation().state as { de?: string } | null)?.de ?? "/perfil"
+  const de = (useLocation().state as { de?: string } | null)?.de
+  // Só caminho interno: nada de redirecionar para fora do site.
+  const origem = de?.startsWith("/") && !de.startsWith("//") ? de : "/perfil"
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)

@@ -2,7 +2,7 @@
 create table public.equipe (
   perfil_id uuid primary key references public.perfis (id) on delete cascade,
   papel public.papel_equipe not null,
-  criado_por uuid,
+  criado_por uuid default auth.uid(),
   criado_em timestamptz not null default now()
 );
 
@@ -32,7 +32,7 @@ create policy equipe_super_admin_le on public.equipe for select to authenticated
   using ((select private.papel_atual()) = 'super_admin');
 
 create policy equipe_super_admin_insere on public.equipe for insert to authenticated
-  with check ((select private.papel_atual()) = 'super_admin');
+  with check ((select private.papel_atual()) = 'super_admin' and criado_por = (select auth.uid()));
 
 create policy equipe_super_admin_altera on public.equipe for update to authenticated
   using ((select private.papel_atual()) = 'super_admin')

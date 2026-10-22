@@ -18,5 +18,5 @@ alter table public.setores enable row level security;
 grant select on public.setores to anon, authenticated;
 grant insert, update, delete on public.setores to authenticated;
 -- A identity precisa de uso da sequencia no insert pela equipe.
-grant usage on all sequences in schema public to authenticated;
+grant usage on sequence public.setores_id_seq to authenticated;
 

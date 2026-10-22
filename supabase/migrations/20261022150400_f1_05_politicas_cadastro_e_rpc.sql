@@ -25,7 +25,9 @@ create policy perfis_dono_altera on public.perfis for update to authenticated
 -- Sem politica de insert (o perfil nasce pelo gatilho) e de delete (exclusao GDPR e do servico).
 
 -- Perfil criado quando a conta nasce. nome vem do cadastro (editavel depois); a declaracao de maioridade
--- (CON-07) e obrigatoria: sem ela a conta nao e criada.
+-- (CON-07) e obrigatoria: sem ela a conta nao e criada. Consequencia: so o cadastro pela tela cria conta
+-- (ela envia maior_18). Convite, createUser do painel e OAuth precisam enviar maior_18 nos metadados;
+-- o primeiro super_admin e criado assim, por quem tem a chave de servico (Decisoes 19).
 create function private.criar_perfil() returns trigger
 language plpgsql security definer
 set search_path = ''
@@ -37,7 +39,7 @@ begin
     raise exception 'maior_18_obrigatorio' using errcode = 'P0001';
   end if;
   insert into public.perfis (id, nome, maior_18_em)
-  values (new.id, left(coalesce(v_nome, split_part(coalesce(new.email, ''), '@', 1), 'Membro'), 120), now());
+  values (new.id, left(coalesce(v_nome, 'Membro'), 120), now());
   return new;
 end;
 $$;
@@ -57,7 +59,7 @@ begin
   end if;
   update public.perfis
      set publico_aprovado_em = case when aprovar then now() else null end
-   where id = perfil and suspenso_em is null and visibilidade = 'publico';
+   where id = perfil and suspenso_em is null and (not aprovar or visibilidade = 'publico');
   if not found then
     raise exception 'perfil_nao_aprovavel' using errcode = 'P0002';
   end if;
