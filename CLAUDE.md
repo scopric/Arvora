@@ -12,7 +12,7 @@ Notas do cofre (pasta `Conhecimento`):
 - `Stack e convenções.md`
 - `Deploy e CI.md`
 
-Decisões e plano da fase: `<cofre do projeto>/Decisões.md` e `.../Claude/Planos/`.
+Decisões e plano da fase: `<cofre do projeto>/Decisões.md` e `<cofre do projeto>/Claude/Planos/`.
 
 ## As 5 regras centrais
 
