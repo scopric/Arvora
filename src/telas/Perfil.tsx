@@ -1,0 +1,154 @@
+import { useEffect, useState, type SubmitEvent } from "react"
+import { Aviso } from "../componentes/Aviso"
+import { Botao } from "../componentes/Botao"
+import { Campo, Selecao } from "../componentes/Campo"
+import { sair, useAuth } from "../lib/sessao"
+import { supabase } from "../lib/supabase"
+import { errosPorCampo, perfilSchema, type CamposDeErro } from "../lib/validacao"
+
+const COLUNAS = "id, nome, empresa_nome, setor_id, cidade, pais, linkedin_url, instagram, bio, visibilidade, publico_aprovado_em"
+
+type PerfilLinha = {
+  nome: string
+  empresa_nome: string | null
+  setor_id: number | null
+  cidade: string | null
+  pais: string | null
+  linkedin_url: string | null
+  instagram: string | null
+  bio: string | null
+  visibilidade: "membros" | "publico"
+  publico_aprovado_em: string | null
+}
+type Setor = { id: number; nome: string }
+type Estado =
+  | { fase: "carregando" }
+  | { fase: "erro"; mensagem: string }
+  | { fase: "pronto"; perfil: PerfilLinha; setores: Setor[] }
+
+export function Perfil() {
+  const { sessao } = useAuth()
+  const uid = sessao?.user.id
+  const [estado, setEstado] = useState<Estado>({ fase: "carregando" })
+  const [erros, setErros] = useState<CamposDeErro>({})
+  const [aviso, setAviso] = useState<{ tipo: "erro" | "ok"; texto: string } | null>(null)
+  const [ocupado, setOcupado] = useState(false)
+
+  useEffect(() => {
+    if (!uid) return
+    let ativo = true
+    Promise.all([
+      supabase.from("perfis").select(COLUNAS).eq("id", uid).maybeSingle(),
+      supabase.from("setores").select("id, nome").eq("ativo", true).order("ordem").order("nome"),
+    ]).then(([p, s]) => {
+      if (!ativo) return
+      // Falha vira mensagem na tela, nunca formulário vazio (Erros 3.2).
+      if (p.error || s.error || !p.data) {
+        return setEstado({ fase: "erro", mensagem: "Não conseguimos carregar seu perfil agora. Tente de novo em instantes." })
+      }
+      setEstado({ fase: "pronto", perfil: p.data as PerfilLinha, setores: s.data })
+    })
+    return () => {
+      ativo = false
+    }
+  }, [uid])
+
+  async function salvar(e: SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!uid || estado.fase !== "pronto") return
+    setAviso(null)
+    const dados = perfilSchema.safeParse(Object.fromEntries(new FormData(e.currentTarget)))
+    if (!dados.success) {
+      setAviso({ tipo: "erro", texto: "Corrija os campos em vermelho." })
+      return setErros(errosPorCampo(dados.error))
+    }
+    setErros({})
+    setOcupado(true)
+    // .select('id'): sob RLS um UPDATE que não casa linha nenhuma volta "ok" e vazio (Erros 2.5).
+    const { data, error } = await supabase.from("perfis").update(dados.data).eq("id", uid).select("id")
+    setOcupado(false)
+    if (error?.code === "23505") {
+      return setAviso({ tipo: "erro", texto: "Esse endereço de perfil já está em uso." })
+    }
+    if (error || !data || data.length === 0) {
+      return setAviso({ tipo: "erro", texto: "Não conseguimos salvar. Tente de novo; se persistir, escreva para o suporte." })
+    }
+    setAviso({ tipo: "ok", texto: "Perfil salvo." })
+    setEstado({ ...estado, perfil: { ...estado.perfil, ...dados.data, publico_aprovado_em: null } })
+  }
+
+  return (
+    <main className="mx-auto max-w-2xl px-6 py-12 sm:py-16">
+      <header className="mb-10 flex items-start justify-between gap-6">
+        <div>
+          <p className="text-xs font-semibold tracking-[0.3em] text-destaque uppercase">Grupo Árvora</p>
+          <h1 className="mt-4 font-titulo text-4xl font-medium">Meu perfil</h1>
+        </div>
+        <button
+          type="button"
+          onClick={() => void sair()}
+          className="rounded-lg border border-creme/30 px-4 py-2 text-sm font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
+        >
+          Sair
+        </button>
+      </header>
+
+      {estado.fase === "carregando" ? <p role="status" className="text-creme/70">Carregando…</p> : null}
+      {estado.fase === "erro" ? <Aviso tipo="erro">{estado.mensagem}</Aviso> : null}
+      {estado.fase === "pronto" ? (
+        <form key={JSON.stringify(estado.perfil)} onSubmit={salvar} noValidate className="space-y-5">
+          {aviso ? <Aviso tipo={aviso.tipo}>{aviso.texto}</Aviso> : null}
+          <p className="text-sm text-creme/70">E-mail da conta: {sessao?.user.email}</p>
+          <Campo rotulo="Nome" name="nome" defaultValue={estado.perfil.nome} erro={erros.nome} autoComplete="name" />
+          <Campo rotulo="Empresa" name="empresa_nome" defaultValue={estado.perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
+          <Selecao rotulo="Setor" name="setor_id" defaultValue={estado.perfil.setor_id?.toString() ?? ""} erro={erros.setor_id}>
+            <option value="">Selecione</option>
+            {estado.setores.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nome}
+              </option>
+            ))}
+          </Selecao>
+          <div className="grid gap-5 sm:grid-cols-[1fr_8rem]">
+            <Campo rotulo="Cidade" name="cidade" defaultValue={estado.perfil.cidade ?? ""} erro={erros.cidade} autoComplete="address-level2" />
+            <Campo rotulo="País" name="pais" defaultValue={estado.perfil.pais ?? ""} erro={erros.pais} maxLength={2} placeholder="IE" ajuda="2 letras" />
+          </div>
+          <Campo rotulo="LinkedIn" name="linkedin_url" type="url" defaultValue={estado.perfil.linkedin_url ?? ""} erro={erros.linkedin_url} placeholder="https://linkedin.com/in/seu-nome" />
+          <Campo rotulo="Instagram" name="instagram" defaultValue={estado.perfil.instagram ?? ""} erro={erros.instagram} placeholder="seu.usuario" />
+          <div>
+            <label htmlFor="bio" className="mb-2 block text-sm font-semibold">Sobre você</label>
+            <textarea
+              id="bio"
+              name="bio"
+              rows={4}
+              maxLength={600}
+              defaultValue={estado.perfil.bio ?? ""}
+              aria-invalid={erros.bio ? true : undefined}
+              className="w-full rounded-lg border border-creme/25 bg-transparent px-4 py-3 text-base outline-none focus-visible:border-dourado focus-visible:ring-2 focus-visible:ring-dourado/40"
+            />
+            {erros.bio ? <p role="alert" className="mt-2 text-sm text-red-300">{erros.bio}</p> : null}
+          </div>
+
+          <fieldset className="space-y-3 rounded-lg border border-creme/25 p-4">
+            <legend className="px-2 text-sm font-semibold">Quem pode ver seu perfil</legend>
+            <label className="flex items-start gap-3 text-sm">
+              <input type="radio" name="visibilidade" value="membros" defaultChecked={estado.perfil.visibilidade === "membros"} className="mt-0.5 size-5 accent-dourado" />
+              <span>Só membros</span>
+            </label>
+            <label className="flex items-start gap-3 text-sm">
+              <input type="radio" name="visibilidade" value="publico" defaultChecked={estado.perfil.visibilidade === "publico"} className="mt-0.5 size-5 accent-dourado" />
+              <span>Também público. A página só aparece depois que a equipe aprovar, e volta para análise sempre que você mudar seus dados.</span>
+            </label>
+            {estado.perfil.visibilidade === "publico" ? (
+              <p className="text-sm text-creme/70">
+                {estado.perfil.publico_aprovado_em ? "Seu perfil público está aprovado." : "Seu perfil público aguarda aprovação da equipe."}
+              </p>
+            ) : null}
+          </fieldset>
+
+          <Botao type="submit" ocupado={ocupado}>Salvar alterações</Botao>
+        </form>
+      ) : null}
+    </main>
+  )
+}
