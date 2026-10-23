@@ -10,6 +10,7 @@
   --color-superficie: #3f5e3f; /* nunca como cor de texto: contraste 2,32 */
   --color-dourado: #c9a24a;
   --color-fundo-ba: #151719;
+  --color-painel: #17281f; /* superfície de card do deck */
 
   --font-titulo: "Playfair Display Variable", Georgia, serif;
   --font-corpo: "Inter Variable", system-ui, sans-serif;

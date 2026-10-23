@@ -27,3 +27,6 @@ dist-ssr
 .env*
 !.env.example
 .vercel
+
+# gerados pelo claude-mem
+CLAUDE.local.md

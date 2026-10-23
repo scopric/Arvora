@@ -1,4 +1,13 @@
-function App() {
+import { BrowserRouter, Navigate, Route, Routes } from "react-router"
+import { AuthProvider } from "./lib/auth"
+import { RotaProtegida } from "./RotaProtegida"
+import { Cadastro } from "./telas/Cadastro"
+import { Entrar } from "./telas/Entrar"
+import { Perfil } from "./telas/Perfil"
+import { RecuperarSenha } from "./telas/RecuperarSenha"
+import { RedefinirSenha } from "./telas/RedefinirSenha"
+
+function EmBreve() {
   return (
     <main className="relative isolate flex min-h-dvh flex-col justify-center overflow-hidden px-6 py-24 sm:px-16 lg:px-32">
       <div
@@ -37,4 +46,22 @@ function App() {
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<EmBreve />} />
+          <Route path="/entrar" element={<Entrar />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+          <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+          <Route element={<RotaProtegida />}>
+            <Route path="/perfil" element={<Perfil />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  )
+}
