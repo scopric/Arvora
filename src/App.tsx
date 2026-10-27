@@ -15,9 +15,17 @@ function EmBreve() {
         className="pointer-events-none absolute -top-1/3 -right-1/4 -z-10 size-[60rem] rounded-full bg-superficie/25 blur-3xl"
       />
 
+      <img
+        src="/logo-simbolo.png"
+        alt=""
+        width="354"
+        height="287"
+        className="animate-subir mb-8 h-16 w-auto self-start"
+        style={{ "--atraso": "0ms" } as React.CSSProperties}
+      />
       <p
         className="animate-subir text-xs font-semibold tracking-[0.3em] text-destaque uppercase"
-        style={{ "--atraso": "0ms" } as React.CSSProperties}
+        style={{ "--atraso": "60ms" } as React.CSSProperties}
       >
         Em breve
       </p>
