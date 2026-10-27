@@ -2,6 +2,7 @@ import { useEffect, useState, type SubmitEvent } from "react"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
+import { Marca } from "../componentes/Marca"
 import { sair, useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, perfilSchema, type CamposDeErro } from "../lib/validacao"
@@ -81,7 +82,7 @@ export function Perfil() {
     <main className="mx-auto max-w-2xl px-6 py-12 sm:py-16">
       <header className="mb-10 flex items-start justify-between gap-6">
         <div>
-          <p className="text-xs font-semibold tracking-[0.3em] text-destaque uppercase">Grupo Árvora</p>
+          <Marca />
           <h1 className="mt-4 font-titulo text-4xl font-medium">Meu perfil</h1>
         </div>
         <button
