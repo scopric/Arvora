@@ -1,13 +1,13 @@
 # Árvora — instruções do repositório
 
-Repositório de código da plataforma Grupo Árvora (privado, `scopric/arvora`). Fica em `~/Code/arvora`, fora do iCloud, de propósito.
+Repositório de código da plataforma Grupo Árvora (`scopric/Arvora`). Fica em `~/Code/arvora`, fora do iCloud, de propósito.
 
 ## Leia antes de mexer
 
 Notas do cofre (pasta `Conhecimento`):
 `<cofre do projeto>/Conhecimento/`
 
-- `Erros que não se repetem.md`: lições pagas na projeto anterior. Erro novo entra no fim, com **O que houve** e **Regra**.
+- `Erros que não se repetem.md`: lições pagas no projeto anterior. Erro novo entra no fim, com **O que houve** e **Regra**.
 - `O que não pode quebrar.md`: lista curta e checklist antes de cada merge.
 - `Stack e convenções.md`
 - `Deploy e CI.md`
