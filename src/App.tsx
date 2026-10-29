@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router"
+import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router"
 import { en } from "./i18n/en"
 import { ehIdioma, gravarIdioma, idiomaPreferido, useCaminho } from "./i18n"
 import { pt } from "./i18n/pt"
@@ -65,9 +65,7 @@ export function Rotas() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Rotas />
-      </BrowserRouter>
+      <Rotas />
     </AuthProvider>
   )
 }
