@@ -130,6 +130,16 @@ Deno.test("processar lança → 500 sem corpo nem e-mail na resposta", async () 
   assert(!texto.includes(corpo));
 });
 
+Deno.test("processar devolve conflito_assinatura_vigente → 500 'conflito' sem corpo nem e-mail", async () => {
+  const d = deps(() => Promise.resolve("conflito_assinatura_vigente"));
+  const r = await handle(await req(), d);
+  assertEquals(r.status, 500);
+  const texto = await r.text();
+  assertEquals(texto, "conflito");
+  assert(!texto.includes("membro.ficticio@exemplo.invalid"));
+  assert(!texto.includes("evt_teste_0001"));
+});
+
 for (const resultado of ["duplicado", "ignorado_orfao"]) {
   Deno.test(`processar devolve ${resultado} → 200`, async () => {
     const r = await handle(await req(), deps(() => Promise.resolve(resultado)));
