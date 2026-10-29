@@ -32,8 +32,10 @@ function montar(o: {
   totp?: boolean;
   naoExiste?: boolean;
   semConfirmar?: boolean;
+  limite?: boolean | "erro";
 } = {}) {
   const ordem: string[] = [];
+  const limites: string[] = [];
   const stripe: { url: string; init: RequestInit; corpo: URLSearchParams }[] =
     [];
   const db: Consultas = {
@@ -43,6 +45,12 @@ function montar(o: {
         email: "titular@exemplo.test",
         totp: o.totp ?? false,
       }),
+    consumirLimite: (a) => {
+      limites.push(a);
+      return o.limite === "erro"
+        ? Promise.reject(new Error("rpc falhou"))
+        : Promise.resolve(o.limite ?? true);
+    },
     temEquipe: () => Promise.resolve(o.equipe ?? false),
     assinaturasVigentes: () => Promise.resolve(o.assinaturas ?? []),
   };
@@ -68,7 +76,7 @@ function montar(o: {
         Response.json({ id: "sub", status: "canceled" }));
     },
   };
-  return { deps, ordem, stripe };
+  return { deps, ordem, stripe, limites };
 }
 
 const jwt = (aal: string) =>
@@ -333,4 +341,51 @@ Deno.test("deleteUser com usuário já apagado (corrida de abas): 200 ok", async
   const r = await handle(post(corpoOk), deps);
   equal(r.status, 200);
   deepEqual(await r.json(), { ok: true });
+});
+
+Deno.test("limite: dentro do limite segue e confere a senha; ação excluir_senha", async () => {
+  const { deps, ordem, limites } = montar();
+  const r = await handle(post(corpoOk), deps);
+  equal(r.status, 200);
+  deepEqual(limites, ["excluir_senha"]);
+  equal(ordem[0], "senha:titular@exemplo.test");
+});
+
+Deno.test("limite: senha errada também consome", async () => {
+  const { deps, limites } = montar();
+  const r = await handle(post({ email: EMAIL, senha: "errada" }), deps);
+  equal(r.status, 401);
+  deepEqual(limites, ["excluir_senha"]);
+});
+
+Deno.test("limite: excedeu é 429 com Retry-After e nada é chamado", async () => {
+  const { deps, ordem, stripe } = montar({ limite: false, assinaturas: DUAS });
+  const r = await handle(post(corpoOk), deps);
+  equal(r.status, 429);
+  deepEqual(await r.json(), { erro: "limite" });
+  equal(r.headers.get("Retry-After"), "3600");
+  deepEqual(ordem, []);
+  equal(stripe.length, 0);
+});
+
+Deno.test("limite: erro do contador é 500 interno e nada é chamado", async () => {
+  const { deps, ordem, stripe } = montar({ limite: "erro", assinaturas: DUAS });
+  const r = await handle(post(corpoOk), deps);
+  equal(r.status, 500);
+  deepEqual(await r.json(), { erro: "interno" });
+  deepEqual(ordem, []);
+  equal(stripe.length, 0);
+});
+
+Deno.test("limite: e-mail diferente e mfa_requerido não consomem", async () => {
+  const a = montar();
+  equal(
+    (await handle(post({ email: "outro@exemplo.test", senha: SENHA }), a.deps))
+      .status,
+    400,
+  );
+  deepEqual(a.limites, []);
+  const b = montar({ totp: true });
+  equal((await handle(post(corpoOk, "POST", jwt("aal1")), b.deps)).status, 403);
+  deepEqual(b.limites, []);
 });

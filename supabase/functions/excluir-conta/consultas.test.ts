@@ -67,3 +67,14 @@ Deno.test("consultas excluir-conta: usuário traz e-mail cru (não confirmado) e
   );
   equal(await q(null).usuario(), null);
 });
+
+Deno.test("consultas excluir-conta: consumirLimite chama o RPC e só aceita boolean", async () => {
+  const { sb, chamadas } = sbFalso(() => ({ data: true, error: null }));
+  equal(await consultas(sb).consumirLimite("excluir_senha"), true);
+  deepEqual(chamadas[0].passos[0], ["rpc", [{ p_acao: "excluir_senha" }]]);
+  await rejects(
+    consultas(sbFalso(() => ({ data: null, error: null })).sb).consumirLimite(
+      "excluir_senha",
+    ),
+  );
+});

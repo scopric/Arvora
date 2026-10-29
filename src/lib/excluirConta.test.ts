@@ -30,9 +30,16 @@ describe("excluirMinhaConta", () => {
     ["equipe", "erro.excluir.equipe"],
     ["stripe", "erro.excluir.stripe"],
     ["exclusao", "erro.excluir.exclusao"],
+    ["limite", "perfil.excluir.erroLimite"],
   ])("erro %s vira mensagem própria e não encerra a sessão", async (erro, mensagem) => {
     invoke.mockResolvedValue({ data: null, error: http({ erro }) })
     expect(await excluirMinhaConta("a@exemplo.test", "x")).toBe(mensagem)
+    expect(sair).not.toHaveBeenCalled()
+  })
+
+  it("429 vira a mensagem de limite mesmo com corpo ilegível", async () => {
+    invoke.mockResolvedValue({ data: null, error: http("não é json", 429) })
+    expect(await excluirMinhaConta("a@exemplo.test", "x")).toBe("perfil.excluir.erroLimite")
     expect(sair).not.toHaveBeenCalled()
   })
 

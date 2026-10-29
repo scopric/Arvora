@@ -144,6 +144,8 @@ export const pt = {
   "perfil.excluir.senha": "Sua senha",
   "perfil.excluir.confirmar": "Excluir definitivamente",
   "perfil.excluir.cancelar": "Cancelar",
+  "perfil.excluir.erroLimite":
+    "Muitas tentativas de senha. Aguarde cerca de uma hora e tente de novo, ou fale com o suporte.",
   "erro.excluir.email_diferente": "O e-mail digitado não é o e-mail da sua conta.",
   "erro.excluir.senha_invalida": "Senha incorreta.",
   "erro.excluir.mfa_requerido":
