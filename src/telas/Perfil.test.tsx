@@ -31,6 +31,10 @@ vi.mock("../lib/supabase", () => {
 vi.mock("../lib/exportar", () => ({ baixarMeusDados: baixar }))
 const abrirPortal = vi.hoisted(() => vi.fn())
 vi.mock("../lib/assinatura", () => ({ abrirPortal }))
+const excluirMinhaConta = vi.hoisted(() => vi.fn())
+vi.mock("../lib/excluirConta", () => ({ excluirMinhaConta }))
+const navegar = vi.hoisted(() => vi.fn())
+vi.mock("react-router", async (original) => ({ ...(await original<typeof import("react-router")>()), useNavigate: () => navegar }))
 vi.mock("../lib/sessao", () => ({
   useAuth: () => ({ sessao: { user: { id: "u1", email: "a@b.com" } }, carregando: false }),
   sair: vi.fn(),
@@ -53,6 +57,8 @@ beforeEach(() => {
   resp.chamadas = 0
   baixar.mockReset()
   abrirPortal.mockReset()
+  excluirMinhaConta.mockReset()
+  navegar.mockReset()
 })
 
 describe("tela Meu perfil", () => {
@@ -133,5 +139,61 @@ describe("bloco Assinatura", () => {
     resp.clientes = { data: null, error: { message: "boom" } }
     render(<Perfil />)
     expect((await screen.findByRole("alert")).textContent).toMatch(/verificar sua assinatura/i)
+  })
+})
+
+describe("bloco Excluir minha conta", () => {
+  const abrir = async () => {
+    render(<Perfil />)
+    await userEvent.click(await screen.findByRole("button", { name: /quero excluir minha conta/i }))
+  }
+  const preencher = async () => {
+    await userEvent.type(screen.getByLabelText(/e-mail da sua conta/i), "a@b.com")
+    await userEvent.type(screen.getByLabelText(/sua senha/i), "senha_falsa")
+  }
+
+  it("vem recolhido, e ao abrir avisa o que acontece", async () => {
+    render(<Perfil />)
+    await screen.findByRole("button", { name: /salvar alterações/i })
+    expect(screen.queryByRole("button", { name: /excluir definitivamente/i })).toBeNull()
+    await userEvent.click(screen.getByRole("button", { name: /quero excluir minha conta/i }))
+    expect(screen.getByText(/sem reembolso automático/i)).toBeTruthy()
+    expect(screen.getByText(/retidos por obrigação legal/i)).toBeTruthy()
+  })
+
+  it("o botão só habilita com e-mail e senha", async () => {
+    await abrir()
+    const botao = screen.getByRole("button", { name: /excluir definitivamente/i }) as HTMLButtonElement
+    expect(botao.disabled).toBe(true)
+    await userEvent.type(screen.getByLabelText(/e-mail da sua conta/i), "a@b.com")
+    expect(botao.disabled).toBe(true)
+    await userEvent.type(screen.getByLabelText(/sua senha/i), "senha_falsa")
+    expect(botao.disabled).toBe(false)
+  })
+
+  it("erro aparece na tela e a conta não sai da tela", async () => {
+    excluirMinhaConta.mockResolvedValue("Senha incorreta.")
+    await abrir()
+    await preencher()
+    await userEvent.click(screen.getByRole("button", { name: /excluir definitivamente/i }))
+    expect((await screen.findByRole("alert")).textContent).toBe("Senha incorreta.")
+    expect(excluirMinhaConta).toHaveBeenCalledWith("a@b.com", "senha_falsa")
+    expect(navegar).not.toHaveBeenCalled()
+  })
+
+  it("sucesso navega para a página inicial do idioma", async () => {
+    excluirMinhaConta.mockResolvedValue(null)
+    await abrir()
+    await preencher()
+    await userEvent.click(screen.getByRole("button", { name: /excluir definitivamente/i }))
+    await waitFor(() => expect(navegar).toHaveBeenCalledWith("/pt", { replace: true }))
+  })
+
+  it("clique duplo envia uma vez só", async () => {
+    excluirMinhaConta.mockReturnValue(new Promise(() => {}))
+    await abrir()
+    await preencher()
+    await userEvent.dblClick(screen.getByRole("button", { name: /excluir definitivamente/i }))
+    expect(excluirMinhaConta).toHaveBeenCalledTimes(1)
   })
 })
