@@ -7,6 +7,7 @@ import { AuthProvider } from "./lib/auth"
 import { RotaProtegida } from "./RotaProtegida"
 import { LANG_HTML } from "./site"
 import { Cadastro } from "./telas/Cadastro"
+import { Confirmar } from "./telas/Confirmar"
 import { EmBreve } from "./telas/EmBreve"
 import { Entrar } from "./telas/Entrar"
 import { Perfil } from "./telas/Perfil"
@@ -44,13 +45,14 @@ function Inicio() {
 export function Rotas() {
   return (
     <Routes>
-      {["/", "/entrar", "/cadastro", "/recuperar-senha", "/redefinir-senha", "/perfil"].map((p) => (
+      {["/", "/entrar", "/cadastro", "/confirmar", "/recuperar-senha", "/redefinir-senha", "/perfil"].map((p) => (
         <Route key={p} path={p} element={<SemPrefixo />} />
       ))}
       <Route path="/:lang" element={<LayoutIdioma />}>
         <Route index element={<EmBreve />} />
         <Route path="entrar" element={<Entrar />} />
         <Route path="cadastro" element={<Cadastro />} />
+        <Route path="confirmar" element={<Confirmar />} />
         <Route path="recuperar-senha" element={<RecuperarSenha />} />
         <Route path="redefinir-senha" element={<RedefinirSenha />} />
         <Route element={<RotaProtegida />}>
