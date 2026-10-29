@@ -1,7 +1,8 @@
 {
+  "outputDirectory": "build/client",
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
+      "source": "/((?!assets/|.*\\.).*)",
       "destination": "/index.html"
     }
   ],

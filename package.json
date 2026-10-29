@@ -7,24 +7,27 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "react-router dev --port 5190",
+    "build": "react-router typegen && tsc -b && react-router build && node scripts/externalizar-scripts.mjs",
     "lint": "oxlint",
-    "typecheck": "tsc -b --noEmit",
-    "preview": "vite preview",
+    "typecheck": "react-router typegen && tsc -b --noEmit",
+    "preview": "npx serve build/client",
     "test": "vitest run",
     "types:gerar": "supabase gen types typescript --local --schema public > src/lib/database.types.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.3.0",
     "@fontsource-variable/playfair-display": "5.3.0",
+    "@react-router/node": "8.5.1",
     "@supabase/supabase-js": "2.118.0",
+    "isbot": "5.2.2",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "react-router": "8.5.0",
+    "react-router": "8.5.1",
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@react-router/dev": "8.5.1",
     "@tailwindcss/vite": "4.3.3",
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.8",

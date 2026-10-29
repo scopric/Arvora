@@ -1,0 +1,32 @@
+[
+  {
+    "edicao": "exemplo-2025",
+    "slug": "maria-exemplo",
+    "nome": "Maria Exemplo",
+    "categoria": { "pt": "Categoria de exemplo A", "en": "Example category A" },
+    "historia": {
+      "pt": "Texto de exemplo para testar a página do premiado. Não é uma pessoa real.",
+      "en": "Example text to test the award winner page. Not a real person."
+    }
+  },
+  {
+    "edicao": "exemplo-2025",
+    "slug": "joao-modelo",
+    "nome": "João Modelo",
+    "categoria": { "pt": "Categoria de exemplo B", "en": "Example category B" },
+    "historia": {
+      "pt": "Texto de exemplo para testar a página do premiado. Não é uma pessoa real.",
+      "en": "Example text to test the award winner page. Not a real person."
+    }
+  },
+  {
+    "edicao": "exemplo-2025",
+    "slug": "clara-teste",
+    "nome": "Clara Teste",
+    "categoria": { "pt": "Categoria de exemplo C", "en": "Example category C" },
+    "historia": {
+      "pt": "Texto de exemplo para testar a página do premiado. Não é uma pessoa real.",
+      "en": "Example text to test the award winner page. Not a real person."
+    }
+  }
+]

@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router"
+import { Navigate, Route, Routes } from "react-router"
 import { AuthProvider } from "./lib/auth"
 import { RotaProtegida } from "./RotaProtegida"
 import { Cadastro } from "./telas/Cadastro"
@@ -11,7 +11,6 @@ import { RedefinirSenha } from "./telas/RedefinirSenha"
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
         <Routes>
           <Route path="/" element={<EmBreve />} />
           <Route path="/entrar" element={<Entrar />} />
@@ -23,7 +22,6 @@ export default function App() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
     </AuthProvider>
   )
 }
