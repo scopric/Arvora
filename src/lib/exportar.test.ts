@@ -39,7 +39,7 @@ describe("baixarMeusDados", () => {
 
   it("erro do banco: devolve mensagem e não baixa nada", async () => {
     rpc.mockResolvedValue({ data: null, error: { message: "boom" } })
-    expect(await baixarMeusDados()).toMatch(/não conseguimos gerar/i)
+    expect(await baixarMeusDados()).toBe("perfil.dados.erro")
     expect(baixados).toHaveLength(0)
   })
 })
