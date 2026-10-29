@@ -3,6 +3,8 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { Marca } from "../componentes/Marca"
+import { useIdioma } from "../i18n"
+import { abrirPortal } from "../lib/assinatura"
 import { sair, useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, perfilSchema, type CamposDeErro } from "../lib/validacao"
@@ -150,6 +152,50 @@ export function Perfil() {
           <Botao type="submit" ocupado={ocupado}>Salvar alterações</Botao>
         </form>
       ) : null}
+      {uid ? <BlocoAssinatura uid={uid} /> : null}
     </main>
+  )
+}
+
+// Só aparece para quem já tem cliente no Stripe (RLS limita a leitura ao dono). Planos e preços não moram aqui.
+function BlocoAssinatura({ uid }: { uid: string }) {
+  const idioma = useIdioma()
+  const [estado, setEstado] = useState<"carregando" | "sem" | "com" | "erro">("carregando")
+  const [erro, setErro] = useState<string | null>(null)
+  const [ocupado, setOcupado] = useState(false)
+
+  useEffect(() => {
+    let ativo = true
+    supabase.from("clientes_stripe").select("id").eq("perfil_id", uid).limit(1).then(({ data, error }) => {
+      if (ativo) setEstado(error || !data ? "erro" : data.length > 0 ? "com" : "sem")
+    })
+    return () => {
+      ativo = false
+    }
+  }, [uid])
+
+  if (estado === "carregando" || estado === "sem") return null
+  return (
+    <section className="mt-12 space-y-3 border-t border-creme/15 pt-8">
+      <h2 className="font-titulo text-2xl font-medium">Assinatura</h2>
+      {estado === "erro" ? <Aviso tipo="erro">Não conseguimos verificar sua assinatura agora. Tente de novo em instantes.</Aviso> : null}
+      {erro ? <Aviso tipo="erro">{erro}</Aviso> : null}
+      {estado === "com" ? (
+        <Botao
+          type="button"
+          variante="contorno"
+          ocupado={ocupado}
+          onClick={async () => {
+            setErro(null)
+            setOcupado(true)
+            const falha = await abrirPortal(idioma)
+            setOcupado(false)
+            setErro(falha)
+          }}
+        >
+          Gerenciar assinatura
+        </Botao>
+      ) : null}
+    </section>
   )
 }
