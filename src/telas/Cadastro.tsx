@@ -26,12 +26,12 @@ export function Cadastro() {
     setErros({})
     setOcupado(true)
     // nome e maior_18 viajam nos metadados só para o gatilho criar o perfil; papel e nível nunca vêm daqui.
+    // idioma só escolhe o idioma do e-mail (apresentação, nunca autorização); o site hoje é só pt-BR.
     const { error } = await supabase.auth.signUp({
       email: dados.data.email,
       password: dados.data.senha,
       options: {
-        data: { nome: dados.data.nome, maior_18: "true" },
-        emailRedirectTo: `${window.location.origin}/entrar`,
+        data: { nome: dados.data.nome, maior_18: "true", idioma: "pt" },
       },
     })
     setOcupado(false)

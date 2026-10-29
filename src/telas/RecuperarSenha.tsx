@@ -20,9 +20,7 @@ export function RecuperarSenha() {
     if (!dados.success) return setErros(errosPorCampo(dados.error))
     setErros({})
     setOcupado(true)
-    const { error } = await supabase.auth.resetPasswordForEmail(dados.data.email, {
-      redirectTo: `${window.location.origin}/redefinir-senha`,
-    })
+    const { error } = await supabase.auth.resetPasswordForEmail(dados.data.email)
     setOcupado(false)
     // Mesma resposta exista a conta ou não, para não revelar quem tem cadastro.
     if (error && error.code !== "validation_failed") return setAviso(mensagemDeErroAuth(error))

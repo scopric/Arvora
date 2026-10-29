@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router"
 import { AuthProvider } from "./lib/auth"
 import { RotaProtegida } from "./RotaProtegida"
 import { Cadastro } from "./telas/Cadastro"
+import { Confirmar } from "./telas/Confirmar"
 import { EmBreve } from "./telas/EmBreve"
 import { Entrar } from "./telas/Entrar"
 import { Perfil } from "./telas/Perfil"
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/" element={<EmBreve />} />
           <Route path="/entrar" element={<Entrar />} />
           <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/confirmar" element={<Confirmar />} />
           <Route path="/recuperar-senha" element={<RecuperarSenha />} />
           <Route path="/redefinir-senha" element={<RedefinirSenha />} />
           <Route element={<RotaProtegida />}>

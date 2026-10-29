@@ -96,6 +96,8 @@ export function mensagemDeErroAuth(erro: { message?: string; code?: string; stat
       return "Confirme seu e-mail para continuar. Procure o link na sua caixa de entrada."
     case "weak_password":
       return "Essa senha é fraca. Use 8 ou mais caracteres com maiúscula, minúscula e número."
+    case "otp_expired":
+      return "Esse link expirou ou já foi usado. Peça um novo."
     case "same_password":
       return "A nova senha precisa ser diferente da atual."
     case "over_email_send_rate_limit":
@@ -108,3 +110,9 @@ export function mensagemDeErroAuth(erro: { message?: string; code?: string; stat
       return "Algo deu errado do nosso lado. Tente de novo; se persistir, escreva para o suporte."
   }
 }
+
+// Parâmetros do link enviado por e-mail (/confirmar): só os tipos que os modelos de e-mail geram.
+export const confirmarSchema = z.object({
+  token_hash: z.string().min(1),
+  type: z.enum(["signup", "recovery", "email_change"]),
+})
