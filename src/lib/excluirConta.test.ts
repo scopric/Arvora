@@ -24,15 +24,15 @@ describe("excluirMinhaConta", () => {
   })
 
   it.each([
-    ["email_diferente", /e-mail digitado/i],
-    ["senha_invalida", /senha incorreta/i],
-    ["mfa_requerido", /duas etapas/i],
-    ["equipe", /equipe/i],
-    ["stripe", /nada foi excluído/i],
-    ["exclusao", /assinatura foi cancelada/i],
+    ["email_diferente", "erro.excluir.email_diferente"],
+    ["senha_invalida", "erro.excluir.senha_invalida"],
+    ["mfa_requerido", "erro.excluir.mfa_requerido"],
+    ["equipe", "erro.excluir.equipe"],
+    ["stripe", "erro.excluir.stripe"],
+    ["exclusao", "erro.excluir.exclusao"],
   ])("erro %s vira mensagem própria e não encerra a sessão", async (erro, mensagem) => {
     invoke.mockResolvedValue({ data: null, error: http({ erro }) })
-    expect(await excluirMinhaConta("a@exemplo.test", "x")).toMatch(mensagem)
+    expect(await excluirMinhaConta("a@exemplo.test", "x")).toBe(mensagem)
     expect(sair).not.toHaveBeenCalled()
   })
 
@@ -40,7 +40,7 @@ describe("excluirMinhaConta", () => {
     for (const e of [http({ erro: "interno", detalhe: "segredo" }, 500), http("não é json", 500), new FunctionsFetchError(new Error("segredo"))]) {
       invoke.mockResolvedValue({ data: null, error: e })
       const m = await excluirMinhaConta("a@exemplo.test", "x")
-      expect(m).toMatch(/não conseguimos excluir/i)
+      expect(m).toBe("erro.excluir.default")
       expect(m).not.toMatch(/segredo/)
     }
     expect(sair).not.toHaveBeenCalled()

@@ -152,13 +152,13 @@ isOneToOne: false
                   ]
                 },"setores": {
                   Row: {
-                    "ativo": boolean,"atualizado_em": string,"criado_em": string,"id": number,"nome": string,"ordem": number,"slug": string
+                    "ativo": boolean,"atualizado_em": string,"criado_em": string,"id": number,"nome": string,"nome_en": string | null,"ordem": number,"slug": string
                   }
                   Insert: {
-                    "ativo"?: boolean,"atualizado_em"?: string,"criado_em"?: string,"id"?: never,"nome": string,"ordem"?: number,"slug": string
+                    "ativo"?: boolean,"atualizado_em"?: string,"criado_em"?: string,"id"?: never,"nome": string,"nome_en"?: string | null,"ordem"?: number,"slug": string
                   }
                   Update: {
-                    "ativo"?: boolean,"atualizado_em"?: string,"criado_em"?: string,"id"?: never,"nome"?: string,"ordem"?: number,"slug"?: string
+                    "ativo"?: boolean,"atualizado_em"?: string,"criado_em"?: string,"id"?: never,"nome"?: string,"nome_en"?: string | null,"ordem"?: number,"slug"?: string
                   }
                   Relationships: [
                     

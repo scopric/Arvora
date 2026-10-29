@@ -1,9 +1,10 @@
+import type { Chave } from "../i18n"
 import { supabase } from "./supabase"
 
-const ERRO = "Não conseguimos gerar seus dados agora. Tente de novo em instantes."
+const ERRO = "perfil.dados.erro"
 
-// Baixa o JSON com os dados pessoais do titular (GDPR art. 15/20). Devolve a mensagem de erro, ou null se deu certo.
-export async function baixarMeusDados(): Promise<string | null> {
+// Baixa o JSON com os dados pessoais do titular (GDPR art. 15/20). Devolve a chave da mensagem de erro, ou null se deu certo.
+export async function baixarMeusDados(): Promise<Chave | null> {
   const { data, error } = await supabase.rpc("exportar_meus_dados")
   if (error || !data) return ERRO
   const d = new Date()

@@ -93,7 +93,7 @@ describe("tela Meu perfil", () => {
   })
 
   it("Meus dados: erro ao baixar aparece na tela", async () => {
-    baixar.mockResolvedValue("Não conseguimos gerar seus dados agora.")
+    baixar.mockResolvedValue("perfil.dados.erro")
     render(<Perfil />)
     await userEvent.click(await screen.findByRole("button", { name: /baixar meus dados/i }))
     expect((await screen.findByRole("alert")).textContent).toMatch(/não conseguimos gerar/i)
@@ -129,7 +129,7 @@ describe("bloco Assinatura", () => {
 
   it("falha ao abrir o portal aparece na tela", async () => {
     resp.clientes = { data: [{ id: 1 }], error: null }
-    abrirPortal.mockResolvedValue("Não conseguimos abrir a página de pagamento agora.")
+    abrirPortal.mockResolvedValue("perfil.assinatura.erroPortal")
     render(<Perfil />)
     await userEvent.click(await screen.findByRole("button", { name: /gerenciar assinatura/i }))
     expect((await screen.findByRole("alert")).textContent).toMatch(/não conseguimos abrir/i)
@@ -172,7 +172,7 @@ describe("bloco Excluir minha conta", () => {
   })
 
   it("erro aparece na tela e a conta não sai da tela", async () => {
-    excluirMinhaConta.mockResolvedValue("Senha incorreta.")
+    excluirMinhaConta.mockResolvedValue("erro.excluir.senha_invalida")
     await abrir()
     await preencher()
     await userEvent.click(screen.getByRole("button", { name: /excluir definitivamente/i }))

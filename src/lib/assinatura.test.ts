@@ -29,7 +29,7 @@ describe("assinatura", () => {
       "https://malicioso.exemplo/?checkout.stripe.com", "https://stripe.com/x", "não é url"]
     for (const r of [...urls.map((url) => ({ data: { url }, error: null })), { data: null, error: new Error("x") }]) {
       invoke.mockResolvedValue(r)
-      expect(await abrirPortal("pt")).toMatch(/não conseguimos/i)
+      expect(await abrirPortal("pt")).toBe("perfil.assinatura.erroPortal")
     }
     expect(assign).not.toHaveBeenCalled()
   })
@@ -37,11 +37,11 @@ describe("assinatura", () => {
   it("429 (limite de chamadas) vira mensagem própria nas duas funções", async () => {
     const erro = new FunctionsHttpError(Response.json({ erro: "limite" }, { status: 429 }))
     invoke.mockResolvedValue({ data: null, error: erro })
-    expect(await abrirPortal("pt")).toMatch(/muitas tentativas/i)
-    expect(await iniciarCheckout(7, "pt")).toMatch(/muitas tentativas/i)
+    expect(await abrirPortal("pt")).toBe("perfil.assinatura.erroLimite")
+    expect(await iniciarCheckout(7, "pt")).toBe("perfil.assinatura.erroLimite")
     expect(assign).not.toHaveBeenCalled()
     const outro = new FunctionsHttpError(Response.json({ erro: "x" }, { status: 500 }))
     invoke.mockResolvedValue({ data: null, error: outro })
-    expect(await abrirPortal("pt")).toMatch(/não conseguimos/i)
+    expect(await abrirPortal("pt")).toBe("perfil.assinatura.erroPortal")
   })
 })
