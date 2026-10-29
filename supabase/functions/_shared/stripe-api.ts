@@ -1,4 +1,4 @@
-// Chamada à API REST do Stripe (form-urlencoded), sem SDK. Usado por stripe-checkout e stripe-portal.
+// Chamada à API REST do Stripe (form-urlencoded), sem SDK. Usado por stripe-checkout, stripe-portal e excluir-conta.
 
 export type Params = {
   [k: string]: string | number | boolean | Params | Params[] | undefined;
@@ -46,6 +46,33 @@ export async function stripePost(
     throw new ErroStripe(`Stripe ${path} respondeu ${r.status}`);
   }
   return await r.json();
+}
+
+// DELETE com parâmetros no corpo form-urlencoded. 404 resource_missing = já não existe: devolve {} (ok).
+// Qualquer outra falha lança ErroStripe; nunca o corpo do erro.
+export async function stripeDelete(
+  path: string,
+  params: Params,
+  { chave, fetch: f = fetch }: { chave: string; fetch?: typeof fetch },
+): Promise<Record<string, unknown>> {
+  const r = await f(`https://api.stripe.com${path}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${chave}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: codificarForm(params),
+  });
+  if (r.ok) return await r.json();
+  if (r.status === 404) {
+    // Só o código do erro é lido; o resto do corpo é descartado.
+    const codigo = await r.json().then(
+      (j) => j?.error?.code,
+      () => undefined,
+    );
+    if (codigo === "resource_missing") return {};
+  } else await r.body?.cancel();
+  throw new ErroStripe(`Stripe ${path} respondeu ${r.status}`);
 }
 
 // Comum às duas funções: CORS restrito a SITE_URL e respostas JSON.

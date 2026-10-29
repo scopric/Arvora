@@ -2,7 +2,7 @@
 -- FIXTURES DE TESTE: os eventos abaixo sao JSON minimos feitos a mao (valores ficticios), a trocar pelos
 -- reais quando houver o 1o evento de teste do Stripe (Erros 5.2).
 begin;
-select plan(63);
+select plan(65);
 
 create schema tt;
 grant usage on schema tt to public;
@@ -175,16 +175,22 @@ select throws_ok($$select tt.processa(tt.ev_co('evt_e14', 9100, 'cus_b1', tt.u('
                  'P0001', 'perfil_divergente: customer cus_b1 ja ligado a outro perfil', 'checkout nao troca o perfil do Customer');
 select is(tt.contagem(), current_setting('tt.antes'), 'erros nao gravam nenhuma linha (assinaturas/eventos/clientes)');
 
--- 7b) dono apagado (GDPR): ignorado_orfao, assinatura intacta, sem religar --------------------------
+-- 7b) dono apagado (GDPR): ignorado_orfao; so o ciclo de vida da orfa muda, o resto da linha fica intacto, sem religar
+-- (o detalhe do comportamento orfao esta em 060-orfao-atualiza.sql)
+create function tt.resto(sub text) returns text language sql as $$
+  select md5((to_jsonb(a) - array['status', 'periodo_inicio', 'periodo_fim', 'cancela_no_fim', 'cancelada_em',
+                                  'stripe_evento_em', 'atualizado_em'])::text)
+  from public.assinaturas a where stripe_subscription_id = sub $$; --------------------------
 select tt.processa(tt.ev_co('evt_d0', 10000, 'cus_d1', tt.u('d1')::text));
 select is(tt.processa(tt.ev_sub('evt_d1', 'customer.subscription.created', 10100, 'sub_d', 'active', cus => 'cus_d1')), 'processado', 'd1 assina');
 delete from auth.users where id = tt.u('d1');
 select set_config('tt.foto', tt.foto(), true);  -- o delete acima e do teste, nao da RPC
 select ok((select perfil_id is null from public.assinaturas where stripe_subscription_id = 'sub_d'), 'perfil apagado: assinatura fica com perfil_id nulo');
-select set_config('tt.sub_d', (select md5(a::text) from public.assinaturas a where stripe_subscription_id = 'sub_d'), true);
+select set_config('tt.sub_d', tt.resto('sub_d'), true);
 select is(tt.processa(tt.ev_sub('evt_d2', 'customer.subscription.updated', 10200, 'sub_d', 'canceled', cus => 'cus_d1')),
           'ignorado_orfao', 'evento de assinatura de perfil apagado: ignorado_orfao');
-select is((select md5(a::text) from public.assinaturas a where stripe_subscription_id = 'sub_d'), current_setting('tt.sub_d'), 'assinatura orfa intacta');
+select is(tt.resto('sub_d'), current_setting('tt.sub_d'), 'assinatura orfa: so o ciclo de vida muda, resto da linha intacto');
+select is(tt.status('sub_d'), 'canceled', 'assinatura orfa: status atualizado pelo evento');
 select ok((select processado_em is not null from public.eventos_stripe where event_id = 'evt_d2'), 'evento orfao fica processado');
 select is(tt.processa(tt.ev_sub('evt_d2', 'customer.subscription.updated', 10200, 'sub_d', 'canceled', cus => 'cus_d1')),
           'duplicado', 'replay do evento orfao: duplicado');
@@ -195,10 +201,11 @@ select is((select count(*)::int from public.assinaturas where stripe_subscriptio
 select tt.processa(tt.ev_co('evt_x0', 11000, 'cus_e1', tt.u('e1')::text));
 select tt.processa(tt.ev_sub('evt_x1', 'customer.subscription.created', 11100, 'sub_e', 'active', cus => 'cus_e1'));
 update public.assinaturas set perfil_id = null where stripe_subscription_id = 'sub_e';
-select set_config('tt.sub_e', (select md5(a::text) from public.assinaturas a where stripe_subscription_id = 'sub_e'), true);
+select set_config('tt.sub_e', tt.resto('sub_e'), true);
 select is(tt.processa(tt.ev_sub('evt_x2', 'customer.subscription.updated', 11200, 'sub_e', 'past_due', cus => 'cus_e1')),
           'ignorado_orfao', 'assinatura orfa: ignorado_orfao mesmo com customer ligado');
-select is((select md5(a::text) from public.assinaturas a where stripe_subscription_id = 'sub_e'), current_setting('tt.sub_e'), 'assinatura orfa nao e religada');
+select is(tt.resto('sub_e'), current_setting('tt.sub_e'), 'assinatura orfa nao e religada (perfil_id e resto intactos)');
+select is(tt.status('sub_e'), 'past_due', 'assinatura orfa com customer ligado: status atualizado, perfil segue nulo');
 
 -- 8) nunca escreve em planos, perfis, contas_stripe, equipe -----------------------------------------
 select is(tt.foto(), current_setting('tt.foto'), 'planos, perfis, contas_stripe e equipe intactos');

@@ -1,11 +1,13 @@
 import { useEffect, useState, type SubmitEvent } from "react"
+import { useNavigate } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { Marca } from "../componentes/Marca"
+import { useCaminho, useIdioma } from "../i18n"
 import { baixarMeusDados } from "../lib/exportar"
-import { useIdioma } from "../i18n"
 import { abrirPortal } from "../lib/assinatura"
+import { excluirMinhaConta } from "../lib/excluirConta"
 import { sair, useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { useT } from "../i18n"
@@ -184,6 +186,7 @@ export function Perfil() {
           </Botao>
         </div>
       </section>
+      {uid ? <BlocoExcluirConta /> : null}
     </main>
   )
 }
@@ -227,6 +230,69 @@ function BlocoAssinatura({ uid }: { uid: string }) {
           Gerenciar assinatura
         </Botao>
       ) : null}
+    </section>
+  )
+}
+
+// Zona de perigo, recolhida por padrão. O servidor reconfere e-mail e senha: aqui só se evita o clique sem querer.
+function BlocoExcluirConta() {
+  const navegar = useNavigate()
+  const caminho = useCaminho()
+  const [aberto, setAberto] = useState(false)
+  const [email, setEmail] = useState("")
+  const [senha, setSenha] = useState("")
+  const [erro, setErro] = useState<string | null>(null)
+  const [ocupado, setOcupado] = useState(false)
+
+  async function excluir(e: SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (ocupado || !email.trim() || !senha) return
+    setErro(null)
+    setOcupado(true)
+    const falha = await excluirMinhaConta(email, senha)
+    if (falha) {
+      setOcupado(false)
+      return setErro(falha)
+    }
+    navegar(caminho("/"), { replace: true })
+  }
+
+  return (
+    <section className="mt-12 space-y-4 border-t border-creme/15 pt-8">
+      <h2 className="font-titulo text-2xl font-medium">Excluir minha conta</h2>
+      {!aberto ? (
+        <button
+          type="button"
+          aria-expanded={false}
+          onClick={() => setAberto(true)}
+          className="text-sm text-creme/70 underline underline-offset-4 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
+        >
+          Quero excluir minha conta
+        </button>
+      ) : (
+        <form onSubmit={excluir} noValidate className="space-y-5">
+          <div className="space-y-2 text-sm text-creme/80">
+            <p>A exclusão é definitiva e não pode ser desfeita:</p>
+            <ul className="list-disc space-y-1 pl-5">
+              <li>Você perde o acesso à sua conta e ao conteúdo.</li>
+              <li>Sua assinatura é cancelada na hora, sem reembolso automático.</li>
+              <li>Alguns dados de cobrança ficam retidos por obrigação legal.</li>
+              <li>Antes de excluir, use Baixar meus dados (acima) para guardar uma cópia: depois da exclusão não dá para recuperá-los.</li>
+            </ul>
+          </div>
+          {erro ? <Aviso tipo="erro">{erro}</Aviso> : null}
+          <Campo rotulo="Digite o e-mail da sua conta" name="confirmar_email" type="email" autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Campo rotulo="Sua senha" name="confirmar_senha" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+          <div className="flex gap-3">
+            <Botao type="submit" variante="contorno" ocupado={ocupado} disabled={!email.trim() || !senha}>
+              Excluir definitivamente
+            </Botao>
+            <Botao type="button" variante="contorno" disabled={ocupado} onClick={() => setAberto(false)}>
+              Cancelar
+            </Botao>
+          </div>
+        </form>
+      )}
     </section>
   )
 }
