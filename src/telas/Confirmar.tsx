@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useCaminho, useT, type Chave } from "../i18n"
+import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { supabase } from "../lib/supabase"
 import { confirmarSchema, mensagemDeErroAuth } from "../lib/validacao"
 
@@ -13,6 +13,7 @@ export function Confirmar() {
   const navegar = useNavigate()
   const caminho = useCaminho()
   const t = useT()
+  useTitulo("titulo.confirmar", true)
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [registrado, setRegistrado] = useState(false)
   const [ocupado, setOcupado] = useState(false)

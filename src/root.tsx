@@ -1,5 +1,6 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useParams } from "react-router"
 import "./index.css"
+import { ehIdioma, textosDe, useIdiomaUrl } from "./i18n"
 import { IDIOMAS, LANG_HTML, type Idioma } from "./site"
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -24,14 +25,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function meta() {
+export function meta({ params }: { params: { lang?: string } }) {
+  const dic = textosDe(ehIdioma(params.lang) ? params.lang : "pt")
   return [
-    { title: "Grupo Árvora — em breve" },
-    {
-      name: "description",
-      content:
-        "Grupo Árvora: cursos, acompanhamento e comunidade para empreendedores brasileiros fora do Brasil. Em breve.",
-    },
+    { title: dic["doc.titulo"] },
+    { name: "description", content: dic["doc.descricao"] },
   ]
 }
 
@@ -39,20 +37,25 @@ export default function Root() {
   return <Outlet />
 }
 
-// Mostrado enquanto o SPA hidrata (e no __spa-fallback.html).
+// Mostrado enquanto o SPA hidrata (e no __spa-fallback.html). Fora do /:lang: idioma pela URL.
 export function HydrateFallback() {
-  return <p role="status" className="p-12 text-creme/70">Carregando…</p>
+  const dic = textosDe(useIdiomaUrl())
+  return <p role="status" className="p-12 text-creme/70">{dic["sistema.carregando"]}</p>
+}
+
+// Título do erro: 404 ou genérico.
+export function chaveErro(error: unknown) {
+  return isRouteErrorResponse(error) && error.status === 404 ? "sistema.naoEncontrada" : "sistema.erro"
 }
 
 // Sem stack na tela. Em páginas pré-renderizadas o status HTTP continua 200 (limite do ssr:false).
 export function ErrorBoundary({ error }: { error: unknown }) {
-  const naoEncontrada = isRouteErrorResponse(error) && error.status === 404
+  const idioma = useIdiomaUrl()
+  const dic = textosDe(idioma)
   return (
     <main className="mx-auto max-w-xl px-6 py-24">
-      <h1 className="font-titulo text-4xl">
-        {naoEncontrada ? "Página não encontrada" : "Algo deu errado"}
-      </h1>
-      <a href="/" className="mt-8 inline-block underline">Voltar ao início</a>
+      <h1 className="font-titulo text-4xl">{dic[chaveErro(error)]}</h1>
+      <a href={`/${idioma}`} className="mt-8 inline-block underline">{dic["sistema.voltar"]}</a>
     </main>
   )
 }

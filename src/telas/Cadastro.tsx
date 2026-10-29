@@ -4,7 +4,7 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useIdioma, useCaminho, useT, type Chave } from "../i18n"
+import { useIdioma, useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { cadastroSchema, errosPorCampo, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
@@ -14,6 +14,7 @@ export function Cadastro() {
   const lang = useIdioma()
   const caminho = useCaminho()
   const t = useT()
+  useTitulo("titulo.cadastro", true)
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [enviado, setEnviado] = useState(false)
