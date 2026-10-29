@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useCaminho } from "../i18n"
+import { useCaminho, useT, type Chave } from "../i18n"
 import { supabase } from "../lib/supabase"
 import { confirmarSchema, mensagemDeErroAuth } from "../lib/validacao"
 
@@ -12,7 +12,8 @@ export function Confirmar() {
   const [params] = useSearchParams()
   const navegar = useNavigate()
   const caminho = useCaminho()
-  const [aviso, setAviso] = useState<string | null>(null)
+  const t = useT()
+  const [aviso, setAviso] = useState<Chave | null>(null)
   const [registrado, setRegistrado] = useState(false)
   const [ocupado, setOcupado] = useState(false)
   const dados = confirmarSchema.safeParse(Object.fromEntries(params))
@@ -28,7 +29,7 @@ export function Confirmar() {
       if (dados.data.type === "email_change" && !data?.session) return setRegistrado(true)
       navegar(caminho(dados.data.type === "recovery" ? "/redefinir-senha" : "/perfil"), { replace: true })
     } catch {
-      setAviso("Algo deu errado do nosso lado. Tente de novo em instantes.")
+      setAviso("confirmar.erro")
     } finally {
       setOcupado(false)
     }
@@ -36,9 +37,9 @@ export function Confirmar() {
 
   if (!dados.success) {
     return (
-      <LayoutAuth titulo="Link inválido" subtitulo="Esse link está incompleto ou não é reconhecido.">
+      <LayoutAuth titulo={t("confirmar.invalido.titulo")} subtitulo={t("confirmar.invalido.subtitulo")}>
         <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
-          Ir para a entrada
+          {t("confirmar.irEntrar")}
         </Link>
       </LayoutAuth>
     )
@@ -46,13 +47,13 @@ export function Confirmar() {
 
   if (registrado) {
     return (
-      <LayoutAuth titulo="Confirmação registrada" subtitulo="Falta só o outro endereço.">
+      <LayoutAuth titulo={t("confirmar.registrado.titulo")} subtitulo={t("confirmar.registrado.subtitulo")}>
         <div className="space-y-5">
           <Aviso tipo="ok">
-            Para concluir a troca de e-mail, abra também o link que enviamos para o outro endereço (o antigo ou o novo).
+            {t("confirmar.registrado.aviso")}
           </Aviso>
           <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
-            Ir para a entrada
+            {t("confirmar.irEntrar")}
           </Link>
         </div>
       </LayoutAuth>
@@ -60,11 +61,11 @@ export function Confirmar() {
   }
 
   return (
-    <LayoutAuth titulo="Confirmar" subtitulo="Clique no botão para concluir.">
+    <LayoutAuth titulo={t("confirmar.titulo")} subtitulo={t("confirmar.subtitulo")}>
       <div className="space-y-5">
-        {aviso ? <Aviso tipo="erro">{aviso}</Aviso> : null}
+        {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
         <Botao type="button" ocupado={ocupado} onClick={confirmar}>
-          Confirmar
+          {t("confirmar.botao")}
         </Botao>
       </div>
     </LayoutAuth>

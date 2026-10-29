@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 // O comportamento sob RLS de verdade é provado no pgTAP; aqui só o que a tela faz com cada resposta.
+const baixar = vi.hoisted(() => vi.fn())
 const resp = vi.hoisted(() => ({ perfil: {} as unknown, setores: {} as unknown, update: {} as unknown, clientes: {} as unknown, chamadas: 0 }))
 
 vi.mock("../lib/supabase", () => {
@@ -27,6 +28,7 @@ vi.mock("../lib/supabase", () => {
     },
   }
 })
+vi.mock("../lib/exportar", () => ({ baixarMeusDados: baixar }))
 const abrirPortal = vi.hoisted(() => vi.fn())
 vi.mock("../lib/assinatura", () => ({ abrirPortal }))
 const excluirMinhaConta = vi.hoisted(() => vi.fn())
@@ -53,6 +55,7 @@ beforeEach(() => {
   resp.update = { data: [{ id: "u1" }], error: null }
   resp.clientes = { data: [], error: null }
   resp.chamadas = 0
+  baixar.mockReset()
   abrirPortal.mockReset()
   excluirMinhaConta.mockReset()
   navegar.mockReset()
@@ -87,6 +90,25 @@ describe("tela Meu perfil", () => {
     await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }))
     expect(await screen.findByText(/código de 2 letras/i)).toBeTruthy()
     expect(resp.chamadas).toBe(0)
+  })
+
+  it("Meus dados: erro ao baixar aparece na tela", async () => {
+    baixar.mockResolvedValue("Não conseguimos gerar seus dados agora.")
+    render(<Perfil />)
+    await userEvent.click(await screen.findByRole("button", { name: /baixar meus dados/i }))
+    expect((await screen.findByRole("alert")).textContent).toMatch(/não conseguimos gerar/i)
+  })
+
+  it("Meus dados: clique duplo não baixa duas vezes e o botão fica desabilitado", async () => {
+    let fim!: () => void
+    baixar.mockReturnValue(new Promise((r) => (fim = () => r(null))))
+    render(<Perfil />)
+    const botao = await screen.findByRole("button", { name: /baixar meus dados/i })
+    await userEvent.dblClick(botao)
+    expect(baixar).toHaveBeenCalledTimes(1)
+    expect((screen.getByRole("button", { name: /aguarde/i }) as HTMLButtonElement).disabled).toBe(true)
+    fim()
+    await screen.findByRole("button", { name: /baixar meus dados/i })
   })
 })
 

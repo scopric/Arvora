@@ -4,14 +4,15 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useCaminho } from "../i18n"
+import { useCaminho, useT, type Chave } from "../i18n"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, mensagemDeErroAuth, recuperarSchema, type CamposDeErro } from "../lib/validacao"
 
 export function RecuperarSenha() {
   const caminho = useCaminho()
+  const t = useT()
   const [erros, setErros] = useState<CamposDeErro>({})
-  const [aviso, setAviso] = useState<string | null>(null)
+  const [aviso, setAviso] = useState<Chave | null>(null)
   const [enviado, setEnviado] = useState(false)
   const [ocupado, setOcupado] = useState(false)
 
@@ -30,21 +31,21 @@ export function RecuperarSenha() {
   }
 
   return (
-    <LayoutAuth titulo="Recuperar senha" subtitulo="Enviamos um link para você criar uma senha nova.">
+    <LayoutAuth titulo={t("recuperar.titulo")} subtitulo={t("recuperar.subtitulo")}>
       {enviado ? (
-        <Aviso tipo="ok">Se houver uma conta com esse e-mail, o link já está a caminho. Confira também o spam.</Aviso>
+        <Aviso tipo="ok">{t("recuperar.enviado")}</Aviso>
       ) : (
         <form onSubmit={enviar} noValidate className="space-y-5">
-          {aviso ? <Aviso tipo="erro">{aviso}</Aviso> : null}
-          <Campo rotulo="E-mail" name="email" type="email" autoComplete="email" erro={erros.email} />
+          {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
+          <Campo rotulo={t("auth.email.rotulo")} name="email" type="email" autoComplete="email" placeholder={t("auth.email.exemplo")} erro={t(erros.email)} />
           <Botao type="submit" ocupado={ocupado}>
-            Enviar link
+            {t("recuperar.botao")}
           </Botao>
         </form>
       )}
       <p className="mt-6 text-sm text-creme/70">
         <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
-          Voltar para entrar
+          {t("recuperar.voltar")}
         </Link>
       </p>
     </LayoutAuth>

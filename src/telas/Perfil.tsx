@@ -5,11 +5,13 @@ import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { Marca } from "../componentes/Marca"
 import { useCaminho, useIdioma } from "../i18n"
+import { baixarMeusDados } from "../lib/exportar"
 import { abrirPortal } from "../lib/assinatura"
 import { excluirMinhaConta } from "../lib/excluirConta"
 import { sair, useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
-import { errosPorCampo, perfilSchema, type CamposDeErro } from "../lib/validacao"
+import { useT } from "../i18n"
+import { errosPorCampo, perfilSchema } from "../lib/validacao"
 
 const COLUNAS = "id, nome, empresa_nome, setor_id, cidade, pais, linkedin_url, instagram, bio, visibilidade, publico_aprovado_em"
 
@@ -33,11 +35,14 @@ type Estado =
 
 export function Perfil() {
   const { sessao } = useAuth()
+  const t = useT()
   const uid = sessao?.user.id
   const [estado, setEstado] = useState<Estado>({ fase: "carregando" })
-  const [erros, setErros] = useState<CamposDeErro>({})
+  const [erros, setErros] = useState<Record<string, string>>({})
   const [aviso, setAviso] = useState<{ tipo: "erro" | "ok"; texto: string } | null>(null)
   const [ocupado, setOcupado] = useState(false)
+  const [baixando, setBaixando] = useState(false)
+  const [erroDados, setErroDados] = useState<string | null>(null)
 
   useEffect(() => {
     if (!uid) return
@@ -65,7 +70,8 @@ export function Perfil() {
     const dados = perfilSchema.safeParse(Object.fromEntries(new FormData(e.currentTarget)))
     if (!dados.success) {
       setAviso({ tipo: "erro", texto: "Corrija os campos em vermelho." })
-      return setErros(errosPorCampo(dados.error))
+      // Passo (c) traduz o resto da tela; aqui só a mensagem do Zod (chave -> texto).
+      return setErros(Object.fromEntries(Object.entries(errosPorCampo(dados.error)).map(([c, k]) => [c, t(k)])))
     }
     setErros({})
     setOcupado(true)
@@ -80,6 +86,18 @@ export function Perfil() {
     }
     setAviso({ tipo: "ok", texto: "Perfil salvo." })
     setEstado({ ...estado, perfil: { ...estado.perfil, ...dados.data, publico_aprovado_em: null } })
+  }
+
+  async function baixar() {
+    setErroDados(null)
+    setBaixando(true)
+    try {
+      setErroDados(await baixarMeusDados())
+    } catch {
+      setErroDados("Não conseguimos gerar seus dados agora. Tente de novo em instantes.")
+    } finally {
+      setBaixando(false)
+    }
   }
 
   return (
@@ -155,6 +173,19 @@ export function Perfil() {
         </form>
       ) : null}
       {uid ? <BlocoAssinatura uid={uid} /> : null}
+
+      <section className="mt-12 border-t border-creme/15 pt-8">
+        <h2 className="text-sm font-semibold">Meus dados</h2>
+        <p className="mt-2 text-sm text-creme/70">
+          Um arquivo JSON com os dados pessoais que guardamos sobre você: conta, perfil, papel na equipe, assinaturas e cadastro de cliente no Stripe.
+        </p>
+        {erroDados ? <div className="mt-4"><Aviso tipo="erro">{erroDados}</Aviso></div> : null}
+        <div className="mt-4 sm:max-w-xs">
+          <Botao type="button" variante="contorno" ocupado={baixando} onClick={() => void baixar()}>
+            Baixar meus dados (JSON)
+          </Botao>
+        </div>
+      </section>
       {uid ? <BlocoExcluirConta /> : null}
     </main>
   )
@@ -246,7 +277,7 @@ function BlocoExcluirConta() {
               <li>Você perde o acesso à sua conta e ao conteúdo.</li>
               <li>Sua assinatura é cancelada na hora, sem reembolso automático.</li>
               <li>Alguns dados de cobrança ficam retidos por obrigação legal.</li>
-              <li>Se quiser uma cópia dos seus dados, peça ao suporte antes de excluir.</li>
+              <li>Antes de excluir, use Baixar meus dados (acima) para guardar uma cópia: depois da exclusão não dá para recuperá-los.</li>
             </ul>
           </div>
           {erro ? <Aviso tipo="erro">{erro}</Aviso> : null}

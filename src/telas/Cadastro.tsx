@@ -4,7 +4,7 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useIdioma, useCaminho } from "../i18n"
+import { useIdioma, useCaminho, useT, type Chave } from "../i18n"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { cadastroSchema, errosPorCampo, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
@@ -13,8 +13,9 @@ export function Cadastro() {
   const { sessao } = useAuth()
   const lang = useIdioma()
   const caminho = useCaminho()
+  const t = useT()
   const [erros, setErros] = useState<CamposDeErro>({})
-  const [aviso, setAviso] = useState<string | null>(null)
+  const [aviso, setAviso] = useState<Chave | null>(null)
   const [enviado, setEnviado] = useState(false)
   const [ocupado, setOcupado] = useState(false)
 
@@ -29,7 +30,7 @@ export function Cadastro() {
     setErros({})
     setOcupado(true)
     // nome e maior_18 viajam nos metadados só para o gatilho criar o perfil; papel e nível nunca vêm daqui.
-    // idioma só escolhe o idioma do e-mail (apresentação, nunca autorização); o site hoje é só pt-BR.
+    // idioma só escolhe o idioma do e-mail (apresentação, nunca autorização): os modelos leem .Data.idioma.
     const { error } = await supabase.auth.signUp({
       email: dados.data.email,
       password: dados.data.senha,
@@ -44,14 +45,13 @@ export function Cadastro() {
 
   if (enviado) {
     return (
-      <LayoutAuth titulo="Confira seu e-mail" subtitulo="Falta só um passo.">
+      <LayoutAuth titulo={t("cadastro.enviado.titulo")} subtitulo={t("cadastro.enviado.subtitulo")}>
         <Aviso tipo="ok">
-          Se esse e-mail puder ser cadastrado, enviamos um link de confirmação. Abra a mensagem e clique no link para
-          ativar a conta.
+          {t("cadastro.enviado.aviso")}
         </Aviso>
         <p className="mt-6 text-sm text-creme/70">
           <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
-            Já confirmei, quero entrar
+            {t("cadastro.enviado.entrar")}
           </Link>
         </p>
       </LayoutAuth>
@@ -59,18 +59,18 @@ export function Cadastro() {
   }
 
   return (
-    <LayoutAuth titulo="Criar conta" subtitulo="Leva um minuto. Você confirma o e-mail em seguida.">
+    <LayoutAuth titulo={t("cadastro.titulo")} subtitulo={t("cadastro.subtitulo")}>
       <form onSubmit={enviar} noValidate className="space-y-5">
-        {aviso ? <Aviso tipo="erro">{aviso}</Aviso> : null}
-        <Campo rotulo="Nome" name="nome" autoComplete="name" erro={erros.nome} />
-        <Campo rotulo="E-mail" name="email" type="email" autoComplete="email" erro={erros.email} />
+        {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
+        <Campo rotulo={t("cadastro.nome")} name="nome" autoComplete="name" erro={t(erros.nome)} />
+        <Campo rotulo={t("auth.email.rotulo")} name="email" type="email" autoComplete="email" placeholder={t("auth.email.exemplo")} erro={t(erros.email)} />
         <Campo
-          rotulo="Senha"
+          rotulo={t("auth.senha.rotulo")}
           name="senha"
           type="password"
           autoComplete="new-password"
-          erro={erros.senha}
-          ajuda="8 ou mais caracteres, com maiúscula, minúscula e número."
+          erro={t(erros.senha)}
+          ajuda={t("auth.senha.regra")}
         />
         <div>
           <label className="flex items-start gap-3 text-sm text-creme">
@@ -81,22 +81,22 @@ export function Cadastro() {
               aria-describedby={erros.maior18 ? "erro-maior18" : undefined}
               className="mt-0.5 size-5 shrink-0 accent-dourado"
             />
-            <span>Tenho 18 anos ou mais.</span>
+            <span>{t("cadastro.maior18")}</span>
           </label>
           {erros.maior18 ? (
             <p id="erro-maior18" role="alert" className="mt-2 text-sm text-red-300">
-              {erros.maior18}
+              {t(erros.maior18)}
             </p>
           ) : null}
         </div>
         <Botao type="submit" ocupado={ocupado}>
-          Criar conta
+          {t("cadastro.botao")}
         </Botao>
       </form>
       <p className="mt-6 text-sm text-creme/70">
-        Já tem conta?{" "}
+        {t("cadastro.jaTemConta")}{" "}
         <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
-          Entrar
+          {t("cadastro.entrar")}
         </Link>
       </p>
     </LayoutAuth>
