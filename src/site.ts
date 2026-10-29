@@ -1,5 +1,5 @@
-// Piloto: o domínio final ainda não existe (Decisões 29). Troque aqui quando houver.
-export const SITE_URL = "https://piloto.example"
+// Domínio final ainda indefinido: o padrão é provisório. Quando sair, definir VITE_SITE_URL no build (Vercel), sem mexer no código.
+export const SITE_URL = import.meta.env.VITE_SITE_URL ?? "https://piloto.example"
 export const IDIOMAS = ["pt", "en"] as const
 export type Idioma = (typeof IDIOMAS)[number]
 export const LANG_HTML: Record<Idioma, string> = { pt: "pt-BR", en: "en" }
