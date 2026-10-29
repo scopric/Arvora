@@ -1,0 +1,17 @@
+{
+  "_comentario": "FIXTURE DE TESTE feita a mao, IDs ficticios. Trocar pelo evento real da conta Stripe de teste.",
+  "id": "evt_teste_0001",
+  "object": "event",
+  "type": "customer.subscription.updated",
+  "created": 1793000000,
+  "livemode": false,
+  "data": {
+    "object": {
+      "id": "sub_teste_0001",
+      "object": "subscription",
+      "customer": "cus_teste_0001",
+      "status": "active",
+      "customer_email": "membro.ficticio@exemplo.invalid"
+    }
+  }
+}
