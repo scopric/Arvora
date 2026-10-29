@@ -40,6 +40,12 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
 
   try {
     const resultado = await deps.processar(Number(id), evento);
+    if (resultado === "conflito_assinatura_vigente") {
+      // 500 de propósito: pode ser evento fora de ordem (o Stripe reenvia e passa); duplicata real
+      // continua falhando e precisa de alerta humano. Log sem corpo nem dado pessoal.
+      console.error("stripe-webhook", evento.id, evento.type, resultado);
+      return new Response("conflito", { status: 500 });
+    }
     return new Response(resultado, { status: 200 });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
