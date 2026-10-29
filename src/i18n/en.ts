@@ -1,6 +1,6 @@
 import type { pt } from "./pt"
 
-// Texto em inglês pendente de revisão do o cliente.
+// Texto em inglês pendente de revisão do cliente.
 export const en: Record<keyof typeof pt, string> = {
   "doc.titulo": "Grupo Árvora — coming soon",
   "idioma.rotulo": "Language",
