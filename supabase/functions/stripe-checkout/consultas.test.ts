@@ -20,14 +20,13 @@ Deno.test("consultas checkout: clientes_stripe e assinaturas sempre filtram perf
   }));
   const db = consultas(sb);
   equal(await db.customer(UID, 2), "cus_x");
-  equal(await db.temAssinaturaVigente(UID, 2), true);
+  equal(await db.temAssinaturaVigente(UID), true);
   for (const c of chamadas) {
-    ok(
-      filtros(c).includes(`perfil_id=${UID}`) &&
-        filtros(c).includes("conta_stripe_id=2"),
-      c.tabela,
-    );
+    ok(filtros(c).includes(`perfil_id=${UID}`), c.tabela);
   }
+  // clientes_stripe segue filtrando a conta; a regra de assinatura vigente é por perfil, em qualquer conta
+  ok(filtros(chamadas[0]).includes("conta_stripe_id=2"));
+  deepEqual(filtros(chamadas[1]), [`perfil_id=${UID}`]);
   deepEqual(chamadas[1].passos.find(([m]) => m === "in")![1], ["status", [
     "active",
     "trialing",
@@ -41,7 +40,8 @@ Deno.test("consultas checkout: erro de consulta lança, nunca vira não encontra
   );
   await rejects(db.plano(7));
   await rejects(db.customer(UID, 1));
-  await rejects(db.temAssinaturaVigente(UID, 1));
+  await rejects(db.temAssinaturaVigente(UID));
+  await rejects(db.consumirLimite("checkout"));
 });
 
 Deno.test("consultas checkout: e-mail só se confirmado", async () => {
@@ -64,5 +64,17 @@ Deno.test("consultas checkout: e-mail só se confirmado", async () => {
   equal(
     await consultas(sbFalso(() => ({ data: null, error: null })).sb).usuario(),
     null,
+  );
+});
+
+Deno.test("consultas checkout: consumirLimite chama o RPC e só aceita boolean", async () => {
+  const { sb, chamadas } = sbFalso(() => ({ data: false, error: null }));
+  equal(await consultas(sb).consumirLimite("checkout"), false);
+  // só p_acao: max e janela nunca saem da função
+  deepEqual(chamadas[0].passos[0], ["rpc", [{ p_acao: "checkout" }]]);
+  await rejects(
+    consultas(sbFalso(() => ({ data: null, error: null })).sb).consumirLimite(
+      "checkout",
+    ),
   );
 });

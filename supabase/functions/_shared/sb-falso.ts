@@ -16,6 +16,11 @@ export function sbFalso(
           error: user ? null : { message: "x" },
         }),
     },
+    rpc(fn, args) {
+      const c: Chamada = { tabela: `rpc:${fn}`, passos: [["rpc", [args]]] };
+      chamadas.push(c);
+      return Promise.resolve(resposta(c));
+    },
     from(tabela: string) {
       const c: Chamada = { tabela, passos: [] };
       chamadas.push(c);

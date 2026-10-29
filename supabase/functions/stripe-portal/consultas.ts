@@ -1,8 +1,14 @@
-import { dados, type Sb, usuarioDoJwt } from "../_shared/supabase-usuario.ts";
+import {
+  consumirLimiteDb,
+  dados,
+  type Sb,
+  usuarioDoJwt,
+} from "../_shared/supabase-usuario.ts";
 import type { Consultas } from "./handler.ts";
 
 export const consultas = (sb: Sb): Consultas => ({
   usuario: () => usuarioDoJwt(sb),
+  consumirLimite: (acao) => consumirLimiteDb(sb, acao),
   // perfil_id explícito sempre, com ou sem conta: não depender só do RLS.
   cliente: async (uid, conta) => {
     let q = sb.from("clientes_stripe").select(

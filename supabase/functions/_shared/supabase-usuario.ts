@@ -15,6 +15,7 @@ export function clienteDoUsuario(authorization: string) {
 // deno-lint-ignore no-explicit-any
 export type Sb = {
   from(tabela: string): any;
+  rpc(fn: string, args: Record<string, unknown>): PromiseLike<{ data: any; error: unknown }>;
   auth: { getUser(): Promise<{ data: { user: any }; error: unknown }> };
 };
 
@@ -31,5 +32,17 @@ export async function usuarioDoJwt(
 // Erro de consulta vira exceção (500), nunca "não encontrado".
 export function dados<T>({ data, error }: { data: T; error: unknown }): T {
   if (error) throw new Error("consulta falhou");
+  return data;
+}
+
+// Limite de chamadas no banco (public.consumir_limite): true = pode seguir, false = excedeu.
+// Erro do RPC lança (500): nunca libera a chamada por falha.
+export async function consumirLimiteDb(
+  sb: Sb,
+  acao: string,
+): Promise<boolean> {
+  // Só a ação: max e janela são do banco (o cliente não escolhe).
+  const { data, error } = await sb.rpc("consumir_limite", { p_acao: acao });
+  if (error || typeof data !== "boolean") throw new Error("limite falhou");
   return data;
 }

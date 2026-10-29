@@ -14,11 +14,16 @@ export type Plano = {
   intervalo: string;
 };
 export type Consultas = {
+  consumirLimite(acao: string): Promise<boolean>;
   usuario(): Promise<{ id: string; email?: string } | null>;
   plano(id: number): Promise<Plano | null>; // só ativo
   customer(uid: string, contaId: number): Promise<string | null>;
-  temAssinaturaVigente(uid: string, contaId: number): Promise<boolean>;
+  temAssinaturaVigente(uid: string): Promise<boolean>; // em qualquer conta
 };
+// Limite real (max e janela) é do banco: public.consumir_limite. A janela aqui serve só ao Retry-After;
+// mantenha igual ao limite em consumir_limite no banco.
+const LIMITE = { acao: "checkout", janelaSeg: 600 };
+
 export type Deps = {
   env: (nome: string) => string | undefined;
   db: (authorization: string) => Consultas;
@@ -59,6 +64,13 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     const usuario = await db.usuario();
     if (!usuario) return json({ erro: "nao_autenticado" }, 401, site);
 
+    // Antes de qualquer consulta cara ou chamada ao Stripe. Erro do RPC lança (500): nunca libera.
+    if (!(await db.consumirLimite(LIMITE.acao))) {
+      return json({ erro: "limite" }, 429, site, {
+        "Retry-After": String(LIMITE.janelaSeg),
+      });
+    }
+
     const plano = await db.plano(plano_id as number);
     if (!plano) return json({ erro: "plano_nao_encontrado" }, 404, site);
 
@@ -69,11 +81,10 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
       return json({ erro: "configuracao" }, 500, site);
     }
 
+    // Regra provisória: UMA assinatura vigente por perfil, em qualquer conta. Clube -> Grupo é troca
+    // de plano pelo portal (mesma assinatura), não um novo checkout. Plano único (avulso) é isento.
     const assinatura = plano.intervalo !== "unico";
-    if (
-      assinatura &&
-      (await db.temAssinaturaVigente(usuario.id, plano.conta_stripe_id))
-    ) {
+    if (assinatura && (await db.temAssinaturaVigente(usuario.id))) {
       return json({ erro: "assinatura_existente" }, 409, site);
     }
 

@@ -131,6 +131,7 @@ export const pt = {
   "perfil.assinatura.gerenciar": "Gerenciar assinatura",
   "perfil.assinatura.erroPortal":
     "Não conseguimos abrir a página de pagamento agora. Tente de novo; se persistir, escreva para o suporte.",
+  "perfil.assinatura.erroLimite": "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.",
   "perfil.excluir.titulo": "Excluir minha conta",
   "perfil.excluir.abrir": "Quero excluir minha conta",
   "perfil.excluir.aviso": "A exclusão é definitiva e não pode ser desfeita:",

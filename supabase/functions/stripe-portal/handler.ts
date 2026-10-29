@@ -3,10 +3,15 @@ import { cors, ErroStripe, json, stripePost } from "../_shared/stripe-api.ts";
 
 export type Cliente = { conta_stripe_id: number; stripe_customer_id: string };
 export type Consultas = {
+  consumirLimite(acao: string): Promise<boolean>;
   usuario(): Promise<{ id: string } | null>;
   // O mais recente do usuário, filtrado pela conta se ela vier.
   cliente(uid: string, contaId?: number): Promise<Cliente | null>;
 };
+// Limite real (max e janela) é do banco: public.consumir_limite. A janela aqui serve só ao Retry-After;
+// mantenha igual ao limite em consumir_limite no banco.
+const LIMITE = { acao: "portal", janelaSeg: 600 };
+
 export type Deps = {
   env: (nome: string) => string | undefined;
   db: (authorization: string) => Consultas;
@@ -49,6 +54,13 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     const db = deps.db(authorization);
     const usuario = await db.usuario();
     if (!usuario) return json({ erro: "nao_autenticado" }, 401, site);
+
+    // Antes de qualquer consulta cara ou chamada ao Stripe. Erro do RPC lança (500): nunca libera.
+    if (!(await db.consumirLimite(LIMITE.acao))) {
+      return json({ erro: "limite" }, 429, site, {
+        "Retry-After": String(LIMITE.janelaSeg),
+      });
+    }
 
     // Decisão atual: sem conta_stripe_id (o front não manda), vale o customer mais recente do usuário.
     // Revisar se um membro puder ter assinatura em duas contas.

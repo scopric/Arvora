@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 const invoke = vi.hoisted(() => vi.fn())
 vi.mock("./supabase", () => ({ supabase: { functions: { invoke } } }))
 
+import { FunctionsHttpError } from "@supabase/supabase-js"
 import { abrirPortal, iniciarCheckout } from "./assinatura"
 
 const assign = vi.fn()
@@ -31,5 +32,16 @@ describe("assinatura", () => {
       expect(await abrirPortal("pt")).toBe("perfil.assinatura.erroPortal")
     }
     expect(assign).not.toHaveBeenCalled()
+  })
+
+  it("429 (limite de chamadas) vira mensagem própria nas duas funções", async () => {
+    const erro = new FunctionsHttpError(Response.json({ erro: "limite" }, { status: 429 }))
+    invoke.mockResolvedValue({ data: null, error: erro })
+    expect(await abrirPortal("pt")).toBe("perfil.assinatura.erroLimite")
+    expect(await iniciarCheckout(7, "pt")).toBe("perfil.assinatura.erroLimite")
+    expect(assign).not.toHaveBeenCalled()
+    const outro = new FunctionsHttpError(Response.json({ erro: "x" }, { status: 500 }))
+    invoke.mockResolvedValue({ data: null, error: outro })
+    expect(await abrirPortal("pt")).toBe("perfil.assinatura.erroPortal")
   })
 })

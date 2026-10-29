@@ -133,6 +133,7 @@ export const en: Record<keyof typeof pt, string> = {
   "perfil.assinatura.erro": "We could not check your subscription right now. Try again in a moment.",
   "perfil.assinatura.gerenciar": "Manage subscription",
   "perfil.assinatura.erroPortal": "We could not open the payment page right now. Try again; if it persists, contact support.",
+  "perfil.assinatura.erroLimite": "Too many attempts in a short time. Wait a few minutes and try again.",
   "perfil.excluir.titulo": "Delete my account",
   "perfil.excluir.abrir": "I want to delete my account",
   "perfil.excluir.aviso": "Deletion is permanent and cannot be undone:",
