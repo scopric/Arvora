@@ -28,7 +28,7 @@ describe("assinatura", () => {
       "https://malicioso.exemplo/?checkout.stripe.com", "https://stripe.com/x", "não é url"]
     for (const r of [...urls.map((url) => ({ data: { url }, error: null })), { data: null, error: new Error("x") }]) {
       invoke.mockResolvedValue(r)
-      expect(await abrirPortal("pt")).toMatch(/não conseguimos/i)
+      expect(await abrirPortal("pt")).toBe("perfil.assinatura.erroPortal")
     }
     expect(assign).not.toHaveBeenCalled()
   })

@@ -4,13 +4,12 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { Marca } from "../componentes/Marca"
-import { useCaminho, useIdioma } from "../i18n"
+import { useCaminho, useIdioma, useT, type Chave } from "../i18n"
 import { baixarMeusDados } from "../lib/exportar"
 import { abrirPortal } from "../lib/assinatura"
 import { excluirMinhaConta } from "../lib/excluirConta"
 import { sair, useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
-import { useT } from "../i18n"
 import { errosPorCampo, perfilSchema } from "../lib/validacao"
 
 const COLUNAS = "id, nome, empresa_nome, setor_id, cidade, pais, linkedin_url, instagram, bio, visibilidade, publico_aprovado_em"
@@ -27,34 +26,35 @@ type PerfilLinha = {
   visibilidade: "membros" | "publico"
   publico_aprovado_em: string | null
 }
-type Setor = { id: number; nome: string }
+type Setor = { id: number; nome: string; nome_en: string | null }
 type Estado =
   | { fase: "carregando" }
-  | { fase: "erro"; mensagem: string }
+  | { fase: "erro"; mensagem: Chave }
   | { fase: "pronto"; perfil: PerfilLinha; setores: Setor[] }
 
 export function Perfil() {
   const { sessao } = useAuth()
   const t = useT()
+  const idioma = useIdioma()
   const uid = sessao?.user.id
   const [estado, setEstado] = useState<Estado>({ fase: "carregando" })
   const [erros, setErros] = useState<Record<string, string>>({})
-  const [aviso, setAviso] = useState<{ tipo: "erro" | "ok"; texto: string } | null>(null)
+  const [aviso, setAviso] = useState<{ tipo: "erro" | "ok"; texto: Chave } | null>(null)
   const [ocupado, setOcupado] = useState(false)
   const [baixando, setBaixando] = useState(false)
-  const [erroDados, setErroDados] = useState<string | null>(null)
+  const [erroDados, setErroDados] = useState<Chave | null>(null)
 
   useEffect(() => {
     if (!uid) return
     let ativo = true
     Promise.all([
       supabase.from("perfis").select(COLUNAS).eq("id", uid).maybeSingle(),
-      supabase.from("setores").select("id, nome").eq("ativo", true).order("ordem").order("nome"),
+      supabase.from("setores").select("id, nome, nome_en").eq("ativo", true).order("ordem").order("nome"),
     ]).then(([p, s]) => {
       if (!ativo) return
       // Falha vira mensagem na tela, nunca formulário vazio (Erros 3.2).
       if (p.error || s.error || !p.data) {
-        return setEstado({ fase: "erro", mensagem: "Não conseguimos carregar seu perfil agora. Tente de novo em instantes." })
+        return setEstado({ fase: "erro", mensagem: "perfil.erroCarregar" })
       }
       setEstado({ fase: "pronto", perfil: p.data as PerfilLinha, setores: s.data })
     })
@@ -69,8 +69,7 @@ export function Perfil() {
     setAviso(null)
     const dados = perfilSchema.safeParse(Object.fromEntries(new FormData(e.currentTarget)))
     if (!dados.success) {
-      setAviso({ tipo: "erro", texto: "Corrija os campos em vermelho." })
-      // Passo (c) traduz o resto da tela; aqui só a mensagem do Zod (chave -> texto).
+      setAviso({ tipo: "erro", texto: "perfil.corrija" })
       return setErros(Object.fromEntries(Object.entries(errosPorCampo(dados.error)).map(([c, k]) => [c, t(k)])))
     }
     setErros({})
@@ -79,12 +78,12 @@ export function Perfil() {
     const { data, error } = await supabase.from("perfis").update(dados.data).eq("id", uid).select("id")
     setOcupado(false)
     if (error?.code === "23505") {
-      return setAviso({ tipo: "erro", texto: "Esse endereço de perfil já está em uso." })
+      return setAviso({ tipo: "erro", texto: "perfil.erroUrl" })
     }
     if (error || !data || data.length === 0) {
-      return setAviso({ tipo: "erro", texto: "Não conseguimos salvar. Tente de novo; se persistir, escreva para o suporte." })
+      return setAviso({ tipo: "erro", texto: "perfil.erroSalvar" })
     }
-    setAviso({ tipo: "ok", texto: "Perfil salvo." })
+    setAviso({ tipo: "ok", texto: "perfil.salvo" })
     setEstado({ ...estado, perfil: { ...estado.perfil, ...dados.data, publico_aprovado_em: null } })
   }
 
@@ -94,7 +93,7 @@ export function Perfil() {
     try {
       setErroDados(await baixarMeusDados())
     } catch {
-      setErroDados("Não conseguimos gerar seus dados agora. Tente de novo em instantes.")
+      setErroDados("perfil.dados.erro")
     } finally {
       setBaixando(false)
     }
@@ -105,41 +104,41 @@ export function Perfil() {
       <header className="mb-10 flex items-start justify-between gap-6">
         <div>
           <Marca />
-          <h1 className="mt-4 font-titulo text-4xl font-medium">Meu perfil</h1>
+          <h1 className="mt-4 font-titulo text-4xl font-medium">{t("perfil.titulo")}</h1>
         </div>
         <button
           type="button"
           onClick={() => void sair()}
           className="rounded-lg border border-creme/30 px-4 py-2 text-sm font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
         >
-          Sair
+          {t("perfil.sair")}
         </button>
       </header>
 
-      {estado.fase === "carregando" ? <p role="status" className="text-creme/70">Carregando…</p> : null}
-      {estado.fase === "erro" ? <Aviso tipo="erro">{estado.mensagem}</Aviso> : null}
+      {estado.fase === "carregando" ? <p role="status" className="text-creme/70">{t("comum.carregando")}</p> : null}
+      {estado.fase === "erro" ? <Aviso tipo="erro">{t(estado.mensagem)}</Aviso> : null}
       {estado.fase === "pronto" ? (
         <form key={JSON.stringify(estado.perfil)} onSubmit={salvar} noValidate className="space-y-5">
-          {aviso ? <Aviso tipo={aviso.tipo}>{aviso.texto}</Aviso> : null}
-          <p className="text-sm text-creme/70">E-mail da conta: {sessao?.user.email}</p>
-          <Campo rotulo="Nome" name="nome" defaultValue={estado.perfil.nome} erro={erros.nome} autoComplete="name" />
-          <Campo rotulo="Empresa" name="empresa_nome" defaultValue={estado.perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
-          <Selecao rotulo="Setor" name="setor_id" defaultValue={estado.perfil.setor_id?.toString() ?? ""} erro={erros.setor_id}>
-            <option value="">Selecione</option>
+          {aviso ? <Aviso tipo={aviso.tipo}>{t(aviso.texto)}</Aviso> : null}
+          <p className="text-sm text-creme/70">{t("perfil.emailConta")} {sessao?.user.email}</p>
+          <Campo rotulo={t("perfil.nome")} name="nome" defaultValue={estado.perfil.nome} erro={erros.nome} autoComplete="name" />
+          <Campo rotulo={t("perfil.empresa")} name="empresa_nome" defaultValue={estado.perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
+          <Selecao rotulo={t("perfil.setor")} name="setor_id" defaultValue={estado.perfil.setor_id?.toString() ?? ""} erro={erros.setor_id}>
+            <option value="">{t("perfil.setor.selecione")}</option>
             {estado.setores.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.nome}
+                {idioma === "en" ? (s.nome_en ?? s.nome) : s.nome}
               </option>
             ))}
           </Selecao>
           <div className="grid gap-5 sm:grid-cols-[1fr_8rem]">
-            <Campo rotulo="Cidade" name="cidade" defaultValue={estado.perfil.cidade ?? ""} erro={erros.cidade} autoComplete="address-level2" />
-            <Campo rotulo="País" name="pais" defaultValue={estado.perfil.pais ?? ""} erro={erros.pais} maxLength={2} placeholder="IE" ajuda="2 letras" />
+            <Campo rotulo={t("perfil.cidade")} name="cidade" defaultValue={estado.perfil.cidade ?? ""} erro={erros.cidade} autoComplete="address-level2" />
+            <Campo rotulo={t("perfil.pais")} name="pais" defaultValue={estado.perfil.pais ?? ""} erro={erros.pais} maxLength={2} placeholder="IE" ajuda={t("perfil.pais.ajuda")} />
           </div>
-          <Campo rotulo="LinkedIn" name="linkedin_url" type="url" defaultValue={estado.perfil.linkedin_url ?? ""} erro={erros.linkedin_url} placeholder="https://linkedin.com/in/seu-nome" />
-          <Campo rotulo="Instagram" name="instagram" defaultValue={estado.perfil.instagram ?? ""} erro={erros.instagram} placeholder="seu.usuario" />
+          <Campo rotulo="LinkedIn" name="linkedin_url" type="url" defaultValue={estado.perfil.linkedin_url ?? ""} erro={erros.linkedin_url} placeholder={t("perfil.linkedin.exemplo")} />
+          <Campo rotulo="Instagram" name="instagram" defaultValue={estado.perfil.instagram ?? ""} erro={erros.instagram} placeholder={t("perfil.instagram.exemplo")} />
           <div>
-            <label htmlFor="bio" className="mb-2 block text-sm font-semibold">Sobre você</label>
+            <label htmlFor="bio" className="mb-2 block text-sm font-semibold">{t("perfil.bio")}</label>
             <textarea
               id="bio"
               name="bio"
@@ -153,36 +152,36 @@ export function Perfil() {
           </div>
 
           <fieldset className="space-y-3 rounded-lg border border-creme/25 p-4">
-            <legend className="px-2 text-sm font-semibold">Quem pode ver seu perfil</legend>
+            <legend className="px-2 text-sm font-semibold">{t("perfil.visibilidade.legenda")}</legend>
             <label className="flex items-start gap-3 text-sm">
               <input type="radio" name="visibilidade" value="membros" defaultChecked={estado.perfil.visibilidade === "membros"} className="mt-0.5 size-5 accent-dourado" />
-              <span>Só membros</span>
+              <span>{t("perfil.visibilidade.membros")}</span>
             </label>
             <label className="flex items-start gap-3 text-sm">
               <input type="radio" name="visibilidade" value="publico" defaultChecked={estado.perfil.visibilidade === "publico"} className="mt-0.5 size-5 accent-dourado" />
-              <span>Também público. A página só aparece depois que a equipe aprovar, e volta para análise sempre que você mudar seus dados.</span>
+              <span>{t("perfil.visibilidade.publico")}</span>
             </label>
             {estado.perfil.visibilidade === "publico" ? (
               <p className="text-sm text-creme/70">
-                {estado.perfil.publico_aprovado_em ? "Seu perfil público está aprovado." : "Seu perfil público aguarda aprovação da equipe."}
+                {t(estado.perfil.publico_aprovado_em ? "perfil.visibilidade.aprovado" : "perfil.visibilidade.aguarda")}
               </p>
             ) : null}
           </fieldset>
 
-          <Botao type="submit" ocupado={ocupado}>Salvar alterações</Botao>
+          <Botao type="submit" ocupado={ocupado}>{t("perfil.salvar")}</Botao>
         </form>
       ) : null}
       {uid ? <BlocoAssinatura uid={uid} /> : null}
 
       <section className="mt-12 border-t border-creme/15 pt-8">
-        <h2 className="text-sm font-semibold">Meus dados</h2>
+        <h2 className="text-sm font-semibold">{t("perfil.dados.titulo")}</h2>
         <p className="mt-2 text-sm text-creme/70">
-          Um arquivo JSON com os dados pessoais que guardamos sobre você: conta, perfil, papel na equipe, assinaturas e cadastro de cliente no Stripe.
+          {t("perfil.dados.texto")}
         </p>
-        {erroDados ? <div className="mt-4"><Aviso tipo="erro">{erroDados}</Aviso></div> : null}
+        {erroDados ? <div className="mt-4"><Aviso tipo="erro">{t(erroDados)}</Aviso></div> : null}
         <div className="mt-4 sm:max-w-xs">
           <Botao type="button" variante="contorno" ocupado={baixando} onClick={() => void baixar()}>
-            Baixar meus dados (JSON)
+            {t("perfil.dados.baixar")}
           </Botao>
         </div>
       </section>
@@ -194,8 +193,9 @@ export function Perfil() {
 // Só aparece para quem já tem cliente no Stripe (RLS limita a leitura ao dono). Planos e preços não moram aqui.
 function BlocoAssinatura({ uid }: { uid: string }) {
   const idioma = useIdioma()
+  const t = useT()
   const [estado, setEstado] = useState<"carregando" | "sem" | "com" | "erro">("carregando")
-  const [erro, setErro] = useState<string | null>(null)
+  const [erro, setErro] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
 
   useEffect(() => {
@@ -211,9 +211,9 @@ function BlocoAssinatura({ uid }: { uid: string }) {
   if (estado === "carregando" || estado === "sem") return null
   return (
     <section className="mt-12 space-y-3 border-t border-creme/15 pt-8">
-      <h2 className="font-titulo text-2xl font-medium">Assinatura</h2>
-      {estado === "erro" ? <Aviso tipo="erro">Não conseguimos verificar sua assinatura agora. Tente de novo em instantes.</Aviso> : null}
-      {erro ? <Aviso tipo="erro">{erro}</Aviso> : null}
+      <h2 className="font-titulo text-2xl font-medium">{t("perfil.assinatura.titulo")}</h2>
+      {estado === "erro" ? <Aviso tipo="erro">{t("perfil.assinatura.erro")}</Aviso> : null}
+      {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
       {estado === "com" ? (
         <Botao
           type="button"
@@ -227,7 +227,7 @@ function BlocoAssinatura({ uid }: { uid: string }) {
             setErro(falha)
           }}
         >
-          Gerenciar assinatura
+          {t("perfil.assinatura.gerenciar")}
         </Botao>
       ) : null}
     </section>
@@ -236,12 +236,13 @@ function BlocoAssinatura({ uid }: { uid: string }) {
 
 // Zona de perigo, recolhida por padrão. O servidor reconfere e-mail e senha: aqui só se evita o clique sem querer.
 function BlocoExcluirConta() {
+  const t = useT()
   const navegar = useNavigate()
   const caminho = useCaminho()
   const [aberto, setAberto] = useState(false)
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
-  const [erro, setErro] = useState<string | null>(null)
+  const [erro, setErro] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
 
   async function excluir(e: SubmitEvent<HTMLFormElement>) {
@@ -259,7 +260,7 @@ function BlocoExcluirConta() {
 
   return (
     <section className="mt-12 space-y-4 border-t border-creme/15 pt-8">
-      <h2 className="font-titulo text-2xl font-medium">Excluir minha conta</h2>
+      <h2 className="font-titulo text-2xl font-medium">{t("perfil.excluir.titulo")}</h2>
       {!aberto ? (
         <button
           type="button"
@@ -267,28 +268,28 @@ function BlocoExcluirConta() {
           onClick={() => setAberto(true)}
           className="text-sm text-creme/70 underline underline-offset-4 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
         >
-          Quero excluir minha conta
+          {t("perfil.excluir.abrir")}
         </button>
       ) : (
         <form onSubmit={excluir} noValidate className="space-y-5">
           <div className="space-y-2 text-sm text-creme/80">
-            <p>A exclusão é definitiva e não pode ser desfeita:</p>
+            <p>{t("perfil.excluir.aviso")}</p>
             <ul className="list-disc space-y-1 pl-5">
-              <li>Você perde o acesso à sua conta e ao conteúdo.</li>
-              <li>Sua assinatura é cancelada na hora, sem reembolso automático.</li>
-              <li>Alguns dados de cobrança ficam retidos por obrigação legal.</li>
-              <li>Antes de excluir, use Baixar meus dados (acima) para guardar uma cópia: depois da exclusão não dá para recuperá-los.</li>
+              <li>{t("perfil.excluir.perde")}</li>
+              <li>{t("perfil.excluir.assinatura")}</li>
+              <li>{t("perfil.excluir.retidos")}</li>
+              <li>{t("perfil.excluir.backup")}</li>
             </ul>
           </div>
-          {erro ? <Aviso tipo="erro">{erro}</Aviso> : null}
-          <Campo rotulo="Digite o e-mail da sua conta" name="confirmar_email" type="email" autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Campo rotulo="Sua senha" name="confirmar_senha" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+          {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
+          <Campo rotulo={t("perfil.excluir.email")} name="confirmar_email" type="email" autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Campo rotulo={t("perfil.excluir.senha")} name="confirmar_senha" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
           <div className="flex gap-3">
             <Botao type="submit" variante="contorno" ocupado={ocupado} disabled={!email.trim() || !senha}>
-              Excluir definitivamente
+              {t("perfil.excluir.confirmar")}
             </Botao>
             <Botao type="button" variante="contorno" disabled={ocupado} onClick={() => setAberto(false)}>
-              Cancelar
+              {t("perfil.excluir.cancelar")}
             </Botao>
           </div>
         </form>
