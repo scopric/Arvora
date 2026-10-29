@@ -1,4 +1,8 @@
-import { dados, type Sb } from "../_shared/supabase-usuario.ts";
+import {
+  consumirLimiteDb,
+  dados,
+  type Sb,
+} from "../_shared/supabase-usuario.ts";
 import type { Assinatura, Consultas } from "./handler.ts";
 
 // perfil_id explícito: não depender só do RLS (a política do financeiro deixa super_admin e auditor
@@ -17,6 +21,7 @@ export const consultas = (sb: Sb): Consultas => ({
       ) => f.factor_type === "totp" && f.status === "verified"),
     };
   },
+  consumirLimite: (acao) => consumirLimiteDb(sb, acao),
   temEquipe: async (uid) =>
     (dados<{ perfil_id: string }[] | null>(
       await sb.from("equipe").select("perfil_id").eq("perfil_id", uid)

@@ -146,6 +146,8 @@ export const en: Record<keyof typeof pt, string> = {
   "perfil.excluir.senha": "Your password",
   "perfil.excluir.confirmar": "Delete permanently",
   "perfil.excluir.cancelar": "Cancel",
+  "perfil.excluir.erroLimite":
+    "Too many password attempts. Wait about an hour and try again, or contact support.",
   "erro.excluir.email_diferente": "The email you typed is not your account email.",
   "erro.excluir.senha_invalida": "Incorrect password.",
   "erro.excluir.mfa_requerido":

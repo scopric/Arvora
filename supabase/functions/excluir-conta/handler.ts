@@ -10,8 +10,9 @@
 //   Todas as chaves Stripe são conferidas ANTES do primeiro cancelamento (sem cancelamento pela metade).
 //
 // Limites conhecidos: (a) conta sem senha (magic link/OAuth, hoje inexistentes) precisa de atendimento manual;
-// (b) o limite de tentativas de senha por usuário NÃO está aqui: depende do contador no banco do próximo PR
-// (limite de chamadas); até lá vale só o limite do Auth do Supabase.
+// (b) limite de tentativas de senha por usuário: ação excluir_senha no banco (5 por hora), consumida logo
+// antes de cada conferência de senha, certa ou errada. Quem roubar só o JWT consegue bloquear a exclusão da
+// vítima por 1 h (risco aceito; o suporte atende).
 //
 // O que o delete em auth.users faz (FKs): perfis e equipe caem em cascata; assinaturas.perfil_id e
 // clientes_stripe.perfil_id viram null.
@@ -25,6 +26,7 @@ export type Assinatura = {
 };
 export type Consultas = {
   usuario(): Promise<{ id: string; email?: string; totp: boolean } | null>;
+  consumirLimite(acao: string): Promise<boolean>;
   temEquipe(uid: string): Promise<boolean>;
   assinaturasVigentes(uid: string): Promise<Assinatura[]>;
 };
@@ -62,6 +64,10 @@ export function aalDoJwt(authorization: string): string | undefined {
 // Cancelamento imediato SEM reembolso proporcional nem fatura final. A política de reembolso/arrependimento
 // é decisão comercial e jurídica ainda indefinida; mudar aqui quando for decidida.
 export const CANCELAR_SEM_REEMBOLSO = { prorate: false, invoice_now: false };
+
+// Limite real (max e janela) é do banco: public.consumir_limite. A janela aqui serve só ao Retry-After;
+// mantenha igual ao limite em consumir_limite no banco.
+const LIMITE = { acao: "excluir_senha", janelaSeg: 3600 };
 
 const MAX_EMAIL = 254;
 const MAX_SENHA = 1024;
@@ -116,6 +122,12 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
       usuario.email.trim().toLowerCase() !== email.trim().toLowerCase()
     ) {
       return json({ erro: "email_diferente" }, 400, site);
+    }
+    // Só quando a próxima etapa é testar a senha. Erro do RPC lança (500): nunca libera.
+    if (!(await db.consumirLimite(LIMITE.acao))) {
+      return json({ erro: "limite" }, 429, site, {
+        "Retry-After": String(LIMITE.janelaSeg),
+      });
     }
     if (!(await deps.senhaConfere(url, anon, usuario.email, senha))) {
       return json({ erro: "senha_invalida" }, 401, site);

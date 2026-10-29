@@ -10,6 +10,7 @@ const CHAVES: Record<string, Chave> = {
   equipe: "erro.excluir.equipe",
   stripe: "erro.excluir.stripe",
   exclusao: "erro.excluir.exclusao",
+  limite: "perfil.excluir.erroLimite",
 }
 
 // Devolve a chave da mensagem de erro (nunca silêncio, Erros 3.2) ou null se a conta foi excluída e a sessão encerrada.
@@ -19,6 +20,7 @@ export async function excluirMinhaConta(email: string, senha: string): Promise<C
     const codigo = error instanceof FunctionsHttpError
       ? await error.context.json().then((j: { erro?: unknown }) => j?.erro, () => undefined)
       : undefined
+    if (error instanceof FunctionsHttpError && error.context.status === 429) return CHAVES.limite
     return (typeof codigo === "string" && CHAVES[codigo]) || "erro.excluir.default"
   }
   await sair()
