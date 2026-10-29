@@ -4,7 +4,7 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useCaminho } from "../i18n"
+import { useCaminho, useT, type Chave } from "../i18n"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
@@ -12,12 +12,13 @@ import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } fro
 export function Entrar() {
   const { sessao } = useAuth()
   const caminho = useCaminho()
+  const t = useT()
   const navegar = useNavigate()
   const de = (useLocation().state as { de?: string } | null)?.de
   // Só caminho interno: nada de redirecionar para fora do site.
   const origem = de?.startsWith("/") && !de.startsWith("//") ? de : caminho("/perfil")
   const [erros, setErros] = useState<CamposDeErro>({})
-  const [aviso, setAviso] = useState<string | null>(null)
+  const [aviso, setAviso] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
 
   if (sessao) return <Navigate to={origem} replace />
@@ -36,24 +37,24 @@ export function Entrar() {
   }
 
   return (
-    <LayoutAuth titulo="Entrar" subtitulo="Use o e-mail e a senha da sua conta.">
+    <LayoutAuth titulo={t("entrar.titulo")} subtitulo={t("entrar.subtitulo")}>
       <form onSubmit={enviar} noValidate className="space-y-5">
-        {aviso ? <Aviso tipo="erro">{aviso}</Aviso> : null}
-        <Campo rotulo="E-mail" name="email" type="email" autoComplete="email" erro={erros.email} />
-        <Campo rotulo="Senha" name="senha" type="password" autoComplete="current-password" erro={erros.senha} />
+        {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
+        <Campo rotulo={t("auth.email.rotulo")} name="email" type="email" autoComplete="email" placeholder={t("auth.email.exemplo")} erro={t(erros.email)} />
+        <Campo rotulo={t("auth.senha.rotulo")} name="senha" type="password" autoComplete="current-password" erro={t(erros.senha)} />
         <Botao type="submit" ocupado={ocupado}>
-          Entrar
+          {t("entrar.botao")}
         </Botao>
       </form>
       <p className="mt-6 text-sm text-creme/70">
         <Link to={caminho("/recuperar-senha")} className="underline decoration-dourado underline-offset-4">
-          Esqueci a senha
+          {t("entrar.esqueci")}
         </Link>
       </p>
       <p className="mt-3 text-sm text-creme/70">
-        Ainda não tem conta?{" "}
+        {t("entrar.semConta")}{" "}
         <Link to={caminho("/cadastro")} className="underline decoration-dourado underline-offset-4">
-          Criar conta
+          {t("entrar.criarConta")}
         </Link>
       </p>
     </LayoutAuth>

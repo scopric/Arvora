@@ -1,4 +1,5 @@
 import type { ComponentProps } from "react"
+import { useT } from "../i18n"
 
 type Props = ComponentProps<"button"> & { variante?: "primario" | "contorno"; ocupado?: boolean }
 
@@ -8,6 +9,7 @@ const estilos = {
 }
 
 export function Botao({ variante = "primario", ocupado, children, className = "", disabled, ...resto }: Props) {
+  const t = useT()
   return (
     <button
       disabled={disabled || ocupado}
@@ -15,7 +17,7 @@ export function Botao({ variante = "primario", ocupado, children, className = ""
       className={`inline-flex min-h-12 w-full items-center justify-center rounded-lg px-6 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado disabled:cursor-not-allowed disabled:opacity-60 ${estilos[variante]} ${className}`}
       {...resto}
     >
-      {ocupado ? "Aguarde…" : children}
+      {ocupado ? t("comum.aguarde") : children}
     </button>
   )
 }

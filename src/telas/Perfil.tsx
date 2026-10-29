@@ -5,7 +5,8 @@ import { Campo, Selecao } from "../componentes/Campo"
 import { Marca } from "../componentes/Marca"
 import { sair, useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
-import { errosPorCampo, perfilSchema, type CamposDeErro } from "../lib/validacao"
+import { useT } from "../i18n"
+import { errosPorCampo, perfilSchema } from "../lib/validacao"
 
 const COLUNAS = "id, nome, empresa_nome, setor_id, cidade, pais, linkedin_url, instagram, bio, visibilidade, publico_aprovado_em"
 
@@ -29,9 +30,10 @@ type Estado =
 
 export function Perfil() {
   const { sessao } = useAuth()
+  const t = useT()
   const uid = sessao?.user.id
   const [estado, setEstado] = useState<Estado>({ fase: "carregando" })
-  const [erros, setErros] = useState<CamposDeErro>({})
+  const [erros, setErros] = useState<Record<string, string>>({})
   const [aviso, setAviso] = useState<{ tipo: "erro" | "ok"; texto: string } | null>(null)
   const [ocupado, setOcupado] = useState(false)
 
@@ -61,7 +63,8 @@ export function Perfil() {
     const dados = perfilSchema.safeParse(Object.fromEntries(new FormData(e.currentTarget)))
     if (!dados.success) {
       setAviso({ tipo: "erro", texto: "Corrija os campos em vermelho." })
-      return setErros(errosPorCampo(dados.error))
+      // Passo (c) traduz o resto da tela; aqui só a mensagem do Zod (chave -> texto).
+      return setErros(Object.fromEntries(Object.entries(errosPorCampo(dados.error)).map(([c, k]) => [c, t(k)])))
     }
     setErros({})
     setOcupado(true)
