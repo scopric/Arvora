@@ -82,8 +82,9 @@ select is(tt.webhook(tt.ev_sub('evt_u1', 'customer.subscription.updated', 400, '
 reset role;
 select is((select count(*)::int from public.eventos_stripe where event_id in ('evt_d1', 'evt_u1') and processado_em is not null),
           2, 'os dois eventos ficam processados (o Stripe nao reenvia)');
-select ok((select perfil_id is null and status = 'active' from public.assinaturas where stripe_subscription_id = 'sub_x'),
-          'assinatura orfa nao e tocada pelo webhook (status segue active no banco; o cancelamento real e no Stripe)');
+select ok((select perfil_id is null and status = 'canceled' and plano_id is not null and conta_stripe_id is not null
+                   from public.assinaturas where stripe_subscription_id = 'sub_x'),
+          'assinatura orfa passa a refletir o ciclo de vida do Stripe (status canceled, perfil_id segue nulo, plano e conta intactos; a f1_14 atualiza so o ciclo de vida)');
 
 select * from finish();
 rollback;
