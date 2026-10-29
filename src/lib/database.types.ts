@@ -172,6 +172,9 @@ isOneToOne: false
             "aprovar_perfil_publico":
 { Args: { "aprovar"?: boolean,"perfil": string }; Returns: undefined
                            },
+"exportar_meus_dados":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "pode_ver_conteudo":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
                            },
