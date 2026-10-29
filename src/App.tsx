@@ -1,8 +1,6 @@
 import { useEffect } from "react"
 import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router"
-import { en } from "./i18n/en"
 import { ehIdioma, gravarIdioma, idiomaPreferido, useCaminho } from "./i18n"
-import { pt } from "./i18n/pt"
 import { AuthProvider } from "./lib/auth"
 import { RotaProtegida } from "./RotaProtegida"
 import { LANG_HTML } from "./site"
@@ -21,7 +19,7 @@ function SemPrefixo() {
   return <Navigate to={`/${idiomaPreferido()}${pathname === "/" ? "" : pathname}${search}${hash}`} replace />
 }
 
-// Layout de /:lang: idioma inválido troca só o 1º segmento pelo preferido; válido ajusta <html lang>, título e lembra a escolha.
+// Layout de /:lang: idioma inválido troca só o 1º segmento pelo preferido; válido ajusta <html lang> e lembra a escolha.
 function LayoutIdioma() {
   const { lang } = useParams()
   const { pathname, search, hash } = useLocation()
@@ -29,7 +27,6 @@ function LayoutIdioma() {
   useEffect(() => {
     if (!ehIdioma(lang)) return
     document.documentElement.lang = LANG_HTML[lang]
-    document.title = (lang === "pt" ? pt : en)["doc.titulo"]
     gravarIdioma(lang)
   }, [lang])
   if (!valido) {
