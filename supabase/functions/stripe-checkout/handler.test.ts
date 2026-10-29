@@ -9,6 +9,7 @@ function montar(o: {
   planos?: Record<number, Plano>;
   customer?: string | null;
   vigente?: boolean;
+  limite?: boolean | "erro";
   env?: Record<string, string>;
   stripe?: () => Response;
 } = {}) {
@@ -22,9 +23,19 @@ function montar(o: {
         intervalo: "mes",
       },
     };
+  const limites: string[] = [];
+  const consultas: string[] = [];
   const db: Consultas = {
+    consumirLimite: (a) => {
+      limites.push(a);
+      return o.limite === "erro"
+        ? Promise.reject(new Error("rpc"))
+        : Promise.resolve(o.limite ?? true);
+    },
     usuario: () => Promise.resolve({ id: UID, email: "jwt@exemplo.invalid" }),
-    plano: (id) => Promise.resolve(planos[id] ?? null),
+    plano: (
+      id,
+    ) => (consultas.push("plano"), Promise.resolve(planos[id] ?? null)),
     customer: () => Promise.resolve(o.customer ?? null),
     temAssinaturaVigente: () => Promise.resolve(o.vigente ?? false),
   };
@@ -47,7 +58,7 @@ function montar(o: {
       );
     },
   };
-  return { deps, chamadas };
+  return { deps, chamadas, limites, consultas };
 }
 
 const post = (corpo: unknown, headers: Record<string, string> = {}) =>
@@ -167,7 +178,7 @@ Deno.test("checkout: plano inexistente ou inativo é 404 sem chamar o Stripe", a
   equal(chamadas.length, 0);
 });
 
-Deno.test("checkout: já assinante na conta é 409", async () => {
+Deno.test("checkout: já assinante (em qualquer conta) é 409", async () => {
   const { deps, chamadas } = montar({ vigente: true });
   const r = await handle(post({ plano_id: 7 }), deps);
   equal(r.status, 409);
@@ -295,4 +306,28 @@ Deno.test("checkout: idempotency key muda quando o customer muda", async () => {
   const k = (m: typeof a) =>
     (m.chamadas[0].init.headers as Record<string, string>)["Idempotency-Key"];
   ok(k(a) !== k(b));
+});
+
+Deno.test("checkout: dentro do limite segue, com a chave da ação checkout", async () => {
+  const { deps, limites } = montar();
+  equal((await handle(post({ plano_id: 7 }), deps)).status, 200);
+  deepEqual(limites, ["checkout"]);
+});
+
+Deno.test("checkout: excedeu o limite é 429 com Retry-After e nada é chamado", async () => {
+  const { deps, chamadas, consultas } = montar({ limite: false });
+  const r = await handle(post({ plano_id: 7 }), deps);
+  equal(r.status, 429);
+  deepEqual(await r.json(), { erro: "limite" });
+  equal(r.headers.get("Retry-After"), "600");
+  equal(chamadas.length, 0);
+  equal(consultas.length, 0);
+});
+
+Deno.test("checkout: erro do RPC é 500 e nada é chamado, nunca libera", async () => {
+  const { deps, chamadas, consultas } = montar({ limite: "erro" });
+  const r = await handle(post({ plano_id: 7 }), deps);
+  equal(r.status, 500);
+  equal(chamadas.length, 0);
+  equal(consultas.length, 0);
 });

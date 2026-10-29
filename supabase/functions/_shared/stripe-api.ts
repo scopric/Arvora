@@ -63,12 +63,14 @@ export function json(
   corpo: unknown,
   status: number,
   siteUrl?: string,
+  extra: Record<string, string> = {},
 ): Response {
   return new Response(JSON.stringify(corpo), {
     status,
     headers: {
       "Content-Type": "application/json",
       ...(siteUrl ? cors(siteUrl) : {}),
+      ...extra,
     },
   });
 }

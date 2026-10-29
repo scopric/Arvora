@@ -1,8 +1,14 @@
-import { dados, type Sb, usuarioDoJwt } from "../_shared/supabase-usuario.ts";
+import {
+  consumirLimiteDb,
+  dados,
+  type Sb,
+  usuarioDoJwt,
+} from "../_shared/supabase-usuario.ts";
 import type { Consultas } from "./handler.ts";
 
 export const consultas = (sb: Sb): Consultas => ({
   usuario: () => usuarioDoJwt(sb),
+  consumirLimite: (acao) => consumirLimiteDb(sb, acao),
   // ativo explícito: as políticas de assinante e super_admin também deixam ler planos inativos.
   plano: async (id) =>
     dados(
@@ -20,12 +26,9 @@ export const consultas = (sb: Sb): Consultas => ({
       ).eq("conta_stripe_id", conta)
         .order("criado_em", { ascending: false }).limit(1).maybeSingle(),
     )?.stripe_customer_id ?? null,
-  temAssinaturaVigente: async (uid, conta) =>
+  temAssinaturaVigente: async (uid) =>
     (dados<{ id: number }[] | null>(
-      await sb.from("assinaturas").select("id").eq("perfil_id", uid).eq(
-        "conta_stripe_id",
-        conta,
-      )
+      await sb.from("assinaturas").select("id").eq("perfil_id", uid)
         .in("status", ["active", "trialing", "past_due"]).limit(1),
     ) ?? []).length > 0,
 });

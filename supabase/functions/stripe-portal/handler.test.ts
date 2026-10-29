@@ -15,10 +15,13 @@ function montar(
     clientes?: typeof CLIENTES;
     env?: Record<string, string>;
     stripe?: () => Response;
+    limite?: boolean | "erro";
   } = {},
 ) {
   const chamadas: { url: string; init: RequestInit; corpo: URLSearchParams }[] =
     [];
+  const limites: string[] = [];
+  const consultas: string[] = [];
   const deps: Deps = {
     env: (n) =>
       (o.env ??
@@ -28,14 +31,22 @@ function montar(
           STRIPE_SECRET_KEY_2: "chave_falsa_conta_2",
         })[n],
     db: () => ({
+      consumirLimite: (a) => {
+        limites.push(a);
+        return o.limite === "erro"
+          ? Promise.reject(new Error("rpc"))
+          : Promise.resolve(o.limite ?? true);
+      },
       usuario: () => Promise.resolve({ id: UID }),
-      cliente: (uid, conta) =>
-        Promise.resolve(
-          (o.clientes ?? CLIENTES).find((c) =>
-            c.perfil === uid &&
-            (conta === undefined || c.conta_stripe_id === conta)
-          ) ?? null,
-        ),
+      cliente: (uid, conta) => (
+        consultas.push("cliente"),
+          Promise.resolve(
+            (o.clientes ?? CLIENTES).find((c) =>
+              c.perfil === uid &&
+              (conta === undefined || c.conta_stripe_id === conta)
+            ) ?? null,
+          )
+      ),
     }),
     fetch: (url, init) => {
       chamadas.push({
@@ -49,7 +60,7 @@ function montar(
       );
     },
   };
-  return { deps, chamadas };
+  return { deps, chamadas, limites, consultas };
 }
 
 const post = (corpo: unknown) =>
@@ -136,4 +147,28 @@ Deno.test("portal: entrada inválida e CORS", async () => {
   );
   equal(pre.status, 204);
   equal(pre.headers.get("Access-Control-Allow-Origin"), SITE);
+});
+
+Deno.test("portal: dentro do limite segue, com a chave da ação portal", async () => {
+  const { deps, limites } = montar();
+  equal((await handle(post({}), deps)).status, 200);
+  deepEqual(limites, ["portal"]);
+});
+
+Deno.test("portal: excedeu o limite é 429 com Retry-After e nada é chamado", async () => {
+  const { deps, chamadas, consultas } = montar({ limite: false });
+  const r = await handle(post({}), deps);
+  equal(r.status, 429);
+  deepEqual(await r.json(), { erro: "limite" });
+  equal(r.headers.get("Retry-After"), "600");
+  equal(chamadas.length, 0);
+  equal(consultas.length, 0);
+});
+
+Deno.test("portal: erro do RPC é 500 e nada é chamado, nunca libera", async () => {
+  const { deps, chamadas, consultas } = montar({ limite: "erro" });
+  const r = await handle(post({}), deps);
+  equal(r.status, 500);
+  equal(chamadas.length, 0);
+  equal(consultas.length, 0);
 });

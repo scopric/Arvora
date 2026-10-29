@@ -172,6 +172,9 @@ isOneToOne: false
             "aprovar_perfil_publico":
 { Args: { "aprovar"?: boolean,"perfil": string }; Returns: undefined
                            },
+"consumir_limite":
+{ Args: { "p_acao": string }; Returns: boolean
+                           },
 "exportar_meus_dados":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
