@@ -11,11 +11,11 @@ import { Confirmar } from "./Confirmar"
 
 function abrir(busca: string) {
   render(
-    <MemoryRouter initialEntries={[`/confirmar${busca}`]}>
+    <MemoryRouter initialEntries={[`/pt/confirmar${busca}`]}>
       <Routes>
-        <Route path="/confirmar" element={<Confirmar />} />
-        <Route path="/perfil" element={<p>tela perfil</p>} />
-        <Route path="/redefinir-senha" element={<p>tela redefinir</p>} />
+        <Route path="/:lang/confirmar" element={<Confirmar />} />
+        <Route path="/:lang/perfil" element={<p>tela perfil</p>} />
+        <Route path="/:lang/redefinir-senha" element={<p>tela redefinir</p>} />
       </Routes>
     </MemoryRouter>,
   )

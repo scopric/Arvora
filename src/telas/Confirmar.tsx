@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { LayoutAuth } from "../componentes/LayoutAuth"
+import { useCaminho } from "../i18n"
 import { supabase } from "../lib/supabase"
 import { confirmarSchema, mensagemDeErroAuth } from "../lib/validacao"
 
@@ -10,6 +11,7 @@ import { confirmarSchema, mensagemDeErroAuth } from "../lib/validacao"
 export function Confirmar() {
   const [params] = useSearchParams()
   const navegar = useNavigate()
+  const caminho = useCaminho()
   const [aviso, setAviso] = useState<string | null>(null)
   const [registrado, setRegistrado] = useState(false)
   const [ocupado, setOcupado] = useState(false)
@@ -24,7 +26,7 @@ export function Confirmar() {
       if (error) return setAviso(mensagemDeErroAuth(error))
       // Com confirmação dupla, o 1º link da troca de e-mail só registra o aceite (resposta sem sessão); o 2º conclui.
       if (dados.data.type === "email_change" && !data?.session) return setRegistrado(true)
-      navegar(dados.data.type === "recovery" ? "/redefinir-senha" : "/perfil", { replace: true })
+      navegar(caminho(dados.data.type === "recovery" ? "/redefinir-senha" : "/perfil"), { replace: true })
     } catch {
       setAviso("Algo deu errado do nosso lado. Tente de novo em instantes.")
     } finally {
@@ -35,7 +37,7 @@ export function Confirmar() {
   if (!dados.success) {
     return (
       <LayoutAuth titulo="Link inválido" subtitulo="Esse link está incompleto ou não é reconhecido.">
-        <Link to="/entrar" className="underline decoration-dourado underline-offset-4">
+        <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
           Ir para a entrada
         </Link>
       </LayoutAuth>
@@ -49,7 +51,7 @@ export function Confirmar() {
           <Aviso tipo="ok">
             Para concluir a troca de e-mail, abra também o link que enviamos para o outro endereço (o antigo ou o novo).
           </Aviso>
-          <Link to="/entrar" className="underline decoration-dourado underline-offset-4">
+          <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
             Ir para a entrada
           </Link>
         </div>

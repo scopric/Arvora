@@ -4,16 +4,18 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
+import { useCaminho } from "../i18n"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
 
 export function Entrar() {
   const { sessao } = useAuth()
+  const caminho = useCaminho()
   const navegar = useNavigate()
   const de = (useLocation().state as { de?: string } | null)?.de
   // Só caminho interno: nada de redirecionar para fora do site.
-  const origem = de?.startsWith("/") && !de.startsWith("//") ? de : "/perfil"
+  const origem = de?.startsWith("/") && !de.startsWith("//") ? de : caminho("/perfil")
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)
@@ -44,13 +46,13 @@ export function Entrar() {
         </Botao>
       </form>
       <p className="mt-6 text-sm text-creme/70">
-        <Link to="/recuperar-senha" className="underline decoration-dourado underline-offset-4">
+        <Link to={caminho("/recuperar-senha")} className="underline decoration-dourado underline-offset-4">
           Esqueci a senha
         </Link>
       </p>
       <p className="mt-3 text-sm text-creme/70">
         Ainda não tem conta?{" "}
-        <Link to="/cadastro" className="underline decoration-dourado underline-offset-4">
+        <Link to={caminho("/cadastro")} className="underline decoration-dourado underline-offset-4">
           Criar conta
         </Link>
       </p>
