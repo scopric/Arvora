@@ -99,7 +99,7 @@ begin
 
     -- Dono apagado (GDPR; perfil_id vira NULL por on delete set null): marca o evento processado e nao toca em
     -- assinaturas, para o Stripe nao reenviar por dias nem a assinatura ser religada a outro perfil.
-    -- A CONFIRMAR COM O RAFAEL: ele pode preferir cancelar a assinatura no Stripe no fluxo de exclusao de conta.
+    -- A CONFIRMAR COM O CLIENTE: ele pode preferir cancelar a assinatura no Stripe no fluxo de exclusao de conta.
     if v_perfil is null or exists (select 1 from public.assinaturas
                                    where stripe_subscription_id = v_obj->>'id' and perfil_id is null) then
       update public.eventos_stripe set processado_em = now(), erro = null where id = v_reserva;
@@ -170,7 +170,7 @@ begin
       email = case when excluded.email = '' then public.clientes_stripe.email else excluded.email end;
 
   else
-    -- invoice.paid, invoice.payment_failed e demais: processados sem efeito (charge.refunded e decisao do o cliente).
+    -- invoice.paid, invoice.payment_failed e demais: processados sem efeito (charge.refunded e decisao do cliente).
     v_resultado := 'ignorado_tipo';
   end if;
 
