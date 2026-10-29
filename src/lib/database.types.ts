@@ -7,13 +7,13 @@ export type Database = {
           Tables: {
             "assinaturas": {
                   Row: {
-                    "atualizado_em": string,"cancela_no_fim": boolean,"cancelada_em": string | null,"conta_stripe_id": number | null,"criado_em": string,"id": number,"origem": Database["public"]['Enums']["origem_assinatura"],"perfil_id": string | null,"periodo_fim": string,"periodo_inicio": string,"plano_id": number,"receita_externa_id": number | null,"status": Database["public"]['Enums']["status_assinatura"],"stripe_subscription_id": string | null
+                    "atualizado_em": string,"cancela_no_fim": boolean,"cancelada_em": string | null,"conta_stripe_id": number | null,"criado_em": string,"id": number,"origem": Database["public"]['Enums']["origem_assinatura"],"perfil_id": string | null,"periodo_fim": string,"periodo_inicio": string,"plano_id": number,"receita_externa_id": number | null,"status": Database["public"]['Enums']["status_assinatura"],"stripe_evento_em": string | null,"stripe_subscription_id": string | null
                   }
                   Insert: {
-                    "atualizado_em"?: string,"cancela_no_fim"?: boolean,"cancelada_em"?: string | null,"conta_stripe_id"?: number | null,"criado_em"?: string,"id"?: never,"origem"?: Database["public"]['Enums']["origem_assinatura"],"perfil_id"?: string | null,"periodo_fim": string,"periodo_inicio": string,"plano_id": number,"receita_externa_id"?: number | null,"status": Database["public"]['Enums']["status_assinatura"],"stripe_subscription_id"?: string | null
+                    "atualizado_em"?: string,"cancela_no_fim"?: boolean,"cancelada_em"?: string | null,"conta_stripe_id"?: number | null,"criado_em"?: string,"id"?: never,"origem"?: Database["public"]['Enums']["origem_assinatura"],"perfil_id"?: string | null,"periodo_fim": string,"periodo_inicio": string,"plano_id": number,"receita_externa_id"?: number | null,"status": Database["public"]['Enums']["status_assinatura"],"stripe_evento_em"?: string | null,"stripe_subscription_id"?: string | null
                   }
                   Update: {
-                    "atualizado_em"?: string,"cancela_no_fim"?: boolean,"cancelada_em"?: string | null,"conta_stripe_id"?: number | null,"criado_em"?: string,"id"?: never,"origem"?: Database["public"]['Enums']["origem_assinatura"],"perfil_id"?: string | null,"periodo_fim"?: string,"periodo_inicio"?: string,"plano_id"?: number,"receita_externa_id"?: number | null,"status"?: Database["public"]['Enums']["status_assinatura"],"stripe_subscription_id"?: string | null
+                    "atualizado_em"?: string,"cancela_no_fim"?: boolean,"cancelada_em"?: string | null,"conta_stripe_id"?: number | null,"criado_em"?: string,"id"?: never,"origem"?: Database["public"]['Enums']["origem_assinatura"],"perfil_id"?: string | null,"periodo_fim"?: string,"periodo_inicio"?: string,"plano_id"?: number,"receita_externa_id"?: number | null,"status"?: Database["public"]['Enums']["status_assinatura"],"stripe_evento_em"?: string | null,"stripe_subscription_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -174,6 +174,9 @@ isOneToOne: false
                            },
 "pode_ver_conteudo":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
+                           },
+"processar_evento_stripe":
+{ Args: { "p_conta_stripe_id": number,"p_evento": Json }; Returns: string
                            },
 "tem_acesso":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
