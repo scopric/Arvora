@@ -28,6 +28,8 @@ for (const arq of achar(raiz)) {
       return `<script${attrs} src="${join("/", dirname(arq).slice(raiz.length), arqJs)}"></script>`
     },
   )
+  // Se sobrar script inline (ex.: regex cortado por um "</script>" nos dados), o build falha à vista.
+  if (/<script(?![^>]*\ssrc=)[^>]*>\s*\S/.test(html)) throw new Error(`Script inline restante em ${arq}`)
   writeFileSync(arq, html)
 }
 console.log(`${total} scripts inline externalizados`)
