@@ -3,6 +3,7 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { Marca } from "../componentes/Marca"
+import { baixarMeusDados } from "../lib/exportar"
 import { sair, useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, perfilSchema, type CamposDeErro } from "../lib/validacao"
@@ -34,6 +35,8 @@ export function Perfil() {
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<{ tipo: "erro" | "ok"; texto: string } | null>(null)
   const [ocupado, setOcupado] = useState(false)
+  const [baixando, setBaixando] = useState(false)
+  const [erroDados, setErroDados] = useState<string | null>(null)
 
   useEffect(() => {
     if (!uid) return
@@ -76,6 +79,18 @@ export function Perfil() {
     }
     setAviso({ tipo: "ok", texto: "Perfil salvo." })
     setEstado({ ...estado, perfil: { ...estado.perfil, ...dados.data, publico_aprovado_em: null } })
+  }
+
+  async function baixar() {
+    setErroDados(null)
+    setBaixando(true)
+    try {
+      setErroDados(await baixarMeusDados())
+    } catch {
+      setErroDados("Não conseguimos gerar seus dados agora. Tente de novo em instantes.")
+    } finally {
+      setBaixando(false)
+    }
   }
 
   return (
@@ -150,6 +165,19 @@ export function Perfil() {
           <Botao type="submit" ocupado={ocupado}>Salvar alterações</Botao>
         </form>
       ) : null}
+
+      <section className="mt-12 border-t border-creme/15 pt-8">
+        <h2 className="text-sm font-semibold">Meus dados</h2>
+        <p className="mt-2 text-sm text-creme/70">
+          Um arquivo JSON com os dados pessoais que guardamos sobre você: conta, perfil, papel na equipe, assinaturas e cadastro de cliente no Stripe.
+        </p>
+        {erroDados ? <div className="mt-4"><Aviso tipo="erro">{erroDados}</Aviso></div> : null}
+        <div className="mt-4 sm:max-w-xs">
+          <Botao type="button" variante="contorno" ocupado={baixando} onClick={() => void baixar()}>
+            Baixar meus dados (JSON)
+          </Botao>
+        </div>
+      </section>
     </main>
   )
 }
