@@ -14,9 +14,17 @@ export function useIdioma(): Idioma {
   return ehIdioma(lang) ? lang : "pt"
 }
 
+export type Chave = keyof typeof pt
+
 export function useT() {
   const dic = dicionarios[useIdioma()]
-  return (chave: keyof typeof pt) => dic[chave]
+  // Aceita chave ausente (erro de campo sem erro) e devolve undefined.
+  function t(chave: Chave): string
+  function t(chave: Chave | undefined): string | undefined
+  function t(chave?: Chave) {
+    return chave && dic[chave]
+  }
+  return t
 }
 
 export function useCaminho() {

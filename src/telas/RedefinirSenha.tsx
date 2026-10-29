@@ -4,7 +4,7 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useCaminho } from "../i18n"
+import { useCaminho, useT, type Chave } from "../i18n"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, mensagemDeErroAuth, redefinirSchema, type CamposDeErro } from "../lib/validacao"
@@ -13,9 +13,10 @@ import { errosPorCampo, mensagemDeErroAuth, redefinirSchema, type CamposDeErro }
 export function RedefinirSenha() {
   const { sessao, carregando } = useAuth()
   const caminho = useCaminho()
+  const t = useT()
   const navegar = useNavigate()
   const [erros, setErros] = useState<CamposDeErro>({})
-  const [aviso, setAviso] = useState<string | null>(null)
+  const [aviso, setAviso] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
 
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
@@ -31,32 +32,32 @@ export function RedefinirSenha() {
     navegar(caminho("/perfil"), { replace: true })
   }
 
-  if (carregando) return <LayoutAuth titulo="Nova senha" subtitulo="Verificando o link…">{null}</LayoutAuth>
+  if (carregando) return <LayoutAuth titulo={t("redefinir.titulo")} subtitulo={t("redefinir.verificando")}>{null}</LayoutAuth>
 
   if (!sessao) {
     return (
-      <LayoutAuth titulo="Link inválido" subtitulo="Esse link expirou ou já foi usado.">
+      <LayoutAuth titulo={t("redefinir.invalido.titulo")} subtitulo={t("redefinir.invalido.subtitulo")}>
         <Link to={caminho("/recuperar-senha")} className="underline decoration-dourado underline-offset-4">
-          Pedir um link novo
+          {t("redefinir.invalido.pedir")}
         </Link>
       </LayoutAuth>
     )
   }
 
   return (
-    <LayoutAuth titulo="Nova senha" subtitulo="Escolha uma senha que você ainda não usou aqui.">
+    <LayoutAuth titulo={t("redefinir.titulo")} subtitulo={t("redefinir.subtitulo")}>
       <form onSubmit={enviar} noValidate className="space-y-5">
-        {aviso ? <Aviso tipo="erro">{aviso}</Aviso> : null}
+        {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
         <Campo
-          rotulo="Nova senha"
+          rotulo={t("redefinir.rotulo")}
           name="senha"
           type="password"
           autoComplete="new-password"
-          erro={erros.senha}
-          ajuda="8 ou mais caracteres, com maiúscula, minúscula e número."
+          erro={t(erros.senha)}
+          ajuda={t("auth.senha.regra")}
         />
         <Botao type="submit" ocupado={ocupado}>
-          Salvar senha
+          {t("redefinir.botao")}
         </Botao>
       </form>
     </LayoutAuth>
