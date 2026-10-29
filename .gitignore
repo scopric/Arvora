@@ -33,3 +33,8 @@ CLAUDE.local.md
 
 # configuração local das sessões do Claude Code
 .claude/
+
+# react-router framework
+.react-router/
+build/
+.playwright-mcp/

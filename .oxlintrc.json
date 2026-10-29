@@ -16,6 +16,19 @@
   },
   "ignorePatterns": [
     "src/lib/database.types.ts",
-    "dist"
+    "dist",
+    "build",
+    ".react-router"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "src/root.tsx",
+        "src/rotas/*.tsx"
+      ],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    }
   ]
 }
