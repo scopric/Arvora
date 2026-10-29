@@ -3,6 +3,17 @@ import type { pt } from "./pt"
 // Texto em inglês pendente de revisão do cliente.
 export const en: Record<keyof typeof pt, string> = {
   "doc.titulo": "Grupo Árvora — coming soon",
+  "doc.descricao": "Grupo Árvora: courses, mentoring and community for Brazilian entrepreneurs living abroad. Coming soon.",
+  "titulo.entrar": "Log in",
+  "titulo.cadastro": "Create account",
+  "titulo.recuperar": "Reset password",
+  "titulo.redefinir": "New password",
+  "titulo.confirmar": "Confirm",
+  "titulo.perfil": "My profile",
+  "sistema.carregando": "Loading…",
+  "sistema.naoEncontrada": "Page not found",
+  "sistema.erro": "Something went wrong",
+  "sistema.voltar": "Back to home",
   "idioma.rotulo": "Language",
   "nav.principal": "Main",
   "nav.entrar": "Log in",

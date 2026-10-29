@@ -4,7 +4,7 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { Marca } from "../componentes/Marca"
-import { useCaminho, useIdioma, useT, type Chave } from "../i18n"
+import { useCaminho, useIdioma, useT, useTitulo, type Chave } from "../i18n"
 import { baixarMeusDados } from "../lib/exportar"
 import { abrirPortal } from "../lib/assinatura"
 import { excluirMinhaConta } from "../lib/excluirConta"
@@ -35,6 +35,7 @@ type Estado =
 export function Perfil() {
   const { sessao } = useAuth()
   const t = useT()
+  useTitulo("titulo.perfil", true)
   const idioma = useIdioma()
   const uid = sessao?.user.id
   const [estado, setEstado] = useState<Estado>({ fase: "carregando" })

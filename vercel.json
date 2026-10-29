@@ -17,6 +17,15 @@
       ]
     },
     {
+      "source": "/(pt|en)/(entrar|cadastro|recuperar-senha|redefinir-senha|confirmar|perfil)(/.*)?",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {

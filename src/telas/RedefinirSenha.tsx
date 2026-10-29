@@ -4,7 +4,7 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useCaminho, useT, type Chave } from "../i18n"
+import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, mensagemDeErroAuth, redefinirSchema, type CamposDeErro } from "../lib/validacao"
@@ -14,6 +14,7 @@ export function RedefinirSenha() {
   const { sessao, carregando } = useAuth()
   const caminho = useCaminho()
   const t = useT()
+  useTitulo("titulo.redefinir", true)
   const navegar = useNavigate()
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<Chave | null>(null)

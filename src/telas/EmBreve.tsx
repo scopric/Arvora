@@ -1,6 +1,6 @@
 import { Link } from "react-router"
 import { SeletorIdioma } from "../componentes/SeletorIdioma"
-import { useCaminho, useT } from "../i18n"
+import { useCaminho, useT, useTitulo } from "../i18n"
 import { useAuth } from "../lib/sessao"
 
 const link =
@@ -9,6 +9,7 @@ const link =
 export function EmBreve() {
   const { sessao, carregando } = useAuth()
   const t = useT()
+  useTitulo("doc.titulo")
   const caminho = useCaminho()
   return (
     <main className="relative isolate flex min-h-dvh flex-col justify-center overflow-hidden px-6 py-24 sm:px-16 lg:px-32">

@@ -1,5 +1,6 @@
 import { Link, useLoaderData } from "react-router"
 import premiados from "../dados/premiados-exemplo.json" with { type: "json" }
+import { textosDe } from "../i18n"
 import { idiomaValido, linksIdioma } from "../site"
 import type { Route } from "./+types/hall-of-fame"
 
@@ -16,6 +17,7 @@ export function loader({ params }: Route.LoaderArgs) {
 export function meta({ loaderData }: Route.MetaArgs) {
   return [
     { title: `${textos[loaderData.lang].titulo} — Árvora (exemplo)` },
+    { name: "description", content: textosDe(loaderData.lang)["doc.descricao"] },
     ...linksIdioma(loaderData.lang, "/hall-of-fame").map((l) => ({ tagName: "link" as const, ...l })),
   ]
 }

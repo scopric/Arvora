@@ -4,13 +4,14 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
-import { useCaminho, useT, type Chave } from "../i18n"
+import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, mensagemDeErroAuth, recuperarSchema, type CamposDeErro } from "../lib/validacao"
 
 export function RecuperarSenha() {
   const caminho = useCaminho()
   const t = useT()
+  useTitulo("titulo.recuperar", true)
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [enviado, setEnviado] = useState(false)
