@@ -30,3 +30,6 @@ dist-ssr
 
 # gerados pelo claude-mem
 CLAUDE.local.md
+
+# configuração local das sessões do Claude Code
+.claude/
