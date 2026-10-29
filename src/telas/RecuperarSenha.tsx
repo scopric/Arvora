@@ -4,10 +4,13 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
+import { useIdioma, useCaminho } from "../i18n"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, mensagemDeErroAuth, recuperarSchema, type CamposDeErro } from "../lib/validacao"
 
 export function RecuperarSenha() {
+  const lang = useIdioma()
+  const caminho = useCaminho()
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<string | null>(null)
   const [enviado, setEnviado] = useState(false)
@@ -21,7 +24,7 @@ export function RecuperarSenha() {
     setErros({})
     setOcupado(true)
     const { error } = await supabase.auth.resetPasswordForEmail(dados.data.email, {
-      redirectTo: `${window.location.origin}/redefinir-senha`,
+      redirectTo: `${window.location.origin}/${lang}/redefinir-senha`,
     })
     setOcupado(false)
     // Mesma resposta exista a conta ou não, para não revelar quem tem cadastro.
@@ -43,7 +46,7 @@ export function RecuperarSenha() {
         </form>
       )}
       <p className="mt-6 text-sm text-creme/70">
-        <Link to="/entrar" className="underline decoration-dourado underline-offset-4">
+        <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
           Voltar para entrar
         </Link>
       </p>

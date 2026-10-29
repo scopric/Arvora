@@ -4,6 +4,7 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
+import { useCaminho } from "../i18n"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, mensagemDeErroAuth, redefinirSchema, type CamposDeErro } from "../lib/validacao"
@@ -11,6 +12,7 @@ import { errosPorCampo, mensagemDeErroAuth, redefinirSchema, type CamposDeErro }
 // Destino do link de recuperação: o Supabase troca o código por uma sessão e só então a senha pode mudar.
 export function RedefinirSenha() {
   const { sessao, carregando } = useAuth()
+  const caminho = useCaminho()
   const navegar = useNavigate()
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<string | null>(null)
@@ -26,7 +28,7 @@ export function RedefinirSenha() {
     const { error } = await supabase.auth.updateUser({ password: dados.data.senha })
     setOcupado(false)
     if (error) return setAviso(mensagemDeErroAuth(error))
-    navegar("/perfil", { replace: true })
+    navegar(caminho("/perfil"), { replace: true })
   }
 
   if (carregando) return <LayoutAuth titulo="Nova senha" subtitulo="Verificando o link…">{null}</LayoutAuth>
@@ -34,7 +36,7 @@ export function RedefinirSenha() {
   if (!sessao) {
     return (
       <LayoutAuth titulo="Link inválido" subtitulo="Esse link expirou ou já foi usado.">
-        <Link to="/recuperar-senha" className="underline decoration-dourado underline-offset-4">
+        <Link to={caminho("/recuperar-senha")} className="underline decoration-dourado underline-offset-4">
           Pedir um link novo
         </Link>
       </LayoutAuth>

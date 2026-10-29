@@ -1,4 +1,6 @@
 import { Link } from "react-router"
+import { SeletorIdioma } from "../componentes/SeletorIdioma"
+import { useCaminho, useT } from "../i18n"
 import { useAuth } from "../lib/sessao"
 
 const link =
@@ -6,15 +8,18 @@ const link =
 
 export function EmBreve() {
   const { sessao, carregando } = useAuth()
+  const t = useT()
+  const caminho = useCaminho()
   return (
     <main className="relative isolate flex min-h-dvh flex-col justify-center overflow-hidden px-6 py-24 sm:px-16 lg:px-32">
-      <nav aria-label="Principal" className="absolute top-0 right-0 flex min-h-17 items-center gap-2 px-4 py-3 text-sm font-semibold sm:px-12">
+      <SeletorIdioma />
+      <nav aria-label={t("nav.principal")} className="absolute top-0 right-0 flex min-h-17 items-center gap-2 px-4 py-3 text-sm font-semibold sm:px-12">
         {carregando ? null : sessao ? (
-          <Link to="/perfil" className={link}>Meu perfil</Link>
+          <Link to={caminho("/perfil")} className={link}>{t("nav.perfil")}</Link>
         ) : (
           <>
-            <Link to="/entrar" className={link}>Entrar</Link>
-            <Link to="/cadastro" className={`${link} border border-creme/30 hover:border-creme/60`}>Criar conta</Link>
+            <Link to={caminho("/entrar")} className={link}>{t("nav.entrar")}</Link>
+            <Link to={caminho("/cadastro")} className={`${link} border border-creme/30 hover:border-creme/60`}>{t("nav.criarConta")}</Link>
           </>
         )}
       </nav>
@@ -35,14 +40,14 @@ export function EmBreve() {
         className="animate-subir text-xs font-semibold tracking-[0.3em] text-destaque uppercase"
         style={{ "--atraso": "60ms" } as React.CSSProperties}
       >
-        Em breve
+        {t("inicio.embreve")}
       </p>
 
       <h1
         className="animate-subir mt-8 max-w-4xl font-titulo text-5xl leading-[1.05] font-medium text-balance sm:text-7xl lg:text-8xl"
         style={{ "--atraso": "120ms" } as React.CSSProperties}
       >
-        Grupo Árvora
+        {t("inicio.titulo")}
       </h1>
 
       <span
@@ -55,8 +60,7 @@ export function EmBreve() {
         className="animate-subir mt-10 max-w-xl text-base leading-relaxed text-creme/75 sm:text-lg"
         style={{ "--atraso": "360ms" } as React.CSSProperties}
       >
-        Cursos, acompanhamento e uma comunidade feitos para empreendedores
-        brasileiros que constroem negócios fora do Brasil.
+        {t("inicio.descricao")}
       </p>
     </main>
   )

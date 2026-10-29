@@ -4,18 +4,21 @@ import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
 import { LayoutAuth } from "../componentes/LayoutAuth"
+import { useIdioma, useCaminho } from "../i18n"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { cadastroSchema, errosPorCampo, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
 
 export function Cadastro() {
   const { sessao } = useAuth()
+  const lang = useIdioma()
+  const caminho = useCaminho()
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<string | null>(null)
   const [enviado, setEnviado] = useState(false)
   const [ocupado, setOcupado] = useState(false)
 
-  if (sessao) return <Navigate to="/perfil" replace />
+  if (sessao) return <Navigate to={caminho("/perfil")} replace />
 
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -31,7 +34,7 @@ export function Cadastro() {
       password: dados.data.senha,
       options: {
         data: { nome: dados.data.nome, maior_18: "true" },
-        emailRedirectTo: `${window.location.origin}/entrar`,
+        emailRedirectTo: `${window.location.origin}/${lang}/entrar`,
       },
     })
     setOcupado(false)
@@ -47,7 +50,7 @@ export function Cadastro() {
           ativar a conta.
         </Aviso>
         <p className="mt-6 text-sm text-creme/70">
-          <Link to="/entrar" className="underline decoration-dourado underline-offset-4">
+          <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
             Já confirmei, quero entrar
           </Link>
         </p>
@@ -92,7 +95,7 @@ export function Cadastro() {
       </form>
       <p className="mt-6 text-sm text-creme/70">
         Já tem conta?{" "}
-        <Link to="/entrar" className="underline decoration-dourado underline-offset-4">
+        <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
           Entrar
         </Link>
       </p>
