@@ -4,12 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 // O comportamento sob RLS de verdade é provado no pgTAP; aqui só o que a tela faz com cada resposta.
 const baixar = vi.hoisted(() => vi.fn())
-const resp = vi.hoisted(() => ({ perfil: {} as unknown, setores: {} as unknown, update: {} as unknown, chamadas: 0 }))
+const resp = vi.hoisted(() => ({ perfil: {} as unknown, setores: {} as unknown, update: {} as unknown, clientes: {} as unknown, chamadas: 0 }))
 
 vi.mock("../lib/supabase", () => {
   const consulta = (valor: () => unknown) => {
     const q: Record<string, unknown> = {}
-    for (const m of ["select", "eq", "order"]) q[m] = () => q
+    for (const m of ["select", "eq", "order", "limit"]) q[m] = () => q
     q.maybeSingle = () => Promise.resolve(valor())
     q.then = (ok: (v: unknown) => unknown) => Promise.resolve(valor()).then(ok)
     return q
@@ -19,7 +19,9 @@ vi.mock("../lib/supabase", () => {
       from: (tabela: string) =>
         tabela === "setores"
           ? consulta(() => resp.setores)
-          : {
+          : tabela === "clientes_stripe"
+            ? consulta(() => resp.clientes)
+            : {
               select: () => consulta(() => resp.perfil),
               update: () => (resp.chamadas++, { eq: () => ({ select: () => Promise.resolve(resp.update) }) }),
             },
@@ -27,6 +29,8 @@ vi.mock("../lib/supabase", () => {
   }
 })
 vi.mock("../lib/exportar", () => ({ baixarMeusDados: baixar }))
+const abrirPortal = vi.hoisted(() => vi.fn())
+vi.mock("../lib/assinatura", () => ({ abrirPortal }))
 vi.mock("../lib/sessao", () => ({
   useAuth: () => ({ sessao: { user: { id: "u1", email: "a@b.com" } }, carregando: false }),
   sair: vi.fn(),
@@ -45,8 +49,10 @@ beforeEach(() => {
   resp.perfil = { data: perfilOk, error: null }
   resp.setores = { data: [{ id: 1, nome: "Educação" }], error: null }
   resp.update = { data: [{ id: "u1" }], error: null }
+  resp.clientes = { data: [], error: null }
   resp.chamadas = 0
   baixar.mockReset()
+  abrirPortal.mockReset()
 })
 
 describe("tela Meu perfil", () => {
@@ -97,5 +103,35 @@ describe("tela Meu perfil", () => {
     expect((screen.getByRole("button", { name: /aguarde/i }) as HTMLButtonElement).disabled).toBe(true)
     fim()
     await screen.findByRole("button", { name: /baixar meus dados/i })
+  })
+})
+
+describe("bloco Assinatura", () => {
+  it("não aparece para quem não tem cliente no Stripe", async () => {
+    render(<Perfil />)
+    await screen.findByRole("button", { name: /salvar alterações/i })
+    expect(screen.queryByRole("button", { name: /gerenciar assinatura/i })).toBeNull()
+  })
+
+  it("aparece para quem tem cliente e abre o portal", async () => {
+    resp.clientes = { data: [{ id: 1 }], error: null }
+    abrirPortal.mockResolvedValue(null)
+    render(<Perfil />)
+    await userEvent.click(await screen.findByRole("button", { name: /gerenciar assinatura/i }))
+    expect(abrirPortal).toHaveBeenCalledWith("pt")
+  })
+
+  it("falha ao abrir o portal aparece na tela", async () => {
+    resp.clientes = { data: [{ id: 1 }], error: null }
+    abrirPortal.mockResolvedValue("Não conseguimos abrir a página de pagamento agora.")
+    render(<Perfil />)
+    await userEvent.click(await screen.findByRole("button", { name: /gerenciar assinatura/i }))
+    expect((await screen.findByRole("alert")).textContent).toMatch(/não conseguimos abrir/i)
+  })
+
+  it("falha ao consultar aparece na tela, não some", async () => {
+    resp.clientes = { data: null, error: { message: "boom" } }
+    render(<Perfil />)
+    expect((await screen.findByRole("alert")).textContent).toMatch(/verificar sua assinatura/i)
   })
 })
