@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { useCaminho, useT } from "../i18n"
+import { FundoArvore } from "./FundoArvore"
 import { Marca } from "./Marca"
 import { SeletorIdioma } from "./SeletorIdioma"
 
@@ -15,6 +16,7 @@ export function LayoutAuth({ titulo, subtitulo, children }: { titulo: string; su
           aria-hidden="true"
           className="pointer-events-none absolute -top-1/4 -left-1/4 -z-10 size-[50rem] rounded-full bg-superficie/25 blur-3xl"
         />
+        <FundoArvore className="hidden min-[1440px]:block" camada="w-[68%]" />
         <Marca to={caminho("/")} />
         <div>
           <span aria-hidden="true" className="mb-8 block h-px w-16 bg-dourado" />

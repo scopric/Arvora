@@ -159,4 +159,6 @@ export const en: Record<keyof typeof pt, string> = {
   "erro.excluir.exclusao":
     "Your subscription was cancelled, but we could not delete the account. Try again; if it persists, contact support.",
   "erro.excluir.default": "We could not delete your account right now. Try again; if it persists, contact support.",
+  "fundo.pausar": "Pause motion",
+  "fundo.continuar": "Resume motion",
 }

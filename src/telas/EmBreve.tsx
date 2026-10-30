@@ -1,4 +1,5 @@
 import { Link } from "react-router"
+import { FundoArvore } from "../componentes/FundoArvore"
 import { SeletorIdioma } from "../componentes/SeletorIdioma"
 import { useCaminho, useT, useTitulo } from "../i18n"
 import { useAuth } from "../lib/sessao"
@@ -28,6 +29,8 @@ export function EmBreve() {
         aria-hidden="true"
         className="pointer-events-none absolute -top-1/3 -right-1/4 -z-10 size-[60rem] rounded-full bg-superficie/25 blur-3xl"
       />
+
+      <FundoArvore className="hidden min-[1280px]:block" camada="w-3/5" />
 
       <img
         src="/logo-simbolo.png"
