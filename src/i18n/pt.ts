@@ -158,4 +158,6 @@ export const pt = {
     "Sua assinatura foi cancelada, mas não conseguimos excluir a conta. Tente de novo; se persistir, escreva para o suporte.",
   "erro.excluir.default":
     "Não conseguimos excluir sua conta agora. Tente de novo; se persistir, escreva para o suporte.",
+  "fundo.pausar": "Pausar movimento",
+  "fundo.continuar": "Retomar movimento",
 } as const
