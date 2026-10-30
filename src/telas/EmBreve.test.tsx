@@ -46,3 +46,12 @@ describe("página inicial", () => {
     expect(screen.queryByRole("link", { name: "Entrar" })).toBeNull()
   })
 })
+
+describe("fundo animado", () => {
+  it("a página inicial traz o botão de pausa e o seletor de idioma", () => {
+    estado.sessao = null
+    nav()
+    expect(screen.getByRole("button", { name: "Pausar movimento" })).toBeTruthy()
+    expect(screen.getByRole("link", { name: "English" })).toBeTruthy()
+  })
+})
