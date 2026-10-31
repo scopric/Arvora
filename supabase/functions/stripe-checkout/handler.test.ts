@@ -92,8 +92,8 @@ Deno.test("checkout feliz: corpo enviado ao Stripe sai do servidor e do JWT", as
   equal(corpo.get("client_reference_id"), UID);
   equal(corpo.get("customer_email"), "jwt@exemplo.invalid");
   equal(corpo.get("customer"), null);
-  equal(corpo.get("success_url"), `${SITE}/pt/perfil?checkout=ok`);
-  equal(corpo.get("cancel_url"), `${SITE}/pt/perfil?checkout=cancelado`);
+  equal(corpo.get("success_url"), `${SITE}/pt/checkout/sucesso`);
+  equal(corpo.get("cancel_url"), `${SITE}/pt/checkout/cancelado`);
   equal(corpo.get("locale"), "pt-BR");
 });
 
@@ -116,7 +116,7 @@ Deno.test("checkout: customer existente, idioma en, plano único vira mode=payme
   equal(c.get("customer"), "cus_teste");
   equal(c.get("customer_email"), null);
   equal(c.get("locale"), "en");
-  equal(c.get("success_url"), `${SITE}/en/perfil?checkout=ok`);
+  equal(c.get("success_url"), `${SITE}/en/checkout/sucesso`);
 });
 
 Deno.test("checkout: plano anual é subscription", async () => {
