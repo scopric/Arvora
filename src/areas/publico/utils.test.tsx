@@ -26,6 +26,34 @@ describe("Markdown", () => {
   })
 })
 
+describe("Markdown: links, listas e entidades", () => {
+  it("recusa barra invertida em qualquer posição e //host", () => {
+    const { container } = render(<Markdown texto={"[a](/\\evil.com) [b](/\\/evil.com) [c](/ok\\x) [d](https://exemplo.invalid/a\\b) [e](//evil.com) [f](/pt/termos)"} />)
+    const links = [...container.querySelectorAll("a")]
+    expect(links.map((a) => a.getAttribute("href"))).toEqual(["/pt/termos"])
+  })
+
+  it("lista numerada começa no número do texto e tem start", () => {
+    const { container } = render(<Markdown texto={"3. três\n4. quatro"} />)
+    expect(container.querySelector("ol")?.getAttribute("start")).toBe("3")
+    expect(container.querySelectorAll("li")).toHaveLength(2)
+  })
+
+  it("linha em branco entre itens não fecha a lista; linha indentada continua o item", () => {
+    const { container } = render(<Markdown texto={"- um\n\n- dois\n  continua aqui\n\nParágrafo depois"} />)
+    expect(container.querySelectorAll("ul")).toHaveLength(1)
+    const itens = [...container.querySelectorAll("li")].map((l) => l.textContent)
+    expect(itens).toEqual(["um", "dois continua aqui"])
+    expect(container.querySelector("p")?.textContent).toBe("Parágrafo depois")
+  })
+
+  it("decodifica &amp; &nbsp; &lt; &gt; &quot; como texto, sem virar HTML nem decodificar duas vezes", () => {
+    const { container } = render(<Markdown texto={"Ana &amp; Cia&nbsp;Ltda &lt;b&gt;x&lt;/b&gt; &quot;oi&quot; &amp;lt;"} />)
+    expect(container.querySelector("b")).toBeNull()
+    expect(container.textContent).toBe("Ana & Cia\u00a0Ltda <b>x</b> \"oi\" &lt;")
+  })
+})
+
 describe("criarSlug", () => {
   it("tira acento e símbolo, respeita o formato do banco e muda a cada chamada", () => {
     const a = criarSlug("Açaí & Cia. Ltda!")

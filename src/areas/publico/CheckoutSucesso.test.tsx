@@ -22,11 +22,14 @@ const ver = (acesso = {}, recarregar = vi.fn()) => (montar(<CheckoutSucesso />, 
 describe("CheckoutSucesso", () => {
   it("consulta o acesso a cada 3 s e, passados 30 s, avisa que pode levar alguns minutos", async () => {
     const recarregar = ver()
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Confirmando sua assinatura")
     expect(screen.getByText("Estamos confirmando seu pagamento.")).toBeTruthy()
     await act(() => vi.advanceTimersByTimeAsync(9000))
     expect(recarregar).toHaveBeenCalledTimes(3)
     await act(() => vi.advanceTimersByTimeAsync(21_000))
     expect(screen.getByText(/Pode levar alguns minutos/)).toBeTruthy()
+    expect(screen.queryByText(/e-mail/)).toBeNull()
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Confirmando sua assinatura")
     const antes = recarregar.mock.calls.length
     await act(() => vi.advanceTimersByTimeAsync(10_000))
     expect(recarregar.mock.calls.length).toBe(antes)
@@ -34,6 +37,7 @@ describe("CheckoutSucesso", () => {
 
   it("com acesso liberado mostra Começar para /bem-vindo e para de consultar", async () => {
     const recarregar = ver({ nivel: "clube" })
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Assinatura confirmada")
     expect(screen.getByRole("link", { name: "Começar" }).getAttribute("href")).toBe("/pt/bem-vindo")
     await act(() => vi.advanceTimersByTimeAsync(10_000))
     expect(recarregar).not.toHaveBeenCalled()

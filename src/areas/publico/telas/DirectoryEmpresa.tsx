@@ -8,6 +8,7 @@ import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { nomeLocalizado, urlImagem } from "../formatos"
 import { Pagina, SemRegistro, linkContorno } from "../Pagina"
+import { useTituloNome } from "../tituloAba"
 import { useConsulta } from "../usarConsulta"
 
 type Empresa = { id: number; nome: string; setor_id: number; cidade: string | null; pais: string | null; logo_path: string | null; site?: string | null; descricao?: string | null }
@@ -18,8 +19,6 @@ const https = (url: string | null | undefined) => (url && /^https?:\/\//i.test(u
 // (o banco não entrega essas colunas ao anônimo). Dono da empresa fica fora: o dado não é público.
 export function DirectoryEmpresa() {
   const t = useT()
-  const idioma = useIdioma()
-  const caminho = useCaminho()
   const { slug = "" } = useParams()
   const { sessao } = useAuth()
   useTitulo("publico.directoryEmpresa.titulo")
@@ -30,31 +29,41 @@ export function DirectoryEmpresa() {
     `empresa/${slug}/${uid}`,
   )
   const e = r.dados
-  const setor = useConsulta(() => supabase.from("setores").select("id,nome,nome_en").eq("id", e?.setor_id ?? 0).maybeSingle(), `setor/${e?.setor_id}`)
-  const premiado = useConsulta(
-    () => supabase.from("premiados").select("id,nome,slug,edicoes(slug)").eq("empresa_id", e?.id ?? 0).limit(1),
-    `premiado-de/${e?.id}`,
-  )
-  const parecidas = useConsulta(
-    () => supabase.from("empresas").select("id,nome,slug,cidade").eq("status", "publicada").eq("setor_id", e?.setor_id ?? 0).neq("id", e?.id ?? 0).order("nome").limit(3),
-    `parecidas/${e?.id}`,
-  )
+  useTituloNome(e ? e.nome : r.carregando || r.erro ? null : t("publico.semRegistro.titulo"), !e && !r.carregando && !r.erro)
 
   if (r.carregando) return <Pagina titulo={t("publico.directoryEmpresa.titulo")}><Esqueleto linhas={5} /></Pagina>
   if (r.erro) return <Pagina titulo={t("publico.directoryEmpresa.titulo")}><Erro aoTentar={r.recarregar} /></Pagina>
   if (!e) return <SemRegistro voltar="/directory" rotulo="publico.directoryEmpresa.voltar" />
+  return <Conteudo e={e} logado={Boolean(uid)} />
+}
 
+// As consultas de apoio (área, premiado, parecidas) só começam depois que a empresa existe; cada erro aparece no seu bloco.
+function Conteudo({ e, logado }: { e: Empresa; logado: boolean }) {
+  const t = useT()
+  const idioma = useIdioma()
+  const caminho = useCaminho()
+  const setor = useConsulta(() => supabase.from("setores").select("id,nome,nome_en").eq("id", e.setor_id).maybeSingle(), `setor/${e.setor_id}`)
+  const premiado = useConsulta(
+    () => supabase.from("premiados").select("id,nome,slug,edicoes(slug)").eq("empresa_id", e.id).not("publicado_em", "is", null).limit(1),
+    `premiado-de/${e.id}`,
+  )
+  const parecidas = useConsulta(
+    () => supabase.from("empresas").select("id,nome,slug,cidade").eq("status", "publicada").eq("setor_id", e.setor_id).neq("id", e.id).order("nome").limit(3),
+    `parecidas/${e.id}`,
+  )
   const logo = urlImagem(e.logo_path)
   const site = https(e.site)
   const p = premiado.dados?.[0]
+  const local = [setor.dados && nomeLocalizado(setor.dados, idioma), e.cidade, e.pais].filter(Boolean).join(" · ")
   return (
     <Pagina titulo={e.nome} largura="max-w-4xl">
       <div className="flex flex-wrap items-center gap-3">
         {p?.edicoes ? <Selo tom="dourado">{t("selo.premiado")}</Selo> : null}
-        <p className="text-lg text-creme/80">{[setor.dados && nomeLocalizado(setor.dados, idioma), e.cidade, e.pais].filter(Boolean).join(" · ")}</p>
+        {local ? <p className="text-lg text-creme/80">{local}</p> : null}
       </div>
+      {setor.erro || premiado.erro ? <div className="mt-6"><Erro aoTentar={() => (setor.recarregar(), premiado.recarregar())} /></div> : null}
       {logo ? <img src={logo} alt={`${t("publico.directoryEmpresa.logo")} ${e.nome}`} className="mt-6 h-20 w-auto max-w-64 object-contain" /> : null}
-      {uid ? (
+      {logado ? (
         <div className="mt-8 space-y-4">
           {e.descricao ? <p className="max-w-prose whitespace-pre-line text-lg">{e.descricao}</p> : null}
           {site ? (
@@ -74,7 +83,9 @@ export function DirectoryEmpresa() {
           <a href={caminho(`/hall-of-fame/${p.edicoes.slug}/${p.slug}`)} className={linkContorno}>{t("publico.directoryEmpresa.verPremiado")}</a>
         </p>
       ) : null}
-      {parecidas.dados?.length ? (
+      {parecidas.erro ? (
+        <div className="mt-14"><Erro aoTentar={parecidas.recarregar} /></div>
+      ) : parecidas.dados?.length ? (
         <section aria-labelledby="parecidas" className="mt-14">
           <h2 id="parecidas" className="mb-4 font-titulo text-3xl font-bold uppercase">{t("publico.directoryEmpresa.parecidas")}</h2>
           <ul className="grid gap-5 sm:grid-cols-3">

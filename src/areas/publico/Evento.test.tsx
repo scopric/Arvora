@@ -59,6 +59,13 @@ describe("Evento", () => {
     await screen.findByRole("link", { name: "Premiado Um" })
     expect(screen.queryByRole("link", { name: "Planos" })).toBeNull()
   })
+  it("cidade e país vazios não deixam vírgula solta; título da aba leva o nome da edição", async () => {
+    falso.tabelas.edicoes_publicas = { data: [{ ...base, cidade: null, pais: null, fase: "antes" }], error: null }
+    montar(<Evento />, "/:lang/evento/:edicao", "/pt/evento/ed-teste")
+    await screen.findByText("Indicado Um")
+    expect(screen.getByText(/Antes do evento/).textContent).not.toMatch(/,|null|undefined/)
+    expect(document.title).toBe("Edição Teste — Grupo Árvora")
+  })
   it("edição inexistente tem tela própria", async () => {
     falso.tabelas.edicoes_publicas = { data: [], error: null }
     montar(<Evento />, "/:lang/evento/:edicao", "/pt/evento/x")
@@ -75,5 +82,6 @@ describe("Awards", () => {
     expect(screen.getByText("Incluído no Grupo Árvora")).toBeTruthy()
     expect(screen.queryByText("Incluído no Clube")).toBeNull()
     expect((await screen.findByRole("link", { name: /Evento/ })).getAttribute("href")).toBe("/pt/evento/ed-teste")
+    expect(falso.chamadas.some((c) => c.tabela === "edicoes_publicas" && c.op === "not" && c.args[0] === "publicada_em")).toBe(true)
   })
 })

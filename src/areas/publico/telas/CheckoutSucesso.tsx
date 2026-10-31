@@ -15,11 +15,13 @@ const DESISTE_MS = 30_000
 export function CheckoutSucesso() {
   const t = useT()
   const caminho = useCaminho()
-  useTitulo("publico.checkoutSucesso.titulo", true)
   const { sessao, carregando: sessaoCarregando } = useAuth()
   const { nivel, erro, recarregar } = useAcesso()
   const [desistiu, setDesistiu] = useState(false)
   const confirmado = nivel !== "visitante"
+  // Título neutro enquanto confirma; "confirmada" só quando o acesso chegou.
+  const titulo = confirmado ? "publico.checkoutSucesso.titulo" : "publico.checkoutSucesso.tituloConfirmando"
+  useTitulo(titulo, true)
   const esperando = Boolean(sessao) && !confirmado && !erro && !desistiu
 
   useEffect(() => {
@@ -34,14 +36,14 @@ export function CheckoutSucesso() {
 
   if (sessaoCarregando) {
     return (
-      <Pagina titulo={t("publico.checkoutSucesso.titulo")} largura="max-w-3xl">
+      <Pagina titulo={t(titulo)} largura="max-w-3xl">
         <Esqueleto />
       </Pagina>
     )
   }
   if (!sessao) {
     return (
-      <Pagina titulo={t("publico.checkoutSucesso.titulo")} largura="max-w-3xl">
+      <Pagina titulo={t(titulo)} largura="max-w-3xl">
         <p className="max-w-prose text-lg">{t("publico.checkoutSucesso.semSessao")}</p>
         <Link to={caminho("/entrar")} className={`${linkPrimario} mt-6`}>
           {t("nav.entrar")}
@@ -50,7 +52,7 @@ export function CheckoutSucesso() {
     )
   }
   return (
-    <Pagina titulo={t("publico.checkoutSucesso.titulo")} largura="max-w-3xl">
+    <Pagina titulo={t(titulo)} largura="max-w-3xl">
       {confirmado ? (
         <div role="status">
           <p className="max-w-prose text-lg">{t("publico.checkoutSucesso.confirmado")}</p>

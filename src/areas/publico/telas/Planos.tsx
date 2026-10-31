@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from "react"
+import { useEffect, useRef, useState, type SubmitEvent } from "react"
 import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
@@ -17,7 +17,7 @@ import { useConsulta } from "../usarConsulta"
 
 type Nivel = "clube" | "grupo"
 type Ciclo = "mes" | "ano"
-type Plano = { id: number; nivel: string | null; intervalo: string; valor_centavos: number; moeda: string }
+type Plano = { id: number; nivel: string | null; intervalo: string; valor_centavos: number; moeda: string; criado_em: string }
 
 // PROVISÓRIO: o que cada nível inclui segue o deck/PRD (§7, §17.3.5) e precisa da validação do Rafael; preço vem só do banco.
 const LINHAS: { rotulo: Chave; clube: boolean; grupo: boolean }[] = [
@@ -56,7 +56,7 @@ export function Planos() {
     () =>
       supabase
         .from("planos")
-        .select("id,nivel,intervalo,valor_centavos,moeda")
+        .select("id,nivel,intervalo,valor_centavos,moeda,criado_em")
         .eq("ativo", true)
         .in("nivel", ["clube", "grupo"])
         .in("intervalo", ["mes", "ano"])
@@ -65,9 +65,23 @@ export function Planos() {
   )
 
   const planos: Plano[] = consulta.dados ?? []
+  const formRef = useRef<HTMLHeadingElement>(null)
   const preco = (p: Plano) =>
     new Intl.NumberFormat(idioma === "pt" ? "pt-BR" : "en-IE", { style: "currency", currency: p.moeda }).format(p.valor_centavos / 100)
-  const doNivel = (n: Nivel) => planos.find((p) => p.nivel === n && p.intervalo === ciclo)
+  // Dois planos ativos para o mesmo nível e ciclo é erro de cadastro: vale o mais recente, e o aviso aparece só em desenvolvimento.
+  const doNivel = (n: Nivel) => planos.filter((p) => p.nivel === n && p.intervalo === ciclo).sort((a, b) => b.criado_em.localeCompare(a.criado_em))[0]
+  useEffect(() => {
+    const vistos = new Set<string>()
+    for (const p of consulta.dados ?? []) {
+      const k = `${p.nivel}/${p.intervalo}`
+      if (vistos.has(k) && import.meta.env.DEV) console.warn(`Planos: mais de um plano ativo para ${k}; vale o mais recente.`)
+      vistos.add(k)
+    }
+  }, [consulta.dados])
+  // Ao escolher o plano, o foco vai para o formulário do aceite (o título é lido por leitor de tela).
+  useEffect(() => {
+    if (escolhido) formRef.current?.focus()
+  }, [escolhido])
 
   // Sem planos ou erro de leitura: nunca uma vitrine vazia, e sim o caminho para o suporte (PRD §17.4.1).
   const semPlanos = (
@@ -111,7 +125,7 @@ export function Planos() {
       )
     }
     return (
-      <Botao aria-pressed={escolhido?.id === plano.id} onClick={() => setEscolhido(plano)}>
+      <Botao aria-controls="aceite" aria-expanded={escolhido?.id === plano.id} onClick={() => (setEscolhido(plano), setErro(null))}>
         {t(nivel === "clube" ? "publico.planos.assinarClube" : "publico.planos.assinarGrupo")}
       </Botao>
     )
@@ -180,11 +194,12 @@ export function Planos() {
             ))}
           </fieldset>
           <div className="grid gap-6 md:grid-cols-2">{card("clube")}{card("grupo")}</div>
+          {/* PROVISÓRIO: texto do IVA a validar (Stripe Tax, ASS-06) */}
           <p className="mt-4 text-sm text-creme/70">{t("publico.planos.vat")}</p>
 
           {escolhido ? (
-            <form onSubmit={ir} noValidate aria-labelledby="aceite-titulo" className="mt-10 space-y-5 rounded-2xl border border-creme/20 p-6">
-              <h2 id="aceite-titulo" className="font-titulo text-3xl font-bold uppercase">
+            <form key={escolhido.id} id="aceite" onSubmit={ir} noValidate aria-labelledby="aceite-titulo" className="mt-10 space-y-5 rounded-2xl border border-creme/20 p-6">
+              <h2 id="aceite-titulo" ref={formRef} tabIndex={-1} className="font-titulo text-3xl font-bold uppercase outline-none">
                 {t("publico.planos.aceite.titulo")}
               </h2>
               <p className="text-creme/80">

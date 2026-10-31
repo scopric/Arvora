@@ -26,9 +26,9 @@ export function Awards() {
   const caminho = useCaminho()
   useTitulo("publico.awards.titulo")
   const { nivel } = useAcesso()
-  // Edição em destaque: a mais recente publicada (RLS já esconde as não publicadas).
+  // Edição em destaque: a mais recente com publicada_em preenchido (filtro explícito; a view já esconde o resto).
   const edicao = useConsulta(
-    () => supabase.from("edicoes_publicas").select("slug,nome,fase").order("ano", { ascending: false }).limit(1).maybeSingle(),
+    () => supabase.from("edicoes_publicas").select("slug,nome,fase").not("publicada_em", "is", null).order("ano", { ascending: false }).limit(1).maybeSingle(),
     "edicao-atual",
   )
   const slugEdicao = edicao.dados?.slug

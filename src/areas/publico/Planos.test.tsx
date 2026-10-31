@@ -27,6 +27,32 @@ beforeEach(() => {
 afterEach(cleanup)
 const ver = (acesso = {}) => montar(<Planos />, "/:lang/planos", "/pt/planos", acesso)
 
+describe("Planos: aceite e duplicidade", () => {
+  it("plano duplicado no mesmo nível e ciclo: vale o mais recente", async () => {
+    falso.tabelas.planos = { data: [
+      { id: 1, nivel: "clube", intervalo: "mes", valor_centavos: 1000, moeda: "EUR", criado_em: "2026-01-01T00:00:00Z" },
+      { id: 2, nivel: "clube", intervalo: "mes", valor_centavos: 2000, moeda: "EUR", criado_em: "2026-06-01T00:00:00Z" },
+    ], error: null }
+    ver()
+    expect(await screen.findByText(/20,00/)).toBeTruthy()
+    expect(screen.queryByText(/10,00/)).toBeNull()
+  })
+
+  it("ao escolher o plano o foco vai para o formulário do aceite; formulário novo a cada plano (confirmações voltam desmarcadas)", async () => {
+    estado.sessao = { user: { id: "u1", email: "a@b.invalid" } }
+    ver()
+    const botao = await screen.findByRole("button", { name: "Assinar o Clube" })
+    expect(botao.getAttribute("aria-expanded")).toBe("false")
+    expect(botao.getAttribute("aria-pressed")).toBeNull()
+    await userEvent.click(botao)
+    expect(document.activeElement?.id).toBe("aceite-titulo")
+    expect(screen.getByRole("button", { name: "Assinar o Clube" }).getAttribute("aria-expanded")).toBe("true")
+    await userEvent.click(screen.getByRole("checkbox", { name: /comece imediatamente/ }))
+    await userEvent.click(screen.getByRole("button", { name: "Assinar o Grupo Árvora" }))
+    expect((screen.getByRole("checkbox", { name: /comece imediatamente/ }) as HTMLInputElement).checked).toBe(false)
+  })
+})
+
 describe("Planos", () => {
   it("mostra preço do banco e alterna mensal/anual (ciclo sem plano = indisponível)", async () => {
     ver()

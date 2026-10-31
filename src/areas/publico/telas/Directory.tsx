@@ -30,7 +30,7 @@ export function Directory() {
     "empresas",
   )
   // Selo Premiado: empresa ligada a um premiado publicado. O selo "Membro Grupo Árvora" (DIR-03) precisa de um dado que o visitante não lê: ver relatório.
-  const premiadas = useConsulta(() => supabase.from("premiados").select("empresa_id").not("empresa_id", "is", null), "premiadas")
+  const premiadas = useConsulta(() => supabase.from("premiados").select("empresa_id").not("empresa_id", "is", null).not("publicado_em", "is", null), "premiadas")
 
   const listaSetores = setores.dados ?? []
   const todas = empresas.dados ?? []

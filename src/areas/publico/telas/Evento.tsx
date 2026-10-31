@@ -10,6 +10,7 @@ import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { dataLonga, diaCurto, horaDublinBrasilia, urlImagem } from "../formatos"
 import { Pagina, SemRegistro, linkPrimario } from "../Pagina"
+import { useTituloNome } from "../tituloAba"
 import { useConsulta } from "../usarConsulta"
 
 const https = (url: string | null | undefined) => (url && /^https:\/\//i.test(url) && URL.canParse(url) ? url : null)
@@ -29,6 +30,8 @@ export function Evento() {
     `edicao/${edicao}`,
   )
   const e = r.dados
+  const achou = Boolean(e && e.id !== null)
+  useTituloNome(achou ? (e?.nome ?? null) : r.carregando || r.erro ? null : t("publico.semRegistro.titulo"), !achou && !r.carregando && !r.erro)
   if (r.carregando) return <Pagina titulo={t("publico.evento.titulo")}><Esqueleto linhas={6} /></Pagina>
   if (r.erro) return <Pagina titulo={t("publico.evento.titulo")}><Erro aoTentar={r.recarregar} /></Pagina>
   if (!e || e.id === null) return <SemRegistro voltar="/awards" rotulo="publico.evento.voltar" />
@@ -36,7 +39,7 @@ export function Evento() {
   return (
     <Pagina titulo={e.nome ?? ""} apoio={e.descricao}>
       <p className="-mt-6 mb-10 font-mono text-xs tracking-[0.15em] text-creme/70 uppercase">
-        {t(`publico.evento.fase.${fase}`)} · {e.cidade}, {e.pais}{e.durante_inicio ? ` · ${dataLonga(e.durante_inicio, idioma)}` : ""}
+        {[t(`publico.evento.fase.${fase}`), [e.cidade, e.pais].filter(Boolean).join(", "), e.durante_inicio ? dataLonga(e.durante_inicio, idioma) : ""].filter(Boolean).join(" · ")}
       </p>
 
       {fase === "durante" ? (

@@ -27,6 +27,7 @@ describe("PaginaVideo", () => {
   it("visitante: só o trecho e o cadeado; nunca pede video_id nem chama a RPC", async () => {
     ver()
     expect(await screen.findByRole("heading", { level: 1, name: "Talk de teste" })).toBeTruthy()
+    await waitFor(() => expect(document.title).toBe("Talk de teste — Grupo Árvora"))
     expect(document.querySelector("iframe")?.getAttribute("src")).toBe("https://exemplo.invalid/trailer")
     expect(screen.getByText("O restante deste vídeo está no Clube.")).toBeTruthy()
     expect(falso.rpc).not.toHaveBeenCalled()
@@ -74,6 +75,7 @@ describe("PaginaVideo", () => {
     falso.tabelas.videos = { data: [], error: null }
     ver()
     expect(await screen.findByText("Não encontramos esta página")).toBeTruthy()
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex")
     cleanup()
     falso.tabelas.videos = { data: null, error: { message: "x" } }
     ver()
