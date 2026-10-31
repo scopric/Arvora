@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react"
-import type { SupabaseClient } from "@supabase/supabase-js"
 import { AcessoContext, type Acesso, type Nivel, type PapelEquipe } from "./acesso"
 import { useAuth } from "./sessao"
 import { supabase } from "./supabase"
@@ -9,11 +8,10 @@ type Estado = { uid: string | null; fase: "carregando" | "erro" | "pronto"; dado
 const vazio: Dados = { nivel: "visitante", premiado: false, equipe: false, papel: null }
 
 // Premiado é só um selo e o bloco Meu Award: se a leitura falhar (ou a tabela ainda não existir), vale `false` e um aviso no console
-// de desenvolvimento; nível e equipe não dependem dela. `premiados` ainda não está em database.types.ts: cliente sem tipos aqui.
-// ponytail: trocar por supabase.from("premiados") ao regenerar os tipos.
+// de desenvolvimento; nível e equipe não dependem dela.
 async function lerPremiado(uid: string): Promise<boolean> {
   try {
-    const { data, error } = await (supabase as unknown as SupabaseClient).from("premiados").select("id").eq("perfil_id", uid).limit(1)
+    const { data, error } = await supabase.from("premiados").select("id").eq("perfil_id", uid).limit(1)
     if (error) throw error
     return (data?.length ?? 0) > 0
   } catch (e) {
