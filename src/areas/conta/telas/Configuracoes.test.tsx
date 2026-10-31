@@ -82,6 +82,20 @@ describe("tela Configurações: senha", () => {
     expect(screen.queryByLabelText("Código recebido por e-mail")).toBeNull()
   })
 
+  it("'Enviar outro código' fica ocupado até o pedido terminar", async () => {
+    auth.updateUser.mockResolvedValueOnce({ error: { code: "reauthentication_needed" } })
+    monta()
+    await userEvent.type(screen.getByLabelText("Nova senha"), "Senha-nova-123")
+    await userEvent.click(screen.getByRole("button", { name: "Trocar senha" }))
+    await screen.findByLabelText("Código recebido por e-mail")
+    let fim!: () => void
+    auth.reauthenticate.mockReturnValue(new Promise((r) => (fim = () => r({ error: null }))))
+    await userEvent.click(screen.getByRole("button", { name: "Enviar outro código" }))
+    expect(screen.getAllByRole("button", { name: "Aguarde…" }).every((b) => (b as HTMLButtonElement).disabled)).toBe(true)
+    fim()
+    await screen.findByRole("button", { name: "Enviar outro código" })
+  })
+
   it("código errado mostra a mensagem e mantém o campo", async () => {
     auth.updateUser.mockResolvedValueOnce({ error: { code: "reauthentication_needed" } }).mockResolvedValueOnce({ error: { code: "reauthentication_not_valid" } })
     monta()
@@ -126,6 +140,33 @@ describe("tela Configurações: 2FA da equipe", () => {
     expect(await screen.findByText(/Não cadastrada/)).toBeTruthy()
     expect(auth.mfa.challengeAndVerify).toHaveBeenCalledWith({ factorId: "f9", code: "654321" })
     expect(auth.mfa.unenroll).toHaveBeenCalledWith({ factorId: "f9" })
+  })
+
+  it("remover tira TODOS os fatores verificados", async () => {
+    auth.mfa.listFactors.mockResolvedValue({ data: { totp: [{ id: "f1" }, { id: "f2" }], all: [] }, error: null })
+    auth.mfa.challengeAndVerify.mockResolvedValue({ error: null })
+    auth.mfa.unenroll.mockResolvedValue({ error: null })
+    monta(true)
+    await userEvent.click(await screen.findByRole("button", { name: "Remover verificação" }))
+    auth.mfa.listFactors.mockResolvedValue({ data: { totp: [], all: [] }, error: null })
+    await userEvent.type(screen.getByLabelText("Código de 6 dígitos"), "654321")
+    await userEvent.click(screen.getByRole("button", { name: "Remover agora" }))
+    expect(await screen.findByText(/Não cadastrada/)).toBeTruthy()
+    expect(auth.mfa.unenroll).toHaveBeenCalledTimes(2)
+    expect(auth.mfa.unenroll).toHaveBeenCalledWith({ factorId: "f2" })
+  })
+
+  it("falha ao remover um dos fatores mostra o estado real (ainda ativa)", async () => {
+    auth.mfa.listFactors.mockResolvedValue({ data: { totp: [{ id: "f1" }, { id: "f2" }], all: [] }, error: null })
+    auth.mfa.challengeAndVerify.mockResolvedValue({ error: null })
+    auth.mfa.unenroll.mockResolvedValueOnce({ error: null }).mockResolvedValueOnce({ error: { message: "x" } })
+    monta(true)
+    await userEvent.click(await screen.findByRole("button", { name: "Remover verificação" }))
+    auth.mfa.listFactors.mockResolvedValue({ data: { totp: [{ id: "f2" }], all: [] }, error: null })
+    await userEvent.type(screen.getByLabelText("Código de 6 dígitos"), "654321")
+    await userEvent.click(screen.getByRole("button", { name: "Remover agora" }))
+    expect(await screen.findByText(/Ativada/)).toBeTruthy()
+    expect((await screen.findAllByRole("alert")).length).toBeGreaterThan(0)
   })
 
   it("código errado na remoção não desvincula", async () => {

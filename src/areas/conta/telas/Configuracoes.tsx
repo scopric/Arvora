@@ -71,6 +71,12 @@ function BlocoSenha() {
   const [ocupado, setOcupado] = useState(false)
   const [pedeCodigo, setPedeCodigo] = useState(false)
 
+  async function novoCodigo() {
+    setOcupado(true)
+    await pedirCodigo()
+    setOcupado(false)
+  }
+
   async function pedirCodigo() {
     const { error } = await supabase.auth.reauthenticate()
     if (error) return setMsg({ tipo: "erro", texto: error.code === "over_email_send_rate_limit" ? "conta.email.limite" : "conta.senha.erro" })
@@ -127,7 +133,7 @@ function BlocoSenha() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("conta.senha.botao")}</Botao>
           {pedeCodigo ? (
-            <Botao type="button" variante="contorno" disabled={ocupado} onClick={() => void pedirCodigo()} className="sm:w-auto">{t("conta.senha.novoCodigo")}</Botao>
+            <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => void novoCodigo()} className="sm:w-auto">{t("conta.senha.novoCodigo")}</Botao>
           ) : null}
         </div>
       </form>
@@ -138,7 +144,7 @@ function BlocoSenha() {
 type Fator =
   | { fase: "carregando" }
   | { fase: "erro" }
-  | { fase: "pronto"; fator: string | null }
+  | { fase: "pronto"; fatores: string[] }
   | { fase: "qr"; fator: string; qr: string; segredo: string }
 
 const soCodigo = (e: SubmitEvent<HTMLFormElement>) => String(new FormData(e.currentTarget).get("codigo") ?? "").replace(/\s/g, "")
@@ -154,7 +160,7 @@ function DoisFatores() {
 
   async function descobrir(): Promise<Fator> {
     const { data, error } = await supabase.auth.mfa.listFactors()
-    return error ? { fase: "erro" } : { fase: "pronto", fator: data.totp[0]?.id ?? null }
+    return error ? { fase: "erro" } : { fase: "pronto", fatores: data.totp.map((f) => f.id) }
   }
   useEffect(() => {
     let ativo = true
@@ -187,7 +193,7 @@ function DoisFatores() {
     }
   }
 
-  async function confirmar(e: SubmitEvent<HTMLFormElement>, fator: string, remover: boolean) {
+  async function confirmar(e: SubmitEvent<HTMLFormElement>, fator: string, remover: string[] | null) {
     e.preventDefault()
     setMsg(null)
     const codigo = soCodigo(e)
@@ -197,8 +203,14 @@ function DoisFatores() {
       const v = await supabase.auth.mfa.challengeAndVerify({ factorId: fator, code: codigo })
       if (v.error) return setMsg({ tipo: "erro", texto: v.error.code === "mfa_verification_failed" ? "mfa.erroCodigo" : "mfa.erro" })
       if (remover) {
-        const r = await supabase.auth.mfa.unenroll({ factorId: fator })
-        if (r.error) return setMsg({ tipo: "erro", texto: "mfa.erro" })
+        // Remove TODOS os fatores verificados: sobrar um deixaria a conta exigindo 2FA depois do "removido".
+        for (const id of remover) {
+          const r = await supabase.auth.mfa.unenroll({ factorId: id })
+          if (r.error) {
+            setEstado(await descobrir()) // mostra o estado real
+            return setMsg({ tipo: "erro", texto: "mfa.erro" })
+          }
+        }
         setRemovendo(false)
       }
       setEstado(await descobrir())
@@ -210,7 +222,7 @@ function DoisFatores() {
     }
   }
 
-  const formCodigo = (fator: string, remover: boolean) => (
+  const formCodigo = (fator: string, remover: string[] | null) => (
     <form onSubmit={(e) => void confirmar(e, fator, remover)} noValidate className="mt-5 space-y-5">
       <Campo rotulo={t("mfa.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" maxLength={7} />
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -228,19 +240,19 @@ function DoisFatores() {
         {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
         {estado.fase === "carregando" ? <Esqueleto linhas={2} /> : null}
         {estado.fase === "erro" ? <Erro aoTentar={() => (setEstado({ fase: "carregando" }), descobrir().then(setEstado, () => setEstado({ fase: "erro" })))}>{t("mfa.erro")}</Erro> : null}
-        {estado.fase === "pronto" && estado.fator === null ? (
+        {estado.fase === "pronto" && estado.fatores.length === 0 ? (
           <>
             <p className="font-semibold">{t("conta.dois.inativa")}</p>
             <Botao type="button" ocupado={ocupado} onClick={() => void cadastrar()} className="sm:w-auto">{t("conta.dois.cadastrar")}</Botao>
           </>
         ) : null}
-        {estado.fase === "pronto" && estado.fator !== null ? (
+        {estado.fase === "pronto" && estado.fatores.length > 0 ? (
           <>
             <p className="font-semibold">{t("conta.dois.ativa")}</p>
             {removendo ? (
               <>
                 <Aviso tipo="erro">{t("conta.dois.removerTexto")}</Aviso>
-                {formCodigo(estado.fator, true)}
+                {formCodigo(estado.fatores[0], estado.fatores)}
               </>
             ) : (
               <Botao type="button" variante="contorno" onClick={() => (setMsg(null), setRemovendo(true))} className="sm:w-auto">{t("conta.dois.remover")}</Botao>
@@ -255,7 +267,7 @@ function DoisFatores() {
             <p className="text-sm text-creme/70">{t("mfa.qr.segredo")}</p>
             <p className="font-mono text-sm break-all select-all">{estado.segredo}</p>
             <p className="text-sm text-creme/70">{t("mfa.verificar.texto")}</p>
-            {formCodigo(estado.fator, false)}
+            {formCodigo(estado.fator, null)}
           </>
         ) : null}
       </div>

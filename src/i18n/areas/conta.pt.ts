@@ -7,6 +7,8 @@ export const contaPt = {
   "conta.assinatura.titulo": "Assinatura",
   "conta.dados.titulo": "Meus dados",
 
+  "conta.perfil.linkPrivacidade": "Visibilidade do perfil e privacidade",
+  "conta.perfil.linkDados": "Meus dados: baixar, pedir ou excluir a conta",
   "conta.menu": "Configurações da conta",
   "conta.menu.conta": "Conta",
   "conta.erroCarregar": "Não conseguimos carregar esta página agora. Tente de novo.",
@@ -107,9 +109,19 @@ export const contaPt = {
   "conta.assinatura.canceladaAte": "Cancelada, ativa até",
   "conta.assinatura.encerradaEm": "Encerrada em",
   "conta.assinatura.acessoManual": "Acesso concedido pela equipe até",
-  // PROVISÓRIO: 7 dias é a tolerância proposta no PRD (ASS-05); o prazo real são as retentativas do Stripe.
-  "conta.assinatura.pendenteTexto":
-    "Não conseguimos cobrar a sua última fatura. Atualize o cartão no Stripe: seu acesso continua durante o prazo de tolerância (7 dias) e a cobrança é tentada de novo nesse período.",
+  "conta.assinatura.pendenteTexto": "Não conseguimos cobrar a sua última fatura. Atualize o cartão no Stripe: seu acesso continua durante o período de novas tentativas de cobrança.",
+  "conta.assinatura.naoConcluidoTexto": "O pagamento desta assinatura não foi concluído. Atualize o cartão no Stripe ou fale com o suporte.",
+  "conta.assinatura.estado.naoConcluido": "Pagamento não concluído",
+  "conta.assinatura.estado.pausada": "Pausada",
+  "conta.assinatura.periodoAtual": "Período atual até",
+  "conta.consent.ler": "Ler o texto",
+  "conta.consent.lerAntes": "Abra e leia o texto acima para poder ligar.",
+  "conta.consent.cookies": "Gerencie nos cookies",
+  "conta.privacidade.visib.igual": "A visibilidade já é essa; nada foi alterado.",
+  "conta.dados.pedido.dialogoExportacao": "Pedir a exportação dos seus dados?",
+  "conta.dados.pedido.dialogoExclusao": "Pedir a exclusão da sua conta?",
+  "conta.dados.pedido.dialogoTexto": "A equipe recebe o pedido e responde em até um mês. Pedido de exclusão: depois de atendido, a conta e os dados são apagados e não dá para desfazer.",
+  "conta.dados.pedido.enviar": "Enviar pedido",
   "conta.assinatura.gerenciar": "Gerenciar no Stripe",
   "conta.assinatura.gerenciarAjuda": "Trocar cartão, ver faturas, fazer upgrade ou cancelar.",
   // PROVISÓRIO: validar com o solicitor (Decisão 50; Consumer Rights Act 2022, Parte 5). Regra comercial é do Rafael.

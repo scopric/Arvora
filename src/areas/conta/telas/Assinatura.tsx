@@ -73,33 +73,40 @@ export function Assinatura() {
   )
 }
 
+// Rótulo, tom do selo e do texto de cada status do Stripe. "Encerrada" só para canceled e incomplete_expired.
+function situacao(a: Linha): { selo: Chave; tom: "destaque" | "alerta" | "neutro"; aviso?: Chave; data: Chave } {
+  if (a.status === "past_due") return { selo: "conta.assinatura.estado.pendente", tom: "alerta", aviso: "conta.assinatura.pendenteTexto", data: "conta.assinatura.periodoAtual" }
+  if (a.status === "incomplete" || a.status === "unpaid") return { selo: "conta.assinatura.estado.naoConcluido", tom: "alerta", aviso: "conta.assinatura.naoConcluidoTexto", data: "conta.assinatura.periodoAtual" }
+  if (a.status === "paused") return { selo: "conta.assinatura.estado.pausada", tom: "neutro", data: "conta.assinatura.periodoAtual" }
+  if (a.status === "canceled" || a.status === "incomplete_expired") return { selo: "conta.assinatura.estado.encerrada", tom: "neutro", data: "conta.assinatura.encerradaEm" }
+  if (a.cancela_no_fim) return { selo: "conta.assinatura.estado.cancelada", tom: "neutro", data: "conta.assinatura.canceladaAte" }
+  return { selo: "conta.assinatura.estado.ativa", tom: "destaque", data: a.origem === "manual" ? "conta.assinatura.acessoManual" : "conta.assinatura.proxima" }
+}
+
 function Plano({ a }: { a: Linha }) {
   const t = useT()
   const idioma = useIdioma()
   const [erro, setErro] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
-  const vigente = VIGENTES.includes(a.status)
-  const pendente = a.status === "past_due"
-  const cancelada = vigente && a.cancela_no_fim
   const manual = a.origem === "manual"
+  const sit = situacao(a)
 
   return (
     <Cartao>
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="font-titulo text-2xl font-bold uppercase">{a.planos?.nome ?? t("conta.assinatura.titulo")}</h2>
-        {pendente ? <Selo tom="alerta">{t("conta.assinatura.estado.pendente")}</Selo> : cancelada ? <Selo tom="neutro">{t("conta.assinatura.estado.cancelada")}</Selo> : vigente ? <Selo tom="destaque">{t("conta.assinatura.estado.ativa")}</Selo> : <Selo tom="neutro">{t("conta.assinatura.estado.encerrada")}</Selo>}
+        <Selo tom={sit.tom}>{t(sit.selo)}</Selo>
       </div>
       <dl className="mt-5 space-y-2 text-sm">
         {a.planos && !manual ? (
           <div className="flex gap-2"><dt className="text-creme/70">{t("conta.assinatura.valor")}:</dt><dd className="font-semibold">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} / {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</dd></div>
         ) : null}
         <div className="flex gap-2">
-          <dt className="text-creme/70">{t(!vigente ? "conta.assinatura.encerradaEm" : manual ? "conta.assinatura.acessoManual" : cancelada ? "conta.assinatura.canceladaAte" : "conta.assinatura.proxima")}:</dt>
+          <dt className="text-creme/70">{t(sit.data)}:</dt>
           <dd className="font-semibold"><time dateTime={a.periodo_fim}>{dataCurta(a.periodo_fim, idioma)}</time></dd>
         </div>
       </dl>
-      {/* PROVISÓRIO: 7 dias é a tolerância proposta no PRD (ASS-05); o prazo real são as retentativas configuradas no Stripe. */}
-      {pendente ? <div className="mt-5"><Aviso tipo="erro">{t("conta.assinatura.pendenteTexto")}</Aviso></div> : null}
+      {sit.aviso ? <div className="mt-5"><Aviso tipo="erro">{t(sit.aviso)}</Aviso></div> : null}
       {erro ? <div className="mt-5"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
       {!manual ? (
         <div className="mt-6">

@@ -1,4 +1,5 @@
-import { useEffect, useState, type SubmitEvent } from "react"
+import { useEffect, useRef, useState, type SubmitEvent } from "react"
+import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
 import { Cartao } from "../../../componentes/Cartao"
@@ -8,7 +9,7 @@ import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
 import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
-import { useIdioma, useT, type Chave } from "../../../i18n"
+import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { BlocoConsentimento } from "../BlocoConsentimento"
@@ -17,8 +18,8 @@ import { dataCurta } from "../formato"
 import { Pagina } from "../Pagina"
 
 // Retirar vale para o que é escolha do titular. Termos, privacidade, reembolso e arrependimento são condição da conta
-// (para retirar, a pessoa exclui a conta); cookies de quem está logado e Hall of Fame são consentimentos de verdade.
-const REVOGAVEIS = ["match", "marketing", "hall_of_fame", "cookies"]
+// (para retirar, a pessoa exclui a conta); a escolha de cookies é feita no banner e em /cookies, não aqui.
+const REVOGAVEIS = ["match", "marketing", "hall_of_fame"]
 
 type Visib = { fase: "carregando" } | { fase: "erro" } | { fase: "pronto"; visibilidade: "membros" | "publico"; aprovado: boolean }
 
@@ -52,6 +53,7 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
   const [estado, setEstado] = useState<Visib>({ fase: "carregando" })
   const [msg, setMsg] = useState<{ tipo: "erro" | "ok"; texto: Chave } | null>(null)
   const [ocupado, setOcupado] = useState(false)
+  const [tentativa, setTentativa] = useState(0)
 
   useEffect(() => {
     let ativo = true
@@ -62,13 +64,15 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
     return () => {
       ativo = false
     }
-  }, [uid])
+  }, [uid, tentativa])
 
   async function salvar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const valor = new FormData(e.currentTarget).get("visibilidade")
-    if (valor !== "membros" && valor !== "publico") return
+    if ((valor !== "membros" && valor !== "publico") || estado.fase !== "pronto") return
     setMsg(null)
+    // Nada mudou: não grava (gravar tiraria a página pública do ar sem motivo) e não promete aprovação.
+    if (valor === estado.visibilidade) return setMsg({ tipo: "ok", texto: "conta.privacidade.visib.igual" })
     setOcupado(true)
     // .select('id'): sob RLS um UPDATE que não casa linha volta "ok" e vazio (Erros 2.5).
     const { data, error } = await supabase.from("perfis").update({ visibilidade: valor }).eq("id", uid).select("id")
@@ -83,7 +87,7 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
     <Cartao>
       <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.privacidade.visib.titulo")}</h2>
       {estado.fase === "carregando" ? <Esqueleto linhas={2} className="mt-4" /> : null}
-      {estado.fase === "erro" ? <div className="mt-4"><Erro>{t("conta.erroCarregar")}</Erro></div> : null}
+      {estado.fase === "erro" ? <div className="mt-4"><Erro aoTentar={() => (setEstado({ fase: "carregando" }), setTentativa((n) => n + 1))}>{t("conta.erroCarregar")}</Erro></div> : null}
       {estado.fase === "pronto" ? (
         <form key={estado.visibilidade} onSubmit={salvar} className="mt-4 space-y-4">
           {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
@@ -109,24 +113,31 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
   )
 }
 
-function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar: () => void }) {
+function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar: () => Promise<void> }) {
   const t = useT()
   const idioma = useIdioma()
   const [alvo, setAlvo] = useState<Aceite | null>(null)
   const [falhou, setFalhou] = useState(false)
+  const [ocupado, setOcupado] = useState(false)
+  const caminho = useCaminho()
+  const titulo = useRef<HTMLHeadingElement>(null)
 
   async function retirar() {
     if (!alvo) return
     const id = alvo.id
     setAlvo(null)
     setFalhou(false)
+    setOcupado(true)
     if (!(await revogar([id]))) setFalhou(true)
-    aoMudar()
+    await aoMudar()
+    setOcupado(false)
+    // O botão que abriu o diálogo some (a linha vira "Retirado"): o foco vai para o título da lista, não se perde.
+    titulo.current?.focus()
   }
 
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.consent.lista.titulo")}</h2>
+      <h2 ref={titulo} tabIndex={-1} className="font-titulo text-2xl font-bold uppercase outline-none">{t("conta.consent.lista.titulo")}</h2>
       <p className="mt-3 text-sm text-creme/70">{t("conta.consent.lista.texto")}</p>
       <div className="mt-5 space-y-4">
         {falhou ? <Aviso tipo="erro">{t("conta.consent.erro")}</Aviso> : null}
@@ -151,9 +162,11 @@ function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar:
                 titulo: t("conta.consent.col.acao"),
                 celula: (a) =>
                   a.revogado_em ? null : REVOGAVEIS.includes(a.documentos_legais?.tipo ?? "") ? (
-                    <button type="button" aria-label={`${t("conta.consent.retirar")}: ${a.documentos_legais?.titulo ?? ""}`} onClick={() => setAlvo(a)} className="min-h-11 rounded-lg border border-creme/30 px-4 font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
+                    <button type="button" disabled={ocupado} aria-label={`${t("conta.consent.retirar")}: ${a.documentos_legais?.titulo ?? ""}`} onClick={() => setAlvo(a)} className="min-h-11 rounded-lg border border-creme/30 px-4 font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
                       {t("conta.consent.retirar")}
                     </button>
+                  ) : a.documentos_legais?.tipo === "cookies" ? (
+                    <Link to={caminho("/cookies")} className="underline underline-offset-4">{t("conta.consent.cookies")}</Link>
                   ) : (
                     <span className="text-creme/70">{t("conta.consent.condicao")}</span>
                   ),
