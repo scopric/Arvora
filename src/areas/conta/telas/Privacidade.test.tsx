@@ -32,7 +32,7 @@ vi.mock("../../../lib/sessao", () => ({
 
 import { Privacidade } from "./Privacidade"
 
-const docMatch = { id: 7, tipo: "match", idioma: "pt", versao: "v1", titulo: "Autorização do Match" }
+const docMatch = { id: 7, tipo: "match", idioma: "pt", versao: "v1", titulo: "Autorização do Match", conteudo_md: "Primeiro parágrafo.\n\n<b>não é html</b>" }
 const aceiteMatch = { id: 5, aceito_em: "2026-10-30T10:00:00Z", revogado_em: null, documentos_legais: { tipo: "match", versao: "v1", titulo: "Autorização do Match" } }
 const aceiteTermos = { id: 6, aceito_em: "2026-10-29T10:00:00Z", revogado_em: null, documentos_legais: { tipo: "termos", versao: "v1", titulo: "Termos de uso" } }
 const monta = (url = "/pt") => renderiza(<main><Privacidade /></main>, url)
@@ -82,8 +82,44 @@ describe("tela Privacidade", () => {
     expect(screen.getByText(/Em breve/)).toBeTruthy()
   })
 
+  it("o texto vem antes: o interruptor só destrava depois de abrir o texto, que é mostrado como texto puro", async () => {
+    monta()
+    const sw = (await screen.findByRole("switch", { name: "Participar do Business Match" })) as HTMLInputElement
+    expect(sw.disabled).toBe(true)
+    expect(screen.getByText(/Abra e leia o texto/)).toBeTruthy()
+    await userEvent.click(screen.getByText(/Ler o texto: Autorização do Match/))
+    await waitFor(() => expect(sw.disabled).toBe(false))
+    expect(screen.getByText("Primeiro parágrafo.")).toBeTruthy()
+    expect(screen.getByText("<b>não é html</b>")).toBeTruthy()
+    expect(document.querySelector("details b")).toBeNull()
+  })
+
+  it("visibilidade igual à atual não grava nem fala em aprovação", async () => {
+    monta()
+    await userEvent.click(await screen.findByRole("button", { name: "Salvar visibilidade" }))
+    expect(await screen.findByText(/nada foi alterado/)).toBeTruthy()
+    expect(chamadas.perfilUpdate).not.toHaveBeenCalled()
+    expect(screen.queryByText(/aguarda a aprovação/)).toBeNull()
+  })
+
+  it("falha ao ler a visibilidade oferece tentar de novo", async () => {
+    resp.perfil = { data: null, error: { message: "boom" } }
+    monta()
+    expect(await screen.findByRole("button", { name: "Tentar de novo" })).toBeTruthy()
+  })
+
+  it("cookies não se retiram aqui: leva à página de cookies", async () => {
+    resp.aceites = { data: [{ id: 8, aceito_em: "2026-10-30T10:00:00Z", revogado_em: null, documentos_legais: { tipo: "cookies", versao: "v1", titulo: "Cookies" } }], error: null }
+    monta()
+    const tabela = await screen.findByRole("table", { name: "Meus consentimentos" })
+    expect(within(tabela).queryByRole("button")).toBeNull()
+    expect(within(tabela).getByRole("link", { name: "Gerencie nos cookies" }).getAttribute("href")).toBe("/pt/cookies")
+  })
+
   it("ligar o Match registra o aceite do texto vigente (também com o texto só em outro idioma)", async () => {
     monta("/en")
+    await userEvent.click(await screen.findByText(/Read the text/))
+    await waitFor(() => expect((screen.getByRole("switch", { name: "Take part in Business Match" }) as HTMLInputElement).disabled).toBe(false))
     await userEvent.click(await screen.findByRole("switch", { name: "Take part in Business Match" }))
     await waitFor(() => expect(chamadas.insert).toHaveBeenCalledTimes(1))
     expect(chamadas.insert.mock.calls[0][0]).toMatchObject({ documento_id: 7, perfil_id: "u1", titular_email: "ana@exemplo.invalid" })
@@ -92,6 +128,7 @@ describe("tela Privacidade", () => {
   it("INSERT que o banco não confirma (vazio) vira erro", async () => {
     resp.insert = { data: [], error: null }
     monta()
+    await userEvent.click(await screen.findByText(/Ler o texto/))
     await userEvent.click(await screen.findByRole("switch", { name: "Participar do Business Match" }))
     expect((await screen.findAllByRole("alert")).some((a) => /não conseguimos atualizar esta autorização/i.test(a.textContent ?? ""))).toBe(true)
   })
@@ -104,6 +141,14 @@ describe("tela Privacidade", () => {
     await userEvent.click(sw)
     await waitFor(() => expect(chamadas.revoga).toHaveBeenCalledTimes(1))
     expect(chamadas.revoga.mock.calls[0][0]).toHaveProperty("revogado_em")
+  })
+
+  it("depois de retirar, o foco vai para o título da lista", async () => {
+    resp.aceites = { data: [aceiteMatch], error: null }
+    monta()
+    await userEvent.click(await screen.findByRole("button", { name: /^Retirar/ }))
+    await userEvent.click(within(screen.getByRole("dialog", { hidden: true })).getByRole("button", { name: "Retirar", hidden: true }))
+    await waitFor(() => expect(document.activeElement?.textContent).toBe("Meus consentimentos"))
   })
 
   it("lista: retirar só nos consentimentos que são escolha; termos são condição da conta; confirma em diálogo", async () => {

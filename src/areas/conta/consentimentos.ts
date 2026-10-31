@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { supabase } from "../../lib/supabase"
 
-export type Documento = { id: number; tipo: string; idioma: string; versao: string; titulo: string }
+export type Documento = { id: number; tipo: string; idioma: string; versao: string; titulo: string; conteudo_md: string }
 export type Aceite = {
   id: number
   aceito_em: string
@@ -17,25 +17,33 @@ export type EstadoConsentimentos =
 // também lê os consentimentos de todo mundo, e esta tela mostra só os dele.
 export function useConsentimentos(uid: string | undefined) {
   const [estado, setEstado] = useState<EstadoConsentimentos>({ fase: "carregando" })
-  const [tentativa, setTentativa] = useState(0)
+  const montado = useRef(true)
   useEffect(() => {
-    if (!uid) return
-    let ativo = true
-    Promise.all([
-      supabase.from("documentos_legais").select("id, tipo, idioma, versao, titulo").lte("vigente_desde", new Date().toISOString()).order("vigente_desde", { ascending: false }),
-      supabase.from("consentimentos").select("id, aceito_em, revogado_em, documentos_legais(tipo, versao, titulo)").eq("perfil_id", uid).order("aceito_em", { ascending: false }),
-    ]).then(
-      ([d, c]) => {
-        if (!ativo) return
-        setEstado(d.error || c.error ? { fase: "erro" } : { fase: "pronto", docs: d.data, aceites: c.data })
-      },
-      () => ativo && setEstado({ fase: "erro" }),
-    )
+    montado.current = true
     return () => {
-      ativo = false
+      montado.current = false
     }
-  }, [uid, tentativa])
-  return { estado, recarregar: () => setTentativa((n) => n + 1) }
+  }, [])
+  // Devolve uma promessa que termina quando a recarga termina: quem chama mantém o "ocupado" até lá.
+  const recarregar = useCallback(async () => {
+    if (!uid) return
+    let novo: EstadoConsentimentos
+    try {
+      // ponytail: traz o texto (conteudo_md) de todas as versões vigentes; se ficar pesado, buscar só ao abrir.
+      const [d, c] = await Promise.all([
+        supabase.from("documentos_legais").select("id, tipo, idioma, versao, titulo, conteudo_md").lte("vigente_desde", new Date().toISOString()).order("vigente_desde", { ascending: false }),
+        supabase.from("consentimentos").select("id, aceito_em, revogado_em, documentos_legais(tipo, versao, titulo)").eq("perfil_id", uid).order("aceito_em", { ascending: false }),
+      ])
+      novo = d.error || c.error ? { fase: "erro" } : { fase: "pronto", docs: d.data, aceites: c.data }
+    } catch {
+      novo = { fase: "erro" }
+    }
+    if (montado.current) setEstado(novo)
+  }, [uid])
+  useEffect(() => {
+    void recarregar()
+  }, [recarregar])
+  return { estado, recarregar }
 }
 
 // Texto vigente mais novo; prefere o idioma do membro, senão qualquer idioma (hoje os textos podem existir só em um).

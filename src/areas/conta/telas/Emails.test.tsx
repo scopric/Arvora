@@ -1,4 +1,5 @@
-import { cleanup, screen } from "@testing-library/react"
+import { cleanup, screen, waitFor } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { renderiza } from "../../../testeUtil"
 import { violacoes } from "../testeConta"
@@ -34,10 +35,12 @@ describe("tela E-mails", () => {
   })
 
   it("com texto de marketing vigente o interruptor pode ser ligado", async () => {
-    resp.docs = { data: [{ id: 6, tipo: "marketing", idioma: "pt", versao: "v1", titulo: "Marketing" }], error: null }
+    resp.docs = { data: [{ id: 6, tipo: "marketing", idioma: "pt", versao: "v1", titulo: "Marketing", conteudo_md: "Texto." }], error: null }
     renderiza(<main><Emails /></main>)
     const marketing = await screen.findByRole("switch", { name: /Receber novidades/ })
-    expect((marketing as HTMLInputElement).disabled).toBe(false)
+    expect((marketing as HTMLInputElement).disabled).toBe(true) // antes de ver o texto, não liga
+    await userEvent.click(screen.getByText(/Ler o texto/))
+    await waitFor(() => expect((marketing as HTMLInputElement).disabled).toBe(false))
   })
 
   it("falha de leitura aparece como erro", async () => {

@@ -68,10 +68,13 @@ describe("tela Meus dados", () => {
   it("pedido manual insere só perfil_id e tipo; pedido repetido (23505) avisa", async () => {
     monta()
     await userEvent.click(await screen.findByRole("button", { name: "Pedir exportação" }))
+    expect(insere).not.toHaveBeenCalled() // antes de confirmar no diálogo, nada é enviado
+    await userEvent.click(screen.getByRole("button", { name: "Enviar pedido", hidden: true }))
     expect(await screen.findByText(/Pedido recebido/)).toBeTruthy()
     expect(insere).toHaveBeenCalledWith({ perfil_id: "u1", tipo: "exportacao" })
     resp.insert = { data: null, error: { code: "23505" } }
     await userEvent.click(screen.getByRole("button", { name: "Pedir exclusão" }))
+    await userEvent.click(screen.getByRole("button", { name: "Enviar pedido", hidden: true }))
     expect((await screen.findAllByRole("alert"))[0].textContent).toMatch(/já tem um pedido aberto/i)
   })
 
@@ -79,6 +82,7 @@ describe("tela Meus dados", () => {
     resp.insert = { data: [], error: null }
     monta()
     await userEvent.click(await screen.findByRole("button", { name: "Pedir exclusão" }))
+    await userEvent.click(screen.getByRole("button", { name: "Enviar pedido", hidden: true }))
     expect((await screen.findAllByRole("alert"))[0].textContent).toMatch(/não conseguimos registrar/i)
   })
 
@@ -88,6 +92,7 @@ describe("tela Meus dados", () => {
     await userEvent.click(await screen.findByRole("button", { name: "Quero excluir minha conta" }))
     expect(screen.queryByLabelText("Sua senha")).toBeNull()
     await userEvent.click(screen.getByRole("button", { name: "Continuar", hidden: true }))
+    expect(document.activeElement).toBe(await screen.findByLabelText("Digite o e-mail da sua conta"))
     await userEvent.type(await screen.findByLabelText("Digite o e-mail da sua conta"), "ana@exemplo.invalid")
     await userEvent.type(screen.getByLabelText("Sua senha"), "segredo")
     await userEvent.click(screen.getByRole("button", { name: "Excluir definitivamente" }))

@@ -43,11 +43,28 @@ describe("tela Assinatura", () => {
     expect(screen.getByText("15/12/2026")).toBeTruthy()
   })
 
-  it("pagamento pendente (past_due) explica a tolerância de 7 dias", async () => {
+  it("pagamento pendente (past_due): fala do período de novas tentativas, sem prometer 7 dias, e o rótulo é 'Período atual até'", async () => {
     resp.assinaturas = { data: [linha({ status: "past_due" })], error: null }
     monta()
     expect(await screen.findAllByText("Pagamento pendente")).toHaveLength(1)
-    expect(screen.getByRole("alert").textContent).toMatch(/7 dias/)
+    expect(screen.getByRole("alert").textContent).toMatch(/período de novas tentativas de cobrança/)
+    expect(screen.getByRole("alert").textContent).not.toMatch(/7 dias/)
+    expect(screen.getByText("Período atual até:")).toBeTruthy()
+    expect(screen.queryByText("Próxima cobrança:")).toBeNull()
+  })
+
+  it.each([
+    ["incomplete", "Pagamento não concluído"],
+    ["unpaid", "Pagamento não concluído"],
+    ["paused", "Pausada"],
+    ["canceled", "Encerrada"],
+    ["incomplete_expired", "Encerrada"],
+  ])("status %s aparece como '%s' (Encerrada só para canceled e incomplete_expired)", async (status, rotulo) => {
+    resp.assinaturas = { data: [linha({ status })], error: null }
+    monta()
+    expect(await screen.findByText(rotulo)).toBeTruthy()
+    expect(screen.queryByText("Ativa")).toBeNull()
+    if (rotulo !== "Encerrada") expect(screen.queryByText("Encerrada")).toBeNull()
   })
 
   it("cancelada e ativa até a data do fim do período", async () => {

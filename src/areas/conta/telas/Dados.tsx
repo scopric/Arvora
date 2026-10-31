@@ -9,6 +9,7 @@ import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
+import type { TablesInsert } from "../../../lib/database.types"
 import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { useAcesso } from "../../../lib/acesso"
 import { baixarMeusDados } from "../../../lib/exportar"
@@ -73,6 +74,7 @@ function BlocoPedidos({ uid }: { uid: string }) {
   const [tentativa, setTentativa] = useState(0)
   const [msg, setMsg] = useState<{ tipo: "erro" | "ok"; texto: Chave } | null>(null)
   const [ocupado, setOcupado] = useState(false)
+  const [confirmar, setConfirmar] = useState<Tipo | null>(null)
 
   useEffect(() => {
     let ativo = true
@@ -87,10 +89,13 @@ function BlocoPedidos({ uid }: { uid: string }) {
   }, [uid, tentativa])
 
   async function pedir(tipo: Tipo) {
+    setConfirmar(null)
     setMsg(null)
     setOcupado(true)
-    // O grant de insert é só (perfil_id, tipo); e-mail e prazo vêm do gatilho. Os tipos gerados os marcam como obrigatórios.
-    const { data, error } = await supabase.from("pedidos_gdpr").insert({ perfil_id: uid, tipo } as never).select("id")
+    // O grant de insert é só (perfil_id, tipo); e-mail e prazo vêm do gatilho, mas os tipos gerados os marcam como obrigatórios.
+    // `satisfies` confere o que enviamos; o cast é só para esses dois campos que o banco preenche.
+    const linha = { perfil_id: uid, tipo } satisfies Pick<TablesInsert<"pedidos_gdpr">, "perfil_id" | "tipo">
+    const { data, error } = await supabase.from("pedidos_gdpr").insert(linha as TablesInsert<"pedidos_gdpr">).select("id")
     setOcupado(false)
     // Índice único: um pedido aberto por tipo e por pessoa.
     if (error?.code === "23505") return setMsg({ tipo: "erro", texto: "conta.dados.pedido.jaAberto" })
@@ -106,8 +111,8 @@ function BlocoPedidos({ uid }: { uid: string }) {
       <div className="mt-5 space-y-4">
         {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => void pedir("exportacao")} className="sm:w-auto">{t("conta.dados.pedido.exportacao")}</Botao>
-          <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => void pedir("exclusao")} className="sm:w-auto">{t("conta.dados.pedido.exclusao")}</Botao>
+          <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exportacao")} className="sm:w-auto">{t("conta.dados.pedido.exportacao")}</Botao>
+          <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exclusao")} className="sm:w-auto">{t("conta.dados.pedido.exclusao")}</Botao>
         </div>
         <h3 className="pt-2 text-sm font-semibold">{t("conta.dados.lista.titulo")}</h3>
         {lista.fase === "carregando" ? <Esqueleto linhas={2} /> : null}
@@ -127,6 +132,15 @@ function BlocoPedidos({ uid }: { uid: string }) {
           />
         ) : null}
       </div>
+      <DialogoConfirmar
+        aberto={confirmar !== null}
+        titulo={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoExclusao" : "conta.dados.pedido.dialogoExportacao")}
+        texto={t("conta.dados.pedido.dialogoTexto")}
+        confirmar={t("conta.dados.pedido.enviar")}
+        perigo={confirmar === "exclusao"}
+        aoConfirmar={() => confirmar && void pedir(confirmar)}
+        aoCancelar={() => setConfirmar(null)}
+      />
     </Cartao>
   )
 }
@@ -177,7 +191,7 @@ function BlocoExcluir() {
         <form onSubmit={excluir} noValidate className="mt-5 space-y-5">
           <p className="text-sm font-semibold">{t("conta.dados.excluir.etapa2")}</p>
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
-          <Campo rotulo={t("perfil.excluir.email")} name="confirmar_email" type="email" autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Campo rotulo={t("perfil.excluir.email")} name="confirmar_email" type="email" autoComplete="off" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
           <Campo rotulo={t("perfil.excluir.senha")} name="confirmar_senha" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
           <div className="flex flex-col gap-3 sm:flex-row">
             <Botao type="submit" variante="contorno" ocupado={ocupado} disabled={!email.trim() || !senha} className="sm:w-auto">{t("perfil.excluir.confirmar")}</Botao>
