@@ -1,12 +1,19 @@
+import { Rotas } from "../App"
 import { cleanup, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter, Route, Routes, useNavigate } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import cfg from "../../vercel.json" with { type: "json" }
+import { renderToString } from "react-dom/server"
+import { NaoEncontrada } from "../componentes/NaoEncontrada"
+import { Carregando } from "../componentes/Carregando"
 import { ErrorBoundary, HydrateFallback, chaveErro, meta } from "../root"
 import { en } from "./en"
 import { textosDe, useTitulo } from "./index"
 import { pt } from "./pt"
+
+vi.mock("../lib/sessao", () => ({ useAuth: () => ({ sessao: null, carregando: false }) }))
+vi.mock("../lib/supabase", () => ({ supabase: {} }))
 
 beforeEach(() => {
   localStorage.clear()
@@ -122,5 +129,43 @@ describe("vercel.json: X-Robots-Tag", () => {
   })
   it("home e páginas públicas não casam", () => {
     for (const p of ["/", "/pt", "/en", "/pt/hall-of-fame", "/en/hall-of-fame/2026/fulano", "/pt/perfilx"]) expect(re.test(p)).toBe(false)
+  })
+})
+
+describe("404 e carregamento", () => {
+  it.each([
+    ["/en/nao-existe", "en", en],
+    ["/pt/nao-existe", "pt", pt],
+  ] as const)("rota inexistente %s mostra a página de 404", (url, lang, dic) => {
+    render(
+      <MemoryRouter initialEntries={[url]}>
+        <Routes>
+          <Route path="/:lang/*" element={<NaoEncontrada />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    expect(document.title).toContain(dic["titulo.naoEncontrada"])
+    expect(screen.getByRole("heading").textContent).toBe(dic["sistema.naoEncontrada"])
+    expect(screen.getByRole("link").getAttribute("href")).toBe(`/${lang}`)
+    expect(document.head.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex")
+  })
+
+  it.each(["/sobre", "/pt/nao-existe", "/xx/nao-existe"])("Rotas reais: %s cai na página de 404, sem ir para o início", (url) => {
+    render(
+      <MemoryRouter initialEntries={[url]}>
+        <Rotas />
+      </MemoryRouter>,
+    )
+    expect(screen.getByRole("heading").textContent).toBe(pt["sistema.naoEncontrada"])
+  })
+
+  it("HTML estático (sem navegador) não mostra texto em português", () => {
+    const html = renderToString(
+      <MemoryRouter initialEntries={["/en/entrar"]}>
+        <Carregando />
+      </MemoryRouter>,
+    )
+    expect(html).toContain("…")
+    expect(html).not.toContain("Carregando")
   })
 })

@@ -1,8 +1,9 @@
 import { useEffect } from "react"
 import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router"
-import { ehIdioma, gravarIdioma, idiomaPreferido, useCaminho } from "./i18n"
+import { ehIdioma, gravarIdioma, idiomaPreferido } from "./i18n"
 import { AuthProvider } from "./lib/auth"
 import { RotaProtegida } from "./RotaProtegida"
+import { NaoEncontrada } from "./componentes/NaoEncontrada"
 import { LANG_HTML } from "./site"
 import { Cadastro } from "./telas/Cadastro"
 import { Confirmar } from "./telas/Confirmar"
@@ -19,7 +20,7 @@ function SemPrefixo() {
   return <Navigate to={`/${idiomaPreferido()}${pathname === "/" ? "" : pathname}${search}${hash}`} replace />
 }
 
-// Layout de /:lang: idioma inválido troca só o 1º segmento pelo preferido; válido ajusta <html lang> e lembra a escolha.
+// Layout de /:lang: 1º segmento com cara de código de idioma ("xx") é trocado pelo preferido; qualquer outro ("sobre") é caminho sem prefixo e vai para o 404; válido ajusta <html lang> e lembra a escolha.
 function LayoutIdioma() {
   const { lang } = useParams()
   const { pathname, search, hash } = useLocation()
@@ -30,13 +31,10 @@ function LayoutIdioma() {
     gravarIdioma(lang)
   }, [lang])
   if (!valido) {
-    return <Navigate to={`/${idiomaPreferido()}${pathname.replace(/^\/[^/]*/, "")}${search}${hash}`} replace />
+    const resto = /^[a-z]{2}(-[a-z]{2})?$/i.test(lang ?? "") ? pathname.replace(/^\/[^/]*/, "") : pathname
+    return <Navigate to={`/${idiomaPreferido()}${resto}${search}${hash}`} replace />
   }
   return <Outlet />
-}
-
-function Inicio() {
-  return <Navigate to={useCaminho()("/")} replace />
 }
 
 export function Rotas() {
@@ -55,7 +53,7 @@ export function Rotas() {
         <Route element={<RotaProtegida />}>
           <Route path="perfil" element={<Perfil />} />
         </Route>
-        <Route path="*" element={<Inicio />} />
+        <Route path="*" element={<NaoEncontrada />} />
       </Route>
     </Routes>
   )

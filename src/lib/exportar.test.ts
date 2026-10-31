@@ -42,4 +42,18 @@ describe("baixarMeusDados", () => {
     expect(await baixarMeusDados()).toBe("perfil.dados.erro")
     expect(baixados).toHaveLength(0)
   })
+
+  it("sub inválido (banco levanta nao_autenticado): devolve mensagem e não baixa nada", async () => {
+    rpc.mockResolvedValue({ data: null, error: { message: "nao_autenticado", code: "P0001" } })
+    expect(await baixarMeusDados()).toBe("perfil.dados.erro")
+    expect(URL.createObjectURL).not.toHaveBeenCalled()
+    expect(baixados).toHaveLength(0)
+  })
+
+  it("assinatura órfã (perfil e equipe nulos, lista de assinaturas vazia): exporta como veio", async () => {
+    const orfa = { versao: 1, conta: { id: "u1" }, perfil: null, equipe: null, assinaturas: [], clientes_stripe: [] }
+    rpc.mockResolvedValue({ data: orfa, error: null })
+    expect(await baixarMeusDados()).toBeNull()
+    expect(JSON.parse(await blobs[0].text())).toEqual(orfa)
+  })
 })

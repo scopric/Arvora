@@ -1,5 +1,6 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useParams } from "react-router"
 import "./index.css"
+import { Carregando } from "./componentes/Carregando"
 import { ehIdioma, textosDe, useIdiomaUrl } from "./i18n"
 import { IDIOMAS, LANG_HTML, type Idioma } from "./site"
 
@@ -39,8 +40,7 @@ export default function Root() {
 
 // Mostrado enquanto o SPA hidrata (e no __spa-fallback.html). Fora do /:lang: idioma pela URL.
 export function HydrateFallback() {
-  const dic = textosDe(useIdiomaUrl())
-  return <p role="status" className="p-12 text-creme/70">{dic["sistema.carregando"]}</p>
+  return <Carregando />
 }
 
 // Título do erro: 404 ou genérico.

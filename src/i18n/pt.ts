@@ -8,6 +8,7 @@ export const pt = {
   "titulo.confirmar": "Confirmar",
   "titulo.perfil": "Meu perfil",
   "sistema.carregando": "Carregando…",
+  "titulo.naoEncontrada": "Página não encontrada",
   "sistema.naoEncontrada": "Página não encontrada",
   "sistema.erro": "Algo deu errado",
   "sistema.voltar": "Voltar ao início",
