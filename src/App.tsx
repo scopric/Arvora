@@ -1,8 +1,9 @@
 import { useEffect } from "react"
 import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router"
-import { ehIdioma, gravarIdioma, idiomaPreferido, useCaminho } from "./i18n"
+import { ehIdioma, gravarIdioma, idiomaPreferido } from "./i18n"
 import { AuthProvider } from "./lib/auth"
 import { RotaProtegida } from "./RotaProtegida"
+import { NaoEncontrada } from "./componentes/NaoEncontrada"
 import { LANG_HTML } from "./site"
 import { Cadastro } from "./telas/Cadastro"
 import { Confirmar } from "./telas/Confirmar"
@@ -35,10 +36,6 @@ function LayoutIdioma() {
   return <Outlet />
 }
 
-function Inicio() {
-  return <Navigate to={useCaminho()("/")} replace />
-}
-
 export function Rotas() {
   return (
     <Routes>
@@ -55,7 +52,7 @@ export function Rotas() {
         <Route element={<RotaProtegida />}>
           <Route path="perfil" element={<Perfil />} />
         </Route>
-        <Route path="*" element={<Inicio />} />
+        <Route path="*" element={<NaoEncontrada />} />
       </Route>
     </Routes>
   )
