@@ -8,5 +8,5 @@ export default defineConfig({
   // O plugin do React Router não roda dentro do vitest.
   plugins: [tailwindcss(), process.env.VITEST ? react() : reactRouter()],
   server: { port: 5190, strictPort: true },
-  test: { environment: 'jsdom', include: ['src/**/*.test.{ts,tsx}'] },
+  test: { environment: 'jsdom', include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'] },
 })
