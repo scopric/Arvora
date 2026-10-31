@@ -1,17 +1,21 @@
 import { Route } from "react-router"
-import { EmConstrucao } from "../../componentes/EmConstrucao"
+import { Comunidade } from "./telas/Comunidade"
+import { Conexoes } from "./telas/Conexoes"
+import { Match } from "./telas/Match"
+import { MeuAward } from "./telas/MeuAward"
+import { Network } from "./telas/Network"
+import { NetworkPerfil } from "./telas/NetworkPerfil"
 
-// Rotas da área rede (caminhos relativos a /:lang). Para entregar uma tela: troque o element da rota
-// pela sua tela (crie-a em src/areas/rede/telas/). Não edite App.tsx.
+// Rotas da área rede (caminhos relativos a /:lang). Não edite App.tsx.
 export function rotasRede() {
   return (
     <>
-      <Route path="comunidade" element={<EmConstrucao titulo="rede.comunidade.titulo" />} />
-      <Route path="network" element={<EmConstrucao titulo="rede.network.titulo" />} />
-      <Route path="network/:perfil" element={<EmConstrucao titulo="rede.networkPerfil.titulo" />} />
-      <Route path="match" element={<EmConstrucao titulo="rede.match.titulo" />} />
-      <Route path="conexoes" element={<EmConstrucao titulo="rede.conexoes.titulo" />} />
-      <Route path="meu-award" element={<EmConstrucao titulo="rede.meuAward.titulo" />} />
+      <Route path="comunidade" element={<Comunidade />} />
+      <Route path="network" element={<Network />} />
+      <Route path="network/:perfil" element={<NetworkPerfil />} />
+      <Route path="match" element={<Match />} />
+      <Route path="conexoes" element={<Conexoes />} />
+      <Route path="meu-award" element={<MeuAward />} />
     </>
   )
 }
