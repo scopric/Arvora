@@ -114,6 +114,24 @@ export function EmBreve() {
         </section>
       )}
       </main>
+      <footer className="border-t border-creme/10 px-6 py-12 sm:px-16 lg:px-24">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+          <div className="max-w-xs">
+            <Marca to={caminho("/")} />
+            <p className="mt-4 text-sm text-creme/70">{t("auth.layout.apoio")}</p>
+          </div>
+          <nav aria-label={t("nav.rodape")} className="flex flex-wrap gap-x-2 text-sm font-semibold">
+            {!carregando && !sessao && (
+              <>
+                <Link to={caminho("/entrar")} className={link}>{t("nav.entrar")}</Link>
+                <Link to={caminho("/cadastro")} className={link}>{t("nav.criarConta")}</Link>
+              </>
+            )}
+            <Link to={caminho("/cookies")} className={link}>{t("cookies.politica")}</Link>
+          </nav>
+        </div>
+        <p className="mx-auto mt-10 max-w-6xl font-mono text-xs tracking-[0.15em] text-creme/60">© Grupo Árvora</p>
+      </footer>
     </div>
   )
 }

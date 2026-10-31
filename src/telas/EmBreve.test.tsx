@@ -25,7 +25,7 @@ describe("página inicial", () => {
   it("sem sessão, links levam a /entrar e /cadastro", () => {
     estado.sessao = null
     nav()
-    expect(screen.getByRole("link", { name: "Entrar" }).getAttribute("href")).toBe("/pt/entrar")
+    expect(screen.getAllByRole("link", { name: "Entrar" })[0]?.getAttribute("href")).toBe("/pt/entrar")
     expect(screen.getAllByRole("link", { name: "Criar conta" })[0]?.getAttribute("href")).toBe("/pt/cadastro")
     expect(screen.queryByRole("link", { name: "Meu perfil" })).toBeNull()
   })
