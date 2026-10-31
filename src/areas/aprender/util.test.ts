@@ -16,7 +16,15 @@ describe("agenda", () => {
     expect(ics).toContain("DTSTART:20261105T190000Z")
     expect(ics).toContain("DTEND:20261105T200000Z")
     expect(ics).toContain("SUMMARY:Live: preço\\, valor\\; margem")
-    expect(ics.split("\r\n").every((l) => l.length <= 75)).toBe(true)
+    expect(ics.split("\r\n").every((l) => new TextEncoder().encode(l).length <= 75)).toBe(true)
+  })
+  it("título acentuado e muito longo dobra por octetos, sem cortar caractere; quebra de linha vira \\n", () => {
+    const ics = gerarIcs({ ...aula, titulo: "Ação é emoção 😀 ".repeat(8) + "\r\nfim\rx" }, "pt")
+    const linhas = ics.split("\r\n")
+    expect(linhas.every((l) => new TextEncoder().encode(l).length <= 75)).toBe(true)
+    expect(ics).not.toContain("\uFFFD")
+    expect(ics.replace(/\r\n /g, "")).toContain("😀")
+    expect(ics.replace(/\r\n /g, "")).toContain("\\nfim\\nx")
   })
   it("link do Google Agenda leva as datas em UTC", () => {
     expect(linkGoogleAgenda(aula, "pt")).toContain("dates=20261105T190000Z%2F20261105T200000Z")

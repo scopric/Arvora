@@ -73,11 +73,18 @@ export function Aula() {
 
       {!permitido ? (
         <Bloqueado previa={<p className="text-lg">{aula.descricao ?? aula.titulo}</p>} frase={t("aprender.aulas.bloqueado")} minimo={aula.nivel_minimo === "clube" ? "clube" : "grupo"} />
-      ) : aoVivo && aula.inicio_em ? (
+      ) : aoVivo ? (
+        // Ao vivo nunca cai no player: sem inicio_em (o banco não deixa, mas a tela não presume) não há sala nem agenda.
         <div className="space-y-8">
           {aula.descricao ? <p className="max-w-prose text-lg">{aula.descricao}</p> : null}
-          <SalaAoVivo aulaId={aula.id} inicio={aula.inicio_em} />
-          <Agenda aula={{ ...aula, inicio_em: aula.inicio_em }} />
+          {aula.inicio_em ? (
+            <>
+              <SalaAoVivo aulaId={aula.id} inicio={aula.inicio_em} duracaoMin={aula.duracao_min} />
+              <Agenda aula={{ ...aula, inicio_em: aula.inicio_em }} />
+            </>
+          ) : (
+            <Erro>{t("aprender.sala.indisponivel")}</Erro>
+          )}
           <Vazio>{t("aprender.materiais.emBreve")}</Vazio>
         </div>
       ) : uid ? (

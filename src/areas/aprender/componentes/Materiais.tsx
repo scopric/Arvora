@@ -38,6 +38,8 @@ function Ebook({ caminho }: { caminho: string }) {
 export function Materiais({ aulaId, uid, podeEnviar }: { aulaId: number; uid: string; podeEnviar: boolean }) {
   const t = useT()
   const { hash } = useLocation()
+  // Rascunhos dos exercícios ficam aqui: a aba inativa é desmontada (Abas) e o texto digitado se perderia.
+  const [rascunhos, setRascunhos] = useState<Record<number, string>>({})
   const [estado, recarregar] = useCarga(async () => {
     const [m, e] = await Promise.all([
       supabase.from("materiais_aula").select("id, tipo, conteudo_md, arquivo_path").eq("aula_id", aulaId),
@@ -55,7 +57,7 @@ export function Materiais({ aulaId, uid, podeEnviar }: { aulaId: number; uid: st
   const de = (tipo: Material["tipo"]) => materiais.find((m) => m.tipo === tipo)
   const resumo = de("resumo")
   const ebook = de("ebook")
-  // Aba sem material mostra o vazio com o prazo (PRD §17.5.3). PROVISÓRIO: o prazo "até [data]" é do Rafael.
+  // Aba sem material: a aula já está publicada, então só falta este item. PROVISÓRIO: o "sai até [data]" do PRD §17.5.3 é prazo do Rafael.
   const vazio = <Vazio>{t("aprender.materiais.vazio")}</Vazio>
 
   return (
@@ -83,7 +85,12 @@ export function Materiais({ aulaId, uid, podeEnviar }: { aulaId: number; uid: st
           conteudo: exercicios.length ? (
             <div className="space-y-5">
               {exercicios.map((x) => (
-                <Exercicio key={x.id} exercicio={x} entrega={entregas.find((e) => e.exercicio_id === x.id) ?? null} uid={uid} podeEnviar={podeEnviar} aoAtualizar={recarregar} />
+                <Exercicio key={x.id} exercicio={x} entrega={entregas.find((e) => e.exercicio_id === x.id) ?? null} uid={uid} podeEnviar={podeEnviar} aoAtualizar={recarregar} rascunho={rascunhos[x.id]} aoDigitar={(v) => setRascunhos((r) => {
+                    const n = { ...r }
+                    if (v === undefined) delete n[x.id]
+                    else n[x.id] = v
+                    return n
+                  })} />
               ))}
             </div>
           ) : (
