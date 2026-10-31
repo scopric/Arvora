@@ -1,21 +1,28 @@
 import { Route } from "react-router"
-import { EmConstrucao } from "../../componentes/EmConstrucao"
+import { Academy } from "./telas/Academy"
+import { Aula } from "./telas/Aula"
+import { Aulas, BemEstar } from "./telas/Aulas"
+import { BemVindo } from "./telas/BemVindo"
+import { Curso } from "./telas/Curso"
+import { CursoAula } from "./telas/CursoAula"
+import { Inicio } from "./telas/Inicio"
+import { Tarefa } from "./telas/Tarefa"
+import { Tarefas } from "./telas/Tarefas"
 
-// Rotas da área aprender (caminhos relativos a /:lang). Para entregar uma tela: troque o element da rota
-// pela sua tela (crie-a em src/areas/aprender/telas/). Não edite App.tsx.
+// Rotas da área aprender (caminhos relativos a /:lang).
 export function rotasAprender() {
   return (
     <>
-      <Route path="inicio" element={<EmConstrucao titulo="aprender.inicio.titulo" />} />
-      <Route path="bem-vindo" element={<EmConstrucao titulo="aprender.bemVindo.titulo" />} />
-      <Route path="aulas" element={<EmConstrucao titulo="aprender.aulas.titulo" />} />
-      <Route path="aulas/:slug" element={<EmConstrucao titulo="aprender.aula.titulo" />} />
-      <Route path="academy" element={<EmConstrucao titulo="aprender.academy.titulo" />} />
-      <Route path="academy/:curso" element={<EmConstrucao titulo="aprender.curso.titulo" />} />
-      <Route path="academy/:curso/:aula" element={<EmConstrucao titulo="aprender.cursoAula.titulo" />} />
-      <Route path="tarefas" element={<EmConstrucao titulo="aprender.tarefas.titulo" />} />
-      <Route path="tarefas/:id" element={<EmConstrucao titulo="aprender.tarefa.titulo" />} />
-      <Route path="bem-estar" element={<EmConstrucao titulo="aprender.bemEstar.titulo" />} />
+      <Route path="inicio" element={<Inicio />} />
+      <Route path="bem-vindo" element={<BemVindo />} />
+      <Route path="aulas" element={<Aulas />} />
+      <Route path="aulas/:slug" element={<Aula />} />
+      <Route path="academy" element={<Academy />} />
+      <Route path="academy/:curso" element={<Curso />} />
+      <Route path="academy/:curso/:aula" element={<CursoAula />} />
+      <Route path="tarefas" element={<Tarefas />} />
+      <Route path="tarefas/:id" element={<Tarefa />} />
+      <Route path="bem-estar" element={<BemEstar />} />
     </>
   )
 }
