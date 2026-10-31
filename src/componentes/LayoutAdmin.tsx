@@ -33,7 +33,7 @@ function Menu() {
 }
 
 // Casca do admin (PRD §17.3.4): sidebar escura, conteúdo em tema claro (classe tema-claro inverte as cores em index.css).
-// Barreira só de interface — o banco decide pelo papel e pelo aal2. Ordem: acesso lido → é equipe? (senão 404, sem pista de que existe)
+// Barreira só de interface — o banco decide pelo papel e pelo aal2. Ordem: acesso lido → é equipe? (senão 404 na tela; os textos do admin vão no pacote JS, quem barra é o RLS)
 // → 2FA (Mfa) → conteúdo. Erro de leitura aparece como erro, nunca como "sem acesso". No celular o menu abre num <details>.
 export function LayoutAdmin() {
   const t = useT()
