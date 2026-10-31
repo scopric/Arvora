@@ -22,7 +22,6 @@ export const en: Record<keyof typeof pt, string> = {
   "nav.criarConta": "Create account",
   "nav.perfil": "My profile",
   "inicio.embreve": "Coming soon",
-  "inicio.titulo": "Grupo Árvora",
   "inicio.descricao":
     "Courses, guidance and a community made for Brazilian entrepreneurs who build businesses outside Brazil.",
   // PROVISÓRIO: textos de cookies a validar pelo cliente/solicitor.
@@ -38,6 +37,18 @@ export const en: Record<keyof typeof pt, string> = {
   "cookies.politica": "Cookie Policy",
   "cookies.recusar": "Decline",
   "cookies.aceitar": "Accept",
+  // PROVISIONAL: home copy below awaits client review (none of it is a confirmed fact or promise).
+  "home.pilares.titulo": "Four fronts, one community.",
+  "home.pilar.1.nome": "Brazilian Awards",
+  "home.pilar.1.texto": "The award that gives a stage to those building Brazilian businesses abroad.",
+  "home.pilar.2.nome": "Árvora Academy",
+  "home.pilar.2.texto": "Live and recorded classes, with materials and exercises to practise.",
+  "home.pilar.3.nome": "Sales & Negotiation",
+  "home.pilar.3.texto": "Classes to sell and negotiate better in your day-to-day business.",
+  "home.pilar.4.nome": "Árvora Mente",
+  "home.pilar.4.texto": "Group content about the mental health of people who run businesses.",
+  "home.saiba": "See the four fronts",
+  "home.cta.titulo": "Start with your account.",
   "comum.aguarde": "Please wait…",
   "comum.carregando": "Loading…",
   "auth.email.rotulo": "Email",

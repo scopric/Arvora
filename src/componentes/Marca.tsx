@@ -2,7 +2,7 @@ import { Link } from "react-router"
 
 // Símbolo do logo (árvore, recortado de Documentos/Logo no cofre) + nome em caixa alta.
 export function Marca({ to, className = "" }: { to?: string; className?: string }) {
-  const classes = `inline-flex items-center gap-3 ${className}`
+  const classes = `inline-flex min-h-11 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado ${className}`
   const conteudo = (
     <>
       <img src="/logo-simbolo.png" alt="" width="354" height="287" className="h-8 w-auto" />

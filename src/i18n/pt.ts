@@ -19,7 +19,6 @@ export const pt = {
   "nav.criarConta": "Criar conta",
   "nav.perfil": "Meu perfil",
   "inicio.embreve": "Em breve",
-  "inicio.titulo": "Grupo Árvora",
   "inicio.descricao":
     "Cursos, acompanhamento e uma comunidade feitos para empreendedores brasileiros que constroem negócios fora do Brasil.",
   // PROVISÓRIO: textos de cookies a validar pelo cliente/solicitor.
@@ -35,6 +34,18 @@ export const pt = {
   "cookies.politica": "Política de Cookies",
   "cookies.recusar": "Recusar",
   "cookies.aceitar": "Aceitar",
+  // PROVISÓRIO: textos da home abaixo aguardam revisão do cliente (nenhum é dado ou promessa confirmada).
+  "home.pilares.titulo": "Quatro frentes, uma comunidade.",
+  "home.pilar.1.nome": "Brazilian Awards",
+  "home.pilar.1.texto": "O prêmio que dá palco a quem constrói negócios brasileiros fora do Brasil.",
+  "home.pilar.2.nome": "Árvora Academy",
+  "home.pilar.2.texto": "Aulas ao vivo e gravadas, com materiais e exercícios para praticar.",
+  "home.pilar.3.nome": "Vendas & Negociação",
+  "home.pilar.3.texto": "Aulas para vender e negociar melhor no dia a dia do seu negócio.",
+  "home.pilar.4.nome": "Árvora Mente",
+  "home.pilar.4.texto": "Conteúdo em grupo sobre a saúde mental de quem empreende.",
+  "home.saiba": "Conhecer as frentes",
+  "home.cta.titulo": "Comece pela sua conta.",
   "comum.aguarde": "Aguarde…",
   "comum.carregando": "Carregando…",
   "auth.email.rotulo": "E-mail",

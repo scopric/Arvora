@@ -26,7 +26,7 @@ describe("página inicial", () => {
     estado.sessao = null
     nav()
     expect(screen.getByRole("link", { name: "Entrar" }).getAttribute("href")).toBe("/pt/entrar")
-    expect(screen.getByRole("link", { name: "Criar conta" }).getAttribute("href")).toBe("/pt/cadastro")
+    expect(screen.getAllByRole("link", { name: "Criar conta" })[0]?.getAttribute("href")).toBe("/pt/cadastro")
     expect(screen.queryByRole("link", { name: "Meu perfil" })).toBeNull()
   })
 
@@ -48,10 +48,20 @@ describe("página inicial", () => {
 })
 
 describe("fundo animado", () => {
-  it("a página inicial traz o botão de pausa e o seletor de idioma", () => {
+  it("a página inicial traz o botão de pausa (cena carrega depois) e o seletor de idioma", async () => {
     estado.sessao = null
     nav()
-    expect(screen.getByRole("button", { name: "Pausar movimento" })).toBeTruthy()
+    expect(await screen.findByRole("button", { name: "Pausar movimento" }, { timeout: 4000 })).toBeTruthy()
     expect(screen.getByRole("link", { name: "English" })).toBeTruthy()
+  })
+})
+
+describe("conteúdo", () => {
+  it("tem um h1, os quatro pilares e a chamada para criar conta", () => {
+    estado.sessao = null
+    nav()
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1)
+    expect(screen.getAllByRole("listitem")).toHaveLength(4)
+    expect(screen.getAllByRole("link", { name: "Criar conta" }).length).toBeGreaterThanOrEqual(2)
   })
 })
