@@ -10,9 +10,19 @@ const EVENTO = "arvora:consentimento"
 let memoria: Consentimento | null = null // vale na visita se o localStorage estiver bloqueado
 
 // Avisa o banner (que vive no layout raiz) de que a escolha mudou.
+// Também ouve o evento `storage` (outra aba escolheu ou retirou): o banner fecha/abre nas duas.
 export function aoMudarConsentimento(cb: () => void) {
+  const outraAba = (e: StorageEvent) => {
+    if (e.key !== null && e.key !== CHAVE) return
+    memoria = null // o que vale agora é o localStorage, que a outra aba acabou de mudar
+    cb()
+  }
   window.addEventListener(EVENTO, cb)
-  return () => window.removeEventListener(EVENTO, cb)
+  window.addEventListener("storage", outraAba)
+  return () => {
+    window.removeEventListener(EVENTO, cb)
+    window.removeEventListener("storage", outraAba)
+  }
 }
 const avisar = () => window.dispatchEvent(new Event(EVENTO))
 
