@@ -1,5 +1,6 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useParams } from "react-router"
 import "./index.css"
+import { BannerCookies } from "./componentes/BannerCookies"
 import { Carregando } from "./componentes/Carregando"
 import { ehIdioma, textosDe, useIdiomaUrl } from "./i18n"
 import { IDIOMAS, LANG_HTML, type Idioma } from "./site"
@@ -35,7 +36,13 @@ export function meta({ params }: { params: { lang?: string } }) {
 }
 
 export default function Root() {
-  return <Outlet />
+  return (
+    <>
+      {/* Antes do conteúdo no DOM (ordem de tab/leitor de tela); visualmente fica embaixo (fixed). */}
+      <BannerCookies />
+      <Outlet />
+    </>
+  )
 }
 
 // Mostrado enquanto o SPA hidrata (e no __spa-fallback.html). Fora do /:lang: idioma pela URL.
