@@ -55,6 +55,7 @@ function montar(o: {
     assinaturasVigentes: () => Promise.resolve(o.assinaturas ?? []),
   };
   const deps: Deps = {
+    agora: () => AGORA,
     env: (n) => (o.env ?? ENV)[n],
     db: () => db,
     senhaConfere: (_u, _a, email, senha) => {
@@ -90,10 +91,15 @@ const post = (corpo: unknown, metodo = "POST", auth = "Bearer jwt_falso") =>
       : undefined,
   });
 const corpoOk = { email: EMAIL, senha: SENHA };
-const DUAS: Assinatura[] = [
-  { stripe_subscription_id: "sub_1", conta_stripe_id: 1 },
-  { stripe_subscription_id: "sub_2", conta_stripe_id: 2 },
-];
+const AGORA = Date.parse("2026-11-30T12:00:00Z");
+const DIA = 24 * 60 * 60 * 1000;
+const haDias = (d: number) => new Date(AGORA - d * DIA).toISOString();
+const sub = (n: number, dias: number): Assinatura => ({
+  stripe_subscription_id: `sub_${n}`,
+  conta_stripe_id: n,
+  criado_em: haDias(dias),
+});
+const DUAS: Assinatura[] = [sub(1, 30), sub(2, 40)];
 
 // Captura tudo que a função loga, para provar que senha e chave nunca aparecem.
 async function comLog<T>(f: () => Promise<T>): Promise<[T, string]> {
@@ -388,4 +394,72 @@ Deno.test("limite: e-mail diferente e mfa_requerido não consomem", async () => 
   const b = montar({ totp: true });
   equal((await handle(post(corpoOk, "POST", jwt("aal1")), b.deps)).status, 403);
   deepEqual(b.limites, []);
+});
+
+for (
+  const [nome, dias] of [["3 dias", 3], [
+    "13 dias e 23 h",
+    13 + 23 / 24,
+  ]] as const
+) {
+  Deno.test(`arrependimento: vigente com ${nome}: 409 e nada chamado depois`, async () => {
+    const { deps, ordem, stripe } = montar({ assinaturas: [sub(1, dias)] });
+    const r = await handle(post(corpoOk), deps);
+    equal(r.status, 409);
+    deepEqual(await r.json(), { erro: "arrependimento" });
+    deepEqual(ordem, ["senha:titular@exemplo.test"]);
+    equal(stripe.length, 0);
+  });
+}
+
+for (const dias of [14, 30]) {
+  Deno.test(`arrependimento: vigente com ${dias} dias segue e cancela`, async () => {
+    const { deps, ordem, stripe } = montar({ assinaturas: [sub(1, dias)] });
+    const r = await handle(post(corpoOk), deps);
+    equal(r.status, 200);
+    equal(stripe.length, 1);
+    ok(ordem.includes(`apagar:${UID}`));
+  });
+}
+
+Deno.test("arrependimento: uma de 3 dias e outra de 40: 409 e nada cancelado", async () => {
+  const { deps, ordem, stripe } = montar({
+    assinaturas: [sub(1, 40), sub(2, 3)],
+  });
+  const r = await handle(post(corpoOk), deps);
+  equal(r.status, 409);
+  deepEqual(await r.json(), { erro: "arrependimento" });
+  equal(stripe.length, 0);
+  ok(!ordem.some((o) => o.startsWith("apagar")));
+});
+
+Deno.test("arrependimento: data inválida conta como recente (409)", async () => {
+  const { deps } = montar({
+    assinaturas: [{ ...sub(1, 30), criado_em: "lixo" }],
+  });
+  equal((await handle(post(corpoOk), deps)).status, 409);
+});
+
+Deno.test("arrependimento: ordem, e-mail/senha/equipe respondem antes", async () => {
+  const recente = [sub(1, 3)];
+  const a = montar({ assinaturas: recente });
+  equal(
+    (await handle(post({ email: "outro@exemplo.test", senha: SENHA }), a.deps))
+      .status,
+    400,
+  );
+  const b = montar({ assinaturas: recente, senhaOk: false });
+  equal((await handle(post(corpoOk), b.deps)).status, 401);
+  const c = montar({ assinaturas: recente, equipe: true });
+  deepEqual(await (await handle(post(corpoOk), c.deps)).json(), {
+    erro: "equipe",
+  });
+});
+
+Deno.test("arrependimento: o 409 vem antes de conferir as chaves do Stripe", async () => {
+  const { deps } = montar({
+    assinaturas: [sub(1, 3)],
+    env: { ...ENV, STRIPE_SECRET_KEY_1: "" },
+  });
+  equal((await handle(post(corpoOk), deps)).status, 409);
 });

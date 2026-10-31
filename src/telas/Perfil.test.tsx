@@ -157,7 +157,7 @@ describe("bloco Excluir minha conta", () => {
     await screen.findByRole("button", { name: /salvar alterações/i })
     expect(screen.queryByRole("button", { name: /excluir definitivamente/i })).toBeNull()
     await userEvent.click(screen.getByRole("button", { name: /quero excluir minha conta/i }))
-    expect(screen.getByText(/sem reembolso automático/i)).toBeTruthy()
+    expect(screen.getByText(/Depois de 14 dias da assinatura/i)).toBeTruthy()
     expect(screen.getByText(/retidos por obrigação legal/i)).toBeTruthy()
   })
 

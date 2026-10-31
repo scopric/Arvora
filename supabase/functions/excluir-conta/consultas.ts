@@ -30,7 +30,7 @@ export const consultas = (sb: Sb): Consultas => ({
   assinaturasVigentes: async (uid) =>
     (dados<Assinatura[] | null>(
       await sb.from("assinaturas").select(
-        "stripe_subscription_id, conta_stripe_id",
+        "stripe_subscription_id, conta_stripe_id, criado_em",
       ).eq("perfil_id", uid)
         .in("status", ["active", "trialing", "past_due"]),
     ) ?? []).filter((a) => a.stripe_subscription_id !== null),

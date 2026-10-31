@@ -7,15 +7,27 @@ const UID = "00000000-0000-0000-0000-0000000000aa";
 Deno.test("consultas excluir-conta: equipe e assinaturas filtram perfil_id do usuário", async () => {
   const { sb, chamadas } = sbFalso((c) => ({
     data: c.tabela === "equipe" ? [{ perfil_id: UID }] : [
-      { stripe_subscription_id: "sub_1", conta_stripe_id: 1 },
-      { stripe_subscription_id: null, conta_stripe_id: 1 },
+      {
+        stripe_subscription_id: "sub_1",
+        conta_stripe_id: 1,
+        criado_em: "2026-01-01T00:00:00Z",
+      },
+      {
+        stripe_subscription_id: null,
+        conta_stripe_id: 1,
+        criado_em: "2026-01-01T00:00:00Z",
+      },
     ],
     error: null,
   }));
   const db = consultas(sb);
   equal(await db.temEquipe(UID), true);
   deepEqual(await db.assinaturasVigentes(UID), [
-    { stripe_subscription_id: "sub_1", conta_stripe_id: 1 },
+    {
+      stripe_subscription_id: "sub_1",
+      conta_stripe_id: 1,
+      criado_em: "2026-01-01T00:00:00Z",
+    },
   ]);
   for (const c of chamadas) {
     ok(filtros(c).includes(`perfil_id=${UID}`), c.tabela);
