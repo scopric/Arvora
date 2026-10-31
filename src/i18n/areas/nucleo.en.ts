@@ -98,6 +98,7 @@ export const nucleoEn: Record<keyof typeof nucleoPt, string> = {
   "admin.item.ia": "AI review (P1)",
   "admin.item.verticais": "Verticals (P1)",
   "captcha.rotulo": "Security check",
+  "captcha.erroCarregar": "We could not load the security check. Check your connection and try again.",
   "captcha.falta": "Complete the security check to continue.",
   "erro.auth.captcha_failed": "We could not confirm the security check. Try again.",
 }

@@ -1,5 +1,6 @@
-import { cleanup } from "@testing-library/react"
+import { cleanup, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
+import userEvent from "@testing-library/user-event"
 import { renderiza } from "../testeUtil"
 
 afterEach(() => {
@@ -19,6 +20,23 @@ describe("Turnstile", () => {
     const { container } = await montar(vi.fn())
     expect(container.firstChild).toBeNull()
     expect(document.querySelector("script[src*='challenges.cloudflare.com']")).toBeNull()
+  })
+
+  it("script que falha ao carregar é removido e a tela oferece 'tentar de novo'", async () => {
+    vi.stubEnv("VITE_TURNSTILE_SITE_KEY", "chave-publica-de-teste")
+    const onToken = vi.fn()
+    await montar(onToken)
+    const script = await vi.waitFor(() => {
+      const el = document.querySelector("script[src*='challenges.cloudflare.com']")
+      expect(el).not.toBeNull()
+      return el!
+    })
+    script.dispatchEvent(new Event("error"))
+    expect((await screen.findByRole("alert")).textContent).toContain("verificação de segurança")
+    expect(document.querySelector("script[src*='challenges.cloudflare.com']")).toBeNull()
+    expect(onToken).toHaveBeenLastCalledWith(null)
+    await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }))
+    await vi.waitFor(() => expect(document.querySelector("script[src*='challenges.cloudflare.com']")).not.toBeNull())
   })
 
   it("com a chave, renderiza o widget e repassa o token (e null quando vence)", async () => {

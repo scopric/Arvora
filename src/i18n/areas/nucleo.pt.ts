@@ -97,6 +97,7 @@ export const nucleoPt = {
   "admin.item.ia": "Revisão de IA (P1)",
   "admin.item.verticais": "Verticais (P1)",
   "captcha.rotulo": "Verificação de segurança",
+  "captcha.erroCarregar": "Não conseguimos carregar a verificação de segurança. Confira a conexão e tente de novo.",
   "captcha.falta": "Confirme a verificação de segurança para continuar.",
   "erro.auth.captcha_failed": "Não conseguimos confirmar a verificação de segurança. Tente de novo.",
 }
