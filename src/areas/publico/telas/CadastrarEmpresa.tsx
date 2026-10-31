@@ -47,7 +47,7 @@ export function CadastrarEmpresa() {
   const uid = sessao?.user.id ?? null
   const setores = useConsulta(() => supabase.from("setores").select("id,nome,nome_en").eq("ativo", true).order("ordem"), "setores")
   const minhas = useConsulta(
-    () => supabase.from("empresas").select("id,nome,status").eq("dono_perfil_id", uid ?? "").order("criado_em", { ascending: false }),
+    () => supabase.rpc("minhas_empresas"),
     `minhas-empresas/${uid}`,
   )
   const [erros, setErros] = useState<CamposDeErro>({})

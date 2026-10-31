@@ -30,7 +30,7 @@ async function violacoes() {
 }
 
 const video = { id: 7, titulo: "Talk", slug: "talk", descricao: "d", duracao_min: 12, nivel_minimo: "clube", trailer_video_id: "https://exemplo.invalid/t", tema_id: 1 }
-const edicao = { id: 1, slug: "ed", nome: "Edição", ano: 2026, cidade: "Dublin", pais: "IE", descricao: "d", durante_inicio: "2026-11-10T10:00:00Z", durante_fim: "2026-11-10T20:00:00Z", transmissao_url: "https://exemplo.invalid/l", gravacao_video_id: "https://exemplo.invalid/g", slug_: "ed" }
+const edicao = { id: 1, slug: "ed", nome: "Edição", cidade: "Dublin", pais: "IE", descricao: "d", durante_inicio: "2026-11-10T10:00:00Z" }
 const empresa = { status: "publicada", id: 1, nome: "Alfa", slug: "alfa", setor_id: 1, cidade: "Dublin", pais: "IE", logo_path: null, site: "https://exemplo.invalid", descricao: "Texto" }
 
 beforeEach(() => {
@@ -46,13 +46,14 @@ beforeEach(() => {
     setores: { data: [{ id: 1, nome: "Tecnologia", nome_en: "Technology", slug: "tec" }], error: null },
     empresas: { data: [empresa], error: null },
     premiados: { data: [{ id: 1, empresa_id: 1, nome: "P", slug: "p", edicoes: { slug: "ed" } }], error: null },
-    edicoes: { data: [{ ...edicao, fase: "durante" }], error: null },
+    edicoes_publicas: { data: [{ ...edicao, fase: "durante" }], error: null },
+    edicoes: { data: [{ transmissao_url: "https://exemplo.invalid/l", gravacao_video_id: "https://exemplo.invalid/g" }], error: null },
     categorias_premio: { data: [{ id: 1, nome: "Cat" }], error: null },
     indicados: { data: [{ id: 1, categoria_id: 1, nome: "Ind", resumo: "r" }], error: null },
     patrocinadores: { data: [{ id: 1, nome: "Patro", logo_path: null, site: "https://exemplo.invalid", nivel: "ouro" }], error: null },
     agenda_evento: { data: [{ id: 1, inicio_em: "2026-11-10T10:00:00Z", titulo: "Abertura", descricao: "d", local: "Sala" }], error: null },
   }
-  falso.rpc.mockResolvedValue({ data: "https://exemplo.invalid/v", error: null })
+  falso.rpc.mockImplementation(async (nome: string) => ({ data: nome === "minhas_empresas" ? [] : "https://exemplo.invalid/v", error: null }))
 })
 afterEach(cleanup)
 

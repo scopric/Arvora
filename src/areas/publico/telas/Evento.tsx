@@ -6,6 +6,7 @@ import { PlayerVideo } from "../../../componentes/PlayerVideo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT, useTitulo } from "../../../i18n"
 import { useAcesso } from "../../../lib/acesso"
+import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { dataLonga, diaCurto, horaDublinBrasilia, urlImagem } from "../formatos"
 import { Pagina, SemRegistro, linkPrimario } from "../Pagina"
@@ -21,41 +22,32 @@ export function Evento() {
   const caminho = useCaminho()
   const { edicao = "" } = useParams()
   const { nivel } = useAcesso()
+  const { sessao } = useAuth()
   useTitulo("publico.evento.titulo")
   const r = useConsulta(
-    () => supabase.from("edicoes").select("id,nome,ano,cidade,pais,descricao,durante_inicio,durante_fim,transmissao_url,gravacao_video_id,fase").eq("slug", edicao).maybeSingle(),
+    () => supabase.from("edicoes_publicas").select("id,nome,cidade,pais,descricao,durante_inicio,fase").eq("slug", edicao).maybeSingle(),
     `edicao/${edicao}`,
   )
   const e = r.dados
   if (r.carregando) return <Pagina titulo={t("publico.evento.titulo")}><Esqueleto linhas={6} /></Pagina>
   if (r.erro) return <Pagina titulo={t("publico.evento.titulo")}><Erro aoTentar={r.recarregar} /></Pagina>
-  if (!e) return <SemRegistro voltar="/awards" rotulo="publico.evento.voltar" />
+  if (!e || e.id === null) return <SemRegistro voltar="/awards" rotulo="publico.evento.voltar" />
   const fase = e.fase === "durante" || e.fase === "depois" ? e.fase : "antes"
-  const transmissao = https(e.transmissao_url)
   return (
-    <Pagina titulo={e.nome} apoio={e.descricao}>
+    <Pagina titulo={e.nome ?? ""} apoio={e.descricao}>
       <p className="-mt-6 mb-10 font-mono text-xs tracking-[0.15em] text-creme/70 uppercase">
-        {t(`publico.evento.fase.${fase}`)} · {e.cidade}, {e.pais} · {dataLonga(e.durante_inicio, idioma)}
+        {t(`publico.evento.fase.${fase}`)} · {e.cidade}, {e.pais}{e.durante_inicio ? ` · ${dataLonga(e.durante_inicio, idioma)}` : ""}
       </p>
 
       {fase === "durante" ? (
         <>
-          {transmissao ? (
-            <p className="mb-10">
-              <a href={transmissao} rel="noopener noreferrer" className={linkPrimario}>{t("publico.evento.assistir")}</a>
-            </p>
-          ) : null}
+          {sessao ? <Midia edicaoId={e.id} nome={e.nome ?? ""} fase="durante" /> : null}
           <Agenda edicaoId={e.id} />
         </>
       ) : null}
       {fase === "depois" ? (
         <>
-          {e.gravacao_video_id ? (
-            <section aria-labelledby="gravacao" className="mb-12">
-              <h2 id="gravacao" className={titulo2}>{t("publico.evento.gravacao")}</h2>
-              <PlayerVideo titulo={`${e.nome} — ${t("publico.evento.gravacao")}`} tipo="embed" src={e.gravacao_video_id} />
-            </section>
-          ) : null}
+          {sessao ? <Midia edicaoId={e.id} nome={e.nome ?? ""} fase="depois" /> : null}
           <Premiados edicaoId={e.id} edicaoSlug={edicao} />
           {nivel === "visitante" ? (
             <Cartao className="mt-12">
@@ -69,6 +61,30 @@ export function Evento() {
       <Patrocinadores edicaoId={e.id} />
     </Pagina>
   )
+}
+
+// Transmissão e gravação: a view pública não traz essas colunas; quem tem sessão lê da tabela da edição.
+// O banco não separa por nível aqui (relatório): o front mostra a quem está logado.
+function Midia({ edicaoId, nome, fase }: { edicaoId: number; nome: string; fase: "durante" | "depois" }) {
+  const t = useT()
+  const r = useConsulta(() => supabase.from("edicoes").select("transmissao_url,gravacao_video_id").eq("id", edicaoId).maybeSingle(), `midia/${edicaoId}`)
+  if (r.carregando) return <Esqueleto linhas={2} />
+  if (r.erro) return <Erro aoTentar={r.recarregar} />
+  const transmissao = https(r.dados?.transmissao_url)
+  const gravacao = r.dados?.gravacao_video_id
+  if (fase === "durante") {
+    return transmissao ? (
+      <p className="mb-10">
+        <a href={transmissao} rel="noopener noreferrer" className={linkPrimario}>{t("publico.evento.assistir")}</a>
+      </p>
+    ) : null
+  }
+  return gravacao ? (
+    <section aria-labelledby="gravacao" className="mb-12">
+      <h2 id="gravacao" className={titulo2}>{t("publico.evento.gravacao")}</h2>
+      <PlayerVideo titulo={`${nome} — ${t("publico.evento.gravacao")}`} tipo="embed" src={gravacao} />
+    </section>
+  ) : null
 }
 
 function Agenda({ edicaoId }: { edicaoId: number }) {

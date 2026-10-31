@@ -55,7 +55,7 @@ describe("CadastrarEmpresa", () => {
     expect(screen.queryByRole("button", { name: "Enviar para revisão" })).toBeNull()
   })
   it("valida campos ao lado do campo e só então insere (sem dono, status ou aprovação vindos da tela)", async () => {
-    falso.tabelas.empresas = (op) => (op === "insert" ? { data: [{ id: 5 }], error: null } : { data: [], error: null })
+    falso.tabelas.empresas = { data: [{ id: 5 }], error: null }
     logar()
     await userEvent.click(await screen.findByRole("button", { name: "Enviar para revisão" }))
     expect(await screen.findByText("Informe o nome da empresa (até 160 caracteres).")).toBeTruthy()
@@ -70,6 +70,14 @@ describe("CadastrarEmpresa", () => {
     expect(dado).toMatchObject({ nome: "Café Exemplo", setor_id: 1, pais: "IE", cidade: null, site: null })
     expect(String(dado.slug)).toMatch(/^cafe-exemplo-[0-9a-f]{6}$/)
     expect(Object.keys(dado).sort()).toEqual(["cidade", "descricao", "nome", "pais", "setor_id", "site", "slug"])
+  })
+  it("lista as empresas do dono pela RPC minhas_empresas, com o estado de cada uma", async () => {
+    falso.rpc.mockResolvedValue({ data: [{ id: 1, nome: "Minha Pendente", status: "pendente" }, { id: 2, nome: "Minha Publicada", status: "publicada" }], error: null })
+    logar()
+    expect(await screen.findByText("Minha Pendente")).toBeTruthy()
+    expect(screen.getByText("Pendente de aprovação")).toBeTruthy()
+    expect(screen.getByText("Publicada")).toBeTruthy()
+    expect(falso.rpc).toHaveBeenCalledWith("minhas_empresas")
   })
   it("resposta vazia do insert (RLS recusou) mostra erro, não 'pendente'", async () => {
     falso.tabelas.empresas = { data: [], error: null }

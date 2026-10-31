@@ -13,6 +13,7 @@ export const zerar = () => {
   falso.tabelas = {}
   falso.chamadas = []
   falso.rpc.mockReset()
+  falso.rpc.mockResolvedValue({ data: [], error: null })
   falso.invoke.mockReset()
 }
 
