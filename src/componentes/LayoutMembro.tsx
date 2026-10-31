@@ -110,7 +110,7 @@ function MenuAvatar({ acesso }: { acesso: Acesso }) {
       }}
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setAberto(false)}
     >
-      <button ref={botao} type="button" aria-expanded={aberto} aria-haspopup="true" aria-label={t("menu.conta")} onClick={() => setAberto(!aberto)} className={`inline-flex size-11 items-center justify-center rounded-full bg-superficie font-semibold uppercase ${foco}`}>
+      <button ref={botao} type="button" aria-expanded={aberto} aria-label={t("menu.conta")} onClick={() => setAberto(!aberto)} className={`inline-flex size-11 items-center justify-center rounded-full bg-superficie font-semibold uppercase ${foco}`}>
         {email.charAt(0) || "?"}
       </button>
       {aberto ? (
@@ -143,7 +143,9 @@ function FolhaMais({ acesso, aberta, fechar }: { acesso: Acesso; aberta: boolean
     if (!aberta && d.open) d.close()
   }, [aberta])
   return (
-    <dialog ref={ref} aria-label={t("menu.mais")} onClose={fechar} className="m-0 mt-auto w-full max-w-none rounded-t-2xl border border-creme/20 bg-painel p-4 text-creme backdrop:bg-black/60 lg:hidden">
+    // Clicar no fundo (o próprio <dialog>, que não tem padding) fecha a folha.
+    <dialog ref={ref} aria-label={t("menu.mais")} onClose={fechar} onClick={(e) => e.target === e.currentTarget && fechar()} className="m-0 mt-auto w-full max-w-none rounded-t-2xl border border-creme/20 bg-painel p-0 text-creme backdrop:bg-black/60 lg:hidden">
+      <div className="p-4">
       <div className="flex items-center justify-between px-3 pb-2">
         <p className="font-semibold">{t("menu.mais")}</p>
         <button type="button" onClick={fechar} aria-label={t("comum.fechar")} className={`inline-flex size-11 items-center justify-center rounded-lg ${foco}`}>
@@ -156,6 +158,7 @@ function FolhaMais({ acesso, aberta, fechar }: { acesso: Acesso; aberta: boolean
           <li key={item.rota}><LinkItem item={item} acesso={acesso} /></li>
         ))}
       </ul>
+      </div>
     </dialog>
   )
 }
@@ -174,7 +177,7 @@ function BarraAbas({ acesso }: { acesso: Acesso }) {
             {t(a.rotulo)}
           </NavLink>
         ))}
-        <button type="button" onClick={() => setMais(true)} aria-haspopup="dialog" className={item}>
+        <button type="button" onClick={() => setMais(true)} className={item}>
           <Icone nome="menu" className="size-6" />
           {t("menu.mais")}
         </button>

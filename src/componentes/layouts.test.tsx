@@ -8,9 +8,10 @@ const h = vi.hoisted(() => ({
   fatores: [] as { id: string }[],
   naoVerificados: [] as { id: string; factor_type: string; status: string }[],
   mfaFalha: false,
+  logado: true,
 }))
 vi.mock("../lib/sessao", () => ({
-  useAuth: () => ({ sessao: { user: { id: "u1", email: "ana@exemplo.invalid" } }, carregando: false }),
+  useAuth: () => ({ sessao: h.logado ? { user: { id: "u1", email: "ana@exemplo.invalid" } } : null, carregando: false }),
   sair: vi.fn(),
 }))
 vi.mock("../lib/supabase", () => ({
@@ -55,7 +56,7 @@ function montar(acesso: Partial<Acesso>, url: string, layout: React.ReactElement
   )
 }
 
-beforeEach(() => Object.assign(h, { aal: "aal2", fatores: [], naoVerificados: [], mfaFalha: false }))
+beforeEach(() => Object.assign(h, { aal: "aal2", fatores: [], naoVerificados: [], mfaFalha: false, logado: true }))
 afterEach(cleanup)
 
 describe("LayoutMembro", () => {
@@ -111,8 +112,23 @@ describe("LayoutMembro", () => {
 })
 
 describe("LayoutPublico", () => {
-  it("tem topo, rodapé e o conteúdo dentro de <main>", () => {
+  it("com sessão, rotas de conteúdo abrem na casca do membro (sidebar), não no topo público", () => {
     montar({}, "/pt/planos", <LayoutPublico />, "planos")
+    expect(screen.getByRole("navigation", { name: "Menu do membro" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: "Tela de dentro" })).toBeTruthy()
+    expect(screen.queryByRole("contentinfo")).toBeNull()
+  })
+
+  it("com sessão, termos e privacidade seguem com o topo público", () => {
+    montar({}, "/pt/termos", <LayoutPublico />, "termos")
+    expect(screen.queryByRole("navigation", { name: "Menu do membro" })).toBeNull()
+    expect(screen.getByRole("contentinfo")).toBeTruthy()
+  })
+
+  it("tem topo, rodapé e o conteúdo dentro de <main>", () => {
+    h.logado = false
+    montar({}, "/pt/planos", <LayoutPublico />, "planos")
+    expect(screen.queryByRole("navigation", { name: "Menu do membro" })).toBeNull()
     expect(within(screen.getByRole("main")).getByRole("heading", { name: "Tela de dentro" })).toBeTruthy()
     expect(screen.getByRole("banner")).toBeTruthy()
     expect(screen.getByRole("contentinfo")).toBeTruthy()

@@ -53,13 +53,24 @@ export function Mfa({ children }: { children: ReactNode }) {
   async function cadastrar() {
     setAviso(null)
     setOcupado(true)
-    // Fator não verificado de tentativa anterior atrapalha um novo enroll: sai antes.
-    const todos = await supabase.auth.mfa.listFactors()
-    for (const f of todos.data?.all ?? []) if (f.factor_type === "totp" && f.status === "unverified") await supabase.auth.mfa.unenroll({ factorId: f.id })
-    const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp" })
-    setOcupado(false)
-    if (error || !data) return setAviso("mfa.erro")
-    setEstado({ fase: "qr", fator: data.id, qr: data.totp.qr_code, segredo: data.totp.secret })
+    try {
+      // Fator não verificado de tentativa anterior atrapalha um novo enroll: sai antes. Falha ao listar/limpar = erro na tela.
+      const todos = await supabase.auth.mfa.listFactors()
+      if (todos.error) return setAviso("mfa.erro")
+      for (const f of todos.data.all) {
+        if (f.factor_type === "totp" && f.status === "unverified") {
+          const saiu = await supabase.auth.mfa.unenroll({ factorId: f.id })
+          if (saiu.error) return setAviso("mfa.erro")
+        }
+      }
+      const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp" })
+      if (error || !data) return setAviso("mfa.erro")
+      setEstado({ fase: "qr", fator: data.id, qr: data.totp.qr_code, segredo: data.totp.secret })
+    } catch {
+      setAviso("mfa.erro")
+    } finally {
+      setOcupado(false)
+    }
   }
 
   async function verificar(e: SubmitEvent<HTMLFormElement>, fator: string) {
@@ -68,10 +79,15 @@ export function Mfa({ children }: { children: ReactNode }) {
     const codigo = String(new FormData(e.currentTarget).get("codigo") ?? "").replace(/\s/g, "")
     if (!/^\d{6}$/.test(codigo)) return setAviso("mfa.erroCodigo")
     setOcupado(true)
-    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId: fator, code: codigo })
-    setOcupado(false)
-    if (error) return setAviso(error.code === "mfa_verification_failed" ? "mfa.erroCodigo" : "mfa.erro")
-    carregar() // a sessão virou aal2: confirma e libera
+    try {
+      const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId: fator, code: codigo })
+      if (error) return setAviso(error.code === "mfa_verification_failed" ? "mfa.erroCodigo" : "mfa.erro")
+      carregar() // a sessão virou aal2: confirma e libera
+    } catch {
+      setAviso("mfa.erro")
+    } finally {
+      setOcupado(false)
+    }
   }
 
   if (estado.fase === "ok") return <>{children}</>

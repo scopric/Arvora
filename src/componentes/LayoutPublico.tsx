@@ -1,6 +1,7 @@
-import { Link, Outlet } from "react-router"
+import { Link, Outlet, useLocation } from "react-router"
 import { useCaminho, useT } from "../i18n"
 import { useAuth } from "../lib/sessao"
+import { LayoutMembro } from "./LayoutMembro"
 import { Marca } from "./Marca"
 import { SeletorIdioma } from "./SeletorIdioma"
 
@@ -92,9 +93,17 @@ export function RodapePublico({ completo = false }: { completo?: boolean }) {
   )
 }
 
+// Páginas de conteúdo que, com sessão, abrem dentro da casca do membro (PRD §17.2.2: "logado, a página muda de estado").
+// Termos, privacidade e checkout seguem com o topo público.
+const COM_CASCA_DO_MEMBRO = new Set(["awards", "biblioteca", "originals", "directory", "evento", "suporte", "planos"])
+
 // Layout das páginas públicas (PRD §17.2.1). A tela de dentro não renderiza <main>: ele é daqui (id="conteudo", alvo do "pular").
+// Com sessão, as rotas de conteúdo acima usam o LayoutMembro (sidebar/abas); visitante e as demais ficam com o topo público.
 export function LayoutPublico() {
   const t = useT()
+  const { sessao } = useAuth()
+  const segmento = useLocation().pathname.split("/")[2]
+  if (sessao && COM_CASCA_DO_MEMBRO.has(segmento)) return <LayoutMembro />
   return (
     <div className="min-h-dvh">
       <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:m-2 focus:rounded-lg focus:bg-creme focus:px-4 focus:py-3 focus:text-fundo">{t("menu.pular")}</a>
