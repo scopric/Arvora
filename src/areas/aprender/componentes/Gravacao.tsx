@@ -16,9 +16,8 @@ export function Gravacao({ aulaId, titulo, uid, aoMudarPercentual }: { aulaId: n
   const t = useT()
   const [estado, recarregar] = useCarga(async () => {
     const [v, p] = await Promise.all([
-      // RPC nova do banco (ainda fora de database.types.ts, por isso o cast). Qualquer erro, inclusive função ausente
-      // ou sem_acesso, vira "vídeo indisponível": a tela não lê video_id da tabela.
-      (supabase as unknown as { rpc: (f: string, a: object) => PromiseLike<{ data: string | null; error: unknown }> }).rpc("video_da_aula", { p_aula: aulaId }),
+      // Qualquer erro (sem_acesso, função ausente) vira "vídeo indisponível": a tela não lê video_id da tabela.
+      supabase.rpc("video_da_aula", { p_aula: aulaId }),
       supabase.from("progresso_aula").select("percentual, posicao_seg").eq("perfil_id", uid).eq("aula_id", aulaId).maybeSingle(),
     ])
     return { videoId: v.error ? null : v.data, progresso: dados(p) }

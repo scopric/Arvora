@@ -15,7 +15,7 @@ import { QuandoAula } from "../componentes/QuandoAula"
 import { SalaAoVivo } from "../componentes/SalaAoVivo"
 import { COLUNAS_AULA, nomeVertical, type AulaLinha, type Vertical } from "../tipos"
 import { useCarga } from "../useCarga"
-import { dados, dataCurta, linkTexto } from "../util"
+import { dados, linkTexto } from "../util"
 
 type AulaComVertical = AulaLinha & { verticais: Vertical | null }
 
@@ -68,7 +68,6 @@ export function Aula() {
       <p className="-mt-4 mb-8 opacity-80">
         {aula.inicio_em ? <QuandoAula inicio={aula.inicio_em} /> : null}
         {aula.duracao_min ? <> · {aula.duracao_min} {t("aprender.min")}</> : null}
-        {!aoVivo && aula.inicio_em ? <> · {dataCurta(aula.inicio_em, lang)}</> : null}
       </p>
       <Link to={caminho("/aulas")} className={`mb-6 inline-block ${linkTexto}`}>‹ {t("aprender.voltarAulas")}</Link>
 
