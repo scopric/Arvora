@@ -44,9 +44,9 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
       <div className="flex items-start gap-4">
         <Avatar nome={p?.nome ?? null} />
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold">
             {p ? <Link to={caminho(`/network/${chaveSlug(p)}`)} className="hover:underline">{p.nome}</Link> : t("rede.conexoes.membroIndisponivel")}
-          </h3>
+          </h2>
           {p?.empresa_nome ? <p className="text-sm opacity-80">{p.empresa_nome}</p> : null}
           <p className="text-sm opacity-60">
             {dia(c.pedida_em, idioma)}

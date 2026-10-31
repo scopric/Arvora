@@ -175,4 +175,5 @@ export const redePt = {
   "rede.meuAward.erroPedir": "Não conseguimos enviar o pedido. Tente de novo.",
   "rede.meuAward.enviado": "Pedido enviado. A equipe vai analisar.",
   "rede.meuAward.erro": "Não conseguimos carregar o seu Award.",
+  "rede.comunidade.apagarBloqueado": "Este texto está em análise por causa de uma denúncia e não pode ser apagado agora.",
 }

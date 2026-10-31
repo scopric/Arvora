@@ -62,7 +62,9 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
     setApagando(false)
     setErro(null)
     const { data, error } = await apagarTexto(alvo)
-    if (error || !data || data.length === 0) return setErro("rede.comunidade.erroApagar")
+    // Sem erro e sem linha: o RLS barrou (denúncia aberta sobre o texto, ou já oculto pela moderação).
+    if (error) return setErro("rede.comunidade.erroApagar")
+    if (!data || data.length === 0) return setErro("rede.comunidade.apagarBloqueado")
     aoMudar()
   }
 

@@ -176,4 +176,5 @@ export const redeEn: Record<keyof typeof redePt, string> = {
   "rede.meuAward.erroPedir": "We could not send the request. Please try again.",
   "rede.meuAward.enviado": "Request sent. The team will review it.",
   "rede.meuAward.erro": "We could not load your Award.",
+  "rede.comunidade.apagarBloqueado": "This text is under review because of a report and cannot be deleted right now.",
 }

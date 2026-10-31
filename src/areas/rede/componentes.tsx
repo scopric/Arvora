@@ -113,9 +113,9 @@ export function CartaoPerfil({ perfil, setor, tags, children, acoes }: { perfil:
       <div className="flex items-start gap-4">
         <Avatar nome={perfil.nome} />
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold">
             <Link to={caminho(`/network/${chaveSlug(perfil)}`)} className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">{perfil.nome}</Link>
-          </h3>
+          </h2>
           {perfil.empresa_nome ? <p className="text-sm opacity-80">{perfil.empresa_nome}</p> : null}
           {local ? <p className="text-sm opacity-60">{local}</p> : null}
           {Children.count(tags) > 0 ? <ul className="mt-3 flex flex-wrap gap-2">{tags}</ul> : null}
