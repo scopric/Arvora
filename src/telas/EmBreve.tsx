@@ -40,9 +40,9 @@ export function EmBreve() {
   const caminho = useCaminho()
   const [ativo, setAtivo] = useState(0)
   return (
-    <>
+    <div>
       <header className="sticky top-0 z-20 flex min-h-17 items-center justify-between gap-3 border-b border-creme/10 bg-fundo/75 px-4 backdrop-blur-md sm:px-12 lg:px-20">
-        <Marca to={caminho("/")} />
+        <Marca to={caminho("/")} className="max-sm:[&>span]:hidden" />
         <nav aria-label={t("nav.principal")} className="flex items-center gap-2 text-sm font-semibold">
           <SeletorIdioma />
           {carregando ? null : sessao ? (
@@ -50,7 +50,7 @@ export function EmBreve() {
           ) : (
             <>
               <Link to={caminho("/entrar")} className={link}>{t("nav.entrar")}</Link>
-              <Link to={caminho("/cadastro")} className={`${botao} hidden min-h-11 bg-creme px-5 text-sm text-fundo hover:bg-white sm:inline-flex`}>{t("nav.criarConta")}</Link>
+              <Link to={caminho("/cadastro")} className={`${botao} min-h-11 bg-creme px-5 text-sm whitespace-nowrap text-fundo hover:bg-white max-sm:hidden`}>{t("nav.criarConta")}</Link>
             </>
           )}
         </nav>
@@ -114,6 +114,6 @@ export function EmBreve() {
         </section>
       )}
       </main>
-    </>
+    </div>
   )
 }
