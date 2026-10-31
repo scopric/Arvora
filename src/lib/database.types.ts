@@ -67,6 +67,37 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"aulas": {
+                  Row: {
+                    "agendada_em": string | null,"atualizado_em": string,"criado_em": string,"descricao": string | null,"duracao_min": number | null,"especialista_id": string | null,"id": number,"inicio_em": string | null,"materiais_publicados_em": string | null,"modulo_id": number | null,"nivel_minimo": Database["public"]['Enums']["nivel_acesso"],"ordem": number,"slug": string,"tipo": Database["public"]['Enums']["tipo_aula"],"titulo": string,"trailer_video_id": string | null,"vertical_id": number,"video_id": string | null
+                  }
+                  Insert: {
+                    "agendada_em"?: string | null,"atualizado_em"?: string,"criado_em"?: string,"descricao"?: string | null,"duracao_min"?: number | null,"especialista_id"?: string | null,"id"?: never,"inicio_em"?: string | null,"materiais_publicados_em"?: string | null,"modulo_id"?: number | null,"nivel_minimo"?: Database["public"]['Enums']["nivel_acesso"],"ordem"?: number,"slug": string,"tipo": Database["public"]['Enums']["tipo_aula"],"titulo": string,"trailer_video_id"?: string | null,"vertical_id": number,"video_id"?: string | null
+                  }
+                  Update: {
+                    "agendada_em"?: string | null,"atualizado_em"?: string,"criado_em"?: string,"descricao"?: string | null,"duracao_min"?: number | null,"especialista_id"?: string | null,"id"?: never,"inicio_em"?: string | null,"materiais_publicados_em"?: string | null,"modulo_id"?: number | null,"nivel_minimo"?: Database["public"]['Enums']["nivel_acesso"],"ordem"?: number,"slug"?: string,"tipo"?: Database["public"]['Enums']["tipo_aula"],"titulo"?: string,"trailer_video_id"?: string | null,"vertical_id"?: number,"video_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "aulas_especialista_id_fkey"
+      columns: ["especialista_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "aulas_modulo_id_fkey"
+      columns: ["modulo_id"]
+isOneToOne: false
+      referencedRelation: "modulos"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "aulas_vertical_id_fkey"
+      columns: ["vertical_id"]
+isOneToOne: false
+      referencedRelation: "verticais"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"cambio_bce": {
                   Row: {
                     "atualizado_em": string,"criado_em": string,"data": string,"fonte_url": string,"moeda": string,"taxa": number
@@ -102,6 +133,31 @@ isOneToOne: false
       columns: ["perfil_id"]
 isOneToOne: false
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"comentarios": {
+                  Row: {
+                    "autor_id": string | null,"corpo": string,"criado_em": string,"editado_em": string | null,"id": number,"oculto_em": string | null,"oculto_por": string | null,"post_id": number
+                  }
+                  Insert: {
+                    "autor_id"?: string | null,"corpo": string,"criado_em"?: string,"editado_em"?: string | null,"id"?: never,"oculto_em"?: string | null,"oculto_por"?: string | null,"post_id": number
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"corpo"?: string,"criado_em"?: string,"editado_em"?: string | null,"id"?: never,"oculto_em"?: string | null,"oculto_por"?: string | null,"post_id"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "comentarios_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "comentarios_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
       referencedColumns: ["id"]
     }
                   ]
@@ -143,6 +199,87 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"cursos": {
+                  Row: {
+                    "atualizado_em": string,"capa_path": string | null,"criado_em": string,"descricao": string | null,"id": number,"nivel_minimo": Database["public"]['Enums']["nivel_acesso"],"ordem": number,"publicado_em": string | null,"slug": string,"titulo": string,"vertical_id": number
+                  }
+                  Insert: {
+                    "atualizado_em"?: string,"capa_path"?: string | null,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nivel_minimo"?: Database["public"]['Enums']["nivel_acesso"],"ordem"?: number,"publicado_em"?: string | null,"slug": string,"titulo": string,"vertical_id": number
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"capa_path"?: string | null,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nivel_minimo"?: Database["public"]['Enums']["nivel_acesso"],"ordem"?: number,"publicado_em"?: string | null,"slug"?: string,"titulo"?: string,"vertical_id"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "cursos_vertical_id_fkey"
+      columns: ["vertical_id"]
+isOneToOne: false
+      referencedRelation: "verticais"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"curtidas": {
+                  Row: {
+                    "criado_em": string,"perfil_id": string,"post_id": number
+                  }
+                  Insert: {
+                    "criado_em"?: string,"perfil_id"?: string,"post_id": number
+                  }
+                  Update: {
+                    "criado_em"?: string,"perfil_id"?: string,"post_id"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "curtidas_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "curtidas_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"denuncias": {
+                  Row: {
+                    "comentario_id": number | null,"criado_em": string,"denunciante_id": string | null,"id": number,"motivo": string,"perfil_denunciado_id": string | null,"post_id": number | null,"resolvida_em": string | null,"resolvida_por": string | null,"status": Database["public"]['Enums']["status_denuncia"],"texto": string | null
+                  }
+                  Insert: {
+                    "comentario_id"?: number | null,"criado_em"?: string,"denunciante_id"?: string | null,"id"?: never,"motivo": string,"perfil_denunciado_id"?: string | null,"post_id"?: number | null,"resolvida_em"?: string | null,"resolvida_por"?: string | null,"status"?: Database["public"]['Enums']["status_denuncia"],"texto"?: string | null
+                  }
+                  Update: {
+                    "comentario_id"?: number | null,"criado_em"?: string,"denunciante_id"?: string | null,"id"?: never,"motivo"?: string,"perfil_denunciado_id"?: string | null,"post_id"?: number | null,"resolvida_em"?: string | null,"resolvida_por"?: string | null,"status"?: Database["public"]['Enums']["status_denuncia"],"texto"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "denuncias_comentario_id_fkey"
+      columns: ["comentario_id"]
+isOneToOne: false
+      referencedRelation: "comentarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "denuncias_denunciante_id_fkey"
+      columns: ["denunciante_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "denuncias_perfil_denunciado_id_fkey"
+      columns: ["perfil_denunciado_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "denuncias_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"documentos_legais": {
                   Row: {
                     "conteudo_md": string,"criado_em": string,"id": number,"idioma": string,"publicado_por": string | null,"sha256": string,"tipo": Database["public"]['Enums']["tipo_documento"],"titulo": string,"versao": string,"vigente_desde": string
@@ -155,6 +292,31 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"entregas": {
+                  Row: {
+                    "arquivo_path": string | null,"atualizado_em": string,"corrigido_em": string | null,"corrigido_por": string | null,"criado_em": string,"devolutiva": string | null,"enviada_em": string,"exercicio_id": number,"id": number,"perfil_id": string,"status": Database["public"]['Enums']["status_entrega"],"texto": string | null
+                  }
+                  Insert: {
+                    "arquivo_path"?: string | null,"atualizado_em"?: string,"corrigido_em"?: string | null,"corrigido_por"?: string | null,"criado_em"?: string,"devolutiva"?: string | null,"enviada_em"?: string,"exercicio_id": number,"id"?: never,"perfil_id": string,"status"?: Database["public"]['Enums']["status_entrega"],"texto"?: string | null
+                  }
+                  Update: {
+                    "arquivo_path"?: string | null,"atualizado_em"?: string,"corrigido_em"?: string | null,"corrigido_por"?: string | null,"criado_em"?: string,"devolutiva"?: string | null,"enviada_em"?: string,"exercicio_id"?: number,"id"?: never,"perfil_id"?: string,"status"?: Database["public"]['Enums']["status_entrega"],"texto"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "entregas_exercicio_id_fkey"
+      columns: ["exercicio_id"]
+isOneToOne: false
+      referencedRelation: "exercicios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "entregas_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"equipe": {
                   Row: {
@@ -175,6 +337,19 @@ isOneToOne: true
       referencedColumns: ["id"]
     }
                   ]
+                },"espacos": {
+                  Row: {
+                    "atualizado_em": string,"criado_em": string,"descricao": string | null,"id": number,"nivel_minimo": Database["public"]['Enums']["nivel_acesso"],"ordem": number,"slug": string,"titulo": string,"titulo_en": string | null
+                  }
+                  Insert: {
+                    "atualizado_em"?: string,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nivel_minimo": Database["public"]['Enums']["nivel_acesso"],"ordem"?: number,"slug": string,"titulo": string,"titulo_en"?: string | null
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nivel_minimo"?: Database["public"]['Enums']["nivel_acesso"],"ordem"?: number,"slug"?: string,"titulo"?: string,"titulo_en"?: string | null
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"eventos_stripe": {
                   Row: {
                     "conta_stripe_id": number,"criado_em": string,"criado_stripe_em": string,"erro": string | null,"event_id": string,"id": number,"payload": Json | null,"processado_em": string | null,"tipo": string
@@ -194,6 +369,25 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"exercicios": {
+                  Row: {
+                    "aceita_arquivo": boolean,"atualizado_em": string,"aula_id": number,"criado_em": string,"enunciado_md": string,"id": number,"ordem": number,"prazo_dias": number | null
+                  }
+                  Insert: {
+                    "aceita_arquivo"?: boolean,"atualizado_em"?: string,"aula_id": number,"criado_em"?: string,"enunciado_md": string,"id"?: never,"ordem": number,"prazo_dias"?: number | null
+                  }
+                  Update: {
+                    "aceita_arquivo"?: boolean,"atualizado_em"?: string,"aula_id"?: number,"criado_em"?: string,"enunciado_md"?: string,"id"?: never,"ordem"?: number,"prazo_dias"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "exercicios_aula_id_fkey"
+      columns: ["aula_id"]
+isOneToOne: false
+      referencedRelation: "aulas"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"log_admin": {
                   Row: {
                     "acao": string,"alvo_id": string | null,"antes": Json | null,"ator_id": string,"criado_em": string,"depois": Json | null,"id": number,"tabela": string
@@ -206,6 +400,63 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"materiais_aula": {
+                  Row: {
+                    "aprovado_em": string | null,"aprovado_por": string | null,"arquivo_path": string | null,"atualizado_em": string,"aula_id": number,"conteudo_md": string | null,"criado_em": string,"id": number,"status": Database["public"]['Enums']["status_material"],"tipo": Database["public"]['Enums']["tipo_material"]
+                  }
+                  Insert: {
+                    "aprovado_em"?: string | null,"aprovado_por"?: string | null,"arquivo_path"?: string | null,"atualizado_em"?: string,"aula_id": number,"conteudo_md"?: string | null,"criado_em"?: string,"id"?: never,"status"?: Database["public"]['Enums']["status_material"],"tipo": Database["public"]['Enums']["tipo_material"]
+                  }
+                  Update: {
+                    "aprovado_em"?: string | null,"aprovado_por"?: string | null,"arquivo_path"?: string | null,"atualizado_em"?: string,"aula_id"?: number,"conteudo_md"?: string | null,"criado_em"?: string,"id"?: never,"status"?: Database["public"]['Enums']["status_material"],"tipo"?: Database["public"]['Enums']["tipo_material"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "materiais_aula_aula_id_fkey"
+      columns: ["aula_id"]
+isOneToOne: false
+      referencedRelation: "aulas"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"modulos": {
+                  Row: {
+                    "atualizado_em": string,"criado_em": string,"curso_id": number,"id": number,"ordem": number,"titulo": string
+                  }
+                  Insert: {
+                    "atualizado_em"?: string,"criado_em"?: string,"curso_id": number,"id"?: never,"ordem": number,"titulo": string
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"criado_em"?: string,"curso_id"?: number,"id"?: never,"ordem"?: number,"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "modulos_curso_id_fkey"
+      columns: ["curso_id"]
+isOneToOne: false
+      referencedRelation: "cursos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"notificacoes": {
+                  Row: {
+                    "criado_em": string,"id": number,"lida_em": string | null,"link": string | null,"perfil_id": string,"tipo": Database["public"]['Enums']["tipo_notificacao"],"titulo": string
+                  }
+                  Insert: {
+                    "criado_em"?: string,"id"?: never,"lida_em"?: string | null,"link"?: string | null,"perfil_id": string,"tipo": Database["public"]['Enums']["tipo_notificacao"],"titulo": string
+                  }
+                  Update: {
+                    "criado_em"?: string,"id"?: never,"lida_em"?: string | null,"link"?: string | null,"perfil_id"?: string,"tipo"?: Database["public"]['Enums']["tipo_notificacao"],"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "notificacoes_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"pagamentos": {
                   Row: {
@@ -326,6 +577,56 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"posts": {
+                  Row: {
+                    "autor_id": string | null,"corpo": string,"criado_em": string,"editado_em": string | null,"espaco_id": number,"id": number,"oculto_em": string | null,"oculto_por": string | null
+                  }
+                  Insert: {
+                    "autor_id"?: string | null,"corpo": string,"criado_em"?: string,"editado_em"?: string | null,"espaco_id": number,"id"?: never,"oculto_em"?: string | null,"oculto_por"?: string | null
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"corpo"?: string,"criado_em"?: string,"editado_em"?: string | null,"espaco_id"?: number,"id"?: never,"oculto_em"?: string | null,"oculto_por"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "posts_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "posts_espaco_id_fkey"
+      columns: ["espaco_id"]
+isOneToOne: false
+      referencedRelation: "espacos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"progresso_aula": {
+                  Row: {
+                    "atualizado_em": string,"aula_id": number,"concluida_em": string | null,"criado_em": string,"percentual": number,"perfil_id": string,"posicao_seg": number
+                  }
+                  Insert: {
+                    "atualizado_em"?: string,"aula_id": number,"concluida_em"?: string | null,"criado_em"?: string,"percentual"?: number,"perfil_id": string,"posicao_seg"?: number
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"aula_id"?: number,"concluida_em"?: string | null,"criado_em"?: string,"percentual"?: number,"perfil_id"?: string,"posicao_seg"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "progresso_aula_aula_id_fkey"
+      columns: ["aula_id"]
+isOneToOne: false
+      referencedRelation: "aulas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "progresso_aula_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"receitas_externas": {
                   Row: {
                     "anulado_em": string | null,"anulado_por": string | null,"atualizado_em": string,"bruto_centavos": number,"cliente_email": string | null,"cliente_nome": string,"comprovante_path": string,"criado_em": string,"descricao": string | null,"id": number,"lancado_por": string,"moeda": string,"motivo_anulacao": string | null,"origem": Database["public"]['Enums']["origem_receita_externa"],"perfil_id": string | null,"plano_id": number | null,"recebido_em": string,"tipo_receita": Database["public"]['Enums']["tipo_receita"],"vat_centavos": number
@@ -408,15 +709,34 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
-                },"verticais": {
+                },"transmissoes": {
                   Row: {
-                    "ativa": boolean,"atualizado_em": string,"conta_como_ia": boolean,"criado_em": string,"descricao": string | null,"id": number,"nome": string,"nome_en": string | null,"ordem": number,"slug": string
+                    "abre_min_antes": number,"atualizado_em": string,"aula_id": number,"criado_em": string,"url": string,"url_reserva": string | null,"usar_reserva": boolean
                   }
                   Insert: {
-                    "ativa"?: boolean,"atualizado_em"?: string,"conta_como_ia"?: boolean,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nome": string,"nome_en"?: string | null,"ordem"?: number,"slug": string
+                    "abre_min_antes"?: number,"atualizado_em"?: string,"aula_id": number,"criado_em"?: string,"url": string,"url_reserva"?: string | null,"usar_reserva"?: boolean
                   }
                   Update: {
-                    "ativa"?: boolean,"atualizado_em"?: string,"conta_como_ia"?: boolean,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nome"?: string,"nome_en"?: string | null,"ordem"?: number,"slug"?: string
+                    "abre_min_antes"?: number,"atualizado_em"?: string,"aula_id"?: number,"criado_em"?: string,"url"?: string,"url_reserva"?: string | null,"usar_reserva"?: boolean
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "transmissoes_aula_id_fkey"
+      columns: ["aula_id"]
+isOneToOne: true
+      referencedRelation: "aulas"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"verticais": {
+                  Row: {
+                    "aceita_entregas": boolean,"ativa": boolean,"atualizado_em": string,"conta_como_ia": boolean,"criado_em": string,"descricao": string | null,"id": number,"nome": string,"nome_en": string | null,"ordem": number,"slug": string
+                  }
+                  Insert: {
+                    "aceita_entregas"?: boolean,"ativa"?: boolean,"atualizado_em"?: string,"conta_como_ia"?: boolean,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nome": string,"nome_en"?: string | null,"ordem"?: number,"slug": string
+                  }
+                  Update: {
+                    "aceita_entregas"?: boolean,"ativa"?: boolean,"atualizado_em"?: string,"conta_como_ia"?: boolean,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nome"?: string,"nome_en"?: string | null,"ordem"?: number,"slug"?: string
                   }
                   Relationships: [
                     
@@ -427,7 +747,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "aprovar_perfil_publico":
+            "aprovar_material":
+{ Args: { "material": number }; Returns: undefined
+                           },
+"aprovar_perfil_publico":
 { Args: { "aprovar"?: boolean,"perfil": string }; Returns: undefined
                            },
 "ciclo_de":
@@ -443,6 +766,9 @@ isOneToOne: false
                            },
 "consumir_limite":
 { Args: { "p_acao": string }; Returns: boolean
+                           },
+"corrigir_entrega":
+{ Args: { "devolutiva": string,"entrega": number,"novo_status": Database["public"]['Enums']["status_entrega"] }; Returns: undefined
                            },
 "exportar_meus_dados":
 { Args: Record<PropertyKey, never>; Returns: Json
@@ -468,8 +794,14 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"link_transmissao":
+{ Args: { "aula": number }; Returns: string
+                           },
 "marcar_relatorio_enviado":
 { Args: { "ciclo_inicio": string,"versao": number }; Returns: undefined
+                           },
+"moderar_conteudo":
+{ Args: { "alvo": string,"alvo_id": number,"ocultar": boolean }; Returns: undefined
                            },
 "pode_ver_conteudo":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
@@ -483,12 +815,18 @@ isOneToOne: false
 "relatorio_ciclo":
 { Args: { "ciclo_inicio": string }; Returns: Json
                            },
+"resolver_denuncia":
+{ Args: { "denuncia": number,"procedente": boolean }; Returns: undefined
+                           },
+"suspender_perfil":
+{ Args: { "perfil": string,"suspender": boolean }; Returns: undefined
+                           },
 "tem_acesso":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
                            }
           }
           Enums: {
-            "nivel_acesso": "visitante"|"clube"|"grupo","origem_assinatura": "stripe"|"manual","origem_receita_externa": "ingresso"|"pix"|"transferencia"|"evento"|"outro","papel_equipe": "super_admin"|"editor"|"corretor"|"moderador"|"auditor","status_assinatura": "incomplete"|"incomplete_expired"|"trialing"|"active"|"past_due"|"canceled"|"unpaid"|"paused","status_pedido": "recebido"|"em_andamento"|"concluido"|"recusado","tipo_documento": "termos"|"privacidade"|"cookies"|"reembolso"|"arrependimento"|"marketing"|"match"|"hall_of_fame","tipo_estorno": "reembolso"|"chargeback","tipo_pedido_gdpr": "exportacao"|"exclusao"|"retificacao","tipo_receita": "assinatura"|"curso"|"produto_digital"|"ingresso","visibilidade_perfil": "membros"|"publico"
+            "nivel_acesso": "visitante"|"clube"|"grupo","origem_assinatura": "stripe"|"manual","origem_receita_externa": "ingresso"|"pix"|"transferencia"|"evento"|"outro","papel_equipe": "super_admin"|"editor"|"corretor"|"moderador"|"auditor","status_assinatura": "incomplete"|"incomplete_expired"|"trialing"|"active"|"past_due"|"canceled"|"unpaid"|"paused","status_denuncia": "aberta"|"procedente"|"improcedente","status_entrega": "enviada"|"aprovada"|"ajustar","status_material": "rascunho"|"aprovado","status_pedido": "recebido"|"em_andamento"|"concluido"|"recusado","tipo_aula": "gravada"|"ao_vivo","tipo_documento": "termos"|"privacidade"|"cookies"|"reembolso"|"arrependimento"|"marketing"|"match"|"hall_of_fame","tipo_estorno": "reembolso"|"chargeback","tipo_material": "resumo"|"ebook"|"exercicios","tipo_notificacao": "conexao_recebida"|"conexao_aceita"|"aula_publicada"|"sistema","tipo_pedido_gdpr": "exportacao"|"exclusao"|"retificacao","tipo_receita": "assinatura"|"curso"|"produto_digital"|"ingresso","visibilidade_perfil": "membros"|"publico"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -604,7 +942,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "nivel_acesso": ["visitante", "clube", "grupo"],"origem_assinatura": ["stripe", "manual"],"origem_receita_externa": ["ingresso", "pix", "transferencia", "evento", "outro"],"papel_equipe": ["super_admin", "editor", "corretor", "moderador", "auditor"],"status_assinatura": ["incomplete", "incomplete_expired", "trialing", "active", "past_due", "canceled", "unpaid", "paused"],"status_pedido": ["recebido", "em_andamento", "concluido", "recusado"],"tipo_documento": ["termos", "privacidade", "cookies", "reembolso", "arrependimento", "marketing", "match", "hall_of_fame"],"tipo_estorno": ["reembolso", "chargeback"],"tipo_pedido_gdpr": ["exportacao", "exclusao", "retificacao"],"tipo_receita": ["assinatura", "curso", "produto_digital", "ingresso"],"visibilidade_perfil": ["membros", "publico"]
+            "nivel_acesso": ["visitante", "clube", "grupo"],"origem_assinatura": ["stripe", "manual"],"origem_receita_externa": ["ingresso", "pix", "transferencia", "evento", "outro"],"papel_equipe": ["super_admin", "editor", "corretor", "moderador", "auditor"],"status_assinatura": ["incomplete", "incomplete_expired", "trialing", "active", "past_due", "canceled", "unpaid", "paused"],"status_denuncia": ["aberta", "procedente", "improcedente"],"status_entrega": ["enviada", "aprovada", "ajustar"],"status_material": ["rascunho", "aprovado"],"status_pedido": ["recebido", "em_andamento", "concluido", "recusado"],"tipo_aula": ["gravada", "ao_vivo"],"tipo_documento": ["termos", "privacidade", "cookies", "reembolso", "arrependimento", "marketing", "match", "hall_of_fame"],"tipo_estorno": ["reembolso", "chargeback"],"tipo_material": ["resumo", "ebook", "exercicios"],"tipo_notificacao": ["conexao_recebida", "conexao_aceita", "aula_publicada", "sistema"],"tipo_pedido_gdpr": ["exportacao", "exclusao", "retificacao"],"tipo_receita": ["assinatura", "curso", "produto_digital", "ingresso"],"visibilidade_perfil": ["membros", "publico"]
           }
         }
 } as const
