@@ -30,8 +30,11 @@ from public.planos p where p.stripe_price_id = 'price_exemplo_grupo';
 
 -- Textos legais de EXEMPLO (os reais sao das Contratantes e do solicitor).
 insert into public.documentos_legais (tipo, versao, idioma, titulo, conteudo_md)
-select t::public.tipo_documento, 'exemplo-0', 'pt', 'Texto de exemplo: ' || t, 'TEXTO DE EXEMPLO, sem valor juridico.'
-from unnest(array['termos', 'privacidade', 'cookies', 'reembolso', 'arrependimento', 'marketing', 'match', 'hall_of_fame']) t;
+select t::public.tipo_documento, 'exemplo-0', i.idioma,
+       case i.idioma when 'pt' then 'Texto de exemplo: ' else 'Sample text: ' end || t,
+       case i.idioma when 'pt' then 'TEXTO DE EXEMPLO, sem valor jurídico.' else 'SAMPLE TEXT, no legal value.' end
+from unnest(array['termos', 'privacidade', 'cookies', 'reembolso', 'arrependimento', 'marketing', 'match', 'hall_of_fame']) t,
+     (values ('pt'), ('en')) i(idioma);
 
 -- Verticais (nomes de trabalho).
 insert into public.verticais (slug, nome, nome_en, ordem, aceita_entregas, conta_como_ia) values
@@ -107,7 +110,7 @@ insert into public.consentimentos (documento_id, titular_email, titular_nome, ac
 select d.id, p.e, p.n, now(), 'exemplo local'
 from public.documentos_legais d,
      (values ('premiado1@exemplo.invalid', 'Premiada de exemplo'), ('premiado2@exemplo.invalid', 'Premiado de exemplo')) p(e, n)
-where d.tipo = 'hall_of_fame';
+where d.tipo = 'hall_of_fame' and d.idioma = 'pt';
 insert into public.premiados (edicao_id, categoria_id, empresa_id, nome, slug, historia, redes, convite_email, consentimento_id, publicado_em)
 select e.id, c.id, (select id from public.empresas where slug = p.emp), p.n, p.s, 'História fictícia de exemplo.', '{}', p.e,
        (select id from public.consentimentos where titular_email = p.e), now()

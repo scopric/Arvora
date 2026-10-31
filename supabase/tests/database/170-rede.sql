@@ -55,7 +55,7 @@ insert into public.perfis_contato (perfil_id, email_contato, whatsapp) values (t
 
 -- 1) vitrine e network_itens ------------------------------------------------------------------------------
 select tt.como(tt.u('c1'));
-select is(tt.n('select 1 from public.perfis_vitrine where id <> auth.uid()'), 8, 'clube ve pela vitrine os perfis visiveis a membros');
+select is(tt.n('select 1 from public.perfis_vitrine where id <> auth.uid()'), 2, 'clube ve pela vitrine so membros ativos (f4_05)');
 select throws_ok($$select maior_18_em from public.perfis_vitrine$$, '42703', null, 'vitrine nao tem colunas internas');
 select throws_ok($$insert into public.network_itens (tipo, categoria_id) values ('oferece', tt.cr('contabilidade'))$$, '42501', null,
                  'clube nao declara procura/oferece');
@@ -143,7 +143,7 @@ select d.id, p, 'x' from public.documentos_legais d, unnest(array[tt.u('b1'), tt
 select is(private.gerar_sugestoes_match('2026-11-04'), 2, 'opt-in dos dois do Grupo: uma sugestao para cada (clube fica de fora)');
 select is((select semana from public.sugestoes_match limit 1), '2026-11-02'::date, 'semana = segunda-feira');
 select is((select pontuacao::int || ' ' || motivo from public.sugestoes_match where perfil_id = tt.u('b1')),
-          '6 oferece Contabilidade, que voce procura; mesma cidade (Dublin); mesmo setor', 'pontuacao e motivo legivel');
+          '6 oferece Contabilidade, que você procura; mesma cidade (Dublin); mesmo setor', 'pontuacao e motivo legivel');
 select is(private.gerar_sugestoes_match('2026-11-05'), 0, 'mesma semana nao duplica');
 select tt.como(tt.u('b1'));
 select is(tt.n('select 1 from public.sugestoes_match'), 1, 'dono le as proprias sugestoes');

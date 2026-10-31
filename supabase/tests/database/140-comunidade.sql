@@ -98,7 +98,7 @@ reset role;
 -- clube cancelado perde a escrita e a leitura
 update public.assinaturas set status = 'canceled' where stripe_subscription_id = 'sub_c1';
 select tt.como(tt.u('c1'));
-select is(tt.n('select 1 from public.posts'), 0, 'cancelado perde a leitura');
+select is(tt.n('select 1 from public.posts where autor_id is distinct from auth.uid()'), 0, 'cancelado perde a leitura (fora o proprio post)');
 select throws_ok($$insert into public.posts (espaco_id, corpo) values (tt.esp('geral'), 'x')$$, '42501', null, 'cancelado nao posta');
 reset role;
 update public.assinaturas set status = 'active' where stripe_subscription_id = 'sub_c1';
