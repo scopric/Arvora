@@ -105,6 +105,53 @@ export function EmBreve() {
         </div>
       </section>
 
+      <section aria-labelledby="funil" className="px-6 py-24 sm:px-16 lg:px-24">
+        <div className="mx-auto max-w-6xl">
+          <h2 id="funil" className="max-w-3xl font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">{t("home.funil.titulo")}</h2>
+          <ol className="relative mt-14 grid gap-10 border-l border-destaque/40 pl-8 md:grid-cols-3 md:gap-8 md:border-t md:border-l-0 md:pt-10 md:pl-0">
+            {([1, 2, 3] as const).map((n) => (
+              <li key={n} className="revela relative">
+                <span aria-hidden="true" className="absolute top-1.5 -left-[2.4rem] size-3 rounded-full bg-destaque md:-top-[2.9rem] md:left-0" />
+                <p aria-hidden="true" className="font-mono text-sm text-destaque">0{n}</p>
+                <h3 className="mt-2 font-titulo text-4xl leading-none font-bold uppercase">{t(`home.funil.${n}.nome`)}</h3>
+                <p className="mt-3 max-w-xs text-creme/75">{t(`home.funil.${n}.texto`)}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section aria-labelledby="aula" className="px-6 py-24 sm:px-16 lg:px-24">
+        <div className="mx-auto grid max-w-6xl gap-12 rounded-2xl border border-creme/15 p-8 sm:p-14 lg:grid-cols-2">
+          <h2 id="aula" className="font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">{t("home.aula.titulo")}</h2>
+          <ol className="grid gap-4 sm:grid-cols-2">
+            {([1, 2, 3, 4] as const).map((n) => (
+              <li key={n} className="revela flex min-h-28 flex-col justify-between rounded-xl bg-painel p-5">
+                <span aria-hidden="true" className="font-mono text-sm text-dourado">0{n}</span>
+                <span className="text-lg font-semibold">{t(`home.aula.${n}`)}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section aria-labelledby="faq" className="bg-creme px-6 py-24 text-fundo sm:px-16 lg:px-24">
+        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_2fr]">
+          <h2 id="faq" className="font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">{t("home.faq.titulo")}</h2>
+          <div className="divide-y divide-fundo/20 border-y border-fundo/20">
+            {([1, 2, 3] as const).map((n) => (
+              <details key={n} className="group py-5">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-xl font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fundo [&::-webkit-details-marker]:hidden">
+                  {t(`home.faq.${n}.p`)}
+                  <span aria-hidden="true" className="text-2xl transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-3 max-w-xl text-fundo/80">{t(`home.faq.${n}.r`)}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {!carregando && !sessao && (
         <section className="px-6 pt-8 pb-32 sm:px-16 lg:px-24">
           <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 border-t border-dourado/60 pt-12">

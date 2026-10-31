@@ -61,7 +61,7 @@ describe("conteúdo", () => {
     estado.sessao = null
     nav()
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1)
-    expect(screen.getAllByRole("listitem")).toHaveLength(4)
+    expect(screen.getAllByRole("listitem")).toHaveLength(11)
     expect(screen.getAllByRole("link", { name: "Criar conta" }).length).toBeGreaterThanOrEqual(2)
   })
 })
