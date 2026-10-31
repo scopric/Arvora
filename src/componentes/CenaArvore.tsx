@@ -6,23 +6,37 @@ import { gerar } from "./arvoreRede"
 // Árvore de luz em WebGL puro (sem biblioteca): os mesmos fios e nós de arvoreRede.ts viram pontos com
 // profundidade. Cresce uma vez, inclina com o ponteiro e gira com a rolagem. Sem WebGL: cai no SVG de FundoArvore.
 const VERT = `attribute vec3 p;attribute vec4 a;
-uniform float uT,uAsp,uPx,uTime,uScroll;uniform vec2 uPtr;
+uniform float uT,uAsp,uPx,uTime,uScroll,uOff;uniform vec2 uPtr;
 varying vec4 vC;
 void main(){
   float g=smoothstep(a.x,a.x+.05,uT);
   vec3 q=p;
-  if(a.z>2.5)q.y=mod(q.y+1.+uTime*.05*(.4+a.w),2.)-1.;
+  if(a.z>2.5&&a.z<3.5)q.y=mod(q.y+1.+uTime*.05*(.4+a.w),2.)-1.;
   q.x+=sin(uTime*.7+q.y*3.+a.w*6.28)*.006*(q.y+1.);
   float r=uPtr.x*.7+uScroll*.9,c=cos(r),s=sin(r);
   q.xz=mat2(c,-s,s,c)*q.xz;
+  q.x+=uOff;
   q.y+=uPtr.y*.08;
   float w=1.+q.z*.45;
   gl_Position=vec4(q.x*.98/uAsp,q.y*.98,0.,w);
   gl_PointSize=max(1.,a.y*uPx*g/w);
   float tw=a.z>.5?.65+.35*sin(uTime*1.6+a.w*40.):1.;
   vec3 col=a.z>1.5?vec3(.79,.64,.29):a.z>.5?vec3(.62,.71,.54):vec3(.96,.96,.94);
-  vC=vec4(col,(a.z>2.5?.55:a.z>.5?1.:.8)*tw*g*(1.-uScroll*.8));
+  float al=(a.z>2.5?.55:a.z>.5?1.:.8)*tw;
+  if(a.z>3.5){col=vec3(1.,.88,.55);al=.24*pow(max(0.,sin(uTime*.5+a.w*20.)),3.);}
+  vC=vec4(col,al*g*(1.-uScroll*.8));
 }`
+// Raios de sol entre as copas (god rays): um triângulo de tela cheia, só gradiente; muda em ciclos de ~18 s.
+const VERT_R = `attribute vec2 q;varying vec2 v;void main(){v=q;gl_Position=vec4(q,0.,1.);}`
+const FRAG_R = `precision mediump float;uniform float uTime,uAsp,uRoll;uniform vec2 uPtr;varying vec2 v;
+void main(){
+  vec2 p=vec2(v.x*uAsp,v.y);
+  vec2 d=p-vec2(1.1*uAsp+uPtr.x*.15,1.5);
+  float a=atan(d.x,-d.y);
+  float f=sin(a*14.+sin(a*5.+uTime*.15)*1.6)*.5+.5;
+  float g=sin(a*31.-uTime*.1)*.5+.5;
+  float k=pow(f,4.)*(.6+.4*g)*(.55+.45*sin(uTime*.35+a*7.))*smoothstep(2.9,.2,length(d))*.5*(1.-uRoll*.8);
+  gl_FragColor=vec4(vec3(1.,.86,.5)*k,k);}`
 const FRAG = `precision mediump float;varying vec4 vC;
 void main(){float d=length(gl_PointCoord-.5);float k=smoothstep(.5,.05,d);gl_FragColor=vec4(vC.rgb*vC.a*k,k*vC.a);}`
 
@@ -55,10 +69,11 @@ const pontos = () => {
   }
   for (let i = 0; i < 140; i++) dados.push((Math.random() - 0.5) * 1.8, Math.random() * 2 - 1, (Math.random() - 0.5) * 1.2, 0.85, 2 + Math.random() * 3, 3, Math.random())
   for (const n of nos) dados.push(X(n.x), Y(n.y), (Math.random() - 0.5) * 0.7, ((n.prof + 1) / PROF) * 0.9, n.r * 3.4, n.ouro ? 2 : 1, Math.random())
+  for (let i = 0; i < 14; i++) dados.push(Math.random() * 1.4 - 0.5, Math.random() * 1.2 - 0.1, (Math.random() - 0.5) * 0.8, 0.9, 30 + Math.random() * 40, 4, Math.random())
   return new Float32Array(dados)
 }
 
-function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boolean, falha: () => void) {
+function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boolean, deslocar: boolean, falha: () => void) {
   const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: true })
   if (!gl) return null
   const sh = (tipo: number, src: string) => {
@@ -72,9 +87,25 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG))
   gl.linkProgram(prog)
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null
+  const compila = (v: string, f: string) => {
+    const o = gl.createProgram()!
+    gl.attachShader(o, sh(gl.VERTEX_SHADER, v))
+    gl.attachShader(o, sh(gl.FRAGMENT_SHADER, f))
+    gl.bindAttribLocation(o, 2, "q")
+    gl.linkProgram(o)
+    return gl.getProgramParameter(o, gl.LINK_STATUS) ? o : null
+  }
+  const raios = compila(VERT_R, FRAG_R)
+  if (!raios) return null
+  const bufR = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufR)
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
+  const ur = (n: string) => gl.getUniformLocation(raios, n)
+  const [rTime, rAsp, rRoll, rPtr] = ["uTime", "uAsp", "uRoll", "uPtr"].map(ur)
   gl.useProgram(prog)
   const dados = pontos()
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer())
+  const bufP = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufP)
   gl.bufferData(gl.ARRAY_BUFFER, dados, gl.STATIC_DRAW)
   const liga = (nome: string, tam: number, desl: number) => {
     const l = gl.getAttribLocation(prog, nome)
@@ -84,7 +115,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   liga("p", 3, 0)
   liga("a", 4, 3)
   const u = (n: string) => gl.getUniformLocation(prog, n)
-  const [uT, uAsp, uPx, uTime, uScroll, uPtr] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr"].map(u)
+  const [uT, uAsp, uPx, uTime, uScroll, uPtr, uOff] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr", "uOff"].map(u)
   gl.enable(gl.BLEND)
   gl.blendFunc(gl.ONE, gl.ONE)
   gl.clearColor(0, 0, 0, 0)
@@ -95,14 +126,18 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   let ini = 0
   let tempo = 0
   let visivel = true
+  let asp = 1
   const medir = () => {
     const dpr = Math.min(devicePixelRatio || 1, 2)
     const { width, height } = canvas.getBoundingClientRect()
     canvas.width = Math.max(1, Math.round(width * dpr))
     canvas.height = Math.max(1, Math.round(height * dpr))
     gl.viewport(0, 0, canvas.width, canvas.height)
-    gl.uniform1f(uAsp, width / Math.max(height, 1))
+    asp = width / Math.max(height, 1)
+    gl.useProgram(prog)
+    gl.uniform1f(uAsp, asp)
     gl.uniform1f(uPx, dpr)
+    gl.uniform1f(uOff, deslocar && asp > 1.3 ? 0.3 * asp : 0)
   }
   const quadro = (agora: number) => {
     const dt = Math.min((agora - (ini || agora)) / 1000, 0.1)
@@ -115,11 +150,25 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     const r = canvas.getBoundingClientRect()
     const rolagem = Math.min(1, Math.max(0, -r.top / Math.max(r.height, 1)))
     const cresce = reduzido ? 1 : Math.min(1, tempo / 3.6)
+    const roll = reduzido ? 0 : rolagem
+    gl.clear(gl.COLOR_BUFFER_BIT)
+    gl.useProgram(raios)
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufR)
+    gl.enableVertexAttribArray(2)
+    gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 0, 0)
+    gl.uniform1f(rTime, reduzido ? 0 : tempo)
+    gl.uniform1f(rAsp, asp)
+    gl.uniform1f(rRoll, roll)
+    gl.uniform2f(rPtr, atual.x, atual.y)
+    gl.drawArrays(gl.TRIANGLES, 0, 3)
+    gl.useProgram(prog)
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufP)
+    liga("p", 3, 0)
+    liga("a", 4, 3)
     gl.uniform1f(uT, 1 - (1 - cresce) ** 3)
     gl.uniform1f(uTime, reduzido ? 0 : tempo)
-    gl.uniform1f(uScroll, reduzido ? 0 : rolagem)
+    gl.uniform1f(uScroll, roll)
     gl.uniform2f(uPtr, atual.x, atual.y)
-    gl.clear(gl.COLOR_BUFFER_BIT)
     gl.drawArrays(gl.POINTS, 0, dados.length / 7)
     raf = !reduzido && visivel && !document.hidden && !parado() ? requestAnimationFrame(quadro) : 0
   }
@@ -163,7 +212,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
 }
 
 // `className` posiciona e dimensiona a cena (precisa de altura definida).
-export default function CenaArvore({ className = "" }: { className?: string }) {
+export default function CenaArvore({ className = "", cheia = false }: { className?: string; cheia?: boolean }) {
   const t = useT()
   const ref = useRef<HTMLCanvasElement>(null)
   const [falhou, setFalhou] = useState(false)
@@ -177,16 +226,16 @@ export default function CenaArvore({ className = "" }: { className?: string }) {
 
   useEffect(() => {
     const reduzido = (typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches)
-    const cena = ref.current && iniciar(ref.current, () => paradoRef.current, reduzido, () => setFalhou(true))
+    const cena = ref.current && iniciar(ref.current, () => paradoRef.current, reduzido, cheia, () => setFalhou(true))
     if (!cena) return setFalhou(true)
     acordar.current = cena.retomar
     return cena.fim
-  }, [])
+  }, [cheia])
 
   if (falhou) return <FundoArvore className={className} camada="w-full" />
   return (
     <div className={`pointer-events-none absolute ${className}`}>
-      <canvas ref={ref} aria-hidden="true" className="cena-mascara size-full" />
+      <canvas ref={ref} aria-hidden="true" className={`size-full ${cheia ? "" : "cena-mascara"}`} />
       <button
         type="button"
         onClick={() => setParado(!parado)}
