@@ -16,11 +16,11 @@ export function LayoutAuth({ titulo, subtitulo, children }: { titulo: string; su
           aria-hidden="true"
           className="pointer-events-none absolute -top-1/4 -left-1/4 -z-10 size-[50rem] rounded-full bg-superficie/25 blur-3xl"
         />
-        <Cena className="inset-x-0 top-10 bottom-[40%] -z-10" />
+        <Cena className="inset-x-0 top-10 bottom-[52%] -z-10" />
         <Marca to={caminho("/")} />
         <div>
           <span aria-hidden="true" className="mb-8 block h-px w-16 bg-dourado" />
-          <p className="max-w-md font-titulo text-7xl leading-[0.92] font-bold tracking-tight text-balance uppercase">
+          <p className="max-w-md font-titulo text-6xl leading-[0.92] font-bold tracking-tight text-balance uppercase">
             {t("auth.layout.destaque")}
           </p>
         </div>

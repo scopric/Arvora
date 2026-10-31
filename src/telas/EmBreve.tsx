@@ -57,7 +57,7 @@ export function EmBreve() {
       </header>
       <main>
       <section className="relative isolate flex min-h-[calc(100dvh-4.25rem)] flex-col justify-center overflow-hidden px-6 py-16 sm:px-16 lg:px-24">
-        <Cena cheia className="inset-0 -z-10 max-lg:opacity-40" />
+        <Cena cheia className="inset-0 -z-10 max-lg:opacity-25" />
         <p className="animate-subir font-mono text-xs font-semibold tracking-[0.3em] text-destaque uppercase" style={atraso(0)}>
           {t("inicio.embreve")}
         </p>
@@ -67,7 +67,7 @@ export function EmBreve() {
         >
           {t("auth.layout.destaque")}
         </h1>
-        <p className="animate-subir mt-8 max-w-lg text-lg leading-relaxed text-creme/80" style={atraso(240)}>
+        <p className="animate-subir mt-8 max-w-lg text-lg leading-relaxed text-creme/90" style={atraso(240)}>
           {t("inicio.descricao")}
         </p>
         {!carregando && !sessao && (

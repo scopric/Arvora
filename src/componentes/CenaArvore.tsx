@@ -6,16 +6,17 @@ import { gerar } from "./arvoreRede"
 // Árvore de luz em WebGL puro (sem biblioteca): os mesmos fios e nós de arvoreRede.ts viram pontos com
 // profundidade. Cresce uma vez, inclina com o ponteiro e gira com a rolagem. Sem WebGL: cai no SVG de FundoArvore.
 const VERT = `attribute vec3 p;attribute vec4 a;
-uniform float uT,uAsp,uPx,uTime,uScroll,uOff;uniform vec2 uPtr;
+uniform float uT,uAsp,uPx,uTime,uScroll,uOff,uEsc;uniform vec2 uPtr;
 varying vec4 vC;
 void main(){
   float g=smoothstep(a.x,a.x+.05,uT);
   vec3 q=p;
   if(a.z>2.5&&a.z<3.5)q.y=mod(q.y+1.+uTime*.05*(.4+a.w),2.)-1.;
   q.x+=sin(uTime*.7+q.y*3.+a.w*6.28)*.006*(q.y+1.);
-  float r=uPtr.x*.7+uScroll*.9,c=cos(r),s=sin(r);
+  float r=uPtr.x*.3+uScroll*.35,c=cos(r),s=sin(r);
   q.xz=mat2(c,-s,s,c)*q.xz;
-  q.x+=uOff;
+  q.x=q.x*uEsc+uOff;
+  q.y=(q.y+1.)*uEsc-1.;
   q.y+=uPtr.y*.08;
   float w=1.+q.z*.45;
   gl_Position=vec4(q.x*.98/uAsp,q.y*.98,0.,w);
@@ -115,7 +116,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   liga("p", 3, 0)
   liga("a", 4, 3)
   const u = (n: string) => gl.getUniformLocation(prog, n)
-  const [uT, uAsp, uPx, uTime, uScroll, uPtr, uOff] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr", "uOff"].map(u)
+  const [uT, uAsp, uPx, uTime, uScroll, uPtr, uOff, uEsc] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr", "uOff", "uEsc"].map(u)
   gl.enable(gl.BLEND)
   gl.blendFunc(gl.ONE, gl.ONE)
   gl.clearColor(0, 0, 0, 0)
@@ -137,6 +138,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.useProgram(prog)
     gl.uniform1f(uAsp, asp)
     gl.uniform1f(uPx, dpr)
+    gl.uniform1f(uEsc, Math.min(1, asp / 0.8))
     gl.uniform1f(uOff, deslocar && asp > 1.3 ? 0.3 * asp : 0)
   }
   const quadro = (agora: number) => {
