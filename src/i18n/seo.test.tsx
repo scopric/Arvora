@@ -1,3 +1,4 @@
+import { Rotas } from "../App"
 import { cleanup, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter, Route, Routes, useNavigate } from "react-router"
@@ -10,6 +11,9 @@ import { ErrorBoundary, HydrateFallback, chaveErro, meta } from "../root"
 import { en } from "./en"
 import { textosDe, useTitulo } from "./index"
 import { pt } from "./pt"
+
+vi.mock("../lib/sessao", () => ({ useAuth: () => ({ sessao: null, carregando: false }) }))
+vi.mock("../lib/supabase", () => ({ supabase: {} }))
 
 beforeEach(() => {
   localStorage.clear()
@@ -140,9 +144,19 @@ describe("404 e carregamento", () => {
         </Routes>
       </MemoryRouter>,
     )
+    expect(document.title).toContain(dic["titulo.naoEncontrada"])
     expect(screen.getByRole("heading").textContent).toBe(dic["sistema.naoEncontrada"])
     expect(screen.getByRole("link").getAttribute("href")).toBe(`/${lang}`)
     expect(document.head.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex")
+  })
+
+  it.each(["/sobre", "/pt/nao-existe", "/xx/nao-existe"])("Rotas reais: %s cai na página de 404, sem ir para o início", (url) => {
+    render(
+      <MemoryRouter initialEntries={[url]}>
+        <Rotas />
+      </MemoryRouter>,
+    )
+    expect(screen.getByRole("heading").textContent).toBe(pt["sistema.naoEncontrada"])
   })
 
   it("HTML estático (sem navegador) não mostra texto em português", () => {

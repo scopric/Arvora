@@ -20,7 +20,7 @@ function SemPrefixo() {
   return <Navigate to={`/${idiomaPreferido()}${pathname === "/" ? "" : pathname}${search}${hash}`} replace />
 }
 
-// Layout de /:lang: idioma inválido troca só o 1º segmento pelo preferido; válido ajusta <html lang> e lembra a escolha.
+// Layout de /:lang: 1º segmento com cara de código de idioma ("xx") é trocado pelo preferido; qualquer outro ("sobre") é caminho sem prefixo e vai para o 404; válido ajusta <html lang> e lembra a escolha.
 function LayoutIdioma() {
   const { lang } = useParams()
   const { pathname, search, hash } = useLocation()
@@ -31,7 +31,8 @@ function LayoutIdioma() {
     gravarIdioma(lang)
   }, [lang])
   if (!valido) {
-    return <Navigate to={`/${idiomaPreferido()}${pathname.replace(/^\/[^/]*/, "")}${search}${hash}`} replace />
+    const resto = /^[a-z]{2}(-[a-z]{2})?$/i.test(lang ?? "") ? pathname.replace(/^\/[^/]*/, "") : pathname
+    return <Navigate to={`/${idiomaPreferido()}${resto}${search}${hash}`} replace />
   }
   return <Outlet />
 }

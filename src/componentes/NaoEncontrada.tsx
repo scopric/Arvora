@@ -3,7 +3,7 @@ import { textosDe, useCaminho, useIdioma, useTitulo } from "../i18n"
 // Rota inexistente: mensagem de 404 em vez de redirecionar. Hospedagem estática serve o SPA com HTTP 200;
 // noindex evita que buscadores indexem a página.
 export function NaoEncontrada() {
-  useTitulo("doc.titulo", true)
+  useTitulo("titulo.naoEncontrada", true)
   const caminho = useCaminho()
   const dic = textosDe(useIdioma())
   return (
