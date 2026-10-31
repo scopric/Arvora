@@ -67,9 +67,9 @@ describe("Comunidade", () => {
     resp.tabelas.posts = ok([{ ...post, autor_id: "eu" }])
     resp.escritas["posts.delete"] = ok([])
     mostra(<Comunidade />)
-    await userEvent.click(await screen.findByRole("button", { name: "Apagar" }))
+    await userEvent.click(await screen.findByRole("button", { name: /^Apagar/ }))
     const dialogo = document.querySelector<HTMLElement>("dialog[open]")!
-    await userEvent.click(within(dialogo).getByRole("button", { name: "Apagar", hidden: true }))
+    await userEvent.click(within(dialogo).getByRole("button", { name: /^Apagar$/, hidden: true }))
     expect((await screen.findByRole("alert")).textContent).toMatch(/em análise por causa de uma denúncia/)
   })
 
@@ -77,17 +77,27 @@ describe("Comunidade", () => {
     resp.tabelas.posts = ok([{ ...post, autor_id: "eu", criado_em: new Date().toISOString() }])
     resp.escritas["posts.update"] = ok([])
     mostra(<Comunidade />)
-    await userEvent.click(await screen.findByRole("button", { name: "Editar" }))
+    await userEvent.click(await screen.findByRole("button", { name: /^Editar/ }))
     await userEvent.click(screen.getByRole("button", { name: "Salvar" }))
     expect((await screen.findByRole("alert")).textContent).toMatch(/prazo de edição/)
   })
 
   it("denunciar envia o post como alvo", async () => {
     mostra(<Comunidade />)
-    await userEvent.click(await screen.findByRole("button", { name: "Denunciar" }))
+    await userEvent.click(await screen.findByRole("button", { name: /^Denunciar/ }))
     await userEvent.selectOptions(screen.getByLabelText("Motivo", { selector: "select" }), "spam")
     await userEvent.click(screen.getByRole("button", { name: "Enviar denúncia" }))
     await waitFor(() => expect(chamou("denuncias.insert")[0]?.args).toMatchObject({ post_id: 10, motivo: "spam" }))
+  })
+
+  it("denúncia repetida (23505) diz 'você já denunciou'", async () => {
+    resp.escritas["denuncias.insert"] = erro("duplicate", "23505")
+    mostra(<Comunidade />)
+    await userEvent.click(await screen.findByRole("button", { name: /^Denunciar/ }))
+    await userEvent.selectOptions(screen.getByLabelText("Motivo", { selector: "select" }), "spam")
+    await userEvent.click(screen.getByRole("button", { name: "Enviar denúncia" }))
+    expect(await screen.findByText(/Você já denunciou/)).toBeTruthy()
+    expect(screen.queryByRole("button", { name: "Enviar denúncia" })).toBeNull()
   })
 
   it("falha ao ler posts mostra erro, não lista vazia", async () => {
@@ -125,6 +135,15 @@ describe("Network", () => {
     expect(screen.getByText(/Conectar: parte do Grupo/)).toBeTruthy()
     expect(chamou("rpc.buscar_membros")).toHaveLength(0)
     await semViolacoes()
+  })
+
+  it("Ver mais pede a próxima página com pular=30 e acrescenta, sem esqueleto", async () => {
+    const trinta = Array.from({ length: 30 }, (_, i) => ({ ...ana, id: `m${i}`, slug: `m${i}`, nome: `Membro ${i}` }))
+    resp.rpc.buscar_membros = ok(trinta)
+    mostra(<Network />)
+    await userEvent.click(await screen.findByRole("button", { name: "Ver mais" }))
+    await waitFor(() => expect(chamou("rpc.buscar_membros").at(-1)?.args).toMatchObject({ pular: 30, limite: 30 }))
+    expect(screen.getAllByRole("listitem").length).toBe(60)
   })
 
   it("sem resultado mostra a frase de vazio", async () => {
@@ -177,6 +196,14 @@ describe("Network: perfil", () => {
     expect(await screen.findByText("ana@exemplo.invalid")).toBeTruthy()
   })
 
+  it("revelar_contato recusado (42501) vira 'contato indisponível'", async () => {
+    resp.tabelas.conexoes = ok([{ id: 1, solicitante_id: "eu", destinatario_id: "ana", status: "aceita", origem: "busca", mensagem: null, respondida_em: null, pedida_em: new Date().toISOString() }])
+    resp.rpc.revelar_contato = erro("sem_conexao_aceita", "42501")
+    perfilNaRota()
+    await userEvent.click(await screen.findByRole("button", { name: "Ver contato" }))
+    expect(await screen.findByText(/Contato indisponível/)).toBeTruthy()
+  })
+
   it("perfil que não volta do banco (privado) mostra a frase certa", async () => {
     resp.tabelas.perfis_vitrine = ok([])
     perfilNaRota()
@@ -197,8 +224,12 @@ describe("Match", () => {
 
   it("primeira vez: pede o opt-in e grava o consentimento com o documento vigente", async () => {
     mostra(<Match />)
-    await userEvent.click(await screen.findByRole("button", { name: "Ativar o Match" }))
-    await waitFor(() => expect(chamou("consentimentos.insert")[0]?.args).toMatchObject({ documento_id: 7, perfil_id: "eu" }))
+    const ativar = await screen.findByRole("button", { name: "Ativar o Match" })
+    expect((ativar as HTMLButtonElement).disabled).toBe(true) // só destrava depois de marcar "Li o texto"
+    expect(screen.getByText(/aparece nas sugestões de outros membros/)).toBeTruthy()
+    await userEvent.click(screen.getByLabelText(/Li o texto do Match \(v1\)/))
+    await userEvent.click(ativar)
+    await waitFor(() => expect(chamou("consentimentos.insert")[0]?.args).toMatchObject({ documento_id: 7, perfil_id: "eu", evidencia: expect.stringContaining("v1") }))
     await semViolacoes()
   })
 
@@ -236,6 +267,15 @@ describe("Match", () => {
     expect(await screen.findByText("oferece Contabilidade")).toBeTruthy()
     expect(screen.getByRole("link", { name: "Ver perfil" })).toBeTruthy()
     await semViolacoes()
+  })
+
+  it("monta o motivo em EN a partir de motivo_dados", async () => {
+    resp.tabelas.consentimentos = ok([{ id: 1, revogado_em: null }])
+    resp.tabelas.sugestoes_match = ok([{ id: 1, sugerido_id: "ana", semana: "2026-10-26", motivo: "texto antigo", pontuacao: 3, motivo_dados: { categoria_id: 4, mesma_cidade: true, cidade: "Dublin" } }])
+    resp.tabelas.categorias_rede = ok([{ id: 4, nome: "Contabilidade", nome_en: "Accounting" }])
+    resp.tabelas.perfis_vitrine = ok([ana])
+    mostra(<Match />, "/en")
+    expect(await screen.findByText("offers Accounting, which you look for; same city (Dublin)")).toBeTruthy()
   })
 
   it("Clube vê só a prévia bloqueada, sem ler nada", async () => {

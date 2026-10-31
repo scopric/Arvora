@@ -7,6 +7,7 @@ import { Cartao } from "../../../componentes/Cartao"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
+import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT, useTitulo, type Chave } from "../../../i18n"
 import { useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
@@ -151,6 +152,7 @@ export function MeuAward() {
   if (acesso.carregando || estado.fase === "carregando") corpo = <Esqueleto linhas={5} />
   else if (acesso.erro) corpo = <Erro aoTentar={acesso.recarregar}>{t("acesso.erro")}</Erro>
   else if (estado.fase === "erro") corpo = <Erro aoTentar={recarregar}>{t("rede.meuAward.erro")}</Erro>
+  else if (estado.dados.length === 0) corpo = <Vazio>{t("rede.meuAward.vazio")}</Vazio>
   else
     corpo = (
       <div className="space-y-12">

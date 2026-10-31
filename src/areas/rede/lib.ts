@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react"
+import { useEffect, useEffectEvent, useRef, useState } from "react"
 import type { Chave } from "../../i18n"
 import { supabase } from "../../lib/supabase"
 
@@ -46,18 +46,21 @@ export function useCarga<T>(buscar: () => Promise<T>, chave: string | number) {
     setChaveVista(chave)
     setEstado({ fase: "carregando" })
   }
+  const esperando = useRef<(() => void)[]>([])
   const executar = useEffectEvent(buscar)
   useEffect(() => {
     let ativo = true
+    const fim = () => esperando.current.splice(0).forEach((r) => r())
     executar().then(
-      (dados) => ativo && setEstado({ fase: "pronto", dados }),
-      () => ativo && setEstado({ fase: "erro" }),
+      (dados) => ativo && (setEstado({ fase: "pronto", dados }), fim()),
+      () => ativo && (setEstado({ fase: "erro" }), fim()),
     )
     return () => {
       ativo = false
     }
   }, [n, chave])
-  return { estado, recarregar: () => setN((v) => v + 1) }
+  // recarregar() devolve uma promessa que resolve quando a nova leitura termina (quem chama mantém o botão ocupado até lá).
+  return { estado, recarregar: () => new Promise<void>((r) => (esperando.current.push(r), setN((v) => v + 1))) }
 }
 
 // Lança se o banco devolveu erro.

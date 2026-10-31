@@ -54,7 +54,7 @@ const MOTIVOS = ["spam", "assedio", "improprio", "golpe", "outro"] as const
 export function DialogoDenuncia({ alvo, aberto, aoFechar }: { alvo: AlvoDenuncia; aberto: boolean; aoFechar: () => void }) {
   const t = useT()
   const [erro, setErro] = useState(false)
-  const [enviado, setEnviado] = useState(false)
+  const [enviado, setEnviado] = useState<"nao" | "ok" | "ja">("nao") // fica gravado enquanto a tela viver: sem reenvio
   const [ocupado, setOcupado] = useState(false)
 
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
@@ -65,19 +65,20 @@ export function DialogoDenuncia({ alvo, aberto, aoFechar }: { alvo: AlvoDenuncia
     setOcupado(true)
     const { error } = await supabase.from("denuncias").insert({ ...alvo, motivo: String(f.get("motivo")), texto: texto || null })
     setOcupado(false)
+    // 23505: o banco só aceita uma denúncia por pessoa e alvo.
+    if (error?.code === "23505") return setEnviado("ja")
     if (error) return setErro(true)
-    setEnviado(true)
+    setEnviado("ok")
   }
   function fechar() {
-    setEnviado(false)
     setErro(false)
     aoFechar()
   }
   return (
     <Dialogo aberto={aberto} titulo={t("rede.denuncia.titulo")} aoFechar={fechar}>
-      {enviado ? (
+      {enviado !== "nao" ? (
         <div className="mt-4 space-y-5">
-          <Aviso tipo="ok">{t("rede.denuncia.enviada")}</Aviso>
+          <Aviso tipo="ok">{t(enviado === "ja" ? "rede.denuncia.jaDenunciou" : "rede.denuncia.enviada")}</Aviso>
           <Botao variante="contorno" onClick={fechar}>{t("comum.fechar")}</Botao>
         </div>
       ) : (
@@ -132,11 +133,11 @@ export const Etiqueta = ({ children }: { children: ReactNode }) => <li><Selo>{ch
 // Contato só depois do aceite (NET-03): a RPC revelar_contato é quem decide; aqui só se chama e se mostra.
 export function Contato({ outroId }: { outroId: string }) {
   const t = useT()
-  const [estado, setEstado] = useState<"fechado" | "carregando" | "erro" | { email: string | null; whatsapp: string | null } | "vazio">("fechado")
+  const [estado, setEstado] = useState<"fechado" | "carregando" | "erro" | "indisponivel" | { email: string | null; whatsapp: string | null } | "vazio">("fechado")
   async function ver() {
     setEstado("carregando")
     const { data, error } = await supabase.rpc("revelar_contato", { outro: outroId })
-    if (error) return setEstado("erro")
+    if (error) return setEstado(error.code === "42501" ? "indisponivel" : "erro")
     const c = data?.[0]
     setEstado(c && (c.email_contato || c.whatsapp) ? { email: c.email_contato, whatsapp: c.whatsapp } : "vazio")
   }
@@ -149,6 +150,7 @@ export function Contato({ outroId }: { outroId: string }) {
         </Botao>
       </div>
     )
+  if (estado === "indisponivel") return <p className="text-sm opacity-80">{t("rede.contato.indisponivel")}</p>
   if (estado === "vazio") return <p className="text-sm opacity-80">{t("rede.contato.vazio")}</p>
   return (
     <dl className="space-y-1 text-sm">
@@ -163,7 +165,7 @@ export function Contato({ outroId }: { outroId: string }) {
 }
 
 // Botão certo para o estado do par (Network, perfil e Match). `conexao` = linha do par, se existir.
-export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar }: { uid: string; outroId: string; nome: string; origem: Conexao["origem"]; conexao?: Conexao; aoMudar: () => void }) {
+export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar }: { uid: string; outroId: string; nome: string; origem: Conexao["origem"]; conexao?: Conexao; aoMudar: () => void | Promise<void> }) {
   const t = useT()
   const caminho = useCaminho()
   const idioma = useIdioma()
@@ -176,19 +178,20 @@ export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar }: { 
     e.preventDefault()
     setOcupado(true)
     const r = await pedirConexao(outroId, origem, String(new FormData(e.currentTarget).get("mensagem") ?? ""), conexao)
-    setOcupado(false)
     setErro(r)
     if (!r) {
       setAberto(false)
-      aoMudar()
+      await aoMudar() // segue ocupado até a leitura nova chegar
     }
+    setOcupado(false)
   }
   async function cancelar() {
     if (!conexao) return
     setOcupado(true)
-    setErro(await mudarStatus(conexao.id, "cancelada"))
+    const r = await mudarStatus(conexao.id, "cancelada")
+    setErro(r)
+    if (!r) await aoMudar()
     setOcupado(false)
-    aoMudar()
   }
 
   const refazer = conexao && (conexao.status === "recusada" || conexao.status === "cancelada")
