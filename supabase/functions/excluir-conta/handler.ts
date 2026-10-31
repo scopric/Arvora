@@ -16,8 +16,8 @@
 // antes de cada conferência de senha, certa ou errada. Quem roubar só o JWT consegue bloquear a exclusão da
 // vítima por 1 h (risco aceito; o suporte atende).
 //
-// O que o delete em auth.users faz (FKs): perfis e equipe caem em cascata; assinaturas.perfil_id e
-// clientes_stripe.perfil_id viram null.
+// O que o delete em auth.users faz (FKs): ver a migration f4_02 (cascade, set null e o que fica retido).
+// Arquivos do titular no Storage: apagarUsuario (index.ts) remove antes do delete; o banco barra o delete se sobrar.
 // DADO RETIDO POR OBRIGAÇÃO LEGAL (retenção fiscal): assinaturas e clientes_stripe ficam, e clientes_stripe
 // guarda o e-mail do cliente. Item a validar pelo solicitor (prazo e se o e-mail pode ser anonimizado).
 import { cors, ErroStripe, json, stripeDelete } from "../_shared/stripe-api.ts";
@@ -25,10 +25,9 @@ import { cors, ErroStripe, json, stripeDelete } from "../_shared/stripe-api.ts";
 export type Assinatura = {
   stripe_subscription_id: string;
   conta_stripe_id: number;
-  // Data em que a linha nasceu = proxy da data do contrato. Limitação: renovação não muda criado_em e
-  // troca de plano pelo portal mantém a mesma linha. Se o webhook gravar a linha antes do pagamento se
-  // confirmar, o prazo começa até cerca de 1 dia antes do contrato: o erro vai para o lado seguro (bloqueia a mais).
-  // Fechar de vez exige guardar o `created` da assinatura do Stripe (migration), fora deste escopo.
+  // Data de criação da assinatura no Stripe (subscription.created, gravada pelo webhook desde a f1_20).
+  // É a base do prazo de 14 dias. Linhas antigas sem ela caem em criado_em (data da linha no banco).
+  stripe_criada_em?: string | null;
   criado_em: string;
 };
 export type Consultas = {
@@ -160,7 +159,8 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
   const agora = (deps.agora ?? Date.now)();
   if (
     vigentes.some((a) =>
-      !(agora - Date.parse(a.criado_em) >= PRAZO_ARREPENDIMENTO_DIAS * DIA_MS)
+      !(agora - Date.parse(a.stripe_criada_em ?? a.criado_em) >=
+        PRAZO_ARREPENDIMENTO_DIAS * DIA_MS)
     )
   ) {
     return json({ erro: "arrependimento" }, 409, site);
