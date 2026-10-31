@@ -8,20 +8,32 @@ type Dados = Pick<Acesso, "nivel" | "premiado" | "equipe" | "papel">
 type Estado = { uid: string | null; fase: "carregando" | "erro" | "pronto"; dados: Dados }
 const vazio: Dados = { nivel: "visitante", premiado: false, equipe: false, papel: null }
 
+// Premiado é só um selo e o bloco Meu Award: se a leitura falhar (ou a tabela ainda não existir), vale `false` e um aviso no console
+// de desenvolvimento; nível e equipe não dependem dela. `premiados` ainda não está em database.types.ts: cliente sem tipos aqui.
+// ponytail: trocar por supabase.from("premiados") ao regenerar os tipos.
+async function lerPremiado(uid: string): Promise<boolean> {
+  try {
+    const { data, error } = await (supabase as unknown as SupabaseClient).from("premiados").select("id").eq("perfil_id", uid).limit(1)
+    if (error) throw error
+    return (data?.length ?? 0) > 0
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("useAcesso: não foi possível ler premiados; premiado = false", e)
+    return false
+  }
+}
+
 async function ler(uid: string): Promise<Dados> {
-  // `premiados` ainda não está em database.types.ts (tabela da migration da branch plataforma-banco): cliente sem tipos aqui.
-  // ponytail: trocar por supabase.from("premiados") ao regenerar os tipos.
-  const solto = supabase as unknown as SupabaseClient
-  const [grupo, clube, eq, prem] = await Promise.all([
+  // ponytail: duas chamadas de tem_acesso (grupo e clube). Uma só exigiria uma RPC nova que devolva o nível; fica para quando o banco tiver.
+  const [grupo, clube, eq, premiado] = await Promise.all([
     supabase.rpc("tem_acesso", { minimo: "grupo" }),
     supabase.rpc("tem_acesso", { minimo: "clube" }),
     supabase.from("equipe").select("papel").eq("perfil_id", uid).maybeSingle(),
-    solto.from("premiados").select("id").eq("perfil_id", uid).limit(1),
+    lerPremiado(uid),
   ])
-  const falha = grupo.error ?? clube.error ?? eq.error ?? prem.error
+  const falha = grupo.error ?? clube.error ?? eq.error
   if (falha) throw falha
   const nivel: Nivel = grupo.data ? "grupo" : clube.data ? "clube" : "visitante"
-  return { nivel, premiado: (prem.data?.length ?? 0) > 0, equipe: !!eq.data, papel: (eq.data?.papel as PapelEquipe | undefined) ?? null }
+  return { nivel, premiado, equipe: !!eq.data, papel: (eq.data?.papel as PapelEquipe | undefined) ?? null }
 }
 
 export function AcessoProvider({ children }: { children: ReactNode }) {
@@ -29,6 +41,8 @@ export function AcessoProvider({ children }: { children: ReactNode }) {
   const uid = sessao?.user.id ?? null
   const [estado, setEstado] = useState<Estado>({ uid: null, fase: "carregando", dados: vazio })
   const [tentativa, setTentativa] = useState(0)
+  // Saiu da conta: esquece o que foi lido (se a mesma pessoa voltar, lê de novo em vez de reaproveitar). Ajuste durante a renderização.
+  if (!uid && estado.uid !== null) setEstado({ uid: null, fase: "carregando", dados: vazio })
 
   useEffect(() => {
     if (!uid) return

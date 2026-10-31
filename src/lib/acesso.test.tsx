@@ -9,6 +9,7 @@ const h = vi.hoisted(() => ({
   erro: false,
   equipe: null as { papel: string } | null,
   premiados: [] as { id: number }[],
+  premiadosFalha: false,
 }))
 vi.mock("./sessao", () => ({ useAuth: () => ({ sessao: h.sessao, carregando: false }) }))
 vi.mock("./supabase", () => {
@@ -20,7 +21,7 @@ vi.mock("./supabase", () => {
         select: () => ({
           eq: () => ({
             maybeSingle: () => resposta(h.equipe),
-            limit: () => resposta(tabela === "premiados" ? h.premiados : []),
+            limit: () => (tabela === "premiados" && h.premiadosFalha ? Promise.resolve({ data: null, error: { message: "sem tabela" } }) : resposta(tabela === "premiados" ? h.premiados : [])),
           }),
         }),
       }),
@@ -44,7 +45,7 @@ function Mostra() {
 const montar = () => render(<AcessoProvider><Mostra /></AcessoProvider>)
 const dados = () => screen.getByTestId("dados").textContent
 
-beforeEach(() => Object.assign(h, { sessao: { user: { id: "u1" } }, grupo: false, clube: false, erro: false, equipe: null, premiados: [] }))
+beforeEach(() => Object.assign(h, { sessao: { user: { id: "u1" } }, grupo: false, clube: false, erro: false, equipe: null, premiados: [], premiadosFalha: false }))
 afterEach(cleanup)
 
 describe("useAcesso", () => {
@@ -72,6 +73,16 @@ describe("useAcesso", () => {
     h.equipe = { papel: "editor" }
     montar()
     await waitFor(() => expect(dados()).toBe("visitante|true|true|editor"))
+  })
+
+  it("falha só na leitura de premiado não derruba nível nem equipe: premiado = false, sem erro", async () => {
+    h.grupo = true
+    h.clube = true
+    h.equipe = { papel: "editor" }
+    h.premiadosFalha = true
+    montar()
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("pronto"))
+    expect(dados()).toBe("grupo|false|true|editor")
   })
 
   it("falha de leitura vira erro (não 'sem acesso') e 'recarregar' tenta de novo", async () => {
