@@ -251,7 +251,8 @@ begin
   return new;
 end $$;
 revoke all on function private.receitas_externas_regras() from public, anon, authenticated;
-create trigger receitas_externas_regras before insert or update on public.receitas_externas
+-- "of motivo_anulacao": o set null de perfil_id na exclusao de conta (retencao fiscal) nao passa por aqui.
+create trigger receitas_externas_regras before insert or update of motivo_anulacao on public.receitas_externas
   for each row execute function private.receitas_externas_regras();
 create trigger receitas_externas_atualizado_em before update on public.receitas_externas
   for each row execute function private.set_atualizado_em();

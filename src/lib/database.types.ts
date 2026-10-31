@@ -48,6 +48,12 @@ isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "assinaturas_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "assinaturas_plano_id_fkey"
       columns: ["plano_id"]
 isOneToOne: false
@@ -104,6 +110,12 @@ isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "aulas_especialista_id_fkey"
+      columns: ["especialista_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "aulas_modulo_id_fkey"
       columns: ["modulo_id"]
 isOneToOne: false
@@ -149,6 +161,19 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"categorias_rede": {
+                  Row: {
+                    "ativa": boolean,"atualizado_em": string,"criado_em": string,"id": number,"nome": string,"nome_en": string | null,"ordem": number,"slug": string
+                  }
+                  Insert: {
+                    "ativa"?: boolean,"atualizado_em"?: string,"criado_em"?: string,"id"?: never,"nome": string,"nome_en"?: string | null,"ordem"?: number,"slug": string
+                  }
+                  Update: {
+                    "ativa"?: boolean,"atualizado_em"?: string,"criado_em"?: string,"id"?: never,"nome"?: string,"nome_en"?: string | null,"ordem"?: number,"slug"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"clientes_stripe": {
                   Row: {
                     "conta_stripe_id": number,"criado_em": string,"email": string,"id": number,"perfil_id": string | null,"stripe_customer_id": string
@@ -172,6 +197,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "clientes_stripe_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
     }
                   ]
                 },"comentarios": {
@@ -192,10 +223,53 @@ isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "comentarios_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "comentarios_post_id_fkey"
       columns: ["post_id"]
 isOneToOne: false
       referencedRelation: "posts"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"conexoes": {
+                  Row: {
+                    "criado_em": string,"destinatario_id": string,"id": number,"mensagem": string | null,"origem": Database["public"]['Enums']["origem_conexao"],"pedida_em": string,"respondida_em": string | null,"solicitante_id": string,"status": Database["public"]['Enums']["status_conexao"]
+                  }
+                  Insert: {
+                    "criado_em"?: string,"destinatario_id": string,"id"?: never,"mensagem"?: string | null,"origem": Database["public"]['Enums']["origem_conexao"],"pedida_em"?: string,"respondida_em"?: string | null,"solicitante_id"?: string,"status"?: Database["public"]['Enums']["status_conexao"]
+                  }
+                  Update: {
+                    "criado_em"?: string,"destinatario_id"?: string,"id"?: never,"mensagem"?: string | null,"origem"?: Database["public"]['Enums']["origem_conexao"],"pedida_em"?: string,"respondida_em"?: string | null,"solicitante_id"?: string,"status"?: Database["public"]['Enums']["status_conexao"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "conexoes_destinatario_id_fkey"
+      columns: ["destinatario_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conexoes_destinatario_id_fkey"
+      columns: ["destinatario_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conexoes_solicitante_id_fkey"
+      columns: ["solicitante_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conexoes_solicitante_id_fkey"
+      columns: ["solicitante_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     }
                   ]
@@ -221,6 +295,12 @@ isOneToOne: false
       columns: ["perfil_id"]
 isOneToOne: false
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "consentimentos_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     }
                   ]
@@ -274,6 +354,12 @@ isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "curtidas_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "curtidas_post_id_fkey"
       columns: ["post_id"]
 isOneToOne: false
@@ -283,13 +369,13 @@ isOneToOne: false
                   ]
                 },"denuncias": {
                   Row: {
-                    "comentario_id": number | null,"criado_em": string,"denunciante_id": string | null,"empresa_id": number | null,"id": number,"motivo": string,"perfil_denunciado_id": string | null,"post_id": number | null,"resolvida_em": string | null,"resolvida_por": string | null,"status": Database["public"]['Enums']["status_denuncia"],"texto": string | null
+                    "comentario_id": number | null,"conexao_id": number | null,"criado_em": string,"denunciante_id": string | null,"empresa_id": number | null,"id": number,"motivo": string,"perfil_denunciado_id": string | null,"post_id": number | null,"resolvida_em": string | null,"resolvida_por": string | null,"status": Database["public"]['Enums']["status_denuncia"],"texto": string | null
                   }
                   Insert: {
-                    "comentario_id"?: number | null,"criado_em"?: string,"denunciante_id"?: string | null,"empresa_id"?: number | null,"id"?: never,"motivo": string,"perfil_denunciado_id"?: string | null,"post_id"?: number | null,"resolvida_em"?: string | null,"resolvida_por"?: string | null,"status"?: Database["public"]['Enums']["status_denuncia"],"texto"?: string | null
+                    "comentario_id"?: number | null,"conexao_id"?: number | null,"criado_em"?: string,"denunciante_id"?: string | null,"empresa_id"?: number | null,"id"?: never,"motivo": string,"perfil_denunciado_id"?: string | null,"post_id"?: number | null,"resolvida_em"?: string | null,"resolvida_por"?: string | null,"status"?: Database["public"]['Enums']["status_denuncia"],"texto"?: string | null
                   }
                   Update: {
-                    "comentario_id"?: number | null,"criado_em"?: string,"denunciante_id"?: string | null,"empresa_id"?: number | null,"id"?: never,"motivo"?: string,"perfil_denunciado_id"?: string | null,"post_id"?: number | null,"resolvida_em"?: string | null,"resolvida_por"?: string | null,"status"?: Database["public"]['Enums']["status_denuncia"],"texto"?: string | null
+                    "comentario_id"?: number | null,"conexao_id"?: number | null,"criado_em"?: string,"denunciante_id"?: string | null,"empresa_id"?: number | null,"id"?: never,"motivo"?: string,"perfil_denunciado_id"?: string | null,"post_id"?: number | null,"resolvida_em"?: string | null,"resolvida_por"?: string | null,"status"?: Database["public"]['Enums']["status_denuncia"],"texto"?: string | null
                   }
                   Relationships: [
                     {
@@ -299,10 +385,22 @@ isOneToOne: false
       referencedRelation: "comentarios"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "denuncias_conexao_id_fkey"
+      columns: ["conexao_id"]
+isOneToOne: false
+      referencedRelation: "conexoes"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "denuncias_denunciante_id_fkey"
       columns: ["denunciante_id"]
 isOneToOne: false
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "denuncias_denunciante_id_fkey"
+      columns: ["denunciante_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "denuncias_empresa_id_fkey"
@@ -315,6 +413,12 @@ isOneToOne: false
       columns: ["perfil_denunciado_id"]
 isOneToOne: false
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "denuncias_perfil_denunciado_id_fkey"
+      columns: ["perfil_denunciado_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "denuncias_post_id_fkey"
@@ -368,6 +472,12 @@ isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "empresas_dono_perfil_id_fkey"
+      columns: ["dono_perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "empresas_setor_id_fkey"
       columns: ["setor_id"]
 isOneToOne: false
@@ -398,6 +508,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "entregas_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
     }
                   ]
                 },"equipe": {
@@ -416,6 +532,12 @@ isOneToOne: false
       columns: ["perfil_id"]
 isOneToOne: true
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "equipe_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: true
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     }
                   ]
@@ -511,6 +633,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "indicados_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
     }
                   ]
                 },"log_admin": {
@@ -564,6 +692,37 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"network_itens": {
+                  Row: {
+                    "atualizado_em": string,"categoria_id": number,"criado_em": string,"id": number,"perfil_id": string,"texto": string | null,"tipo": Database["public"]['Enums']["tipo_network"]
+                  }
+                  Insert: {
+                    "atualizado_em"?: string,"categoria_id": number,"criado_em"?: string,"id"?: never,"perfil_id"?: string,"texto"?: string | null,"tipo": Database["public"]['Enums']["tipo_network"]
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"categoria_id"?: number,"criado_em"?: string,"id"?: never,"perfil_id"?: string,"texto"?: string | null,"tipo"?: Database["public"]['Enums']["tipo_network"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "network_itens_categoria_id_fkey"
+      columns: ["categoria_id"]
+isOneToOne: false
+      referencedRelation: "categorias_rede"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "network_itens_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "network_itens_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"notificacoes": {
                   Row: {
                     "criado_em": string,"id": number,"lida_em": string | null,"link": string | null,"perfil_id": string,"tipo": Database["public"]['Enums']["tipo_notificacao"],"titulo": string
@@ -580,6 +739,12 @@ isOneToOne: false
       columns: ["perfil_id"]
 isOneToOne: false
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "notificacoes_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     }
                   ]
@@ -611,6 +776,12 @@ isOneToOne: false
       columns: ["perfil_id"]
 isOneToOne: false
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pagamentos_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     }
                   ]
@@ -681,6 +852,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pedidos_gdpr_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
     }
                   ]
                 },"perfis": {
@@ -699,6 +876,31 @@ isOneToOne: false
       columns: ["setor_id"]
 isOneToOne: false
       referencedRelation: "setores"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"perfis_contato": {
+                  Row: {
+                    "atualizado_em": string,"criado_em": string,"email_contato": string | null,"perfil_id": string,"whatsapp": string | null
+                  }
+                  Insert: {
+                    "atualizado_em"?: string,"criado_em"?: string,"email_contato"?: string | null,"perfil_id"?: string,"whatsapp"?: string | null
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"criado_em"?: string,"email_contato"?: string | null,"perfil_id"?: string,"whatsapp"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "perfis_contato_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: true
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "perfis_contato_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: true
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     }
                   ]
@@ -743,6 +945,12 @@ isOneToOne: false
       columns: ["autor_id"]
 isOneToOne: false
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "posts_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "posts_espaco_id_fkey"
@@ -799,6 +1007,12 @@ isOneToOne: true
 isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "premiados_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
     }
                   ]
                 },"progresso_aula": {
@@ -824,6 +1038,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "progresso_aula_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
     }
                   ]
                 },"receitas_externas": {
@@ -842,6 +1062,12 @@ isOneToOne: false
       columns: ["perfil_id"]
 isOneToOne: false
       referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "receitas_externas_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "receitas_externas_plano_id_fkey"
@@ -919,6 +1145,12 @@ isOneToOne: false
       referencedRelation: "perfis"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "salvos_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "salvos_video_id_fkey"
       columns: ["video_id"]
 isOneToOne: false
@@ -938,6 +1170,43 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"sugestoes_match": {
+                  Row: {
+                    "criado_em": string,"id": number,"motivo": string,"perfil_id": string,"pontuacao": number,"semana": string,"sugerido_id": string
+                  }
+                  Insert: {
+                    "criado_em"?: string,"id"?: never,"motivo": string,"perfil_id": string,"pontuacao": number,"semana": string,"sugerido_id": string
+                  }
+                  Update: {
+                    "criado_em"?: string,"id"?: never,"motivo"?: string,"perfil_id"?: string,"pontuacao"?: number,"semana"?: string,"sugerido_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sugestoes_match_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sugestoes_match_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sugestoes_match_sugerido_id_fkey"
+      columns: ["sugerido_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sugestoes_match_sugerido_id_fkey"
+      columns: ["sugerido_id"]
+isOneToOne: false
+      referencedRelation: "perfis_vitrine"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"temas": {
                   Row: {
@@ -1043,7 +1312,26 @@ isOneToOne: false
                 }
           }
           Views: {
-            [_ in never]: never
+            "perfis_vitrine": {
+                  Row: {
+                    "bio": string | null,"cidade": string | null,"empresa_nome": string | null,"foto_path": string | null,"id": string | null,"instagram": string | null,"linkedin_url": string | null,"nome": string | null,"pais": string | null,"setor_id": number | null,"slug": string | null
+                  }
+                  Insert: {
+                           "bio"?: string | null,"cidade"?: string | null,"empresa_nome"?: string | null,"foto_path"?: string | null,"id"?: string | null,"instagram"?: string | null,"linkedin_url"?: string | null,"nome"?: string | null,"pais"?: string | null,"setor_id"?: number | null,"slug"?: string | null
+                         }
+                        Update: {
+                           "bio"?: string | null,"cidade"?: string | null,"empresa_nome"?: string | null,"foto_path"?: string | null,"id"?: string | null,"instagram"?: string | null,"linkedin_url"?: string | null,"nome"?: string | null,"pais"?: string | null,"setor_id"?: number | null,"slug"?: string | null
+                         }
+                        Relationships: [
+                    {
+      foreignKeyName: "perfis_setor_id_fkey"
+      columns: ["setor_id"]
+isOneToOne: false
+      referencedRelation: "setores"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
           }
           Functions: {
             "aprovar_alteracao_premiado":
@@ -1057,6 +1345,16 @@ isOneToOne: false
                            },
 "aprovar_perfil_publico":
 { Args: { "aprovar"?: boolean,"perfil": string }; Returns: undefined
+                           },
+"arquivos_do_titular":
+{ Args: { "p_uid": string }; Returns: {
+              "bucket": string,"nome": string
+            }[]
+                           },
+"buscar_membros":
+{ Args: { "filtro_categoria"?: number,"filtro_cidade"?: string,"filtro_setor"?: number,"filtro_tipo"?: Database["public"]['Enums']["tipo_network"],"limite"?: number,"pular"?: number }; Returns: {
+              "bio": string,"cidade": string,"empresa_nome": string,"foto_path": string,"id": string,"instagram": string,"linkedin_url": string,"nome": string,"pais": string,"setor_id": number,"slug": string
+            }[]
                            },
 "ciclo_de":
 { Args: { "t": string }; Returns: unknown
@@ -1132,6 +1430,11 @@ isOneToOne: false
 "resolver_denuncia":
 { Args: { "denuncia": number,"procedente": boolean }; Returns: undefined
                            },
+"revelar_contato":
+{ Args: { "outro": string }; Returns: {
+              "email_contato": string,"whatsapp": string
+            }[]
+                           },
 "suspender_perfil":
 { Args: { "perfil": string,"suspender": boolean }; Returns: undefined
                            },
@@ -1140,7 +1443,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "nivel_acesso": "visitante"|"clube"|"grupo","origem_assinatura": "stripe"|"manual","origem_receita_externa": "ingresso"|"pix"|"transferencia"|"evento"|"outro","papel_equipe": "super_admin"|"editor"|"corretor"|"moderador"|"auditor","status_assinatura": "incomplete"|"incomplete_expired"|"trialing"|"active"|"past_due"|"canceled"|"unpaid"|"paused","status_denuncia": "aberta"|"procedente"|"improcedente","status_entrega": "enviada"|"aprovada"|"ajustar","status_material": "rascunho"|"aprovado","status_moderacao": "pendente"|"publicada"|"rejeitada","status_pedido": "recebido"|"em_andamento"|"concluido"|"recusado","tipo_aula": "gravada"|"ao_vivo","tipo_documento": "termos"|"privacidade"|"cookies"|"reembolso"|"arrependimento"|"marketing"|"match"|"hall_of_fame","tipo_estorno": "reembolso"|"chargeback","tipo_material": "resumo"|"ebook"|"exercicios","tipo_notificacao": "conexao_recebida"|"conexao_aceita"|"aula_publicada"|"sistema","tipo_pedido_gdpr": "exportacao"|"exclusao"|"retificacao","tipo_receita": "assinatura"|"curso"|"produto_digital"|"ingresso","tipo_video": "talk"|"original"|"cerimonia","visibilidade_perfil": "membros"|"publico"
+            "nivel_acesso": "visitante"|"clube"|"grupo","origem_assinatura": "stripe"|"manual","origem_conexao": "busca"|"match","origem_receita_externa": "ingresso"|"pix"|"transferencia"|"evento"|"outro","papel_equipe": "super_admin"|"editor"|"corretor"|"moderador"|"auditor","status_assinatura": "incomplete"|"incomplete_expired"|"trialing"|"active"|"past_due"|"canceled"|"unpaid"|"paused","status_conexao": "pendente"|"aceita"|"recusada"|"cancelada","status_denuncia": "aberta"|"procedente"|"improcedente","status_entrega": "enviada"|"aprovada"|"ajustar","status_material": "rascunho"|"aprovado","status_moderacao": "pendente"|"publicada"|"rejeitada","status_pedido": "recebido"|"em_andamento"|"concluido"|"recusado","tipo_aula": "gravada"|"ao_vivo","tipo_documento": "termos"|"privacidade"|"cookies"|"reembolso"|"arrependimento"|"marketing"|"match"|"hall_of_fame","tipo_estorno": "reembolso"|"chargeback","tipo_material": "resumo"|"ebook"|"exercicios","tipo_network": "procura"|"oferece","tipo_notificacao": "conexao_recebida"|"conexao_aceita"|"aula_publicada"|"sistema","tipo_pedido_gdpr": "exportacao"|"exclusao"|"retificacao","tipo_receita": "assinatura"|"curso"|"produto_digital"|"ingresso","tipo_video": "talk"|"original"|"cerimonia","visibilidade_perfil": "membros"|"publico"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1256,7 +1559,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "nivel_acesso": ["visitante", "clube", "grupo"],"origem_assinatura": ["stripe", "manual"],"origem_receita_externa": ["ingresso", "pix", "transferencia", "evento", "outro"],"papel_equipe": ["super_admin", "editor", "corretor", "moderador", "auditor"],"status_assinatura": ["incomplete", "incomplete_expired", "trialing", "active", "past_due", "canceled", "unpaid", "paused"],"status_denuncia": ["aberta", "procedente", "improcedente"],"status_entrega": ["enviada", "aprovada", "ajustar"],"status_material": ["rascunho", "aprovado"],"status_moderacao": ["pendente", "publicada", "rejeitada"],"status_pedido": ["recebido", "em_andamento", "concluido", "recusado"],"tipo_aula": ["gravada", "ao_vivo"],"tipo_documento": ["termos", "privacidade", "cookies", "reembolso", "arrependimento", "marketing", "match", "hall_of_fame"],"tipo_estorno": ["reembolso", "chargeback"],"tipo_material": ["resumo", "ebook", "exercicios"],"tipo_notificacao": ["conexao_recebida", "conexao_aceita", "aula_publicada", "sistema"],"tipo_pedido_gdpr": ["exportacao", "exclusao", "retificacao"],"tipo_receita": ["assinatura", "curso", "produto_digital", "ingresso"],"tipo_video": ["talk", "original", "cerimonia"],"visibilidade_perfil": ["membros", "publico"]
+            "nivel_acesso": ["visitante", "clube", "grupo"],"origem_assinatura": ["stripe", "manual"],"origem_conexao": ["busca", "match"],"origem_receita_externa": ["ingresso", "pix", "transferencia", "evento", "outro"],"papel_equipe": ["super_admin", "editor", "corretor", "moderador", "auditor"],"status_assinatura": ["incomplete", "incomplete_expired", "trialing", "active", "past_due", "canceled", "unpaid", "paused"],"status_conexao": ["pendente", "aceita", "recusada", "cancelada"],"status_denuncia": ["aberta", "procedente", "improcedente"],"status_entrega": ["enviada", "aprovada", "ajustar"],"status_material": ["rascunho", "aprovado"],"status_moderacao": ["pendente", "publicada", "rejeitada"],"status_pedido": ["recebido", "em_andamento", "concluido", "recusado"],"tipo_aula": ["gravada", "ao_vivo"],"tipo_documento": ["termos", "privacidade", "cookies", "reembolso", "arrependimento", "marketing", "match", "hall_of_fame"],"tipo_estorno": ["reembolso", "chargeback"],"tipo_material": ["resumo", "ebook", "exercicios"],"tipo_network": ["procura", "oferece"],"tipo_notificacao": ["conexao_recebida", "conexao_aceita", "aula_publicada", "sistema"],"tipo_pedido_gdpr": ["exportacao", "exclusao", "retificacao"],"tipo_receita": ["assinatura", "curso", "produto_digital", "ingresso"],"tipo_video": ["talk", "original", "cerimonia"],"visibilidade_perfil": ["membros", "publico"]
           }
         }
 } as const

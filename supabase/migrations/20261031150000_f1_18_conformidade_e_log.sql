@@ -197,7 +197,8 @@ begin
   new.revogado_em := now();
   return new;
 end $$;
-create trigger consentimentos_revogar before update on public.consentimentos
+-- "of revogado_em": o set null de perfil_id na exclusao de conta nao passa por aqui.
+create trigger consentimentos_revogar before update of revogado_em on public.consentimentos
   for each row execute function private.consentimentos_revogar();
 
 alter table public.consentimentos enable row level security;

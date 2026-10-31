@@ -3,6 +3,12 @@
 begin;
 select plan(21);
 
+-- O seed de desenvolvimento (supabase/seed.sql) nao entra no teste: apagado aqui, dentro da transacao desfeita no fim.
+truncate public.verticais, public.edicoes, public.temas, public.categorias_rede, public.espacos, public.empresas,
+  public.documentos_legais, public.planos cascade;
+delete from auth.users where email like '%@exemplo.invalid';
+delete from public.contas_stripe where stripe_account_id = 'acct_exemplo_local';
+
 create schema tt;
 grant usage on schema tt to public;
 create function tt.como(uid uuid, aal text default 'aal1') returns void language plpgsql as $$
