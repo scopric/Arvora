@@ -1,17 +1,21 @@
 import { Route } from "react-router"
-import { EmConstrucao } from "../../componentes/EmConstrucao"
+import { Assinatura } from "./telas/Assinatura"
+import { Configuracoes } from "./telas/Configuracoes"
+import { Dados } from "./telas/Dados"
+import { Emails } from "./telas/Emails"
+import { Notificacoes } from "./telas/Notificacoes"
+import { Privacidade } from "./telas/Privacidade"
 
-// Rotas da área conta (caminhos relativos a /:lang). Para entregar uma tela: troque o element da rota
-// pela sua tela (crie-a em src/areas/conta/telas/). Não edite App.tsx.
+// Rotas da área conta (caminhos relativos a /:lang).
 export function rotasConta() {
   return (
     <>
-      <Route path="notificacoes" element={<EmConstrucao titulo="conta.notificacoes.titulo" />} />
-      <Route path="configuracoes" element={<EmConstrucao titulo="conta.configuracoes.titulo" />} />
-      <Route path="configuracoes/privacidade" element={<EmConstrucao titulo="conta.privacidade.titulo" />} />
-      <Route path="configuracoes/emails" element={<EmConstrucao titulo="conta.emails.titulo" />} />
-      <Route path="configuracoes/assinatura" element={<EmConstrucao titulo="conta.assinatura.titulo" />} />
-      <Route path="configuracoes/dados" element={<EmConstrucao titulo="conta.dados.titulo" />} />
+      <Route path="notificacoes" element={<Notificacoes />} />
+      <Route path="configuracoes" element={<Configuracoes />} />
+      <Route path="configuracoes/privacidade" element={<Privacidade />} />
+      <Route path="configuracoes/emails" element={<Emails />} />
+      <Route path="configuracoes/assinatura" element={<Assinatura />} />
+      <Route path="configuracoes/dados" element={<Dados />} />
     </>
   )
 }
