@@ -28,6 +28,7 @@ describe("excluirMinhaConta", () => {
     ["senha_invalida", "erro.excluir.senha_invalida"],
     ["mfa_requerido", "erro.excluir.mfa_requerido"],
     ["equipe", "erro.excluir.equipe"],
+    ["arrependimento", "erro.excluir.arrependimento"],
     ["stripe", "erro.excluir.stripe"],
     ["exclusao", "erro.excluir.exclusao"],
     ["limite", "perfil.excluir.erroLimite"],

@@ -151,7 +151,8 @@ export const pt = {
   "perfil.excluir.abrir": "Quero excluir minha conta",
   "perfil.excluir.aviso": "A exclusão é definitiva e não pode ser desfeita:",
   "perfil.excluir.perde": "Você perde o acesso à sua conta e ao conteúdo.",
-  "perfil.excluir.assinatura": "Sua assinatura é cancelada na hora, sem reembolso automático.",
+  "perfil.excluir.assinatura":
+    "Depois de 14 dias da assinatura, ela é cancelada na hora, sem reembolso. Antes disso, fale com o suporte para cancelar com o reembolso a que você tem direito.",
   "perfil.excluir.retidos": "Alguns dados de cobrança ficam retidos por obrigação legal.",
   "perfil.excluir.backup":
     "Antes de excluir, use Baixar meus dados (acima) para guardar uma cópia: depois da exclusão não dá para recuperá-los.",
@@ -167,6 +168,8 @@ export const pt = {
     "Sua conta tem verificação em duas etapas. Entre de novo confirmando o segundo fator para excluir.",
   "erro.excluir.equipe":
     "Sua conta tem papel na equipe. Peça a um administrador para removê-lo antes de excluir a conta.",
+  "erro.excluir.arrependimento":
+    "Sua assinatura tem menos de 14 dias. Para cancelar com o reembolso a que você tem direito, fale com o suporte; depois a exclusão da conta é feita.",
   "erro.excluir.stripe":
     "Não conseguimos cancelar sua assinatura agora, então nada foi excluído. Tente de novo em instantes.",
   "erro.excluir.exclusao":

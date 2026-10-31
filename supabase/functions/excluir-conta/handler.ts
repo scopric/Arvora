@@ -4,7 +4,9 @@
 // Ordem (e porquê):
 //   0. se tem TOTP verificado, o JWT precisa ser aal2 (403 mfa_requerido),
 //   1. e-mail igual ao do JWT, 2. senha conferida, 3. bloqueio se for da equipe (um admin remove o papel
-//   antes: evita apagar o último super_admin), 4. cancelar no Stripe, 5. só então apagar o usuário.
+//   antes: evita apagar o último super_admin), 4. assinatura vigente com menos de 14 dias: 409 arrependimento
+//   (o suporte cancela com reembolso; só depois dos 14 dias o cancelamento sem reembolso vale),
+//   5. cancelar no Stripe, 6. só então apagar o usuário.
 //   Cancelar ANTES de apagar: se o Stripe falhar, nada é apagado e a pessoa tenta de novo. Se o delete
 //   falhar depois, a assinatura já está cancelada no Stripe: aceitável e visível (500 "exclusao").
 //   Todas as chaves Stripe são conferidas ANTES do primeiro cancelamento (sem cancelamento pela metade).
@@ -23,6 +25,11 @@ import { cors, ErroStripe, json, stripeDelete } from "../_shared/stripe-api.ts";
 export type Assinatura = {
   stripe_subscription_id: string;
   conta_stripe_id: number;
+  // Data em que a linha nasceu = proxy da data do contrato. Limitação: renovação não muda criado_em e
+  // troca de plano pelo portal mantém a mesma linha. Se o webhook gravar a linha antes do pagamento se
+  // confirmar, o prazo começa até cerca de 1 dia antes do contrato: o erro vai para o lado seguro (bloqueia a mais).
+  // Fechar de vez exige guardar o `created` da assinatura do Stripe (migration), fora deste escopo.
+  criado_em: string;
 };
 export type Consultas = {
   usuario(): Promise<{ id: string; email?: string; totp: boolean } | null>;
@@ -45,6 +52,7 @@ export type Deps = {
     uid: string,
   ) => Promise<void>;
   fetch?: typeof fetch;
+  agora?: () => number; // relógio injetável (ms); padrão Date.now
 };
 
 // O apagarUsuario lança isto quando o usuário já não existe (outra aba apagou antes): conta como sucesso.
@@ -61,9 +69,14 @@ export function aalDoJwt(authorization: string): string | undefined {
   }
 }
 
-// Cancelamento imediato SEM reembolso proporcional nem fatura final. A política de reembolso/arrependimento
-// é decisão comercial e jurídica ainda indefinida; mudar aqui quando for decidida.
+// Cancelamento imediato SEM reembolso proporcional nem fatura final. Só vale depois dos 14 dias da
+// assinatura: antes disso o handler responde 409 arrependimento e o suporte trata o reembolso.
 export const CANCELAR_SEM_REEMBOLSO = { prorate: false, invoice_now: false };
+
+// Prazo de arrependimento: 14 dias da conclusão do contrato (Consumer Rights Act 2022, s. 113(2), Irlanda).
+// Regra PROVISÓRIA, sujeita a revisão jurídica.
+export const PRAZO_ARREPENDIMENTO_DIAS = 14;
+const DIA_MS = 24 * 60 * 60 * 1000;
 
 // Limite real (max e janela) é do banco: public.consumir_limite. A janela aqui serve só ao Retry-After;
 // mantenha igual ao limite em consumir_limite no banco.
@@ -141,6 +154,16 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
       e instanceof Error ? e.message : "",
     );
     return json({ erro: "interno" }, 500, site);
+  }
+
+  // Menos de 14 dias: a exclusão não acontece sozinha. `!(>=)` trata data inválida como recente.
+  const agora = (deps.agora ?? Date.now)();
+  if (
+    vigentes.some((a) =>
+      !(agora - Date.parse(a.criado_em) >= PRAZO_ARREPENDIMENTO_DIAS * DIA_MS)
+    )
+  ) {
+    return json({ erro: "arrependimento" }, 409, site);
   }
 
   // Sem chave da conta: 500 explícito, sem chave reserva, antes de cancelar qualquer coisa.

@@ -153,7 +153,8 @@ export const en: Record<keyof typeof pt, string> = {
   "perfil.excluir.abrir": "I want to delete my account",
   "perfil.excluir.aviso": "Deletion is permanent and cannot be undone:",
   "perfil.excluir.perde": "You lose access to your account and the content.",
-  "perfil.excluir.assinatura": "Your subscription is cancelled immediately, with no automatic refund.",
+  "perfil.excluir.assinatura":
+    "After 14 days from subscribing, it is cancelled immediately with no refund. Before that, please get in touch with support to cancel with the refund you are entitled to.",
   "perfil.excluir.retidos": "Some billing data is kept because of a legal obligation.",
   "perfil.excluir.backup":
     "Before deleting, use Download my data (above) to keep a copy: after deletion it cannot be recovered.",
@@ -169,6 +170,8 @@ export const en: Record<keyof typeof pt, string> = {
     "Your account has two-step verification. Log in again and confirm the second factor to delete.",
   "erro.excluir.equipe":
     "Your account has a team role. Ask an administrator to remove it before deleting the account.",
+  "erro.excluir.arrependimento":
+    "Your subscription is less than 14 days old. To cancel with the refund you are entitled to, please get in touch with support; your account can be deleted afterwards.",
   "erro.excluir.stripe":
     "We could not cancel your subscription right now, so nothing was deleted. Try again in a moment.",
   "erro.excluir.exclusao":
