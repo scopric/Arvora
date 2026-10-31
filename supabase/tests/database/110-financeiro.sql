@@ -2,7 +2,7 @@
 -- cambio_bce e o webhook gravando pagamentos e estornos. Eventos sao JSON minimos feitos a mao (formato real
 -- NAO VERIFICADO). Transacao desfeita.
 begin;
-select plan(53);
+select plan(55);
 
 -- O seed de desenvolvimento (supabase/seed.sql) nao entra no teste: apagado aqui, dentro da transacao desfeita no fim.
 truncate public.verticais, public.edicoes, public.temas, public.categorias_rede, public.espacos, public.empresas,
@@ -184,14 +184,18 @@ select throws_ok($$insert into public.reembolsos (tipo, receita_externa_id, moed
 select throws_ok($$insert into public.reembolsos (tipo, pagamento_id, moeda, valor_centavos, devolvido_em)
   select 'reembolso', id, 'EUR', 1, now() from public.pagamentos$$, '42501', null, 'estorno de pagamento Stripe so pelo webhook');
 select throws_ok($$update public.receitas_externas set motivo_anulacao = null$$, 'P0001', 'motivo_obrigatorio', 'anular exige motivo');
-select is(tt.afeta($q$update public.receitas_externas set motivo_anulacao = 'lancado em duplicidade'$q$), 1, 'anula com motivo');
-select throws_ok($$update public.receitas_externas set motivo_anulacao = 'de novo'$$, 'P0001', 'ja_anulado', 'nao anula duas vezes');
+select throws_ok($$update public.receitas_externas set motivo_anulacao = 'lancado em duplicidade'$$, 'P0001', 'receita_com_estorno',
+                 'receita com estorno nao se anula (f4_03)');
+select lives_ok($$insert into public.receitas_externas (recebido_em, origem, tipo_receita, cliente_nome, moeda, bruto_centavos, comprovante_path)
+  values (current_date, 'pix', 'assinatura', 'Cliente 2', 'BRL', 500, '2026/y.pdf')$$, 'segunda receita, sem estorno');
+select is(tt.afeta($q$update public.receitas_externas set motivo_anulacao = 'lancado em duplicidade' where comprovante_path = '2026/y.pdf'$q$), 1, 'anula com motivo');
+select throws_ok($$update public.receitas_externas set motivo_anulacao = 'de novo' where comprovante_path = '2026/y.pdf'$$, 'P0001', 'ja_anulado', 'nao anula duas vezes');
 select lives_ok($$insert into public.cambio_bce (data, moeda, taxa, fonte_url) values ('2026-01-09', 'BRL', 6.1, 'https://www.ecb.europa.eu/teste')$$,
                 'super_admin informa taxa do BCE');
 select throws_ok($$insert into public.cambio_bce (data, moeda, taxa, fonte_url) values ('2026-01-09', 'EUR', 1, 'https://x')$$,
                  '23514', null, 'EUR nao entra em cambio_bce');
 reset role;
-select ok((select anulado_por = tt.u('51') and anulado_em is not null and lancado_por = tt.u('51') from public.receitas_externas),
+select ok((select anulado_por = tt.u('51') and anulado_em is not null and lancado_por = tt.u('51') from public.receitas_externas where comprovante_path = '2026/y.pdf'),
           'lancado_por e anulado_por vem da sessao');
 select is(private.cambio_em('BRL', '2026-01-11'), 6.1::numeric, 'cambio do dia 11 sem cotacao usa a ultima anterior');
 select is(private.cambio_em('EUR', '2026-01-11'), 1::numeric, 'EUR vale 1');
