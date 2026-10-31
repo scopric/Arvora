@@ -34,9 +34,23 @@ const DURACAO_PADRAO_MIN = 60 // quando a aula não registra duração
 
 const utc = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")
 const fim = (a: AulaAgenda) => new Date(new Date(a.inicio_em).getTime() + (a.duracao_min ?? DURACAO_PADRAO_MIN) * 60000)
-const escapar = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n")
-// RFC 5545: linhas com mais de 75 octetos são dobradas. ponytail: conta caracteres, não octetos; título muito acentuado pode passar de 75 octetos.
-const dobrar = (linha: string) => linha.replace(/(.{74})(?=.)/g, "$1\r\n ")
+const escapar = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r\n|\r|\n/g, "\\n")
+// RFC 5545: linhas com mais de 75 octetos são dobradas (CRLF + espaço). Conta octetos UTF-8 e nunca corta um caractere ao meio.
+const codificador = new TextEncoder()
+function dobrar(linha: string) {
+  let saida = ""
+  let octetos = 0
+  for (const c of linha) {
+    const n = codificador.encode(c).length
+    if (octetos + n > 75) {
+      saida += "\r\n "
+      octetos = 1
+    }
+    saida += c
+    octetos += n
+  }
+  return saida
+}
 
 export function gerarIcs(a: AulaAgenda, lang: string): string {
   const url = `${SITE_URL}/${lang}/aulas/${a.slug}`

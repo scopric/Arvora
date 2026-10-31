@@ -38,7 +38,7 @@ export function Inicio() {
     uid,
   )
   const [materiais, recMateriais] = useCarga(
-    async () => dados(await supabase.from("aulas").select("id, slug, titulo").not("materiais_publicados_em", "is", null).order("materiais_publicados_em", { ascending: false }).limit(3)) as { id: number; slug: string; titulo: string }[],
+    async () => dados(await supabase.from("aulas").select("id, slug, titulo").is("modulo_id", null).not("materiais_publicados_em", "is", null).order("materiais_publicados_em", { ascending: false }).limit(3)) as { id: number; slug: string; titulo: string }[],
     uid,
   )
   const [salvos, recSalvos] = useCarga(

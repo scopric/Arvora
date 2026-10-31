@@ -112,7 +112,7 @@ export const aprenderEn: Record<keyof typeof aprenderPt, string> = {
   "aprender.marcarConcluida": "Mark as completed",
   "aprender.materiais.emBreve": "The summary, e-book and exercises are published after the lesson.",
   "aprender.materiais.rotulo": "Lesson materials",
-  "aprender.materiais.vazio": "This lesson's materials are not published yet. You will get a notification when they are.",
+  "aprender.materiais.vazio": "This material is not available for this lesson yet.",
   "aprender.min": "min",
   "aprender.naoEncontrada": "We could not find this page.",
   "aprender.parouEm": "You stopped at",
@@ -140,4 +140,5 @@ export const aprenderEn: Record<keyof typeof aprenderPt, string> = {
   "aprender.voltarAcademy": "Academy",
   "aprender.voltarAulas": "All lessons",
   "aprender.inicio.proximaESugestoes": "Next lesson and suggestions",
+  "aprender.sala.rede": "We could not reach the server. Check your connection and try again.",
 }

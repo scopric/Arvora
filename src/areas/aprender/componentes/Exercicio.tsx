@@ -32,12 +32,19 @@ async function abrirArquivo(caminho: string): Promise<boolean> {
 
 // Um exercício: enunciado, a resposta enviada, o status, a devolutiva e (se pode) o formulário de envio/reenvio.
 // `podeEnviar` = vertical aceita entregas e o membro é do Grupo (o RLS confere de novo).
-export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; aoAtualizar: () => void }) {
+// `rascunho`/`aoDigitar` (opcionais): quem hospeda o exercício em abas guarda o texto fora daqui, porque a aba inativa é
+// desmontada. `aoDigitar(undefined)` = apagar o rascunho (depois de enviar).
+export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, rascunho, aoDigitar }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void }) {
   const t = useT()
   const lang = useIdioma()
   const id = useId()
   const reenvio = entrega?.status === "ajustar" ? entrega : null
-  const [texto, setTexto] = useState(entrega?.texto ?? "")
+  const [local, setLocal] = useState(entrega?.texto ?? "")
+  const texto = rascunho ?? local
+  const setTexto = (v: string) => {
+    setLocal(v)
+    aoDigitar?.(v)
+  }
   const [arquivo, setArquivo] = useState<File | null>(null)
   const [erro, setErro] = useState<Chave | null>(null)
   const [ok, setOk] = useState(false)
@@ -75,7 +82,10 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar }: 
       if (arquivo && caminho) void supabase.storage.from("entregas").remove([caminho]) // não deixa arquivo órfão
       return setErro(r.error?.code === "23505" ? "aprender.exercicio.jaEnviado" : "aprender.exercicio.erroEnvio") // o texto fica na tela
     }
+    // ponytail: a remoção do arquivo antigo (e a do órfão acima) é best-effort e sem checar o resultado; se falhar, sobra um
+    // arquivo solto no bucket do próprio membro. Varrer por job só se o volume incomodar.
     if (arquivo && antigo) void supabase.storage.from("entregas").remove([antigo])
+    aoDigitar?.(undefined)
     setArquivo(null)
     setOk(true)
     aoAtualizar()

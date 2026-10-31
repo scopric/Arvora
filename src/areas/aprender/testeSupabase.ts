@@ -13,9 +13,9 @@ export function criarFalso(respostas: Record<string, Resposta | ((args: unknown[
     let metodo = "select"
     let args: unknown[] = []
     const q: Record<string, unknown> = {}
-    for (const m of ["select", "insert", "update", "delete", "eq", "in", "is", "not", "lt", "gt", "gte", "order", "limit"]) {
+    for (const m of ["select", "insert", "update", "upsert", "delete", "eq", "in", "is", "not", "lt", "gt", "gte", "order", "limit"]) {
       q[m] = (...a: unknown[]) => {
-        if (["insert", "update", "delete"].includes(m)) {
+        if (["insert", "update", "upsert", "delete"].includes(m)) {
           metodo = m
           args = a
           chamadas.push({ tabela, metodo: m, args: a })

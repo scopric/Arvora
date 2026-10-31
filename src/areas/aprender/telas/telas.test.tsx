@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react"
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import axe from "axe-core"
 import { MemoryRouter, Route, Routes } from "react-router"
@@ -80,7 +80,7 @@ describe("/aulas/:slug ao vivo", () => {
     sala({ data: null, error: { message: "sem_acesso" } })
     expect(await screen.findByText(/bloqueado: parte do grupo/i)).toBeTruthy()
     cleanup()
-    sala({ data: null, error: { message: "boom" } })
+    sala({ data: null, error: { message: "boom", code: "XX000" } })
     expect((await screen.findByRole("alert")).textContent).toMatch(/fale com o suporte|falar com o suporte/i)
   })
   it("Clube vê a prévia com cadeado e nem chama a RPC", async () => {
@@ -120,10 +120,35 @@ describe("/aulas/:slug gravada e exercícios", () => {
     expect(await screen.findByText("Escreva sua proposta.")).toBeTruthy()
     expect(screen.getByRole("tab", { name: "Exercícios" }).getAttribute("aria-selected")).toBe("true")
   })
-  it("sem a RPC de vídeo (ainda não existe): 'vídeo indisponível', materiais seguem", async () => {
-    montarGravada({ "rpc:video_da_aula": { data: null, error: { message: "function not found" } } })
+  it("sem_acesso da RPC de vídeo: 'vídeo indisponível' e os materiais seguem", async () => {
+    montarGravada({ "rpc:video_da_aula": { data: null, error: { message: "sem_acesso", code: "42501" } } })
     expect(await screen.findByText(/não conseguimos abrir este vídeo/i)).toBeTruthy()
     expect(await screen.findByText("Escreva sua proposta.")).toBeTruthy()
+  })
+  it("erro de rede na RPC de vídeo: Erro com 'tentar de novo', não 'indisponível'", async () => {
+    montarGravada({ "rpc:video_da_aula": { data: null, error: { message: "TypeError: Failed to fetch", code: "" } } })
+    expect(await screen.findByRole("button", { name: /tentar de novo/i })).toBeTruthy()
+    expect(screen.queryByText(/não conseguimos abrir este vídeo/i)).toBeNull()
+  })
+  it("progresso nunca regride: voltar o vídeo grava a posição mas mantém o maior percentual (inteiro)", async () => {
+    montarGravada({ "rpc:video_da_aula": ok("https://video.invalid/a.mp4"), progresso_aula: ok({ percentual: 80, posicao_seg: 70 }), "progresso_aula.update": ok([{ aula_id: 5 }]) })
+    const video = (await screen.findByLabelText("Live de proposta")) as HTMLVideoElement
+    Object.defineProperty(video, "duration", { value: 90 })
+    video.currentTime = 10.4
+    fireEvent.pause(video)
+    await waitFor(() => expect(chamadas.some((c) => c.tabela === "progresso_aula" && c.metodo === "update")).toBe(true))
+    expect(chamadas.find((c) => c.tabela === "progresso_aula")?.args[0]).toEqual({ percentual: 80, posicao_seg: 10 })
+    video.currentTime = 85.6
+    fireEvent.pause(video)
+    await waitFor(() => expect(chamadas.filter((c) => c.tabela === "progresso_aula").length).toBe(2))
+    expect(chamadas.filter((c) => c.tabela === "progresso_aula")[1].args[0]).toEqual({ percentual: 95, posicao_seg: 85 })
+  })
+  it("rascunho do exercício sobrevive à troca de aba", async () => {
+    montarGravada({})
+    await userEvent.type(await screen.findByLabelText("Sua resposta"), "rascunho meu")
+    await userEvent.click(screen.getByRole("tab", { name: "Resumo" }))
+    await userEvent.click(screen.getByRole("tab", { name: "Exercícios" }))
+    expect((screen.getByLabelText("Sua resposta") as HTMLTextAreaElement).value).toBe("rascunho meu")
   })
   it("INSERT que o RLS barra (resposta vazia) vira erro e o texto digitado fica na tela", async () => {
     montarGravada({ "entregas.insert": ok([]) })
@@ -270,7 +295,7 @@ describe("/inicio", () => {
 })
 
 describe("/bem-vindo", () => {
-  const base = (extra: Record<string, Resposta> = {}) => ({
+  const base = (extra: Record<string, Resposta | (() => Resposta)> = {}) => ({
     perfis: ok({ nome: "Ana", empresa_nome: null, setor_id: null, cidade: null, pais: null, visibilidade: "membros" }),
     setores: ok([{ id: 1, nome: "Educação", nome_en: null }]),
     categorias_rede: ok([{ id: 1, nome: "Clientes", nome_en: null }, { id: 2, nome: "Parceiros", nome_en: null }]),
@@ -284,7 +309,12 @@ describe("/bem-vindo", () => {
     expect(screen.queryByText(/escolha o que faz sentido/i)).toBeNull()
   })
   it("Grupo: percorre os 3 passos, grava procura/oferece e marca o onboarding", async () => {
-    falso.atual = criarFalso(base({ "perfis.update": ok([{ id: "u1" }]), "network_itens.insert": ok([{ id: 1 }, { id: 2 }]) }))
+    // Antes do upsert network_itens está vazio; depois dele, a leitura de conferência devolve o que ficou gravado.
+    falso.atual = criarFalso(base({
+      "perfis.update": ok([{ id: "u1" }]),
+      "network_itens.upsert": ok(null),
+      network_itens: () => ok(!chamadas.some((c) => c.metodo === "upsert") ? [] : [{ id: 1, tipo: "procura", categoria_id: 1 }, { id: 2, tipo: "oferece", categoria_id: 2 }]),
+    }))
     montar("bem-vindo", <BemVindo />, "/pt/bem-vindo")
     await userEvent.click(await screen.findByRole("button", { name: "Continuar" }))
     const busco = await screen.findByRole("group", { name: "Busco" })
@@ -294,13 +324,22 @@ describe("/bem-vindo", () => {
     expect(await violacoes()).toEqual([])
     await userEvent.click(screen.getByRole("button", { name: "Continuar" }))
     expect(await screen.findByText("Live de proposta")).toBeTruthy()
-    expect(chamadas.find((c) => c.tabela === "network_itens" && c.metodo === "insert")?.args[0]).toEqual([
+    expect(chamadas.find((c) => c.tabela === "network_itens" && c.metodo === "upsert")?.args[0]).toEqual([
       { tipo: "procura", categoria_id: 1 },
       { tipo: "oferece", categoria_id: 2 },
     ])
     await userEvent.click(screen.getByRole("button", { name: "Concluir" }))
     await waitFor(() => expect(chamadas.filter((c) => c.tabela === "perfis" && c.metodo === "update").length).toBe(2))
     expect(chamadas.filter((c) => c.tabela === "perfis" && c.metodo === "update")[1].args[0]).toHaveProperty("onboarding_em")
+  })
+  it("etapa 2: se o banco não ficou como o escolhido, mostra erro e não avança", async () => {
+    falso.atual = criarFalso(base({ "perfis.update": ok([{ id: "u1" }]), "network_itens.upsert": ok(null) })) // leitura sempre vazia
+    montar("bem-vindo", <BemVindo />, "/pt/bem-vindo")
+    await userEvent.click(await screen.findByRole("button", { name: "Continuar" }))
+    await userEvent.click(within(await screen.findByRole("group", { name: "Busco" })).getByRole("checkbox", { name: "Clientes" }))
+    await userEvent.click(screen.getByRole("button", { name: "Continuar" }))
+    expect((await screen.findAllByRole("alert"))[0].textContent).toMatch(/não conseguimos salvar suas escolhas/i)
+    expect(screen.queryByText("Live de proposta")).toBeNull()
   })
   it("Clube: passo 2 vira 'Conheça a rede' (sem escrever em network_itens) e o 3 é cadeado", async () => {
     falso.atual = criarFalso(base({ "perfis.update": ok([{ id: "u1" }]) }))

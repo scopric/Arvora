@@ -75,19 +75,29 @@ export function BemVindo() {
     const { data, error } = await supabase.from("perfis").update(r.data).eq("id", uid).select("id") // .select: Erros 2.5
     setOcupado(false)
     if (error || !data || data.length === 0) return setAviso("perfil.erroSalvar")
+    recarregar() // o formulário volta ao passo 1 com o que está gravado
     setEtapa(2)
   }
 
+  // Idempotente: o diff é contra o que está no banco agora (relido ao fim de cada gravação), o INSERT ignora o que já existe
+  // (ON CONFLICT DO NOTHING) e, no fim, o estado do banco é conferido contra a escolha. Voltar ao passo 2 e salvar de novo não duplica.
   async function salvarRede() {
     setAviso(null)
     setOcupado(true)
     const antes = new Set(itens.map((x) => `${x.tipo}:${x.categoria_id}`))
     const novos = [...sel].filter((k) => !antes.has(k)).map((k) => ({ tipo: k.split(":")[0] as Item["tipo"], categoria_id: Number(k.split(":")[1]) }))
     const fora = itens.filter((x) => !sel.has(`${x.tipo}:${x.categoria_id}`))
-    const ins = novos.length ? await supabase.from("network_itens").insert(novos).select("id") : null
-    const del = fora.length ? await supabase.from("network_itens").delete().in("id", fora.map((x) => x.id)).select("id") : null
+    const ins = novos.length ? await supabase.from("network_itens").upsert(novos, { onConflict: "perfil_id,tipo,categoria_id", ignoreDuplicates: true }) : null
+    const del = fora.length ? await supabase.from("network_itens").delete().in("id", fora.map((x) => x.id)) : null
+    const depois = ins?.error || del?.error ? null : await supabase.from("network_itens").select("id, tipo, categoria_id").eq("perfil_id", uid)
     setOcupado(false)
-    if (ins?.error || (ins && ins.data?.length !== novos.length) || del?.error || (del && del.data?.length !== fora.length)) return setAviso("aprender.bemVindo.erroRede")
+    const chaves = new Set((depois?.data ?? []).map((x) => `${x.tipo}:${x.categoria_id}`))
+    if (!depois || depois.error || chaves.size !== sel.size || [...sel].some((k) => !chaves.has(k))) {
+      recarregar()
+      return setAviso("aprender.bemVindo.erroRede")
+    }
+    setMarcados(null) // a partir daqui a escolha é a do banco
+    recarregar()
     setEtapa(3)
   }
 

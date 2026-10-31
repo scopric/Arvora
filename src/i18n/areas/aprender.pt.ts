@@ -111,7 +111,7 @@ export const aprenderPt = {
   "aprender.marcarConcluida": "Marcar como concluída",
   "aprender.materiais.emBreve": "O resumo, o e-book e os exercícios saem depois da aula.",
   "aprender.materiais.rotulo": "Materiais da aula",
-  "aprender.materiais.vazio": "Os materiais desta aula ainda não foram publicados. Quando saírem, você recebe uma notificação.",
+  "aprender.materiais.vazio": "Este material ainda não está disponível nesta aula.",
   "aprender.min": "min",
   "aprender.naoEncontrada": "Não encontramos esta página.",
   "aprender.parouEm": "Você parou em",
@@ -139,4 +139,5 @@ export const aprenderPt = {
   "aprender.voltarAcademy": "Academy",
   "aprender.voltarAulas": "Todas as aulas",
   "aprender.inicio.proximaESugestoes": "Próxima aula e sugestões",
+  "aprender.sala.rede": "Não conseguimos falar com o servidor. Confira sua conexão e tente de novo.",
 }
