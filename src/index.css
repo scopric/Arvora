@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "@fontsource-variable/playfair-display";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/big-shoulders-display";
+@import "@fontsource-variable/schibsted-grotesk";
 
 /* Hex aproximados do deck (22/10/2026); confirmar com o contratante. */
 @theme {
@@ -12,8 +12,8 @@
   --color-fundo-ba: #151719;
   --color-painel: #17281f; /* superfície de card do deck */
 
-  --font-titulo: "Playfair Display Variable", Georgia, serif;
-  --font-corpo: "Inter Variable", system-ui, sans-serif;
+  --font-titulo: "Big Shoulders Display Variable", Impact, sans-serif;
+  --font-corpo: "Schibsted Grotesk Variable", system-ui, sans-serif;
 }
 
 @layer base {
@@ -92,4 +92,20 @@
   .fa-no {
     animation: none;
   }
+}
+
+/* Home: entrada ligada à rolagem só onde o navegador sabe (view timeline); sem suporte, tudo visível. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .revela {
+      animation: subir linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+.cena-mascara {
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
+  mask-image: radial-gradient(closest-side, #000 55%, transparent);
 }
