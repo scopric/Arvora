@@ -1,5 +1,8 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useParams } from "react-router"
 import "./index.css"
+import interUrl from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url"
+import playfairUrl from "@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2?url"
+import { BannerCookies } from "./componentes/BannerCookies"
 import { Carregando } from "./componentes/Carregando"
 import { ehIdioma, textosDe, useIdiomaUrl } from "./i18n"
 import { IDIOMAS, LANG_HTML, type Idioma } from "./site"
@@ -26,6 +29,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
+// Fontes pré-carregadas: sem isso o navegador só as descobre depois de baixar o CSS (cadeia html → css → fonte).
+export const links = () =>
+  [interUrl, playfairUrl].map((href) => ({ rel: "preload", href, as: "font", type: "font/woff2", crossOrigin: "anonymous" as const }))
+
 export function meta({ params }: { params: { lang?: string } }) {
   const dic = textosDe(ehIdioma(params.lang) ? params.lang : "pt")
   return [
@@ -35,7 +42,13 @@ export function meta({ params }: { params: { lang?: string } }) {
 }
 
 export default function Root() {
-  return <Outlet />
+  return (
+    <>
+      {/* Antes do conteúdo no DOM (ordem de tab/leitor de tela); visualmente fica embaixo (fixed). */}
+      <BannerCookies />
+      <Outlet />
+    </>
+  )
 }
 
 // Mostrado enquanto o SPA hidrata (e no __spa-fallback.html). Fora do /:lang: idioma pela URL.
