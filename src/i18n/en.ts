@@ -11,6 +11,7 @@ export const en: Record<keyof typeof pt, string> = {
   "titulo.confirmar": "Confirm",
   "titulo.perfil": "My profile",
   "sistema.carregando": "Loading…",
+  "titulo.naoEncontrada": "Page not found",
   "sistema.naoEncontrada": "Page not found",
   "sistema.erro": "Something went wrong",
   "sistema.voltar": "Back to home",
