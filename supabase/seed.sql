@@ -108,8 +108,8 @@ select d.id, p.e, p.n, now(), 'exemplo local'
 from public.documentos_legais d,
      (values ('premiado1@exemplo.invalid', 'Premiada de exemplo'), ('premiado2@exemplo.invalid', 'Premiado de exemplo')) p(e, n)
 where d.tipo = 'hall_of_fame';
-insert into public.premiados (edicao_id, categoria_id, empresa_id, nome, slug, historia, redes, consentimento_id, publicado_em)
-select e.id, c.id, (select id from public.empresas where slug = p.emp), p.n, p.s, 'História fictícia de exemplo.', '{}',
+insert into public.premiados (edicao_id, categoria_id, empresa_id, nome, slug, historia, redes, convite_email, consentimento_id, publicado_em)
+select e.id, c.id, (select id from public.empresas where slug = p.emp), p.n, p.s, 'História fictícia de exemplo.', '{}', p.e,
        (select id from public.consentimentos where titular_email = p.e), now()
 from public.edicoes e
 join public.categorias_premio c on c.edicao_id = e.id

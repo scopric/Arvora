@@ -22,6 +22,12 @@ export type Database = {
 isOneToOne: false
       referencedRelation: "edicoes"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "agenda_evento_edicao_id_fkey"
+      columns: ["edicao_id"]
+isOneToOne: false
+      referencedRelation: "edicoes_publicas"
+      referencedColumns: ["id"]
     }
                   ]
                 },"assinaturas": {
@@ -158,6 +164,12 @@ isOneToOne: false
       columns: ["edicao_id"]
 isOneToOne: false
       referencedRelation: "edicoes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "categorias_premio_edicao_id_fkey"
+      columns: ["edicao_id"]
+isOneToOne: false
+      referencedRelation: "edicoes_publicas"
       referencedColumns: ["id"]
     }
                   ]
@@ -594,13 +606,13 @@ isOneToOne: false
                   ]
                 },"indicados": {
                   Row: {
-                    "atualizado_em": string,"categoria_id": number,"consentimento_id": number | null,"criado_em": string,"edicao_id": number,"empresa_id": number | null,"foto_path": string | null,"id": number,"nome": string,"perfil_id": string | null,"publicado_em": string | null,"resumo": string | null
+                    "atualizado_em": string,"categoria_id": number,"consentimento_id": number | null,"convite_email": string | null,"criado_em": string,"edicao_id": number,"empresa_id": number | null,"foto_path": string | null,"id": number,"nome": string,"perfil_id": string | null,"publicado_em": string | null,"resumo": string | null
                   }
                   Insert: {
-                    "atualizado_em"?: string,"categoria_id": number,"consentimento_id"?: number | null,"criado_em"?: string,"edicao_id": number,"empresa_id"?: number | null,"foto_path"?: string | null,"id"?: never,"nome": string,"perfil_id"?: string | null,"publicado_em"?: string | null,"resumo"?: string | null
+                    "atualizado_em"?: string,"categoria_id": number,"consentimento_id"?: number | null,"convite_email"?: string | null,"criado_em"?: string,"edicao_id": number,"empresa_id"?: number | null,"foto_path"?: string | null,"id"?: never,"nome": string,"perfil_id"?: string | null,"publicado_em"?: string | null,"resumo"?: string | null
                   }
                   Update: {
-                    "atualizado_em"?: string,"categoria_id"?: number,"consentimento_id"?: number | null,"criado_em"?: string,"edicao_id"?: number,"empresa_id"?: number | null,"foto_path"?: string | null,"id"?: never,"nome"?: string,"perfil_id"?: string | null,"publicado_em"?: string | null,"resumo"?: string | null
+                    "atualizado_em"?: string,"categoria_id"?: number,"consentimento_id"?: number | null,"convite_email"?: string | null,"criado_em"?: string,"edicao_id"?: number,"empresa_id"?: number | null,"foto_path"?: string | null,"id"?: never,"nome"?: string,"perfil_id"?: string | null,"publicado_em"?: string | null,"resumo"?: string | null
                   }
                   Relationships: [
                     {
@@ -620,6 +632,12 @@ isOneToOne: false
       columns: ["edicao_id"]
 isOneToOne: false
       referencedRelation: "edicoes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "indicados_edicao_id_fkey"
+      columns: ["edicao_id"]
+isOneToOne: false
+      referencedRelation: "edicoes_publicas"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "indicados_empresa_id_fkey"
@@ -828,6 +846,12 @@ isOneToOne: false
       referencedRelation: "edicoes"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "patrocinadores_edicao_id_fkey"
+      columns: ["edicao_id"]
+isOneToOne: false
+      referencedRelation: "edicoes_publicas"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "patrocinadores_empresa_id_fkey"
       columns: ["empresa_id"]
 isOneToOne: false
@@ -988,6 +1012,12 @@ isOneToOne: false
       columns: ["edicao_id"]
 isOneToOne: false
       referencedRelation: "edicoes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "premiados_edicao_id_fkey"
+      columns: ["edicao_id"]
+isOneToOne: false
+      referencedRelation: "edicoes_publicas"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "premiados_empresa_id_fkey"
@@ -1271,6 +1301,12 @@ isOneToOne: false
       referencedRelation: "edicoes"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "videos_edicao_id_fkey"
+      columns: ["edicao_id"]
+isOneToOne: false
+      referencedRelation: "edicoes_publicas"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "videos_tema_id_fkey"
       columns: ["tema_id"]
 isOneToOne: false
@@ -1312,7 +1348,20 @@ isOneToOne: false
                 }
           }
           Views: {
-            "perfis_vitrine": {
+            "edicoes_publicas": {
+                  Row: {
+                    "ano": number | null,"cidade": string | null,"descricao": string | null,"durante_fim": string | null,"durante_inicio": string | null,"fase": string | null,"id": number | null,"nome": string | null,"pais": string | null,"publicada_em": string | null,"slug": string | null
+                  }
+                  Insert: {
+                           "ano"?: number | null,"cidade"?: string | null,"descricao"?: string | null,"durante_fim"?: string | null,"durante_inicio"?: string | null,"fase"?: never,"id"?: number | null,"nome"?: string | null,"pais"?: string | null,"publicada_em"?: string | null,"slug"?: string | null
+                         }
+                        Update: {
+                           "ano"?: number | null,"cidade"?: string | null,"descricao"?: string | null,"durante_fim"?: string | null,"durante_inicio"?: string | null,"fase"?: never,"id"?: number | null,"nome"?: string | null,"pais"?: string | null,"publicada_em"?: string | null,"slug"?: string | null
+                         }
+                        Relationships: [
+                    
+                  ]
+                },"perfis_vitrine": {
                   Row: {
                     "bio": string | null,"cidade": string | null,"empresa_nome": string | null,"foto_path": string | null,"id": string | null,"instagram": string | null,"linkedin_url": string | null,"nome": string | null,"pais": string | null,"setor_id": number | null,"slug": string | null
                   }
@@ -1359,6 +1408,9 @@ isOneToOne: false
 "ciclo_de":
 { Args: { "t": string }; Returns: unknown
                            },
+"classificar_item_pagamento":
+{ Args: { "item": number,"plano": number }; Returns: undefined
+                           },
 "clientes_ativos":
 { Args: { "ciclo_inicio": string }; Returns: {
               "cliente_chave": string,"origem": string
@@ -1373,11 +1425,38 @@ isOneToOne: false
 "corrigir_entrega":
 { Args: { "devolutiva": string,"entrega": number,"novo_status": Database["public"]['Enums']["status_entrega"] }; Returns: undefined
                            },
+"empresas_equipe":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "aprovada_em": string | null,
+"aprovada_por": string | null,
+"atualizado_em": string,
+"cidade": string | null,
+"criado_em": string,
+"descricao": string | null,
+"dono_perfil_id": string | null,
+"id": number,
+"logo_path": string | null,
+"nome": string,
+"pais": string | null,
+"setor_id": number,
+"site": string | null,
+"slug": string,
+"status": Database["public"]['Enums']["status_moderacao"]
+            }[]
+                          SetofOptions: {
+        from: "*"
+        to: "empresas"
+        isOneToOne: false
+        isSetofReturn: true
+      } },
 "exportar_meus_dados":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
 "fase":
 { Args: { "e": Database["public"]['Tables']["edicoes"]['Row'] }; Returns: string
+                           },
+"fase_edicao":
+{ Args: { "fim": string,"inicio": string }; Returns: string
                            },
 "fechar_ciclo":
 { Args: { "ciclo_inicio": string }; Returns: {
@@ -1406,6 +1485,30 @@ isOneToOne: false
 "marcar_relatorio_enviado":
 { Args: { "ciclo_inicio": string,"versao": number }; Returns: undefined
                            },
+"minhas_empresas":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "aprovada_em": string | null,
+"aprovada_por": string | null,
+"atualizado_em": string,
+"cidade": string | null,
+"criado_em": string,
+"descricao": string | null,
+"dono_perfil_id": string | null,
+"id": number,
+"logo_path": string | null,
+"nome": string,
+"pais": string | null,
+"setor_id": number,
+"site": string | null,
+"slug": string,
+"status": Database["public"]['Enums']["status_moderacao"]
+            }[]
+                          SetofOptions: {
+        from: "*"
+        to: "empresas"
+        isOneToOne: false
+        isSetofReturn: true
+      } },
 "moderar_conteudo":
 { Args: { "alvo": string,"alvo_id": number,"ocultar": boolean }; Returns: undefined
                            },
@@ -1440,6 +1543,12 @@ isOneToOne: false
                            },
 "tem_acesso":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
+                           },
+"video_da_aula":
+{ Args: { "p_aula": number }; Returns: string
+                           },
+"video_do_video":
+{ Args: { "p_video": number }; Returns: string
                            }
           }
           Enums: {
