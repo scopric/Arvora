@@ -6,6 +6,7 @@ import { RotaProtegida } from "./RotaProtegida"
 import { NaoEncontrada } from "./componentes/NaoEncontrada"
 import { LANG_HTML } from "./site"
 import { Cadastro } from "./telas/Cadastro"
+import { Cookies } from "./telas/Cookies"
 import { Confirmar } from "./telas/Confirmar"
 import { EmBreve } from "./telas/EmBreve"
 import { Entrar } from "./telas/Entrar"
@@ -45,6 +46,7 @@ export function Rotas() {
       ))}
       <Route path="/:lang" element={<LayoutIdioma />}>
         <Route index element={<EmBreve />} />
+        <Route path="cookies" element={<Cookies />} />
         <Route path="entrar" element={<Entrar />} />
         <Route path="cadastro" element={<Cadastro />} />
         <Route path="confirmar" element={<Confirmar />} />
