@@ -13,8 +13,8 @@ type Props = {
   legendas?: Legenda[]
 }
 
-// Só https; nada de javascript:/data: vindo do banco virar iframe ou vídeo.
-const seguro = (url: string) => URL.canParse(url) && new URL(url).protocol === "https:"
+// Só https (http: apenas em desenvolvimento, p.ex. Storage local); nada de javascript:/data: vindo do banco virar iframe ou vídeo.
+const seguro = (url: string) => URL.canParse(url) && (new URL(url).protocol === "https:" || (import.meta.env.DEV && new URL(url).protocol === "http:"))
 
 export function PlayerVideo({ titulo, tipo, src, capa, legendas = [] }: Props) {
   const t = useT()
@@ -34,7 +34,7 @@ export function PlayerVideo({ titulo, tipo, src, capa, legendas = [] }: Props) {
         />
       ) : (
         // controls nativo = teclado (espaço, setas), velocidade e legendas; sem autoplay (PRD §17.9).
-        <video src={src} poster={capa} controls preload="metadata" playsInline aria-label={titulo} onError={() => setFalhou(true)} className="size-full">
+        <video src={src} poster={capa} crossOrigin={legendas.length ? "anonymous" : undefined} controls preload="metadata" playsInline aria-label={titulo} onError={() => setFalhou(true)} className="size-full">
           {legendas.map((l) => (
             <track key={l.src} kind="subtitles" src={l.src} srcLang={l.idioma} label={l.rotulo} default={l.padrao} />
           ))}

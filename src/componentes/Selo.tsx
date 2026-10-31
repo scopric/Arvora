@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 const tons = {
   neutro: "border-current/30",
   destaque: "border-destaque text-destaque",
-  // Dourado só no braço Brazilian Awards (PRD §17.7.1): o Selo "Premiado" é o único uso fora das páginas dele.
+  // Dourado identifica o braço Brazilian Awards (PRD §17.7.1): use este tom só nesse contexto (ex.: selo Premiado).
   dourado: "border-dourado text-dourado",
   alerta: "border-red-300/60 text-red-200",
 }

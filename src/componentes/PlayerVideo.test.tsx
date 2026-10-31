@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, screen } from "@testing-library/react"
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { renderiza } from "../testeUtil"
 import { PlayerVideo } from "./PlayerVideo"
 
@@ -23,13 +23,20 @@ describe("PlayerVideo", () => {
     expect(screen.getByTitle("Aula 2").tagName).toBe("IFRAME")
   })
 
-  it("recusa URL que não é https (javascript:, data:, http:) e mostra o erro", () => {
+  it("recusa URL que não é https (javascript:, data:, e http: fora do desenvolvimento) e mostra o erro", () => {
+    vi.stubEnv("DEV", false)
     for (const src of ["javascript:alert(1)", "data:text/html,x", "http://exemplo.invalid/a.mp4"]) {
       const { container, unmount } = montar({ titulo: "x", tipo: "embed", src })
       expect(container.querySelector("iframe")).toBeNull()
       expect(screen.getByRole("alert").textContent).toContain("Não conseguimos abrir este vídeo")
       unmount()
     }
+    vi.unstubAllEnvs()
+  })
+
+  it("http: só vale em desenvolvimento; legenda liga crossOrigin anônimo", () => {
+    const { container } = montar({ titulo: "x", tipo: "arquivo", src: "http://127.0.0.1:55321/a.mp4", legendas: [{ src: "http://127.0.0.1:55321/a.vtt", idioma: "pt", rotulo: "Português" }] })
+    expect(container.querySelector("video")!.getAttribute("crossorigin")).toBe("anonymous")
   })
 
   it("falha de carregamento do arquivo vira erro na tela", () => {
