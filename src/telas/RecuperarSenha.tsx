@@ -3,8 +3,10 @@ import { Link } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
+import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
 import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
+import { useCaptcha } from "../lib/captcha"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, mensagemDeErroAuth, recuperarSchema, type CamposDeErro } from "../lib/validacao"
 
@@ -16,6 +18,7 @@ export function RecuperarSenha() {
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [enviado, setEnviado] = useState(false)
   const [ocupado, setOcupado] = useState(false)
+  const captcha = useCaptcha()
 
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -23,9 +26,11 @@ export function RecuperarSenha() {
     const dados = recuperarSchema.safeParse(Object.fromEntries(new FormData(e.currentTarget)))
     if (!dados.success) return setErros(errosPorCampo(dados.error))
     setErros({})
+    if (captcha.falta) return setAviso("captcha.falta")
     setOcupado(true)
-    const { error } = await supabase.auth.resetPasswordForEmail(dados.data.email)
+    const { error } = await supabase.auth.resetPasswordForEmail(dados.data.email, captcha.token ? captcha.opcoes : undefined)
     setOcupado(false)
+    captcha.renovar()
     // Mesma resposta exista a conta ou não, para não revelar quem tem cadastro.
     if (error && error.code !== "validation_failed") return setAviso(mensagemDeErroAuth(error))
     setEnviado(true)
@@ -39,6 +44,7 @@ export function RecuperarSenha() {
         <form onSubmit={enviar} noValidate className="space-y-5">
           {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
           <Campo rotulo={t("auth.email.rotulo")} name="email" type="email" autoComplete="email" placeholder={t("auth.email.exemplo")} erro={t(erros.email)} />
+          <Turnstile key={captcha.reinicio} onToken={captcha.setToken} />
           <Botao type="submit" ocupado={ocupado}>
             {t("recuperar.botao")}
           </Botao>

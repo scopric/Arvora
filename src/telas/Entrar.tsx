@@ -3,8 +3,10 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
+import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
 import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
+import { useCaptcha } from "../lib/captcha"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
@@ -21,6 +23,7 @@ export function Entrar() {
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
+  const captcha = useCaptcha()
 
   if (sessao) return <Navigate to={origem} replace />
 
@@ -30,10 +33,14 @@ export function Entrar() {
     const dados = loginSchema.safeParse(Object.fromEntries(new FormData(e.currentTarget)))
     if (!dados.success) return setErros(errosPorCampo(dados.error))
     setErros({})
+    if (captcha.falta) return setAviso("captcha.falta")
     setOcupado(true)
-    const { error } = await supabase.auth.signInWithPassword({ email: dados.data.email, password: dados.data.senha })
+    const { error } = await supabase.auth.signInWithPassword({ email: dados.data.email, password: dados.data.senha, ...(captcha.token && { options: captcha.opcoes }) })
     setOcupado(false)
-    if (error) return setAviso(mensagemDeErroAuth(error))
+    if (error) {
+      captcha.renovar() // o token vale uma vez só
+      return setAviso(mensagemDeErroAuth(error))
+    }
     navegar(origem, { replace: true })
   }
 
@@ -43,6 +50,7 @@ export function Entrar() {
         {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
         <Campo rotulo={t("auth.email.rotulo")} name="email" type="email" autoComplete="email" placeholder={t("auth.email.exemplo")} erro={t(erros.email)} />
         <Campo rotulo={t("auth.senha.rotulo")} name="senha" type="password" autoComplete="current-password" erro={t(erros.senha)} />
+        <Turnstile key={captcha.reinicio} onToken={captcha.setToken} />
         <Botao type="submit" ocupado={ocupado}>
           {t("entrar.botao")}
         </Botao>
