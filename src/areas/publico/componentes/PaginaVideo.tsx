@@ -11,6 +11,7 @@ import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { Pagina, SemRegistro, linkPrimario } from "../Pagina"
+import { useTituloNome } from "../tituloAba"
 import { useConsulta } from "../usarConsulta"
 
 type Props = { tipo: "talk" | "original"; base: string; titulo: Chave }
@@ -38,6 +39,7 @@ export function PaginaVideo({ tipo, base, titulo }: Props) {
     `video/${tipo}/${slug}/${uid}`,
   )
   const v = video.dados
+  useTituloNome(v ? v.titulo : video.carregando || video.erro ? null : t("publico.semRegistro.titulo"), !v && !video.carregando && !video.erro)
 
   if (video.carregando || acesso.carregando) return <Pagina titulo={t(titulo)}><Esqueleto linhas={6} /></Pagina>
   if (video.erro) return <Pagina titulo={t(titulo)}><Erro aoTentar={video.recarregar} /></Pagina>

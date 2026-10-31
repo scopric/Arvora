@@ -47,7 +47,8 @@ export function CadastrarEmpresa() {
   const uid = sessao?.user.id ?? null
   const setores = useConsulta(() => supabase.from("setores").select("id,nome,nome_en").eq("ativo", true).order("ordem"), "setores")
   const minhas = useConsulta(
-    () => supabase.rpc("minhas_empresas"),
+    // Sem sessão não há o que ler (e a RPC é só de quem tem conta).
+    () => (uid ? supabase.rpc("minhas_empresas") : Promise.resolve({ data: [] as { id: number; nome: string; status: string }[], error: null })),
     `minhas-empresas/${uid}`,
   )
   const [erros, setErros] = useState<CamposDeErro>({})
@@ -89,8 +90,11 @@ export function CadastrarEmpresa() {
   return (
     <Pagina titulo={titulo} apoio={t("publico.cadastrarEmpresa.apoio")} largura="max-w-3xl">
       {enviado ? (
-        <div className="mb-10">
+        <div className="mb-10 space-y-5">
           <Aviso tipo="ok">{t("publico.cadastrarEmpresa.pendente")}</Aviso>
+          <Botao variante="contorno" onClick={() => setEnviado(false)} className="sm:w-auto">
+            {t("publico.cadastrarEmpresa.outra")}
+          </Botao>
         </div>
       ) : null}
       {lista.length ? (
@@ -108,7 +112,7 @@ export function CadastrarEmpresa() {
       ) : minhas.erro ? (
         <div className="mb-10"><Erro aoTentar={minhas.recarregar} /></div>
       ) : null}
-      {setores.erro ? (
+      {enviado ? null : setores.erro ? (
         <Erro aoTentar={setores.recarregar} />
       ) : (
         <form onSubmit={enviar} noValidate className="space-y-5">

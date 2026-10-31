@@ -75,7 +75,8 @@ export const publicoPt = {
   "publico.planos.faq.a4": "Para consumidores, o preço mostrado já inclui o IVA. A fatura traz os dados do vendedor.",  // PROVISÓRIO: validar com o Rafael/solicitor
   "publico.checkoutSucesso.semSessao": "Entre na sua conta para ver o estado da sua assinatura.",
   "publico.checkoutSucesso.confirmando": "Estamos confirmando seu pagamento.",
-  "publico.checkoutSucesso.demora": "Estamos confirmando seu pagamento. Pode levar alguns minutos. Avisamos por e-mail.",
+  "publico.checkoutSucesso.demora": "Estamos confirmando seu pagamento. Pode levar alguns minutos. Você pode verificar de novo ou falar com o suporte.",
+  "publico.checkoutSucesso.tituloConfirmando": "Confirmando sua assinatura",
   "publico.checkoutSucesso.confirmado": "Pagamento confirmado. Seu acesso já está liberado.",
   "publico.checkoutSucesso.comecar": "Começar",
   "publico.checkoutSucesso.verificar": "Verificar de novo",
@@ -168,6 +169,7 @@ export const publicoPt = {
   "publico.cadastrarEmpresa.site": "Site",
   "publico.cadastrarEmpresa.siteAjuda": "Começa com https://",
   "publico.cadastrarEmpresa.descricao": "Descrição",
+  "publico.cadastrarEmpresa.outra": "Cadastrar outra empresa",
   "publico.cadastrarEmpresa.enviar": "Enviar para revisão",
   "publico.cadastrarEmpresa.erro.nome": "Informe o nome da empresa (até 160 caracteres).",
   "publico.cadastrarEmpresa.erro.setor": "Escolha uma área.",
