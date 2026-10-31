@@ -23,6 +23,7 @@ export function Equipe() {
   const { recarregar: recarregarAcesso } = useAcesso()
   const acao = useAcao()
   const [remover, setRemover] = useState<string | null>(null)
+  const [trocar, setTrocar] = useState<{ perfil: string; nome: string; papel: PapelEquipe } | null>(null)
   const [busca, setBusca] = useState("")
   const [achados, setAchados] = useState<{ id: string; nome: string }[]>([])
   const [novoPapel, setNovoPapel] = useState<PapelEquipe>("editor")
@@ -69,12 +70,12 @@ export function Equipe() {
                 {
                   chave: "papel", titulo: t("admin.equipe.papel"),
                   celula: (l) => (
-                    <Selecao rotulo={t("admin.equipe.papel")} value={l.papel} onChange={(e) => void mudar(l.perfil_id, e.target.value as PapelEquipe)}>
+                    <Selecao rotulo={`${t("admin.equipe.papel")} — ${l.nome}`} value={l.papel} disabled={l.perfil_id === eu || acao.ocupado} onChange={(e) => setTrocar({ perfil: l.perfil_id, nome: l.nome, papel: e.target.value as PapelEquipe })}>
                       {PAPEIS.map((p) => <option key={p} value={p}>{t(`admin.papel.${p}`)}</option>)}
                     </Selecao>
                   ),
                 },
-                { chave: "acoes", titulo: t("admin.comum.acoes"), celula: (l) => (l.perfil_id === eu ? "—" : <button type="button" className={classeAcao} onClick={() => setRemover(l.perfil_id)}>{t("admin.equipe.remover")}</button>) },
+                { chave: "acoes", titulo: t("admin.comum.acoes"), celula: (l) => (l.perfil_id === eu ? "—" : <button type="button" className={classeAcao} aria-label={`${t("admin.equipe.remover")}: ${l.nome}`} onClick={() => setRemover(l.perfil_id)}>{t("admin.equipe.remover")}</button>) },
               ]}
             />
           )
@@ -97,6 +98,11 @@ export function Equipe() {
           ))}
         </ul>
       </Secao>
+      <DialogoConfirmar
+        aberto={trocar !== null} titulo={t("admin.equipe.trocarTitulo")} texto={trocar ? `${trocar.nome}: ${t(`admin.papel.${trocar.papel}`)}. ${t("admin.equipe.trocarTexto")}` : ""} confirmar={t("admin.equipe.trocar")}
+        aoCancelar={() => setTrocar(null)}
+        aoConfirmar={() => { const x = trocar; setTrocar(null); if (x) void mudar(x.perfil, x.papel) }}
+      />
       <DialogoConfirmar
         aberto={remover !== null} perigo titulo={t("admin.equipe.removerTitulo")} texto={t("admin.equipe.removerTexto")} confirmar={t("admin.equipe.remover")}
         aoCancelar={() => setRemover(null)}

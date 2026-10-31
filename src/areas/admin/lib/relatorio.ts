@@ -15,3 +15,4 @@ export type Relatorio = {
 export type Plano = { id: number; nome: string }
 export type Versao = { versao: number; dados: Relatorio; enviado_em: string | null; reaberto_em: string | null; motivo_reabertura: string | null; csv_sha256: string; criado_em: string }
 
+export type Receita = { id: number; cliente_nome: string; plano_id: number | null; perfil_id: string | null; moeda: string; bruto_centavos: number; recebido_em: string }

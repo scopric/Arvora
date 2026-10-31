@@ -11,7 +11,7 @@ import { classeAcao } from "../componentes/Campos"
 import { AvisoDe, Mostrar, Pagina, Secao } from "../componentes/Pagina"
 import { exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { dataCurta } from "../lib/formato"
-import { FINANCEIRO, MODERA, usePode } from "../lib/papel"
+import { FINANCEIRO, MODERA, SUPER, usePode } from "../lib/papel"
 
 // Detalhe só leitura (ADM-04). Pagamento: ação no Stripe. Suspender é da moderação (suspender_perfil).
 export function Membro() {
@@ -20,6 +20,7 @@ export function Membro() {
   const { id = "" } = useParams()
   const financeiro = usePode(FINANCEIRO)
   const modera = usePode(MODERA)
+  const super_ = usePode(SUPER)
   const acao = useAcao()
   const [confirmar, setConfirmar] = useState(false)
   const carga = useCarga(async () => {
@@ -30,15 +31,22 @@ export function Membro() {
       assinaturas = exigir(await supabase.from("assinaturas").select("id, plano_id, status, periodo_inicio, periodo_fim, cancela_no_fim, origem").eq("perfil_id", id).order("periodo_fim", { ascending: false }))
       if (assinaturas.length) planos = new Map(exigir(await supabase.from("planos").select("id, nome").in("id", assinaturas.map((a) => a.plano_id))).map((p) => [p.id, p.nome]))
     }
-    // Se o banco não liberar a leitura para este papel, a lista vem vazia e o link simplesmente não aparece.
-    const clientes = await supabase.from("clientes_stripe").select("stripe_customer_id, email").eq("perfil_id", id)
-    return { perfil, assinaturas, planos, clientes: clientes.error ? [] : (clientes.data ?? []) }
-  }, [id, financeiro])
+    // Só o super_admin lê o ID do cliente no Stripe e o e-mail (lote 2 do banco). Erro aparece: não vira lista vazia.
+    const clientes = super_ ? exigir(await supabase.from("clientes_stripe").select("stripe_customer_id, email").eq("perfil_id", id)) : []
+    let email: string | null = null
+    let emailErro = false
+    if (super_) {
+      const r = await (supabase.rpc as unknown as (f: string, a: object) => PromiseLike<{ data: string | null; error: unknown }>)("email_do_membro", { perfil: id })
+      if (r.error) emailErro = true
+      else email = r.data
+    }
+    return { perfil, assinaturas, planos, clientes, email, emailErro }
+  }, [id, financeiro, super_])
 
   return (
     <Pagina titulo="admin.membro.titulo" acoes={<Link className="underline" to={caminho("/admin/membros")}>{t("admin.comum.voltar")}</Link>}>
       <Mostrar carga={carga}>
-        {({ perfil, assinaturas, planos, clientes }) => (
+        {({ perfil, assinaturas, planos, clientes, email, emailErro }) => (
           <>
             <Cartao>
               <div className="flex flex-wrap items-center gap-3">
@@ -46,6 +54,7 @@ export function Membro() {
                 {perfil.suspenso_em ? <Selo tom="alerta">{t("admin.membros.suspenso")}</Selo> : null}
               </div>
               <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                {super_ ? <div><dt className="text-sm opacity-70">{t("admin.membro.email")}</dt><dd>{emailErro ? <span role="alert" className="text-red-300">{t("admin.membro.emailErro")}</span> : (email ?? "—")}</dd></div> : null}
                 <div><dt className="text-sm opacity-70">{t("admin.membros.empresa")}</dt><dd>{perfil.empresa_nome ?? "—"}</dd></div>
                 <div><dt className="text-sm opacity-70">{t("admin.comum.cidade")}</dt><dd>{[perfil.cidade, perfil.pais].filter(Boolean).join(", ") || "—"}</dd></div>
                 <div><dt className="text-sm opacity-70">{t("admin.membros.visibilidade")}</dt><dd>{t(`admin.membros.vis.${perfil.visibilidade}`)}</dd></div>

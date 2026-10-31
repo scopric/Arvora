@@ -25,9 +25,22 @@ export function Membros() {
   const [suspensos, setSuspensos] = useState(false)
   const [limite, setLimite] = useState(PAGINA)
   const carga = useCarga(async () => {
+    // Filtro de nível no servidor (a paginação conta só quem passa no filtro). ponytail: lista de ids na URL, ok até alguns milhares de assinaturas vigentes.
+    let ids: string[] | null = null
+    if (financeiro && nivel) {
+      const planos = exigir(await supabase.from("planos").select("id, nivel").not("nivel", "is", null))
+      const daqui = nivel === "nenhum" ? planos : planos.filter((p) => p.nivel === nivel)
+      const vig = daqui.length ? exigir(await supabase.from("assinaturas").select("perfil_id").in("plano_id", daqui.map((p) => p.id)).in("status", VIGENTES).gt("periodo_fim", new Date().toISOString())) : []
+      ids = [...new Set(vig.map((a) => a.perfil_id).filter((x): x is string => !!x))]
+    }
     let q = supabase.from("perfis").select("id, nome, empresa_nome, cidade, pais, visibilidade, suspenso_em, criado_em").order("criado_em", { ascending: false }).limit(limite)
     if (busca.trim()) q = q.ilike("nome", `%${busca.trim().replace(/[%,()]/g, " ")}%`)
     if (suspensos) q = q.not("suspenso_em", "is", null)
+    if (ids) {
+      if (nivel === "nenhum") { if (ids.length) q = q.not("id", "in", `(${ids.join(",")})`) }
+      else if (ids.length) q = q.in("id", ids)
+      else return { perfis: [], niveis: new Map<string, { nivel: string | null; status: string }>() }
+    }
     const perfis = exigir(await q)
     const niveis = new Map<string, { nivel: string | null; status: string }>()
     if (financeiro && perfis.length) {
@@ -36,7 +49,7 @@ export function Membros() {
       for (const a of ass) if (a.perfil_id) niveis.set(a.perfil_id, { nivel: planos.find((p) => p.id === a.plano_id)?.nivel ?? null, status: a.status })
     }
     return { perfis, niveis }
-  }, [busca, suspensos, limite, financeiro])
+  }, [busca, suspensos, limite, financeiro, nivel])
 
   return (
     <Pagina titulo="admin.membros.titulo" intro={financeiro ? "admin.membros.intro" : "admin.membros.introSemPlano"}>
@@ -50,7 +63,7 @@ export function Membros() {
       </form>
       {financeiro ? (
         <div className="max-w-xs">
-          <Selecao rotulo={t("admin.membros.nivel")} value={nivel} onChange={(e) => setNivel(e.target.value)}>
+          <Selecao rotulo={t("admin.membros.nivel")} value={nivel} onChange={(e) => { setNivel(e.target.value); setLimite(PAGINA) }}>
             <option value="">{t("admin.comum.todos")}</option>
             <option value="clube">{t("nivel.clube")}</option>
             <option value="grupo">{t("nivel.grupo")}</option>
@@ -60,7 +73,7 @@ export function Membros() {
       ) : null}
       <Mostrar carga={carga}>
         {({ perfis, niveis }) => {
-          const linhas = perfis.filter((p) => !nivel || (nivel === "nenhum" ? !niveis.has(p.id) : niveis.get(p.id)?.nivel === nivel))
+          const linhas = perfis
           return linhas.length === 0 ? (
             <Vazio>{t("admin.membros.vazio")}</Vazio>
           ) : (

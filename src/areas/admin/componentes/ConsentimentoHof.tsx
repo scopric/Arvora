@@ -4,12 +4,12 @@ import { useIdioma, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { exigir, exigirLinha, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
-import { SUPER, usePode } from "../lib/papel"
+import { EDITA, usePode } from "../lib/papel"
 import { classeAcao } from "./Campos"
 import { FormularioRegistro, type CampoDef } from "./FormularioRegistro"
 import { AvisoDe, Mostrar } from "./Pagina"
 
-// Consentimento do Hall of Fame (HOF-04): data e versão do documento ficam em `consentimentos`. Só o super_admin registra e revoga
+// Consentimento do Hall of Fame (HOF-04): data e versão do documento ficam em `consentimentos`. Super_admin e editor registram e revogam
 // (RLS). Premiado/indicado só publica com consentimento vigente do PRÓPRIO titular: use o e-mail dele (o banco confere).
 export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, aoMudar }: {
   id: number | null
@@ -20,7 +20,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
 }) {
   const t = useT()
   const lang = useIdioma()
-  const pode = usePode(SUPER)
+  const pode = usePode(EDITA)
   const acao = useAcao()
   const [versao, setVersao] = useState(0)
   const carga = useCarga(async () => {

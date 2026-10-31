@@ -82,13 +82,15 @@ export function AulaForm() {
             { chave: "trailer_video_id", rotulo: "admin.videos.trailer", tipo: "texto" },
             { chave: "descricao", rotulo: "admin.comum.descricao", tipo: "area" },
           ]
-          async function salvarAula(carga: Record<string, unknown>) {
-            if (d.aula) exigirLinha(await supabase.from("aulas").update(carga as never).eq("id", d.aula.id).select("id"))
+          async function salvarAula(valores: Record<string, unknown>) {
+            if (d.aula) exigirLinha(await supabase.from("aulas").update(valores as never).eq("id", d.aula.id).select("id"))
             else {
-              const r = await supabase.from("aulas").insert({ ordem: 0, ...carga } as never).select("id")
+              const r = await supabase.from("aulas").insert({ ordem: 0, ...valores } as never).select("id")
               exigirLinha(r)
               navegar(caminho(`/admin/aulas/${r.data![0].id}`))
+              return
             }
+            carga.recarregar()
           }
           const aula = d.aula
           const estado = aula ? estadoAula(aula) : "rascunho"
@@ -110,6 +112,7 @@ export function AulaForm() {
                           aoSalvar={async (c) => {
                             if (d.transmissao) exigirLinha(await supabase.from("transmissoes").update(c as never).eq("aula_id", aula.id).select("aula_id"))
                             else exigirLinha(await supabase.from("transmissoes").insert({ ...c, aula_id: aula.id } as never).select("aula_id"))
+                            carga.recarregar() // sem isto, o próximo "Salvar" tentaria inserir de novo e bateria na chave única
                           }}
                         />
                       </Secao>

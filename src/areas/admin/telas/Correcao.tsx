@@ -30,7 +30,7 @@ function Item({ e, titulo, membro, enunciado, aoMudar }: { e: Entrega; titulo: s
   const dias = Math.max(0, Math.floor((agora - Date.parse(e.enviada_em)) / 86400000))
   return (
     <Cartao>
-      <h3 className="text-lg font-semibold">{membro} · {titulo}</h3>
+      <h2 className="text-lg font-semibold">{membro} · {titulo}</h2>
       <p className="mt-1 text-sm opacity-75">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}</p>
       <p className="mt-3 text-sm opacity-75">{enunciado}</p>
       {e.texto ? <p className="mt-3 whitespace-pre-wrap">{e.texto}</p> : null}
