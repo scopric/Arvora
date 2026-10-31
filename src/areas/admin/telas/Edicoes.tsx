@@ -8,10 +8,7 @@ import { classeAcao } from "../componentes/Campos"
 import { Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { EDITA, usePode } from "../lib/papel"
-
-// Fase (antes/durante/depois) pelas datas, igual a public.fase().
-export const faseDe = (e: { durante_inicio: string; durante_fim: string }, agora = Date.now()) =>
-  agora < Date.parse(e.durante_inicio) ? "antes" : agora <= Date.parse(e.durante_fim) ? "durante" : "depois"
+import { faseDe } from "../lib/regras"
 
 export function Edicoes() {
   const t = useT()

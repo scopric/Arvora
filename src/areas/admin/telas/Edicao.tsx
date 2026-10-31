@@ -10,7 +10,7 @@ import { Mostrar, Pagina, Secao } from "../componentes/Pagina"
 import { exigir, exigirLinha, useCarga } from "../lib/consulta"
 import { opcoesDe } from "../lib/opcoes"
 import { EDITA, usePode } from "../lib/papel"
-import { faseDe } from "./Edicoes"
+import { faseDe } from "../lib/regras"
 
 const COLUNAS = "id, slug, nome, ano, pais, cidade, descricao, durante_inicio, durante_fim, transmissao_url, gravacao_video_id, publicada_em"
 const EDICAO: CampoDef[] = [
@@ -66,6 +66,7 @@ function Indicados({ edicaoId, pode }: { edicaoId: number; pode: boolean }) {
           { chave: "categoria_id", rotulo: "admin.edicao.categoria", tipo: "selecao", obrigatorio: true, opcoes: opcoesDe(cats), naTabela: true },
           { chave: "empresa_id", rotulo: "admin.videos.empresa", tipo: "selecao", opcoes: opcoesDe(emps) },
           { chave: "foto_path", rotulo: "admin.premiado.foto", tipo: "imagem", pasta: "indicados" },
+          { chave: "convite_email", rotulo: "admin.premiado.convite", tipo: "email", soEscrita: true, ajuda: "admin.edicao.conviteIndicadoAjuda" },
           { chave: "resumo", rotulo: "admin.edicao.resumo", tipo: "area" },
           { chave: "consentimento_id", rotulo: "admin.edicao.consentimentoId", tipo: "numero", ajuda: "admin.edicao.consentimentoIdAjuda", naTabela: true },
           { chave: "publicado_em", rotulo: "admin.comum.publicar", tipo: "publicado", naTabela: true },

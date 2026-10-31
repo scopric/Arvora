@@ -9,9 +9,9 @@ import { Mostrar, Pagina, Secao } from "../componentes/Pagina"
 import { exigir, exigirLinha, useCarga } from "../lib/consulta"
 import { EDITA, usePode } from "../lib/papel"
 import { FormularioRegistro } from "../componentes/FormularioRegistro"
-import { COLUNAS_CURSO, camposCurso } from "./Cursos"
+import { COLUNAS_CURSO, camposCurso } from "../lib/camposCurso"
 import { useOpcoesNivel } from "../lib/opcoes"
-import { estadoAula } from "./Aulas"
+import { estadoAula } from "../lib/regras"
 
 const MODULO: CampoDef[] = [
   { chave: "titulo", rotulo: "admin.comum.titulo", tipo: "texto", obrigatorio: true, naTabela: true },

@@ -3,7 +3,7 @@ import { supabase } from "../../../lib/supabase"
 import { CrudTabela } from "../componentes/CrudTabela"
 import type { CampoDef } from "../componentes/FormularioRegistro"
 import { Mostrar, Pagina, Secao } from "../componentes/Pagina"
-import { exigir, useCarga } from "../lib/consulta"
+import { exigir, exigirSemNulo, useCarga } from "../lib/consulta"
 import { opcoesDe, useOpcoesNivel } from "../lib/opcoes"
 import { EDITA, usePode } from "../lib/papel"
 
@@ -50,7 +50,7 @@ export function Videos() {
           ]
           return (
             <>
-              <CrudTabela tabela="videos" colunas="id, tipo, titulo, slug, descricao, tema_id, edicao_id, video_id, trailer_video_id, duracao_min, nivel_minimo, publicado_em" campos={campos} ordem={[{ coluna: "criado_em", asc: false }]} podeEditar={pode} podeApagar legenda="admin.videos.titulo" vazio="admin.videos.vazio" />
+              <CrudTabela tabela="videos" colunas="id, tipo, titulo, slug, descricao, tema_id, edicao_id, trailer_video_id, duracao_min, nivel_minimo, publicado_em" campos={campos} aoEditar={async (l) => ({ ...l, video_id: exigirSemNulo(await supabase.rpc("video_do_video", { p_video: l.id as number })) })} ordem={[{ coluna: "criado_em", asc: false }]} podeEditar={pode} podeApagar legenda="admin.videos.titulo" vazio="admin.videos.vazio" />
               <Secao titulo="admin.videos.citados">
                 <CrudTabela tabela="videos_citados" colunas="id, video_id, premiado_id, empresa_id" campos={citados} ordem={[{ coluna: "id", asc: false }]} podeEditar={pode} podeApagar legenda="admin.videos.citados" vazio="admin.videos.citadosVazio" />
               </Secao>

@@ -14,25 +14,8 @@ import { AvisoDe, Mostrar, Pagina, Secao, SemPermissao } from "../componentes/Pa
 import { enviarArquivo, exigir, exigirLinha, exigirSemDados, abrirAssinado, useAcao, useCarga } from "../lib/consulta"
 import { cicloAnterior, cicloDe, cicloFim, dataCurta, decimalParaCentavos, hojeEmDublin, moeda } from "../lib/formato"
 import { FINANCEIRO, SUPER, usePode } from "../lib/papel"
-
-export type LinhaRel = { fonte: string; ref_id: number; data: string; conta_ou_origem: string; cliente: string | null; moeda: string; bruto: number; vat: number | null; taxa: number | null; bruto_eur: number | null; vat_eur: number | null; referencia: string | null }
-export type Relatorio = {
-  ciclo: { inicio: string; fim: string; estado: "rascunho" | "fechado"; ultima_versao: number | null }
-  cambio: { data_referencia: string; taxas: { moeda: string; taxa: number; data: string | null; fonte_url: string | null }[] }
-  receita: { stripe: number; externa: number; bruta: number }
-  deducoes: { vat: number; estornos: number; estornos_vat: number; total: number }
-  receita_base: number
-  clientes_ativos: { quantidade: number; lista: { chave: string; origem: string }[] }
-  ia: { avulsa: number; rateio: number; total: number; por_nivel: { nivel: string; receita_liquida: number; horas_ia: number; horas_total: number; rateio: number }[] }
-  faixa: { faixa: number; limites: number[]; percentual: number | null; valor: number | null }
-  pendencias: { tipo: string; moeda?: string; pagamento_id?: number }[]
-  linhas: LinhaRel[]
-  csv: string
-}
-type Versao = { versao: number; dados: Relatorio; enviado_em: string | null; reaberto_em: string | null; motivo_reabertura: string | null; csv_sha256: string; criado_em: string }
-
-// Pendências que o banco recusa ao fechar (fechar_ciclo): sem câmbio ou item sem plano.
-export const bloqueia = (r: Relatorio) => r.pendencias.some((p) => p.tipo === "cambio_ausente" || p.tipo === "item_sem_plano")
+import { bloqueia } from "../lib/regras"
+import type { LinhaRel, Plano, Relatorio, Versao } from "../lib/relatorio"
 
 function baixar(nome: string, csv: string) {
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }))
@@ -80,6 +63,22 @@ function Como({ children }: { children: ReactNode }) {
       <summary className="min-h-11 cursor-pointer py-2 text-sm underline">{t("admin.rel.como")}</summary>
       <div className="mt-2">{children}</div>
     </details>
+  )
+}
+
+function ClassificarItem({ itemId, planos, aoFeito }: { itemId: number; planos: Plano[]; aoFeito: () => void }) {
+  const t = useT()
+  const [plano, setPlano] = useState("")
+  const acao = useAcao()
+  return (
+    <li className="space-y-2">
+      <Selecao rotulo={`${t("admin.rel.classificar")} #${itemId}`} value={plano} onChange={(e) => setPlano(e.target.value)}>
+        <option value="">—</option>
+        {planos.map((x) => <option key={x.id} value={x.id}>{x.nome}</option>)}
+      </Selecao>
+      <AvisoDe aviso={acao.aviso} />
+      <button type="button" className={classeAcao} disabled={acao.ocupado || plano === ""} onClick={() => void acao.rodar(async () => { exigirSemDados(await supabase.rpc("classificar_item_pagamento", { item: itemId, plano: Number(plano) })); aoFeito() }, "admin.rel.classificado")}>{t("admin.rel.classificarBotao")}</button>
+    </li>
   )
 }
 
@@ -134,7 +133,7 @@ function LancarReceita({ aoFeito }: { aoFeito: () => void }) {
             recebido_em: String(c.recebido_em), origem: c.origem as (typeof ORIGENS)[number], tipo_receita: c.tipo_receita as (typeof TIPOS)[number],
             cliente_nome: String(c.cliente_nome), cliente_email: (c.cliente_email as string | null) ?? null, moeda: String(c.moeda).toUpperCase(),
             bruto_centavos: bruto, vat_centavos: vat, comprovante_path: caminho, descricao: (c.descricao as string | null) ?? null,
-          }).select("id"))
+          } as never).select("id"))
           aoFeito()
         }}
       />
@@ -164,7 +163,7 @@ function Cambio({ aoFeito }: { aoFeito: () => void }) {
   )
 }
 
-export function Corpo({ rel, versao, super_, financeiro, aoMudar, hoje }: { rel: Relatorio; versao: Versao | null; super_: boolean; financeiro: boolean; aoMudar: () => void; hoje: string }) {
+export function Corpo({ rel, versao, super_, financeiro, aoMudar, hoje, planos }: { rel: Relatorio; versao: Versao | null; super_: boolean; financeiro: boolean; aoMudar: () => void; hoje: string; planos: Plano[] }) {
   const t = useT()
   const lang = useIdioma()
   const acao = useAcao()
@@ -191,6 +190,11 @@ export function Corpo({ rel, versao, super_, financeiro, aoMudar, hoje }: { rel:
         <Aviso tipo="erro">
           {t("admin.rel.pendencias")}: {rel.pendencias.map(pendTexto).join(" · ")}
         </Aviso>
+      ) : null}
+      {super_ && !fechado && rel.pendencias.some((x) => x.tipo === "item_sem_plano" && x.item_id) ? (
+        <ul className="max-w-md space-y-4 max-md:hidden">
+          {rel.pendencias.filter((x) => x.tipo === "item_sem_plano" && x.item_id).map((x) => <ClassificarItem key={x.item_id} itemId={x.item_id!} planos={planos} aoFeito={aoMudar} />)}
+        </ul>
       ) : null}
 
       <Secao titulo="admin.rel.s1">
@@ -315,12 +319,13 @@ export function RelatorioCiclo() {
   for (let i = 0; i < 11; i++) opcoes.push(cicloAnterior(opcoes[opcoes.length - 1]))
   const carga = useCarga(async () => {
     if (!financeiro) return null
+    const planos = super_ ? exigir(await supabase.from("planos").select("id, nome").order("nome")) : []
     const versoes = exigir(await supabase.from("relatorios_ciclo").select("versao, dados, enviado_em, reaberto_em, motivo_reabertura, csv_sha256, criado_em").eq("ciclo_inicio", ciclo).order("versao", { ascending: false })) as unknown as Versao[]
     const ultima = versoes[0] ?? null
-    if (ultima && !ultima.reaberto_em) return { rel: ultima.dados, versao: ultima }
+    if (ultima && !ultima.reaberto_em) return { rel: ultima.dados, versao: ultima, planos }
     const rel = exigir(await supabase.rpc("relatorio_ciclo", { ciclo_inicio: ciclo })) as unknown as Relatorio
-    return { rel, versao: ultima }
-  }, [ciclo, financeiro])
+    return { rel, versao: ultima, planos }
+  }, [ciclo, financeiro, super_])
   if (!financeiro) return <Pagina titulo="admin.relatorioCiclo.titulo"><SemPermissao /></Pagina>
   return (
     <Pagina titulo="admin.relatorioCiclo.titulo" intro="admin.rel.intro">
@@ -330,7 +335,7 @@ export function RelatorioCiclo() {
         </Selecao>
       </div>
       <Mostrar carga={carga}>
-        {(d) => (d ? <Corpo key={`${ciclo}-${d.versao?.versao ?? 0}-${d.rel.ciclo.estado}`} rel={d.rel} versao={d.versao} super_={super_} financeiro={financeiro} aoMudar={carga.recarregar} hoje={hoje} /> : <Vazio>{t("admin.vazio.nada")}</Vazio>)}
+        {(d) => (d ? <Corpo key={`${ciclo}-${d.versao?.versao ?? 0}-${d.rel.ciclo.estado}`} rel={d.rel} versao={d.versao} super_={super_} financeiro={financeiro} aoMudar={carga.recarregar} hoje={hoje} planos={d.planos} /> : <Vazio>{t("admin.vazio.nada")}</Vazio>)}
       </Mostrar>
     </Pagina>
   )

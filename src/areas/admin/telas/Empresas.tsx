@@ -23,10 +23,10 @@ export function Empresas() {
   const [versao, setVersao] = useState(0)
   const carga = useCarga(async () => {
     const [fila, setores] = await Promise.all([
-      supabase.from("empresas").select("id, nome, cidade, pais, site, descricao, setor_id, criado_em").eq("status", "pendente").order("criado_em"),
+      supabase.rpc("empresas_equipe"),
       supabase.from("setores").select("id, nome").order("ordem"),
     ])
-    return { fila: exigir(fila), setores: exigir(setores) }
+    return { fila: exigir(fila).filter((e) => e.status === "pendente").sort((a, b) => a.criado_em.localeCompare(b.criado_em)), setores: exigir(setores) }
   }, [versao])
 
   const decidir = (id: number, aprovar: boolean) =>

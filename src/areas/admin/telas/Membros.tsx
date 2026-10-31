@@ -11,10 +11,9 @@ import { Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { dataCurta } from "../lib/formato"
 import { FINANCEIRO, usePode } from "../lib/papel"
+import { VIGENTES } from "../lib/regras"
 
 const PAGINA = 50
-export const VIGENTES = ["active", "trialing", "past_due"]
-
 // Membros (ADM-04): perfis + nível/status da assinatura. Pagamento só leitura; assinatura só para super_admin e auditor (RLS).
 export function Membros() {
   const t = useT()

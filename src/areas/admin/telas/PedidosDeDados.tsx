@@ -11,15 +11,11 @@ import { AvisoDe, Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
 import { exigir, exigirLinha, useAcao, useCarga } from "../lib/consulta"
 import { dataCurta, hojeEmDublin } from "../lib/formato"
 import { SUPER, usePode } from "../lib/papel"
+import { diasAte } from "../lib/regras"
 
 const STATUS = ["recebido", "em_andamento", "concluido", "recusado"] as const
 type Status = (typeof STATUS)[number]
 type Pedido = { id: number; email: string; tipo: "exportacao" | "exclusao" | "retificacao"; status: Status; prazo_em: string; observacao: string | null }
-
-// Dias até o prazo (negativo = vencido). Datas 'YYYY-MM-DD' em UTC puro para não depender do fuso do navegador.
-export function diasAte(prazo: string, hoje: string) {
-  return Math.round((Date.parse(prazo.slice(0, 10)) - Date.parse(hoje)) / 86400000)
-}
 
 function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
   const t = useT()

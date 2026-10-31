@@ -459,4 +459,13 @@ export const adminEn: Record<keyof typeof adminPt, string> = {
   "admin.rel.reabrir": "Reopen",
   "admin.rel.reaberto": "Cycle reopened. The next closing creates the next version.",
   "admin.rel.soLeituraCelular": "On mobile the report is read-only. To record, void or close, use a computer.",
+  "admin.cod.ciclo_com_pendencias": "The Cycle has pending items (missing rate or payment item without a plan). Resolve them before closing.",
+  "admin.cod.receita_com_estorno": "This revenue has a refund recorded and cannot be voided.",
+  "admin.cod.receita_ja_usada": "This revenue already granted a manual access.",
+  "admin.cod.receita_invalida": "Invalid revenue entry for this operation.",
+  "admin.cod.consentimento_de_outra_pessoa": "The consent belongs to someone else: register a consent with the holder's own e-mail.",
+  "admin.edicao.conviteIndicadoAjuda": "Leave blank to keep it. The database does not show the stored e-mail.",
+  "admin.rel.classificar": "Plan for the item without a plan",
+  "admin.rel.classificarBotao": "Classify item",
+  "admin.rel.classificado": "Item classified. The preview was recalculated.",
 }

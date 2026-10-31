@@ -19,7 +19,7 @@ export function VisaoGeral() {
   const caminho = useCaminho()
   const { papel } = useAcesso()
   const em7 = new Date(Date.parse(hojeEmDublin()) + 7 * 86400000).toISOString().slice(0, 10)
-  const cartoes: CartaoDef[] = [
+  const todos: CartaoDef[] = [
     { chave: "empresas", titulo: "admin.visao.empresas", rota: "/admin/empresas", papeis: APROVA_EMPRESA, contar: () => supabase.from("empresas").select("id", contar).eq("status", "pendente") },
     { chave: "denuncias", titulo: "admin.visao.denuncias", rota: "/admin/moderacao", papeis: MODERA, contar: () => supabase.from("denuncias").select("id", contar).eq("status", "aberta") },
     { chave: "pedidos", titulo: "admin.visao.pedidos", rota: "/admin/pedidos-de-dados", papeis: SUPER, contar: () => supabase.from("pedidos_gdpr").select("id", contar).in("status", ["recebido", "em_andamento"]) },
@@ -27,7 +27,8 @@ export function VisaoGeral() {
     { chave: "aulas", titulo: "admin.visao.aulas", rota: "/admin/aulas", papeis: EDITA, contar: () => supabase.from("aulas").select("id", contar).not("agendada_em", "is", null).is("materiais_publicados_em", null) },
     { chave: "entregas", titulo: "admin.visao.entregas", rota: "/admin/correcao", papeis: CORRIGE, contar: () => supabase.from("entregas").select("id", contar).eq("status", "enviada") },
     { chave: "alteracoes", titulo: "admin.visao.alteracoes", rota: "/admin/premiados", papeis: EDITA, contar: () => supabase.from("premiados").select("id", contar).not("alteracao_em", "is", null) },
-  ].filter((c) => papel !== null && c.papeis.includes(papel))
+  ]
+  const cartoes = todos.filter((c) => papel !== null && c.papeis.includes(papel))
   const carga = useCarga(async () => {
     const r = await Promise.all(cartoes.map((c) => c.contar()))
     const erro = r.find((x) => x.error)

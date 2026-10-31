@@ -28,6 +28,8 @@ export type CrudProps = {
   extra?: { titulo: Chave; celula: (l: Linha) => ReactNode }
   legenda: Chave
   vazio: Chave
+  // completa a linha antes de editar (ex.: colunas que só uma RPC entrega, como video_id)
+  aoEditar?: (l: Linha) => Promise<Linha>
   // chamado depois de gravar/apagar (ex.: recarregar a página-mãe)
   aoMudar?: () => void
 }
@@ -66,6 +68,13 @@ export function CrudTabela(p: CrudProps) {
     p.aoMudar?.()
   }
 
+  async function abrirEdicao(l: Linha) {
+    await acao.rodar(async () => {
+      setEditando(p.aoEditar ? await p.aoEditar(l) : l)
+      setFormKey((k) => k + 1)
+    })
+  }
+
   async function salvar(payload: Linha) {
     if (editando) {
       const r = await tabelaSolta(p.tabela).update(payload).eq(chave, editando[chave]).select(chave)
@@ -86,7 +95,7 @@ export function CrudTabela(p: CrudProps) {
           titulo: t("admin.comum.acoes"),
           celula: (l: Linha) => (
             <span className="flex gap-2">
-              <button type="button" className={classeAcao} onClick={() => { setEditando(l); setFormKey((k) => k + 1) }}>{t("admin.comum.editar")}</button>
+              <button type="button" className={classeAcao} onClick={() => void abrirEdicao(l)}>{t("admin.comum.editar")}</button>
               {p.podeApagar ? <button type="button" className={classeAcao} onClick={() => setApagar(l)}>{t("admin.comum.apagar")}</button> : null}
             </span>
           ),
@@ -108,7 +117,7 @@ export function CrudTabela(p: CrudProps) {
       <AvisoDe aviso={acao.aviso} />
       {p.podeEditar ? (
         <div className="rounded-2xl border border-current/15 p-5">
-          <h3 className="mb-4 text-lg font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</h3>
+          <p className="mb-4 text-lg font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
           <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
         </div>
       ) : null}

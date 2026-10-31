@@ -9,24 +9,9 @@ import { AvisoDe, Mostrar, Pagina, Secao } from "../componentes/Pagina"
 import { exigir, exigirLinha, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { opcoesDe } from "../lib/opcoes"
 import { EDITA, usePode } from "../lib/papel"
+import { camposParaRedes, redesParaCampos, type Json } from "../lib/regras"
 
 const COLUNAS = "id, edicao_id, categoria_id, empresa_id, perfil_id, nome, slug, foto_path, historia, video_entrevista_id, video_premiacao_id, materia_url, redes, consentimento_id, alteracao_em, publicado_em"
-const REDES = ["instagram", "linkedin", "site"] as const
-type Json = Record<string, unknown>
-
-// premiados.redes é um objeto livre; o formulário edita as três chaves usuais e preserva as outras.
-export const redesParaCampos = (redes: unknown): Json =>
-  Object.fromEntries(REDES.map((k) => [`redes_${k}`, (redes as Json | null)?.[k] ?? ""]))
-export function camposParaRedes(carga: Json, antigas: unknown): Json {
-  const redes: Json = { ...((antigas as Json | null) ?? {}) }
-  for (const k of REDES) {
-    const v = carga[`redes_${k}`]
-    if (typeof v === "string" && v !== "") redes[k] = v
-    else delete redes[k]
-  }
-  return redes
-}
-
 // Premiado (HOF-01/04/05): dados, convite por e-mail, consentimento com data e versão, publicação (o banco barra sem consentimento
 // vigente) e aprovação da alteração pedida pelo próprio premiado.
 export function Premiado() {
@@ -89,7 +74,7 @@ export function Premiado() {
                       {Object.entries(pend).map(([k, v]) => (
                         <div key={k}>
                           <dt className="text-sm font-semibold">{k}</dt>
-                          <dd className="text-sm whitespace-pre-wrap"><span className="opacity-60">{t("admin.premiado.atual")}: </span>{String((d.p as Json)[k] === undefined ? "" : typeof (d.p as Json)[k] === "object" ? JSON.stringify((d.p as Json)[k]) : (d.p as Json)[k])}</dd>
+                          <dd className="text-sm whitespace-pre-wrap"><span className="opacity-60">{t("admin.premiado.atual")}: </span>{String((d.p as unknown as Json)[k] === undefined ? "" : typeof (d.p as unknown as Json)[k] === "object" ? JSON.stringify((d.p as unknown as Json)[k]) : (d.p as unknown as Json)[k])}</dd>
                           <dd className="text-sm whitespace-pre-wrap"><span className="opacity-60">{t("admin.premiado.proposto")}: </span>{typeof v === "object" ? JSON.stringify(v) : String(v)}</dd>
                         </div>
                       ))}

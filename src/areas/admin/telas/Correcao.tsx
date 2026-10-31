@@ -26,7 +26,8 @@ function Item({ e, titulo, membro, enunciado, aoMudar }: { e: Entrega; titulo: s
       aoMudar()
     }, "admin.correcao.corrigida")
   }
-  const dias = Math.max(0, Math.floor((Date.now() - Date.parse(e.enviada_em)) / 86400000))
+  const [agora] = useState(() => Date.now())
+  const dias = Math.max(0, Math.floor((agora - Date.parse(e.enviada_em)) / 86400000))
   return (
     <Cartao>
       <h3 className="text-lg font-semibold">{membro} · {titulo}</h3>

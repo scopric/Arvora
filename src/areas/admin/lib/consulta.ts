@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useT, type Chave } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 
@@ -9,9 +9,14 @@ export class SemLinha extends Error {
   }
 }
 
-export function exigir<T>(r: { data: T | null; error: unknown }): T {
+export function exigir<T>(r: { data: T; error: unknown }): NonNullable<T> {
   if (r.error) throw r.error
-  if (r.data === null) throw new SemLinha()
+  if (r.data === null || r.data === undefined) throw new SemLinha()
+  return r.data
+}
+// Resultado de RPC que devolve texto: nulo é válido (campo vazio), erro não.
+export function exigirSemNulo(r: { data: string | null; error: unknown }): string | null {
+  if (r.error) throw r.error
   return r.data
 }
 export function exigirSemDados(r: { error: unknown }) {
@@ -41,22 +46,22 @@ export type Carga<T> =
 
 // Carrega ao montar e quando `deps` muda. Falha vira fase "erro" (a tela mostra o erro com "tentar de novo"), nunca lista vazia.
 export function useCarga<T>(buscar: () => Promise<T>, deps: readonly unknown[]): Carga<T> {
-  const [estado, setEstado] = useState<{ fase: "carregando" } | { fase: "erro" } | { fase: "pronto"; dados: T }>({ fase: "carregando" })
   const [volta, setVolta] = useState(0)
+  const chave = `${JSON.stringify(deps)}#${volta}`
+  const [estado, setEstado] = useState<{ chave: string; fase: "erro" } | { chave: string; fase: "pronto"; dados: T }>({ chave: "", fase: "erro" })
   const recarregar = useCallback(() => setVolta((n) => n + 1), [])
-  const ultimo = useRef(buscar)
-  ultimo.current = buscar
   useEffect(() => {
     let ativo = true
-    setEstado({ fase: "carregando" })
-    ultimo
-      .current()
-      .then((dados) => ativo && setEstado({ fase: "pronto", dados }))
-      .catch(() => ativo && setEstado({ fase: "erro" }))
+    buscar()
+      .then((dados) => ativo && setEstado({ chave, fase: "pronto", dados }))
+      .catch(() => ativo && setEstado({ chave, fase: "erro" }))
     return () => {
       ativo = false
     }
-  }, [...deps, volta])
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- `chave` resume as deps; `buscar` é recriada a cada render
+  }, [chave])
+  // Enquanto o resultado guardado não é desta chave (deps mudaram ou recarregar), a tela mostra "carregando".
+  if (estado.chave !== chave) return { fase: "carregando", recarregar }
   return { ...estado, recarregar } as Carga<T>
 }
 
@@ -81,6 +86,11 @@ const CODIGOS: Record<string, Chave> = {
   comprovante_obrigatorio: "admin.cod.comprovante_obrigatorio",
   valor_invalido: "admin.cod.valor_invalido",
   material_vazio: "admin.cod.material_vazio",
+  ciclo_com_pendencias: "admin.cod.ciclo_com_pendencias",
+  receita_com_estorno: "admin.cod.receita_com_estorno",
+  receita_ja_usada: "admin.cod.receita_ja_usada",
+  receita_invalida: "admin.cod.receita_invalida",
+  consentimento_de_outra_pessoa: "admin.cod.consentimento_de_outra_pessoa",
 }
 
 export function textoErro(e: unknown, t: (c: Chave) => string): string {

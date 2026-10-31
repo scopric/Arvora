@@ -11,10 +11,7 @@ import { Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { EDITA, usePode } from "../lib/papel"
-
-export type EstadoAula = "rascunho" | "agendada" | "publicados"
-export const estadoAula = (a: { agendada_em: string | null; materiais_publicados_em: string | null }): EstadoAula =>
-  a.materiais_publicados_em ? "publicados" : a.agendada_em ? "agendada" : "rascunho"
+import { estadoAula } from "../lib/regras"
 
 export function Aulas() {
   const t = useT()

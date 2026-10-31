@@ -10,13 +10,13 @@ import { CrudTabela } from "../componentes/CrudTabela"
 import { FormularioRegistro, type CampoDef } from "../componentes/FormularioRegistro"
 import { MateriaisAula, type Material } from "../componentes/MateriaisAula"
 import { AvisoDe, Mostrar, Pagina, Secao } from "../componentes/Pagina"
-import { exigir, exigirLinha, useAcao, useCarga } from "../lib/consulta"
+import { exigir, exigirLinha, exigirSemNulo, useAcao, useCarga } from "../lib/consulta"
 import { FUSO, dataHora } from "../lib/formato"
 import { opcoesDe, useOpcoesNivel } from "../lib/opcoes"
 import { EDITA, usePode } from "../lib/papel"
-import { estadoAula } from "./Aulas"
+import { estadoAula } from "../lib/regras"
 
-const COLUNAS = "id, modulo_id, vertical_id, tipo, titulo, slug, descricao, nivel_minimo, ordem, inicio_em, duracao_min, video_id, trailer_video_id, agendada_em, materiais_publicados_em"
+const COLUNAS = "id, modulo_id, vertical_id, tipo, titulo, slug, descricao, nivel_minimo, ordem, inicio_em, duracao_min, trailer_video_id, agendada_em, materiais_publicados_em"
 const EXERCICIO: CampoDef[] = [
   { chave: "ordem", rotulo: "admin.comum.ordem", tipo: "numero", obrigatorio: true, naTabela: true },
   { chave: "enunciado_md", rotulo: "admin.aula.enunciado", tipo: "area", obrigatorio: true, naTabela: true },
@@ -57,7 +57,10 @@ export function AulaForm() {
       supabase.from("materiais_aula").select("id, tipo, conteudo_md, arquivo_path, status").eq("aula_id", aulaId),
     ])
     if (transmissao.error) throw transmissao.error
-    return { ...base, aula: exigir(aula), transmissao: transmissao.data, materiais: exigir(materiais) as Material[] }
+    const a = exigir(aula)
+    // video_id não sai por select: a equipe lê pela RPC (e grava normalmente).
+    const video = exigirSemNulo(await supabase.rpc("video_da_aula", { p_aula: aulaId }))
+    return { ...base, aula: { ...a, video_id: video }, transmissao: transmissao.data, materiais: exigir(materiais) as Material[] }
   }, [id])
 
   return (

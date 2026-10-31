@@ -457,4 +457,13 @@ export const adminPt = {
   "admin.rel.reabrir": "Reabrir",
   "admin.rel.reaberto": "Ciclo reaberto. O próximo fechamento gera a versão seguinte.",
   "admin.rel.soLeituraCelular": "No celular o relatório é só leitura. Para lançar, anular ou fechar, use o computador.",
+  "admin.cod.ciclo_com_pendencias": "O Ciclo tem pendências (câmbio ou item de pagamento sem plano). Resolva-as antes de fechar.",
+  "admin.cod.receita_com_estorno": "Esta receita tem reembolso lançado e não pode ser anulada.",
+  "admin.cod.receita_ja_usada": "Esta receita já concedeu um acesso manual.",
+  "admin.cod.receita_invalida": "Receita inválida para esta operação.",
+  "admin.cod.consentimento_de_outra_pessoa": "O consentimento é de outra pessoa: registre um consentimento com o e-mail do próprio titular.",
+  "admin.edicao.conviteIndicadoAjuda": "Deixe em branco para não mudar. O banco não mostra o e-mail já gravado.",
+  "admin.rel.classificar": "Plano do item sem plano",
+  "admin.rel.classificarBotao": "Classificar item",
+  "admin.rel.classificado": "Item classificado. A prévia foi recalculada.",
 }

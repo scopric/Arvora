@@ -4,12 +4,11 @@ import { Selo } from "../../../componentes/Selo"
 import { useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { abrirAssinado, enviarArquivo, exigirLinha, exigirSemDados, useAcao } from "../lib/consulta"
+import { TIPOS_MATERIAL } from "../lib/regras"
 import { AreaTexto, classeAcao } from "./Campos"
 import { AvisoDe } from "./Pagina"
 
 export type Material = { id: number; tipo: "resumo" | "ebook" | "exercicios"; conteudo_md: string | null; arquivo_path: string | null; status: "rascunho" | "aprovado" }
-export const TIPOS_MATERIAL = ["resumo", "ebook", "exercicios"] as const
-
 // Um material (resumo, e-book ou exercícios): texto e/ou PDF/EPUB no bucket `materiais/{aula_id}/`. Editar volta a rascunho (banco);
 // publicar para o membro exige aprovar_material (nada sem revisão de pessoa).
 function Um({ aulaId, tipo, atual, aoMudar }: { aulaId: number; tipo: Material["tipo"]; atual: Material | undefined; aoMudar: () => void }) {
