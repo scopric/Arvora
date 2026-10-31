@@ -23,7 +23,7 @@ void main(){
   float tw=a.z>.5?.65+.35*sin(uTime*1.6+a.w*40.):1.;
   vec3 col=a.z>1.5?vec3(.79,.64,.29):a.z>.5?vec3(.62,.71,.54):vec3(.96,.96,.94);
   float al=(a.z>2.5?.55:a.z>.5?1.:.8)*tw;
-  if(a.z>3.5){col=vec3(1.,.88,.55);al=.24*pow(max(0.,sin(uTime*.5+a.w*20.)),3.);}
+  if(a.z>3.5){col=vec3(1.,.88,.55);al=.14*pow(max(0.,sin(uTime*.5+a.w*20.)),3.);}
   vC=vec4(col,al*g*(1.-uScroll*.8));
 }`
 // Raios de sol entre as copas (god rays): um triângulo de tela cheia, só gradiente; muda em ciclos de ~18 s.
@@ -35,7 +35,7 @@ void main(){
   float a=atan(d.x,-d.y);
   float f=sin(a*14.+sin(a*5.+uTime*.15)*1.6)*.5+.5;
   float g=sin(a*31.-uTime*.1)*.5+.5;
-  float k=pow(f,4.)*(.6+.4*g)*(.55+.45*sin(uTime*.35+a*7.))*smoothstep(2.9,.2,length(d))*.5*(1.-uRoll*.8);
+  float k=pow(f,4.)*(.6+.4*g)*(.55+.45*sin(uTime*.35+a*7.))*smoothstep(2.9,.2,length(d))*.5*mix(.6,1.,smoothstep(.8,1.4,uAsp))*(1.-uRoll*.8);
   gl_FragColor=vec4(vec3(1.,.86,.5)*k,k);}`
 const FRAG = `precision mediump float;varying vec4 vC;
 void main(){float d=length(gl_PointCoord-.5);float k=smoothstep(.5,.05,d);gl_FragColor=vec4(vC.rgb*vC.a*k,k*vC.a);}`
@@ -69,7 +69,7 @@ const pontos = () => {
   }
   for (let i = 0; i < 140; i++) dados.push((Math.random() - 0.5) * 1.8, Math.random() * 2 - 1, (Math.random() - 0.5) * 1.2, 0.85, 2 + Math.random() * 3, 3, Math.random())
   for (const n of nos) dados.push(X(n.x), Y(n.y), (Math.random() - 0.5) * 0.7, ((n.prof + 1) / PROF) * 0.9, n.r * 3.4, n.ouro ? 2 : 1, Math.random())
-  for (let i = 0; i < 14; i++) dados.push(Math.random() * 1.4 - 0.5, Math.random() * 1.2 - 0.1, (Math.random() - 0.5) * 0.8, 0.9, 30 + Math.random() * 40, 4, Math.random())
+  for (let i = 0; i < 14; i++) dados.push(Math.random() * 1.4 - 0.5, Math.random() * 1.2 - 0.5, (Math.random() - 0.5) * 0.8, 0.9, 30 + Math.random() * 40, 4, Math.random())
   return new Float32Array(dados)
 }
 
@@ -156,7 +156,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.bindBuffer(gl.ARRAY_BUFFER, bufR)
     gl.enableVertexAttribArray(2)
     gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 0, 0)
-    gl.uniform1f(rTime, reduzido ? 0 : tempo)
+    gl.uniform1f(rTime, reduzido ? 0 : tempo % (40 * Math.PI))
     gl.uniform1f(rAsp, asp)
     gl.uniform1f(rRoll, roll)
     gl.uniform2f(rPtr, atual.x, atual.y)
@@ -165,6 +165,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.bindBuffer(gl.ARRAY_BUFFER, bufP)
     liga("p", 3, 0)
     liga("a", 4, 3)
+    gl.disableVertexAttribArray(2)
     gl.uniform1f(uT, 1 - (1 - cresce) ** 3)
     gl.uniform1f(uTime, reduzido ? 0 : tempo)
     gl.uniform1f(uScroll, roll)

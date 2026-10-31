@@ -57,7 +57,7 @@ export function EmBreve() {
       </header>
       <main>
       <section className="relative isolate flex min-h-[calc(100dvh-4.25rem)] flex-col justify-center overflow-hidden px-6 py-16 sm:px-16 lg:px-24">
-        <Cena className="inset-0 -z-10 opacity-45 lg:left-[38%] lg:opacity-100" />
+        <Cena cheia className="inset-0 -z-10 max-lg:opacity-40" />
         <p className="animate-subir font-mono text-xs font-semibold tracking-[0.3em] text-destaque uppercase" style={atraso(0)}>
           {t("inicio.embreve")}
         </p>
