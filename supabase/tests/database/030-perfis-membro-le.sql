@@ -41,7 +41,8 @@ insert into public.planos (conta_stripe_id, stripe_price_id, nome, nivel, interv
 select id, 'price_t_clube', 'Clube teste', 'clube', 'mes', 'assinatura', 1, 'EUR' from public.contas_stripe;
 insert into public.assinaturas (perfil_id, conta_stripe_id, stripe_subscription_id, plano_id, status, periodo_inicio, periodo_fim)
 select tt.u(v.s), p.conta_stripe_id, 'sub_' || v.s, p.id, v.st::public.status_assinatura, now() - interval '10 days', now() + v.fim
-from public.planos p, (values ('a1', 'active', interval '10 days'), ('e1', 'active', interval '-1 day'),
+-- b1 tambem ativo: desde a f4_05 o membro so ve perfis de membros ativos.
+from public.planos p, (values ('a1', 'active', interval '10 days'), ('b1', 'active', interval '10 days'), ('e1', 'active', interval '-1 day'),
                               ('ca', 'canceled', interval '10 days')) v(s, st, fim);
 
 -- membro pagante
