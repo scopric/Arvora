@@ -50,8 +50,8 @@ from (values ('c1', 'price_t_clube'), ('b1', 'price_t_grupo'), ('b2', 'price_t_g
 
 insert into public.documentos_legais (tipo, versao, idioma, titulo, conteudo_md) values ('hall_of_fame', 'v1', 'pt', 'HoF', 'autorizo (teste)');
 insert into public.consentimentos (documento_id, titular_email, titular_nome, evidencia)
-select id, 'premiado@x.test', 'Premiada', 'formulario (teste)' from public.documentos_legais;
-create function tt.cons() returns bigint language sql as $$ select id from public.consentimentos where titular_email = 'premiado@x.test' $$;
+select id, 'b1@t.test', 'Premiada', 'formulario (teste)' from public.documentos_legais;
+create function tt.cons() returns bigint language sql as $$ select id from public.consentimentos where titular_email = 'b1@t.test' $$;
 insert into public.edicoes (slug, nome, ano, pais, cidade, durante_inicio, durante_fim, publicada_em) values
   ('dublin-2025', 'Dublin 2025', 2025, 'IE', 'Dublin', now() - interval '400 days', now() - interval '399 days', now()),
   ('dublin-2027', 'Dublin 2027', 2027, 'IE', 'Dublin', now() + interval '300 days', now() + interval '301 days', null);
@@ -118,7 +118,7 @@ select is((select historia || '/' || (alteracao_em is null)::text from public.pr
 
 -- 4) revogar consentimento despublica -------------------------------------------------------------------------
 select tt.como(tt.u('51'), 'aal2');
-select is(tt.afeta($q$update public.consentimentos set revogado_em = now() where titular_email = 'premiado@x.test'$q$), 1, 'equipe registra a revogacao');
+select is(tt.afeta($q$update public.consentimentos set revogado_em = now() where titular_email = 'b1@t.test'$q$), 1, 'equipe registra a revogacao');
 reset role;
 select is((select publicado_em from public.premiados where slug = 'premiada'), null, 'revogou: premiado despublicado');
 select throws_ok($$update public.premiados set publicado_em = now() where slug = 'premiada'$$, 'P0001', 'consentimento_ausente_ou_revogado',
@@ -154,7 +154,7 @@ reset role;
 select tt.como(tt.u('c1'));
 select lives_ok($$insert into public.empresas (nome, slug, setor_id, site) select 'Empresa C1', 'empresa-c1', id, 'https://c1.exemplo' from public.setores limit 1$$,
                 'clube cadastra a propria empresa');
-select is((select status::text || '/' || (dono_perfil_id = tt.u('c1'))::text from public.empresas), 'pendente/true', 'nasce pendente e do dono');
+select is((select status::text || '/' || (dono_perfil_id = tt.u('c1'))::text from public.minhas_empresas()), 'pendente/true', 'nasce pendente e do dono');
 reset role;
 select tt.anonimo();
 select is(tt.n('select 1 from public.empresas'), 0, 'pendente nao aparece no Directory');
