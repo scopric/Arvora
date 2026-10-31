@@ -1,26 +1,38 @@
 import { Route } from "react-router"
-import { EmConstrucao } from "../../componentes/EmConstrucao"
+import { Awards } from "./telas/Awards"
+import { Biblioteca } from "./telas/Biblioteca"
+import { BibliotecaVideo } from "./telas/BibliotecaVideo"
+import { CadastrarEmpresa } from "./telas/CadastrarEmpresa"
+import { CheckoutCancelado } from "./telas/CheckoutCancelado"
+import { CheckoutSucesso } from "./telas/CheckoutSucesso"
+import { Directory } from "./telas/Directory"
+import { DirectoryEmpresa } from "./telas/DirectoryEmpresa"
+import { Evento } from "./telas/Evento"
+import { Legal } from "./telas/Legal"
+import { Originals } from "./telas/Originals"
+import { OriginalsEpisodio } from "./telas/OriginalsEpisodio"
+import { Planos } from "./telas/Planos"
+import { Suporte } from "./telas/Suporte"
 
-// Rotas da área publico (caminhos relativos a /:lang). Para entregar uma tela: troque o element da rota
-// pela sua tela (crie-a em src/areas/publico/telas/). Não edite App.tsx.
+// Rotas da área publico (caminhos relativos a /:lang). Hall of Fame é pré-renderizado e não passa por aqui.
 export function rotasPublico() {
   return (
     <>
-      <Route path="planos" element={<EmConstrucao titulo="publico.planos.titulo" />} />
-      <Route path="checkout/sucesso" element={<EmConstrucao titulo="publico.checkoutSucesso.titulo" />} />
-      <Route path="checkout/cancelado" element={<EmConstrucao titulo="publico.checkoutCancelado.titulo" />} />
-      <Route path="suporte" element={<EmConstrucao titulo="publico.suporte.titulo" />} />
-      <Route path="termos" element={<EmConstrucao titulo="publico.termos.titulo" />} />
-      <Route path="privacidade" element={<EmConstrucao titulo="publico.privacidade.titulo" />} />
-      <Route path="awards" element={<EmConstrucao titulo="publico.awards.titulo" />} />
-      <Route path="biblioteca" element={<EmConstrucao titulo="publico.biblioteca.titulo" />} />
-      <Route path="biblioteca/:slug" element={<EmConstrucao titulo="publico.bibliotecaVideo.titulo" />} />
-      <Route path="originals" element={<EmConstrucao titulo="publico.originals.titulo" />} />
-      <Route path="originals/:slug" element={<EmConstrucao titulo="publico.originalsEpisodio.titulo" />} />
-      <Route path="directory" element={<EmConstrucao titulo="publico.directory.titulo" />} />
-      <Route path="directory/:slug" element={<EmConstrucao titulo="publico.directoryEmpresa.titulo" />} />
-      <Route path="cadastrar-empresa" element={<EmConstrucao titulo="publico.cadastrarEmpresa.titulo" />} />
-      <Route path="evento/:edicao" element={<EmConstrucao titulo="publico.evento.titulo" />} />
+      <Route path="planos" element={<Planos />} />
+      <Route path="checkout/sucesso" element={<CheckoutSucesso />} />
+      <Route path="checkout/cancelado" element={<CheckoutCancelado />} />
+      <Route path="suporte" element={<Suporte />} />
+      <Route path="termos" element={<Legal tipo="termos" titulo="publico.termos.titulo" />} />
+      <Route path="privacidade" element={<Legal tipo="privacidade" titulo="publico.privacidade.titulo" />} />
+      <Route path="awards" element={<Awards />} />
+      <Route path="biblioteca" element={<Biblioteca />} />
+      <Route path="biblioteca/:slug" element={<BibliotecaVideo />} />
+      <Route path="originals" element={<Originals />} />
+      <Route path="originals/:slug" element={<OriginalsEpisodio />} />
+      <Route path="directory" element={<Directory />} />
+      <Route path="directory/:slug" element={<DirectoryEmpresa />} />
+      <Route path="cadastrar-empresa" element={<CadastrarEmpresa />} />
+      <Route path="evento/:edicao" element={<Evento />} />
     </>
   )
 }
