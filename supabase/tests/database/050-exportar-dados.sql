@@ -58,7 +58,7 @@ reset role;
 select set_config('tt.a', tt.exp('a1')::text, true);
 select set_config('tt.b', tt.exp('b1')::text, true);
 select ok(current_setting('tt.a')::jsonb ?& array['versao', 'exportado_em', 'conta', 'perfil', 'equipe', 'assinaturas', 'clientes_stripe'], 'chaves esperadas presentes');
-select is(current_setting('tt.a')::jsonb -> 'versao', '2'::jsonb, 'versao 2 (f4_02: tabelas novas)');
+select is(current_setting('tt.a')::jsonb -> 'versao', '3'::jsonb, 'versao 3 (f4_03: indicados, receitas, estornos, log)');
 select is(current_setting('tt.a')::jsonb #>> '{conta,email}', 'a1@exemplo.test', 'conta: e-mail do dono');
 select is(current_setting('tt.a')::jsonb #>> '{conta,id}', tt.u('a1')::text, 'conta: id do dono');
 select is(current_setting('tt.a')::jsonb #>> '{perfil,id}', tt.u('a1')::text, 'perfil: id do dono');
