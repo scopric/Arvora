@@ -1,10 +1,27 @@
 import { useEffect } from "react"
 import { useLocation, useParams } from "react-router"
 import { IDIOMAS, type Idioma } from "../site"
+import { adminEn } from "./areas/admin.en"
+import { adminPt } from "./areas/admin.pt"
+import { aprenderEn } from "./areas/aprender.en"
+import { aprenderPt } from "./areas/aprender.pt"
+import { contaEn } from "./areas/conta.en"
+import { contaPt } from "./areas/conta.pt"
+import { nucleoEn } from "./areas/nucleo.en"
+import { nucleoPt } from "./areas/nucleo.pt"
+import { publicoEn } from "./areas/publico.en"
+import { publicoPt } from "./areas/publico.pt"
+import { redeEn } from "./areas/rede.en"
+import { redePt } from "./areas/rede.pt"
 import { en } from "./en"
 import { pt } from "./pt"
 
-const dicionarios: Record<Idioma, Record<keyof typeof pt, string>> = { pt, en }
+// Dicionário = textos de base (pt/en) + um arquivo por área. O tipo de cada <area>.en.ts já obriga as mesmas chaves do .pt.
+// Chave repetida entre arquivos é barrada em i18n.test.tsx.
+export const PARTES_PT = [pt, nucleoPt, publicoPt, aprenderPt, redePt, contaPt, adminPt]
+const ptTodo = { ...pt, ...nucleoPt, ...publicoPt, ...aprenderPt, ...redePt, ...contaPt, ...adminPt }
+const enTodo: Record<keyof typeof ptTodo, string> = { ...en, ...nucleoEn, ...publicoEn, ...aprenderEn, ...redeEn, ...contaEn, ...adminEn }
+const dicionarios: Record<Idioma, Record<keyof typeof ptTodo, string>> = { pt: ptTodo, en: enTodo }
 const CHAVE = "arvora.idioma"
 
 export const ehIdioma = (v: string | undefined): v is Idioma => IDIOMAS.some((i) => i === v)
@@ -15,7 +32,7 @@ export function useIdioma(): Idioma {
   return ehIdioma(lang) ? lang : "pt"
 }
 
-export type Chave = keyof typeof pt
+export type Chave = keyof typeof ptTodo
 
 export function useT() {
   const dic = dicionarios[useIdioma()]
@@ -79,7 +96,7 @@ function definirMeta(nome: string, conteudo: string | null) {
 }
 
 // Título da aba ("<tela> — Grupo Árvora") e description no idioma da página; noindex reforça o X-Robots-Tag do vercel.json.
-export function useTitulo(chave: "doc.titulo" | `titulo.${string}` & Chave, noindex = false) {
+export function useTitulo(chave: Chave, noindex = false) {
   const idioma = useIdioma()
   useEffect(() => {
     const dic = dicionarios[idioma]

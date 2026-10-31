@@ -1,15 +1,10 @@
 import { useState } from "react"
 import { Link } from "react-router"
 import { Cena } from "../componentes/Cena"
-import { Marca } from "../componentes/Marca"
-import { SeletorIdioma } from "../componentes/SeletorIdioma"
+import { botaoPublico as botao, RodapePublico, TopoPublico } from "../componentes/LayoutPublico"
 import { useCaminho, useT, useTitulo } from "../i18n"
 import { useAuth } from "../lib/sessao"
 
-const link =
-  "inline-flex min-h-11 items-center rounded-lg px-4 text-creme transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
-const botao =
-  "inline-flex min-h-12 items-center justify-center rounded-lg px-7 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
 const atraso = (ms: number) => ({ "--atraso": `${ms}ms` }) as React.CSSProperties
 const PILARES = [1, 2, 3, 4] as const
 
@@ -41,20 +36,7 @@ export function EmBreve() {
   const [ativo, setAtivo] = useState(0)
   return (
     <div>
-      <header className="sticky top-0 z-20 flex min-h-17 items-center justify-between gap-3 border-b border-creme/10 bg-fundo/75 px-4 backdrop-blur-md sm:px-12 lg:px-20">
-        <Marca to={caminho("/")} className="max-sm:[&>span]:hidden" />
-        <nav aria-label={t("nav.principal")} className="flex items-center gap-2 text-sm font-semibold">
-          <SeletorIdioma />
-          {carregando ? null : sessao ? (
-            <Link to={caminho("/perfil")} className={link}>{t("nav.perfil")}</Link>
-          ) : (
-            <>
-              <Link to={caminho("/entrar")} className={link}>{t("nav.entrar")}</Link>
-              <Link to={caminho("/cadastro")} className={`${botao} min-h-11 bg-creme px-5 text-sm whitespace-nowrap text-fundo hover:bg-white max-sm:hidden`}>{t("nav.criarConta")}</Link>
-            </>
-          )}
-        </nav>
-      </header>
+      <TopoPublico />
       <main>
       <section className="relative isolate flex min-h-[calc(100dvh-4.25rem)] flex-col justify-center overflow-hidden px-6 py-16 sm:px-16 lg:px-24">
         <Cena cheia className="inset-0 -z-10 max-lg:opacity-25" />
@@ -161,24 +143,7 @@ export function EmBreve() {
         </section>
       )}
       </main>
-      <footer className="border-t border-creme/10 px-6 py-12 sm:px-16 lg:px-24">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-          <div className="max-w-xs">
-            <Marca to={caminho("/")} />
-            <p className="mt-4 text-sm text-creme/70">{t("auth.layout.apoio")}</p>
-          </div>
-          <nav aria-label={t("nav.rodape")} className="flex flex-wrap gap-x-2 text-sm font-semibold">
-            {!carregando && !sessao && (
-              <>
-                <Link to={caminho("/entrar")} className={link}>{t("nav.entrar")}</Link>
-                <Link to={caminho("/cadastro")} className={link}>{t("nav.criarConta")}</Link>
-              </>
-            )}
-            <Link to={caminho("/cookies")} className={link}>{t("cookies.politica")}</Link>
-          </nav>
-        </div>
-        <p className="mx-auto mt-10 max-w-6xl font-mono text-xs tracking-[0.15em] text-creme/60">© Grupo Árvora</p>
-      </footer>
+      <RodapePublico />
     </div>
   )
 }

@@ -109,3 +109,14 @@
   -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
   mask-image: radial-gradient(closest-side, #000 55%, transparent);
 }
+
+/* Admin (PRD §17.7.2): tema claro. Troca os papéis das cores, então todo componente que usa creme/fundo/dourado se inverte sozinho.
+   dourado 4,57 e destaque 6,6 sobre creme (PRD §17.7.1); o anel de foco e o texto passam o contraste. */
+.tema-claro {
+  --color-fundo: #f4f4ef;
+  --color-creme: #112019;
+  --color-painel: #e8e8e0;
+  --color-dourado: #8a6a1f;
+  --color-destaque: #3f5e3f;
+  --color-white: #000;
+}

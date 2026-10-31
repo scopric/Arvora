@@ -1,6 +1,5 @@
 import { z } from "zod"
-import type { Chave } from "../i18n"
-import { pt } from "../i18n/pt"
+import { textosDe, type Chave } from "../i18n"
 
 // Mensagens dos schemas são CHAVES do dicionário (src/i18n); a tela traduz com t().
 const texto = (max: 80 | 120 | 600) => z.string().trim().max(max, `validacao.max${max}`)
@@ -94,7 +93,7 @@ export function errosPorCampo(erro: z.ZodError): CamposDeErro {
 // Nada de texto técnico na tela.
 export function mensagemDeErroAuth(erro: { message?: string; code?: string; status?: number }): Chave {
   const chave = `erro.auth.${erro.code}`
-  return chave in pt ? (chave as Chave) : "erro.auth.default"
+  return chave in textosDe("pt") ? (chave as Chave) : "erro.auth.default"
 }
 
 // Parâmetros do link enviado por e-mail (/confirmar): só os tipos que os modelos de e-mail geram.
