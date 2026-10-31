@@ -1,7 +1,7 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useParams } from "react-router"
 import "./index.css"
-import interUrl from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url"
-import playfairUrl from "@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2?url"
+import corpoUrl from "@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url"
+import tituloUrl from "@fontsource-variable/big-shoulders-display/files/big-shoulders-display-latin-wght-normal.woff2?url"
 import { BannerCookies } from "./componentes/BannerCookies"
 import { Carregando } from "./componentes/Carregando"
 import { ehIdioma, textosDe, useIdiomaUrl } from "./i18n"
@@ -31,7 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 // Fontes pré-carregadas: sem isso o navegador só as descobre depois de baixar o CSS (cadeia html → css → fonte).
 export const links = () =>
-  [interUrl, playfairUrl].map((href) => ({ rel: "preload", href, as: "font", type: "font/woff2", crossOrigin: "anonymous" as const }))
+  [corpoUrl, tituloUrl].map((href) => ({ rel: "preload", href, as: "font", type: "font/woff2", crossOrigin: "anonymous" as const }))
 
 export function meta({ params }: { params: { lang?: string } }) {
   const dic = textosDe(ehIdioma(params.lang) ? params.lang : "pt")
