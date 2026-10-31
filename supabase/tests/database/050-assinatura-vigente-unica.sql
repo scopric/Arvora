@@ -78,7 +78,7 @@ select is(tt.processa(tt.ev_sub('evt_c', 'customer.subscription.created', 2100, 
 select is((select count(*)::int from public.eventos_stripe where event_id = 'evt_b'), 1, 'reentrega nao duplica a reserva');
 select throws_ok($$select tt.processa(tt.ev_sub('evt_x', 'customer.subscription.created', 2150, 'sub_x', 'active', 'price_nao', 'cus_b1'))$$,
                  'P0001', 'Price desconhecido nesta conta: price_nao', 'dado invalido continua levantando excecao (nao vira conflito)');
-select is(public.processar_evento_stripe(tt.conta(), '{"id":"evt_y","type":"invoice.paid","created":2160,"data":{"object":{"id":"in_1"}}}'),
+select is(public.processar_evento_stripe(tt.conta(), '{"id":"evt_y","type":"invoice.finalized","created":2160,"data":{"object":{"id":"in_1"}}}'),
           'ignorado_tipo', 'evento de outro tipo continua processado');
 select is(tt.processa(tt.ev_sub('evt_d', 'customer.subscription.created', 2200, 'sub_d', 'canceled', 'price_v1b', 'cus_b1')),
           'processado', 'evento nao vigente (canceled) nao conflita');

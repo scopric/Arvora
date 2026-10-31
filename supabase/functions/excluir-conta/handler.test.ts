@@ -433,6 +433,25 @@ Deno.test("arrependimento: uma de 3 dias e outra de 40: 409 e nada cancelado", a
   ok(!ordem.some((o) => o.startsWith("apagar")));
 });
 
+Deno.test("arrependimento: vale a data do Stripe (stripe_criada_em), não a da linha", async () => {
+  const { deps, ordem } = montar({
+    assinaturas: [{ ...sub(1, 30), stripe_criada_em: haDias(3) }],
+  });
+  const r = await handle(post(corpoOk), deps);
+  equal(r.status, 409);
+  deepEqual(await r.json(), { erro: "arrependimento" });
+  ok(!ordem.some((o) => o.startsWith("apagar")));
+});
+
+Deno.test("arrependimento: stripe_criada_em antiga libera mesmo com linha recente", async () => {
+  const { deps, ordem } = montar({
+    assinaturas: [{ ...sub(1, 2), stripe_criada_em: haDias(30) }],
+  });
+  const r = await handle(post(corpoOk), deps);
+  equal(r.status, 200);
+  ok(ordem.includes(`apagar:${UID}`));
+});
+
 Deno.test("arrependimento: data inválida conta como recente (409)", async () => {
   const { deps } = montar({
     assinaturas: [{ ...sub(1, 30), criado_em: "lixo" }],

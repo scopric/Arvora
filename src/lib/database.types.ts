@@ -7,13 +7,13 @@ export type Database = {
           Tables: {
             "assinaturas": {
                   Row: {
-                    "atualizado_em": string,"cancela_no_fim": boolean,"cancelada_em": string | null,"conta_stripe_id": number | null,"criado_em": string,"id": number,"origem": Database["public"]['Enums']["origem_assinatura"],"perfil_id": string | null,"periodo_fim": string,"periodo_inicio": string,"plano_id": number,"receita_externa_id": number | null,"status": Database["public"]['Enums']["status_assinatura"],"stripe_evento_em": string | null,"stripe_subscription_id": string | null
+                    "atualizado_em": string,"cancela_no_fim": boolean,"cancelada_em": string | null,"conta_stripe_id": number | null,"criado_em": string,"id": number,"origem": Database["public"]['Enums']["origem_assinatura"],"perfil_id": string | null,"periodo_fim": string,"periodo_inicio": string,"plano_id": number,"receita_externa_id": number | null,"status": Database["public"]['Enums']["status_assinatura"],"stripe_criada_em": string | null,"stripe_evento_em": string | null,"stripe_subscription_id": string | null
                   }
                   Insert: {
-                    "atualizado_em"?: string,"cancela_no_fim"?: boolean,"cancelada_em"?: string | null,"conta_stripe_id"?: number | null,"criado_em"?: string,"id"?: never,"origem"?: Database["public"]['Enums']["origem_assinatura"],"perfil_id"?: string | null,"periodo_fim": string,"periodo_inicio": string,"plano_id": number,"receita_externa_id"?: number | null,"status": Database["public"]['Enums']["status_assinatura"],"stripe_evento_em"?: string | null,"stripe_subscription_id"?: string | null
+                    "atualizado_em"?: string,"cancela_no_fim"?: boolean,"cancelada_em"?: string | null,"conta_stripe_id"?: number | null,"criado_em"?: string,"id"?: never,"origem"?: Database["public"]['Enums']["origem_assinatura"],"perfil_id"?: string | null,"periodo_fim": string,"periodo_inicio": string,"plano_id": number,"receita_externa_id"?: number | null,"status": Database["public"]['Enums']["status_assinatura"],"stripe_criada_em"?: string | null,"stripe_evento_em"?: string | null,"stripe_subscription_id"?: string | null
                   }
                   Update: {
-                    "atualizado_em"?: string,"cancela_no_fim"?: boolean,"cancelada_em"?: string | null,"conta_stripe_id"?: number | null,"criado_em"?: string,"id"?: never,"origem"?: Database["public"]['Enums']["origem_assinatura"],"perfil_id"?: string | null,"periodo_fim"?: string,"periodo_inicio"?: string,"plano_id"?: number,"receita_externa_id"?: number | null,"status"?: Database["public"]['Enums']["status_assinatura"],"stripe_evento_em"?: string | null,"stripe_subscription_id"?: string | null
+                    "atualizado_em"?: string,"cancela_no_fim"?: boolean,"cancelada_em"?: string | null,"conta_stripe_id"?: number | null,"criado_em"?: string,"id"?: never,"origem"?: Database["public"]['Enums']["origem_assinatura"],"perfil_id"?: string | null,"periodo_fim"?: string,"periodo_inicio"?: string,"plano_id"?: number,"receita_externa_id"?: number | null,"status"?: Database["public"]['Enums']["status_assinatura"],"stripe_criada_em"?: string | null,"stripe_evento_em"?: string | null,"stripe_subscription_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -34,7 +34,51 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "planos"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "assinaturas_receita_externa_id_fkey"
+      columns: ["receita_externa_id"]
+isOneToOne: false
+      referencedRelation: "receitas_externas"
+      referencedColumns: ["id"]
     }
+                  ]
+                },"assinaturas_status": {
+                  Row: {
+                    "assinatura_id": number,"criado_em": string,"desde": string,"id": number,"plano_id": number,"status": Database["public"]['Enums']["status_assinatura"]
+                  }
+                  Insert: {
+                    "assinatura_id": number,"criado_em"?: string,"desde": string,"id"?: never,"plano_id": number,"status": Database["public"]['Enums']["status_assinatura"]
+                  }
+                  Update: {
+                    "assinatura_id"?: number,"criado_em"?: string,"desde"?: string,"id"?: never,"plano_id"?: number,"status"?: Database["public"]['Enums']["status_assinatura"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "assinaturas_status_assinatura_id_fkey"
+      columns: ["assinatura_id"]
+isOneToOne: false
+      referencedRelation: "assinaturas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "assinaturas_status_plano_id_fkey"
+      columns: ["plano_id"]
+isOneToOne: false
+      referencedRelation: "planos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"cambio_bce": {
+                  Row: {
+                    "atualizado_em": string,"criado_em": string,"data": string,"fonte_url": string,"moeda": string,"taxa": number
+                  }
+                  Insert: {
+                    "atualizado_em"?: string,"criado_em"?: string,"data": string,"fonte_url": string,"moeda": string,"taxa": number
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"criado_em"?: string,"data"?: string,"fonte_url"?: string,"moeda"?: string,"taxa"?: number
+                  }
+                  Relationships: [
+                    
                   ]
                 },"clientes_stripe": {
                   Row: {
@@ -61,6 +105,31 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"consentimentos": {
+                  Row: {
+                    "aceito_em": string,"criado_em": string,"documento_id": number,"evidencia": string | null,"id": number,"perfil_id": string | null,"registrado_por": string | null,"revogado_em": string | null,"titular_email": string,"titular_nome": string | null
+                  }
+                  Insert: {
+                    "aceito_em"?: string,"criado_em"?: string,"documento_id": number,"evidencia"?: string | null,"id"?: never,"perfil_id"?: string | null,"registrado_por"?: string | null,"revogado_em"?: string | null,"titular_email": string,"titular_nome"?: string | null
+                  }
+                  Update: {
+                    "aceito_em"?: string,"criado_em"?: string,"documento_id"?: number,"evidencia"?: string | null,"id"?: never,"perfil_id"?: string | null,"registrado_por"?: string | null,"revogado_em"?: string | null,"titular_email"?: string,"titular_nome"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "consentimentos_documento_id_fkey"
+      columns: ["documento_id"]
+isOneToOne: false
+      referencedRelation: "documentos_legais"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "consentimentos_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"contas_stripe": {
                   Row: {
                     "ativa": boolean,"criado_em": string,"id": number,"pais": string,"stripe_account_id": string,"titular": string
@@ -70,6 +139,19 @@ isOneToOne: false
                   }
                   Update: {
                     "ativa"?: boolean,"criado_em"?: string,"id"?: never,"pais"?: string,"stripe_account_id"?: string,"titular"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"documentos_legais": {
+                  Row: {
+                    "conteudo_md": string,"criado_em": string,"id": number,"idioma": string,"publicado_por": string | null,"sha256": string,"tipo": Database["public"]['Enums']["tipo_documento"],"titulo": string,"versao": string,"vigente_desde": string
+                  }
+                  Insert: {
+                    "conteudo_md": string,"criado_em"?: string,"id"?: never,"idioma": string,"publicado_por"?: string | null,"sha256": string,"tipo": Database["public"]['Enums']["tipo_documento"],"titulo": string,"versao": string,"vigente_desde"?: string
+                  }
+                  Update: {
+                    "conteudo_md"?: string,"criado_em"?: string,"id"?: never,"idioma"?: string,"publicado_por"?: string | null,"sha256"?: string,"tipo"?: Database["public"]['Enums']["tipo_documento"],"titulo"?: string,"versao"?: string,"vigente_desde"?: string
                   }
                   Relationships: [
                     
@@ -112,6 +194,94 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"log_admin": {
+                  Row: {
+                    "acao": string,"alvo_id": string | null,"antes": Json | null,"ator_id": string,"criado_em": string,"depois": Json | null,"id": number,"tabela": string
+                  }
+                  Insert: {
+                    "acao": string,"alvo_id"?: string | null,"antes"?: Json | null,"ator_id": string,"criado_em"?: string,"depois"?: Json | null,"id"?: never,"tabela": string
+                  }
+                  Update: {
+                    "acao"?: string,"alvo_id"?: string | null,"antes"?: Json | null,"ator_id"?: string,"criado_em"?: string,"depois"?: Json | null,"id"?: never,"tabela"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"pagamentos": {
+                  Row: {
+                    "assinatura_id": number | null,"bruto_centavos": number,"cliente_email": string,"conta_stripe_id": number,"criado_em": string,"id": number,"metodo": string | null,"moeda": string,"pago_em": string,"perfil_id": string | null,"stripe_invoice_id": string | null,"stripe_payment_intent_id": string | null,"vat_centavos": number
+                  }
+                  Insert: {
+                    "assinatura_id"?: number | null,"bruto_centavos": number,"cliente_email": string,"conta_stripe_id": number,"criado_em"?: string,"id"?: never,"metodo"?: string | null,"moeda": string,"pago_em": string,"perfil_id"?: string | null,"stripe_invoice_id"?: string | null,"stripe_payment_intent_id"?: string | null,"vat_centavos"?: number
+                  }
+                  Update: {
+                    "assinatura_id"?: number | null,"bruto_centavos"?: number,"cliente_email"?: string,"conta_stripe_id"?: number,"criado_em"?: string,"id"?: never,"metodo"?: string | null,"moeda"?: string,"pago_em"?: string,"perfil_id"?: string | null,"stripe_invoice_id"?: string | null,"stripe_payment_intent_id"?: string | null,"vat_centavos"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pagamentos_assinatura_id_fkey"
+      columns: ["assinatura_id"]
+isOneToOne: false
+      referencedRelation: "assinaturas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pagamentos_conta_stripe_id_fkey"
+      columns: ["conta_stripe_id"]
+isOneToOne: false
+      referencedRelation: "contas_stripe"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pagamentos_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"pagamentos_itens": {
+                  Row: {
+                    "bruto_centavos": number,"criado_em": string,"descricao": string | null,"id": number,"pagamento_id": number,"plano_id": number | null,"tipo_receita": Database["public"]['Enums']["tipo_receita"],"vat_centavos": number
+                  }
+                  Insert: {
+                    "bruto_centavos": number,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"pagamento_id": number,"plano_id"?: number | null,"tipo_receita": Database["public"]['Enums']["tipo_receita"],"vat_centavos"?: number
+                  }
+                  Update: {
+                    "bruto_centavos"?: number,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"pagamento_id"?: number,"plano_id"?: number | null,"tipo_receita"?: Database["public"]['Enums']["tipo_receita"],"vat_centavos"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pagamentos_itens_pagamento_id_fkey"
+      columns: ["pagamento_id"]
+isOneToOne: false
+      referencedRelation: "pagamentos"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pagamentos_itens_plano_id_fkey"
+      columns: ["plano_id"]
+isOneToOne: false
+      referencedRelation: "planos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"pedidos_gdpr": {
+                  Row: {
+                    "atendido_por": string | null,"atualizado_em": string,"concluido_em": string | null,"criado_em": string,"email": string,"id": number,"observacao": string | null,"perfil_id": string | null,"prazo_em": string,"status": Database["public"]['Enums']["status_pedido"],"tipo": Database["public"]['Enums']["tipo_pedido_gdpr"]
+                  }
+                  Insert: {
+                    "atendido_por"?: string | null,"atualizado_em"?: string,"concluido_em"?: string | null,"criado_em"?: string,"email": string,"id"?: never,"observacao"?: string | null,"perfil_id"?: string | null,"prazo_em": string,"status"?: Database["public"]['Enums']["status_pedido"],"tipo": Database["public"]['Enums']["tipo_pedido_gdpr"]
+                  }
+                  Update: {
+                    "atendido_por"?: string | null,"atualizado_em"?: string,"concluido_em"?: string | null,"criado_em"?: string,"email"?: string,"id"?: never,"observacao"?: string | null,"perfil_id"?: string | null,"prazo_em"?: string,"status"?: Database["public"]['Enums']["status_pedido"],"tipo"?: Database["public"]['Enums']["tipo_pedido_gdpr"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pedidos_gdpr_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"perfis": {
                   Row: {
                     "atualizado_em": string,"bio": string | null,"cidade": string | null,"criado_em": string,"empresa_nome": string | null,"foto_path": string | null,"id": string,"instagram": string | null,"linkedin_url": string | null,"maior_18_em": string,"nome": string,"onboarding_em": string | null,"pais": string | null,"publico_aprovado_em": string | null,"setor_id": number | null,"slug": string | null,"suspenso_em": string | null,"visibilidade": Database["public"]['Enums']["visibilidade_perfil"]
@@ -148,7 +318,82 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "contas_stripe"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "planos_vertical_id_fkey"
+      columns: ["vertical_id"]
+isOneToOne: false
+      referencedRelation: "verticais"
+      referencedColumns: ["id"]
     }
+                  ]
+                },"receitas_externas": {
+                  Row: {
+                    "anulado_em": string | null,"anulado_por": string | null,"atualizado_em": string,"bruto_centavos": number,"cliente_email": string | null,"cliente_nome": string,"comprovante_path": string,"criado_em": string,"descricao": string | null,"id": number,"lancado_por": string,"moeda": string,"motivo_anulacao": string | null,"origem": Database["public"]['Enums']["origem_receita_externa"],"perfil_id": string | null,"plano_id": number | null,"recebido_em": string,"tipo_receita": Database["public"]['Enums']["tipo_receita"],"vat_centavos": number
+                  }
+                  Insert: {
+                    "anulado_em"?: string | null,"anulado_por"?: string | null,"atualizado_em"?: string,"bruto_centavos": number,"cliente_email"?: string | null,"cliente_nome": string,"comprovante_path": string,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"lancado_por": string,"moeda": string,"motivo_anulacao"?: string | null,"origem": Database["public"]['Enums']["origem_receita_externa"],"perfil_id"?: string | null,"plano_id"?: number | null,"recebido_em": string,"tipo_receita": Database["public"]['Enums']["tipo_receita"],"vat_centavos"?: number
+                  }
+                  Update: {
+                    "anulado_em"?: string | null,"anulado_por"?: string | null,"atualizado_em"?: string,"bruto_centavos"?: number,"cliente_email"?: string | null,"cliente_nome"?: string,"comprovante_path"?: string,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"lancado_por"?: string,"moeda"?: string,"motivo_anulacao"?: string | null,"origem"?: Database["public"]['Enums']["origem_receita_externa"],"perfil_id"?: string | null,"plano_id"?: number | null,"recebido_em"?: string,"tipo_receita"?: Database["public"]['Enums']["tipo_receita"],"vat_centavos"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "receitas_externas_perfil_id_fkey"
+      columns: ["perfil_id"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "receitas_externas_plano_id_fkey"
+      columns: ["plano_id"]
+isOneToOne: false
+      referencedRelation: "planos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"reembolsos": {
+                  Row: {
+                    "conta_stripe_id": number | null,"criado_em": string,"devolvido_em": string,"id": number,"lancado_por": string | null,"moeda": string,"pagamento_id": number | null,"receita_externa_id": number | null,"stripe_id": string | null,"tipo": Database["public"]['Enums']["tipo_estorno"],"valor_centavos": number,"vat_centavos": number
+                  }
+                  Insert: {
+                    "conta_stripe_id"?: number | null,"criado_em"?: string,"devolvido_em": string,"id"?: never,"lancado_por"?: string | null,"moeda": string,"pagamento_id"?: number | null,"receita_externa_id"?: number | null,"stripe_id"?: string | null,"tipo": Database["public"]['Enums']["tipo_estorno"],"valor_centavos": number,"vat_centavos"?: number
+                  }
+                  Update: {
+                    "conta_stripe_id"?: number | null,"criado_em"?: string,"devolvido_em"?: string,"id"?: never,"lancado_por"?: string | null,"moeda"?: string,"pagamento_id"?: number | null,"receita_externa_id"?: number | null,"stripe_id"?: string | null,"tipo"?: Database["public"]['Enums']["tipo_estorno"],"valor_centavos"?: number,"vat_centavos"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "reembolsos_conta_stripe_id_fkey"
+      columns: ["conta_stripe_id"]
+isOneToOne: false
+      referencedRelation: "contas_stripe"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "reembolsos_pagamento_id_fkey"
+      columns: ["pagamento_id"]
+isOneToOne: false
+      referencedRelation: "pagamentos"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "reembolsos_receita_externa_id_fkey"
+      columns: ["receita_externa_id"]
+isOneToOne: false
+      referencedRelation: "receitas_externas"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"relatorios_ciclo": {
+                  Row: {
+                    "ciclo_fim": string,"ciclo_inicio": string,"criado_em": string,"csv_sha256": string,"dados": NonNullable<Json>,"enviado_em": string | null,"gerado_por": string,"motivo_reabertura": string | null,"motivo_reemissao": string | null,"reaberto_em": string | null,"reaberto_por": string | null,"versao": number
+                  }
+                  Insert: {
+                    "ciclo_fim": string,"ciclo_inicio": string,"criado_em"?: string,"csv_sha256": string,"dados": NonNullable<Json>,"enviado_em"?: string | null,"gerado_por": string,"motivo_reabertura"?: string | null,"motivo_reemissao"?: string | null,"reaberto_em"?: string | null,"reaberto_por"?: string | null,"versao": number
+                  }
+                  Update: {
+                    "ciclo_fim"?: string,"ciclo_inicio"?: string,"criado_em"?: string,"csv_sha256"?: string,"dados"?: NonNullable<Json>,"enviado_em"?: string | null,"gerado_por"?: string,"motivo_reabertura"?: string | null,"motivo_reemissao"?: string | null,"reaberto_em"?: string | null,"reaberto_por"?: string | null,"versao"?: number
+                  }
+                  Relationships: [
+                    
                   ]
                 },"setores": {
                   Row: {
@@ -163,6 +408,19 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"verticais": {
+                  Row: {
+                    "ativa": boolean,"atualizado_em": string,"conta_como_ia": boolean,"criado_em": string,"descricao": string | null,"id": number,"nome": string,"nome_en": string | null,"ordem": number,"slug": string
+                  }
+                  Insert: {
+                    "ativa"?: boolean,"atualizado_em"?: string,"conta_como_ia"?: boolean,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nome": string,"nome_en"?: string | null,"ordem"?: number,"slug": string
+                  }
+                  Update: {
+                    "ativa"?: boolean,"atualizado_em"?: string,"conta_como_ia"?: boolean,"criado_em"?: string,"descricao"?: string | null,"id"?: never,"nome"?: string,"nome_en"?: string | null,"ordem"?: number,"slug"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 }
           }
           Views: {
@@ -172,11 +430,46 @@ isOneToOne: false
             "aprovar_perfil_publico":
 { Args: { "aprovar"?: boolean,"perfil": string }; Returns: undefined
                            },
+"ciclo_de":
+{ Args: { "t": string }; Returns: unknown
+                           },
+"clientes_ativos":
+{ Args: { "ciclo_inicio": string }; Returns: {
+              "cliente_chave": string,"origem": string
+            }[]
+                           },
+"conceder_acesso_manual":
+{ Args: { "ate": string,"perfil": string,"plano": number,"receita": number }; Returns: number
+                           },
 "consumir_limite":
 { Args: { "p_acao": string }; Returns: boolean
                            },
 "exportar_meus_dados":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"fechar_ciclo":
+{ Args: { "ciclo_inicio": string }; Returns: {
+              "ciclo_fim": string,
+"ciclo_inicio": string,
+"criado_em": string,
+"csv_sha256": string,
+"dados": NonNullable<Json>,
+"enviado_em": string | null,
+"gerado_por": string,
+"motivo_reabertura": string | null,
+"motivo_reemissao": string | null,
+"reaberto_em": string | null,
+"reaberto_por": string | null,
+"versao": number
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "relatorios_ciclo"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
+"marcar_relatorio_enviado":
+{ Args: { "ciclo_inicio": string,"versao": number }; Returns: undefined
                            },
 "pode_ver_conteudo":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
@@ -184,12 +477,18 @@ isOneToOne: false
 "processar_evento_stripe":
 { Args: { "p_conta_stripe_id": number,"p_evento": Json }; Returns: string
                            },
+"reabrir_ciclo":
+{ Args: { "ciclo_inicio": string,"motivo": string }; Returns: undefined
+                           },
+"relatorio_ciclo":
+{ Args: { "ciclo_inicio": string }; Returns: Json
+                           },
 "tem_acesso":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
                            }
           }
           Enums: {
-            "nivel_acesso": "visitante"|"clube"|"grupo","origem_assinatura": "stripe"|"manual","papel_equipe": "super_admin"|"editor"|"corretor"|"moderador"|"auditor","status_assinatura": "incomplete"|"incomplete_expired"|"trialing"|"active"|"past_due"|"canceled"|"unpaid"|"paused","tipo_receita": "assinatura"|"curso"|"produto_digital"|"ingresso","visibilidade_perfil": "membros"|"publico"
+            "nivel_acesso": "visitante"|"clube"|"grupo","origem_assinatura": "stripe"|"manual","origem_receita_externa": "ingresso"|"pix"|"transferencia"|"evento"|"outro","papel_equipe": "super_admin"|"editor"|"corretor"|"moderador"|"auditor","status_assinatura": "incomplete"|"incomplete_expired"|"trialing"|"active"|"past_due"|"canceled"|"unpaid"|"paused","status_pedido": "recebido"|"em_andamento"|"concluido"|"recusado","tipo_documento": "termos"|"privacidade"|"cookies"|"reembolso"|"arrependimento"|"marketing"|"match"|"hall_of_fame","tipo_estorno": "reembolso"|"chargeback","tipo_pedido_gdpr": "exportacao"|"exclusao"|"retificacao","tipo_receita": "assinatura"|"curso"|"produto_digital"|"ingresso","visibilidade_perfil": "membros"|"publico"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -305,7 +604,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "nivel_acesso": ["visitante", "clube", "grupo"],"origem_assinatura": ["stripe", "manual"],"papel_equipe": ["super_admin", "editor", "corretor", "moderador", "auditor"],"status_assinatura": ["incomplete", "incomplete_expired", "trialing", "active", "past_due", "canceled", "unpaid", "paused"],"tipo_receita": ["assinatura", "curso", "produto_digital", "ingresso"],"visibilidade_perfil": ["membros", "publico"]
+            "nivel_acesso": ["visitante", "clube", "grupo"],"origem_assinatura": ["stripe", "manual"],"origem_receita_externa": ["ingresso", "pix", "transferencia", "evento", "outro"],"papel_equipe": ["super_admin", "editor", "corretor", "moderador", "auditor"],"status_assinatura": ["incomplete", "incomplete_expired", "trialing", "active", "past_due", "canceled", "unpaid", "paused"],"status_pedido": ["recebido", "em_andamento", "concluido", "recusado"],"tipo_documento": ["termos", "privacidade", "cookies", "reembolso", "arrependimento", "marketing", "match", "hall_of_fame"],"tipo_estorno": ["reembolso", "chargeback"],"tipo_pedido_gdpr": ["exportacao", "exclusao", "retificacao"],"tipo_receita": ["assinatura", "curso", "produto_digital", "ingresso"],"visibilidade_perfil": ["membros", "publico"]
           }
         }
 } as const

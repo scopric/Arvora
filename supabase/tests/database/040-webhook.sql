@@ -136,8 +136,8 @@ select ok((select processado_em is not null from public.eventos_stripe where eve
 select is(tt.processa(tt.ev_co('evt_8', 8000, 'cus_c1', tt.u('c1')::text, meta => tt.u('a1')::text)),
   'processado', 'checkout.session.completed processado');
 select is((select perfil_id from public.clientes_stripe where stripe_customer_id = 'cus_c1'), tt.u('c1'), 'checkout liga customer ao perfil do client_reference_id (metadata ignorada)');
-select is(public.processar_evento_stripe(tt.conta(), '{"id":"evt_9","type":"invoice.paid","created":9000,"data":{"object":{"id":"in_1"}}}'),
-          'ignorado_tipo', 'invoice.paid processado sem efeito');
+select is(public.processar_evento_stripe(tt.conta(), '{"id":"evt_9","type":"invoice.finalized","created":9000,"data":{"object":{"id":"in_1"}}}'),
+          'ignorado_tipo', 'invoice.finalized processado sem efeito (invoice.paid grava pagamento desde a f1_20)');
 
 -- 7) erros desfazem tudo -----------------------------------------------------------------------------
 select set_config('tt.antes', tt.contagem(), true);
