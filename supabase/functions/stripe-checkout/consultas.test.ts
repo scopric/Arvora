@@ -82,10 +82,20 @@ Deno.test("consultas checkout: consumirLimite chama o RPC e só aceita boolean",
 Deno.test("consultas checkout: registrarAceite chama o RPC só com plano e versão; erro lança", async () => {
   const chamadas: [string, Record<string, unknown>][] = [];
   const ok = consultas({
-    rpc: (fn: string, args: Record<string, unknown>) => (chamadas.push([fn, args]), Promise.resolve({ data: 1, error: null })),
+    rpc: (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => (chamadas.push([fn, args]), Promise.resolve({ data: 1, error: null })),
   } as never);
   await ok.registrarAceite(7, "2026-10");
-  deepEqual(chamadas, [["registrar_aceite_checkout", { p_plano_id: 7, p_versao: "2026-10" }]]);
-  const ruim = consultas({ rpc: () => Promise.resolve({ data: null, error: { code: "x" } }) } as never);
+  deepEqual(chamadas, [["registrar_aceite_checkout", {
+    p_plano_id: 7,
+    p_versao: "2026-10",
+  }]]);
+  const ruim = consultas(
+    {
+      rpc: () => Promise.resolve({ data: null, error: { code: "x" } }),
+    } as never,
+  );
   await rejects(() => ruim.registrarAceite(7, "v"));
 });

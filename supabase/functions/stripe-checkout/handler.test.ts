@@ -79,13 +79,11 @@ const post = (corpo: unknown, headers: Record<string, string> = {}) =>
       Host: "malicioso.exemplo",
       ...headers,
     },
-    body: typeof corpo === "string"
-      ? corpo
-      : JSON.stringify(
-        corpo && typeof corpo === "object" && !("aceite" in corpo)
-          ? { ...corpo, aceite: ACEITE }
-          : corpo,
-      ),
+    body: typeof corpo === "string" ? corpo : JSON.stringify(
+      corpo && typeof corpo === "object" && !("aceite" in corpo)
+        ? { ...corpo, aceite: ACEITE }
+        : corpo,
+    ),
   });
 
 Deno.test("checkout feliz: corpo enviado ao Stripe sai do servidor e do JWT", async () => {
@@ -349,9 +347,18 @@ Deno.test("checkout: erro do RPC é 500 e nada é chamado, nunca libera", async 
 
 Deno.test("checkout: sem aceite válido não grava prova, não chama o Stripe e dá 400", async () => {
   for (
-    const aceite of [null, {}, { versao: "" }, { versao: 5 }, { versao: "a b" }, {
-      versao: "x".repeat(33),
-    }, "sim", true]
+    const aceite of [
+      null,
+      {},
+      { versao: "" },
+      { versao: 5 },
+      { versao: "a b" },
+      {
+        versao: "x".repeat(33),
+      },
+      "sim",
+      true,
+    ]
   ) {
     const { deps, chamadas, aceites } = montar();
     const r = await handle(post({ plano_id: 7, aceite }), deps);
@@ -365,7 +372,10 @@ Deno.test("checkout: sem aceite válido não grava prova, não chama o Stripe e 
 Deno.test("checkout: grava a prova com plano e versão, só o servidor decide o tipo", async () => {
   const { deps, aceites } = montar();
   const r = await handle(
-    post({ plano_id: 7, aceite: { versao: "2026-10", tipo: "conteudo_digital" } }),
+    post({
+      plano_id: 7,
+      aceite: { versao: "2026-10", tipo: "conteudo_digital" },
+    }),
     deps,
   );
   equal(r.status, 200);
