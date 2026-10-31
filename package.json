@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "react-router dev --port 5190",
-    "build": "react-router typegen && tsc -b && react-router build && node scripts/externalizar-scripts.mjs",
+    "build": "react-router typegen && tsc -b && react-router build && node scripts/externalizar-scripts.mjs && node scripts/gerar-robots-sitemap.mjs",
     "lint": "oxlint",
     "typecheck": "react-router typegen && tsc -b --noEmit",
     "preview": "npx serve build/client",
