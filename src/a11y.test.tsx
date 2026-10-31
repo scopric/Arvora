@@ -7,6 +7,7 @@ vi.mock("./lib/sessao", () => ({ useAuth: () => ({ sessao: null, carregando: fal
 vi.mock("./lib/supabase", () => ({ supabase: { auth: {} } }))
 
 import { Rotas } from "./App"
+import { BannerCookies } from "./componentes/BannerCookies"
 import HallOfFame, { loader as loaderHall } from "./rotas/hall-of-fame"
 import Premiado, { loader as loaderPremiado } from "./rotas/premiado"
 import premiados from "./dados/premiados-exemplo.json" with { type: "json" }
@@ -43,6 +44,13 @@ describe("acessibilidade (axe)", () => {
   it.each(telas)("%s sem violações", async (_url, montar) => {
     montar()
     await screen.findByRole("heading", { level: 1 })
+    expect(await violacoes()).toEqual([])
+  })
+
+  it.each(["pt", "en"])("banner de cookies (%s) sem violações", async (l) => {
+    localStorage.clear()
+    render(<MemoryRouter initialEntries={[`/${l}`]}><BannerCookies /></MemoryRouter>)
+    await screen.findByRole("button", { name: l === "pt" ? "Aceitar" : "Accept" })
     expect(await violacoes()).toEqual([])
   })
 })
