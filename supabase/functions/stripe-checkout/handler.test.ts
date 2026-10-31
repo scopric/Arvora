@@ -10,6 +10,7 @@ function montar(o: {
   customer?: string | null;
   vigente?: boolean;
   limite?: boolean | "erro";
+  aceite?: "erro";
   env?: Record<string, string>;
   stripe?: () => Response;
 } = {}) {
@@ -25,6 +26,7 @@ function montar(o: {
     };
   const limites: string[] = [];
   const consultas: string[] = [];
+  const aceites: [number, string][] = [];
   const db: Consultas = {
     consumirLimite: (a) => {
       limites.push(a);
@@ -38,6 +40,11 @@ function montar(o: {
     ) => (consultas.push("plano"), Promise.resolve(planos[id] ?? null)),
     customer: () => Promise.resolve(o.customer ?? null),
     temAssinaturaVigente: () => Promise.resolve(o.vigente ?? false),
+    registrarAceite: (id, v) => {
+      if (o.aceite === "erro") return Promise.reject(new Error("rpc"));
+      aceites.push([id, v]);
+      return Promise.resolve();
+    },
   };
   const deps: Deps = {
     env: (n) => (o.env ?? { SITE_URL: SITE, STRIPE_SECRET_KEY_1: CHAVE })[n],
@@ -58,9 +65,11 @@ function montar(o: {
       );
     },
   };
-  return { deps, chamadas, limites, consultas };
+  return { deps, chamadas, limites, consultas, aceites };
 }
 
+// Corpo objeto sem a chave "aceite" ganha o aceite válido; os testes do aceite passam a chave de propósito.
+const ACEITE = { versao: "2026-10" };
 const post = (corpo: unknown, headers: Record<string, string> = {}) =>
   new Request("https://fn.exemplo/stripe-checkout", {
     method: "POST",
@@ -70,7 +79,13 @@ const post = (corpo: unknown, headers: Record<string, string> = {}) =>
       Host: "malicioso.exemplo",
       ...headers,
     },
-    body: typeof corpo === "string" ? corpo : JSON.stringify(corpo),
+    body: typeof corpo === "string"
+      ? corpo
+      : JSON.stringify(
+        corpo && typeof corpo === "object" && !("aceite" in corpo)
+          ? { ...corpo, aceite: ACEITE }
+          : corpo,
+      ),
   });
 
 Deno.test("checkout feliz: corpo enviado ao Stripe sai do servidor e do JWT", async () => {
@@ -330,4 +345,41 @@ Deno.test("checkout: erro do RPC é 500 e nada é chamado, nunca libera", async 
   equal(r.status, 500);
   equal(chamadas.length, 0);
   equal(consultas.length, 0);
+});
+
+Deno.test("checkout: sem aceite válido não grava prova, não chama o Stripe e dá 400", async () => {
+  for (
+    const aceite of [null, {}, { versao: "" }, { versao: 5 }, { versao: "a b" }, {
+      versao: "x".repeat(33),
+    }, "sim", true]
+  ) {
+    const { deps, chamadas, aceites } = montar();
+    const r = await handle(post({ plano_id: 7, aceite }), deps);
+    equal(r.status, 400, JSON.stringify(aceite));
+    deepEqual(await r.json(), { erro: "aceite_obrigatorio" });
+    equal(chamadas.length, 0);
+    equal(aceites.length, 0);
+  }
+});
+
+Deno.test("checkout: grava a prova com plano e versão, só o servidor decide o tipo", async () => {
+  const { deps, aceites } = montar();
+  const r = await handle(
+    post({ plano_id: 7, aceite: { versao: "2026-10", tipo: "conteudo_digital" } }),
+    deps,
+  );
+  equal(r.status, 200);
+  deepEqual(aceites, [[7, "2026-10"]]);
+});
+
+Deno.test("checkout: falha ao gravar a prova = 500 e nenhuma sessão no Stripe", async () => {
+  const { deps, chamadas } = montar({ aceite: "erro" });
+  equal((await handle(post({ plano_id: 7 }), deps)).status, 500);
+  equal(chamadas.length, 0);
+});
+
+Deno.test("checkout: 409 de assinatura existente não grava prova", async () => {
+  const { deps, aceites } = montar({ vigente: true });
+  equal((await handle(post({ plano_id: 7 }), deps)).status, 409);
+  equal(aceites.length, 0);
 });
