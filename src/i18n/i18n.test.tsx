@@ -8,6 +8,7 @@ vi.mock("../lib/supabase", () => ({ supabase: {} }))
 import { Rotas } from "../App"
 import { en } from "./en"
 import { pt } from "./pt"
+import { PARTES_PT, textosDe } from "./index"
 
 function Local() {
   const { pathname, search, hash } = useLocation()
@@ -34,6 +35,13 @@ afterEach(() => {
 })
 
 describe("dicionários", () => {
+  it("nenhuma chave se repete entre a base e as áreas, e pt e en mesclados batem", () => {
+    const total = PARTES_PT.reduce((n, parte) => n + Object.keys(parte).length, 0)
+    expect(Object.keys(textosDe("pt")).length).toBe(total)
+    expect(Object.keys(textosDe("en")).sort()).toEqual(Object.keys(textosDe("pt")).sort())
+    for (const d of [textosDe("pt"), textosDe("en")]) for (const v of Object.values(d)) expect(v.trim()).not.toBe("")
+  })
+
   it("pt e en têm as mesmas chaves e nenhum valor vazio", () => {
     expect(Object.keys(en).sort()).toEqual(Object.keys(pt).sort())
     for (const d of [pt, en]) for (const v of Object.values(d)) expect(v.trim()).not.toBe("")

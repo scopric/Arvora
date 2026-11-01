@@ -1,13 +1,11 @@
 import { useEffect, useState, type SubmitEvent } from "react"
-import { useNavigate } from "react-router"
+import { Link } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { Marca } from "../componentes/Marca"
 import { useCaminho, useIdioma, useT, useTitulo, type Chave } from "../i18n"
-import { baixarMeusDados } from "../lib/exportar"
 import { abrirPortal } from "../lib/assinatura"
-import { excluirMinhaConta } from "../lib/excluirConta"
 import { sair, useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, perfilSchema } from "../lib/validacao"
@@ -42,8 +40,7 @@ export function Perfil() {
   const [erros, setErros] = useState<Record<string, string>>({})
   const [aviso, setAviso] = useState<{ tipo: "erro" | "ok"; texto: Chave } | null>(null)
   const [ocupado, setOcupado] = useState(false)
-  const [baixando, setBaixando] = useState(false)
-  const [erroDados, setErroDados] = useState<Chave | null>(null)
+  const caminho = useCaminho()
 
   useEffect(() => {
     if (!uid) return
@@ -86,18 +83,6 @@ export function Perfil() {
     }
     setAviso({ tipo: "ok", texto: "perfil.salvo" })
     setEstado({ ...estado, perfil: { ...estado.perfil, ...dados.data, publico_aprovado_em: null } })
-  }
-
-  async function baixar() {
-    setErroDados(null)
-    setBaixando(true)
-    try {
-      setErroDados(await baixarMeusDados())
-    } catch {
-      setErroDados("perfil.dados.erro")
-    } finally {
-      setBaixando(false)
-    }
   }
 
   return (
@@ -152,22 +137,11 @@ export function Perfil() {
             {erros.bio ? <p role="alert" className="mt-2 text-sm text-red-300">{erros.bio}</p> : null}
           </div>
 
-          <fieldset className="space-y-3 rounded-lg border border-creme/25 p-4">
-            <legend className="px-2 text-sm font-semibold">{t("perfil.visibilidade.legenda")}</legend>
-            <label className="flex items-start gap-3 text-sm">
-              <input type="radio" name="visibilidade" value="membros" defaultChecked={estado.perfil.visibilidade === "membros"} className="mt-0.5 size-5 accent-dourado" />
-              <span>{t("perfil.visibilidade.membros")}</span>
-            </label>
-            <label className="flex items-start gap-3 text-sm">
-              <input type="radio" name="visibilidade" value="publico" defaultChecked={estado.perfil.visibilidade === "publico"} className="mt-0.5 size-5 accent-dourado" />
-              <span>{t("perfil.visibilidade.publico")}</span>
-            </label>
-            {estado.perfil.visibilidade === "publico" ? (
-              <p className="text-sm text-creme/70">
-                {t(estado.perfil.publico_aprovado_em ? "perfil.visibilidade.aprovado" : "perfil.visibilidade.aguarda")}
-              </p>
-            ) : null}
-          </fieldset>
+          {/* A visibilidade agora se muda em Configurações > Privacidade; o campo segue no envio só porque o schema o exige. */}
+          <input type="hidden" name="visibilidade" value={estado.perfil.visibilidade} />
+          <p className="text-sm text-creme/70">
+            <Link to={caminho("/configuracoes/privacidade")} className="underline underline-offset-4">{t("conta.perfil.linkPrivacidade")}</Link>
+          </p>
 
           <Botao type="submit" ocupado={ocupado}>{t("perfil.salvar")}</Botao>
         </form>
@@ -177,16 +151,9 @@ export function Perfil() {
       <section className="mt-12 border-t border-creme/15 pt-8">
         <h2 className="text-sm font-semibold">{t("perfil.dados.titulo")}</h2>
         <p className="mt-2 text-sm text-creme/70">
-          {t("perfil.dados.texto")}
+          <Link to={caminho("/configuracoes/dados")} className="underline underline-offset-4">{t("conta.perfil.linkDados")}</Link>
         </p>
-        {erroDados ? <div className="mt-4"><Aviso tipo="erro">{t(erroDados)}</Aviso></div> : null}
-        <div className="mt-4 sm:max-w-xs">
-          <Botao type="button" variante="contorno" ocupado={baixando} onClick={() => void baixar()}>
-            {t("perfil.dados.baixar")}
-          </Botao>
-        </div>
       </section>
-      {uid ? <BlocoExcluirConta /> : null}
     </main>
   )
 }
@@ -231,70 +198,6 @@ function BlocoAssinatura({ uid }: { uid: string }) {
           {t("perfil.assinatura.gerenciar")}
         </Botao>
       ) : null}
-    </section>
-  )
-}
-
-// Zona de perigo, recolhida por padrão. O servidor reconfere e-mail e senha: aqui só se evita o clique sem querer.
-function BlocoExcluirConta() {
-  const t = useT()
-  const navegar = useNavigate()
-  const caminho = useCaminho()
-  const [aberto, setAberto] = useState(false)
-  const [email, setEmail] = useState("")
-  const [senha, setSenha] = useState("")
-  const [erro, setErro] = useState<Chave | null>(null)
-  const [ocupado, setOcupado] = useState(false)
-
-  async function excluir(e: SubmitEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (ocupado || !email.trim() || !senha) return
-    setErro(null)
-    setOcupado(true)
-    const falha = await excluirMinhaConta(email, senha)
-    if (falha) {
-      setOcupado(false)
-      return setErro(falha)
-    }
-    navegar(caminho("/"), { replace: true })
-  }
-
-  return (
-    <section className="mt-12 space-y-4 border-t border-creme/15 pt-8">
-      <h2 className="font-titulo text-2xl font-medium">{t("perfil.excluir.titulo")}</h2>
-      {!aberto ? (
-        <button
-          type="button"
-          aria-expanded={false}
-          onClick={() => setAberto(true)}
-          className="text-sm text-creme/70 underline underline-offset-4 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
-        >
-          {t("perfil.excluir.abrir")}
-        </button>
-      ) : (
-        <form onSubmit={excluir} noValidate className="space-y-5">
-          <div className="space-y-2 text-sm text-creme/80">
-            <p>{t("perfil.excluir.aviso")}</p>
-            <ul className="list-disc space-y-1 pl-5">
-              <li>{t("perfil.excluir.perde")}</li>
-              <li>{t("perfil.excluir.assinatura")}</li>
-              <li>{t("perfil.excluir.retidos")}</li>
-              <li>{t("perfil.excluir.backup")}</li>
-            </ul>
-          </div>
-          {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
-          <Campo rotulo={t("perfil.excluir.email")} name="confirmar_email" type="email" autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Campo rotulo={t("perfil.excluir.senha")} name="confirmar_senha" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
-          <div className="flex gap-3">
-            <Botao type="submit" variante="contorno" ocupado={ocupado} disabled={!email.trim() || !senha}>
-              {t("perfil.excluir.confirmar")}
-            </Botao>
-            <Botao type="button" variante="contorno" disabled={ocupado} onClick={() => setAberto(false)}>
-              {t("perfil.excluir.cancelar")}
-            </Botao>
-          </div>
-        </form>
-      )}
     </section>
   )
 }

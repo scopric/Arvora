@@ -3,8 +3,10 @@ import { Link, Navigate } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo } from "../componentes/Campo"
+import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
 import { useIdioma, useCaminho, useT, useTitulo, type Chave } from "../i18n"
+import { useCaptcha } from "../lib/captcha"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { cadastroSchema, errosPorCampo, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
@@ -19,6 +21,7 @@ export function Cadastro() {
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [enviado, setEnviado] = useState(false)
   const [ocupado, setOcupado] = useState(false)
+  const captcha = useCaptcha()
 
   if (sessao) return <Navigate to={caminho("/perfil")} replace />
 
@@ -29,6 +32,7 @@ export function Cadastro() {
     const dados = cadastroSchema.safeParse({ ...bruto, maior18: bruto.maior18 === "on" })
     if (!dados.success) return setErros(errosPorCampo(dados.error))
     setErros({})
+    if (captcha.falta) return setAviso("captcha.falta")
     setOcupado(true)
     // nome e maior_18 viajam nos metadados só para o gatilho criar o perfil; papel e nível nunca vêm daqui.
     // idioma só escolhe o idioma do e-mail (apresentação, nunca autorização): os modelos leem .Data.idioma.
@@ -37,10 +41,14 @@ export function Cadastro() {
       password: dados.data.senha,
       options: {
         data: { nome: dados.data.nome, maior_18: "true", idioma: lang },
+        ...captcha.opcoes,
       },
     })
     setOcupado(false)
-    if (error) return setAviso(mensagemDeErroAuth(error))
+    if (error) {
+      captcha.renovar()
+      return setAviso(mensagemDeErroAuth(error))
+    }
     setEnviado(true)
   }
 
@@ -90,6 +98,7 @@ export function Cadastro() {
             </p>
           ) : null}
         </div>
+        <Turnstile key={captcha.reinicio} onToken={captcha.setToken} />
         <Botao type="submit" ocupado={ocupado}>
           {t("cadastro.botao")}
         </Botao>

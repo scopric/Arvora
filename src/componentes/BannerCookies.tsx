@@ -14,9 +14,17 @@ export function BannerCookies() {
 
   // Reserva espaço no fim da página para o banner fixo não cobrir botões de formulário.
   useEffect(() => {
-    if (!visivel || !ref.current) return
-    document.body.style.paddingBottom = `${ref.current.offsetHeight}px`
+    const el = ref.current
+    if (!visivel || !el) return
+    // A altura muda ao girar o celular (o texto quebra em outras linhas): acompanha com ResizeObserver.
+    const reservar = () => {
+      document.body.style.paddingBottom = `${el.offsetHeight}px`
+    }
+    reservar()
+    const obs = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(reservar)
+    obs?.observe(el)
     return () => {
+      obs?.disconnect()
       document.body.style.paddingBottom = ""
     }
   }, [visivel, idioma])

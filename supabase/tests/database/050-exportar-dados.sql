@@ -2,6 +2,12 @@
 begin;
 select plan(25);
 
+-- O seed de desenvolvimento (supabase/seed.sql) nao entra no teste: apagado aqui, dentro da transacao desfeita no fim.
+truncate public.verticais, public.edicoes, public.temas, public.categorias_rede, public.espacos, public.empresas,
+  public.documentos_legais, public.planos cascade;
+delete from auth.users where email like '%@exemplo.invalid';
+delete from public.contas_stripe where stripe_account_id = 'acct_exemplo_local';
+
 create schema tt;
 grant usage on schema tt to public;
 create function tt.como(uid uuid, aal text default 'aal1') returns void language plpgsql as $$
@@ -52,7 +58,7 @@ reset role;
 select set_config('tt.a', tt.exp('a1')::text, true);
 select set_config('tt.b', tt.exp('b1')::text, true);
 select ok(current_setting('tt.a')::jsonb ?& array['versao', 'exportado_em', 'conta', 'perfil', 'equipe', 'assinaturas', 'clientes_stripe'], 'chaves esperadas presentes');
-select is(current_setting('tt.a')::jsonb -> 'versao', '1'::jsonb, 'versao 1');
+select is(current_setting('tt.a')::jsonb -> 'versao', '3'::jsonb, 'versao 3 (f4_03: indicados, receitas, estornos, log)');
 select is(current_setting('tt.a')::jsonb #>> '{conta,email}', 'a1@exemplo.test', 'conta: e-mail do dono');
 select is(current_setting('tt.a')::jsonb #>> '{conta,id}', tt.u('a1')::text, 'conta: id do dono');
 select is(current_setting('tt.a')::jsonb #>> '{perfil,id}', tt.u('a1')::text, 'perfil: id do dono');

@@ -3,6 +3,12 @@
 begin;
 select plan(14);
 
+-- O seed de desenvolvimento (supabase/seed.sql) nao entra no teste: apagado aqui, dentro da transacao desfeita no fim.
+truncate public.verticais, public.edicoes, public.temas, public.categorias_rede, public.espacos, public.empresas,
+  public.documentos_legais, public.planos cascade;
+delete from auth.users where email like '%@exemplo.invalid';
+delete from public.contas_stripe where stripe_account_id = 'acct_exemplo_local';
+
 create schema tt;
 grant usage on schema tt to public;
 create function tt.como(uid uuid, aal text default 'aal1') returns void language plpgsql as $$
@@ -35,7 +41,8 @@ insert into public.planos (conta_stripe_id, stripe_price_id, nome, nivel, interv
 select id, 'price_t_clube', 'Clube teste', 'clube', 'mes', 'assinatura', 1, 'EUR' from public.contas_stripe;
 insert into public.assinaturas (perfil_id, conta_stripe_id, stripe_subscription_id, plano_id, status, periodo_inicio, periodo_fim)
 select tt.u(v.s), p.conta_stripe_id, 'sub_' || v.s, p.id, v.st::public.status_assinatura, now() - interval '10 days', now() + v.fim
-from public.planos p, (values ('a1', 'active', interval '10 days'), ('e1', 'active', interval '-1 day'),
+-- b1 tambem ativo: desde a f4_05 o membro so ve perfis de membros ativos.
+from public.planos p, (values ('a1', 'active', interval '10 days'), ('b1', 'active', interval '10 days'), ('e1', 'active', interval '-1 day'),
                               ('ca', 'canceled', interval '10 days')) v(s, st, fim);
 
 -- membro pagante

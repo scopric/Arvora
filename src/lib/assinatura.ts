@@ -3,7 +3,7 @@ import type { Chave } from "../i18n"
 import type { Idioma } from "../site"
 import { supabase } from "./supabase"
 
-const HOSTS = ["checkout.stripe.com", "billing.stripe.com"]
+const HOSTS = ["billing.stripe.com"]
 
 // Chama a Edge Function e segue para o Stripe. Erro volta como chave da mensagem para a tela (Erros 3.2), nunca silêncio.
 async function irPara(funcao: string, corpo: Record<string, unknown>): Promise<Chave | null> {
@@ -22,4 +22,4 @@ async function irPara(funcao: string, corpo: Record<string, unknown>): Promise<C
 }
 
 export const abrirPortal = (idioma: Idioma) => irPara("stripe-portal", { idioma })
-export const iniciarCheckout = (planoId: number, idioma: Idioma) => irPara("stripe-checkout", { plano_id: planoId, idioma })
+// O checkout (com o aceite expresso) fica em src/areas/publico/checkout.ts.

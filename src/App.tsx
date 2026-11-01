@@ -1,6 +1,15 @@
 import { useEffect } from "react"
 import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router"
 import { ehIdioma, gravarIdioma, idiomaPreferido } from "./i18n"
+import { rotasAdmin } from "./areas/admin/rotas"
+import { rotasAprender } from "./areas/aprender/rotas"
+import { rotasConta } from "./areas/conta/rotas"
+import { rotasPublico } from "./areas/publico/rotas"
+import { rotasRede } from "./areas/rede/rotas"
+import { LayoutAdmin } from "./componentes/LayoutAdmin"
+import { LayoutMembro } from "./componentes/LayoutMembro"
+import { LayoutPublico } from "./componentes/LayoutPublico"
+import { AcessoProvider } from "./lib/AcessoProvider"
 import { AuthProvider } from "./lib/auth"
 import { RotaProtegida } from "./RotaProtegida"
 import { NaoEncontrada } from "./componentes/NaoEncontrada"
@@ -54,7 +63,19 @@ export function Rotas() {
         <Route path="redefinir-senha" element={<RedefinirSenha />} />
         <Route element={<RotaProtegida />}>
           <Route path="perfil" element={<Perfil />} />
+          {/* Área do membro: login + LayoutMembro (sidebar/abas). Cada área registra as suas rotas em src/areas/<area>/rotas.tsx. */}
+          <Route element={<LayoutMembro />}>
+            {rotasAprender()}
+            {rotasRede()}
+            {rotasConta()}
+          </Route>
+          {/* Admin: login, depois LayoutAdmin (equipe + 2FA). Caminhos relativos a /:lang/admin. */}
+          <Route path="admin" element={<LayoutAdmin />}>
+            {rotasAdmin()}
+          </Route>
         </Route>
+        {/* Páginas públicas (topo e rodapé do site). */}
+        <Route element={<LayoutPublico />}>{rotasPublico()}</Route>
         <Route path="*" element={<NaoEncontrada />} />
       </Route>
     </Routes>
@@ -64,7 +85,9 @@ export function Rotas() {
 export default function App() {
   return (
     <AuthProvider>
-      <Rotas />
+      <AcessoProvider>
+        <Rotas />
+      </AcessoProvider>
     </AuthProvider>
   )
 }

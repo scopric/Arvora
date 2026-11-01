@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react"
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -85,5 +85,48 @@ describe("BannerCookies", () => {
 
   it("hook devolve false por padrão", () => {
     expect(consentimentoAnalytics()).toBe(false)
+  })
+
+  it("fecha quando outra aba grava a escolha (evento storage) e reabre quando ela retira", async () => {
+    montar()
+    expect(await screen.findByRole("region", { name: "Cookies" })).toBeTruthy()
+    const salvo = JSON.stringify({ versao: VERSAO_CONSENTIMENTO, escolha: "recusado", em: new Date().toISOString() })
+    localStorage.setItem("arvora.consentimento", salvo)
+    act(() => {
+      window.dispatchEvent(new StorageEvent("storage", { key: "arvora.consentimento", newValue: salvo }))
+    })
+    await waitFor(() => expect(screen.queryByRole("region", { name: "Cookies" })).toBeNull())
+    localStorage.removeItem("arvora.consentimento")
+    act(() => {
+      window.dispatchEvent(new StorageEvent("storage", { key: "arvora.consentimento", newValue: null }))
+    })
+    expect(await screen.findByRole("region", { name: "Cookies" })).toBeTruthy()
+  })
+
+  it("acompanha a altura do banner com ResizeObserver (girar o celular) e desliga ao fechar", async () => {
+    let aoRedimensionar: () => void = () => {}
+    const disconnect = vi.fn()
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(cb: () => void) {
+          aoRedimensionar = cb
+        }
+        observe() {}
+        disconnect = disconnect
+      },
+    )
+    let altura = 100
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(() => altura)
+    montar()
+    await screen.findByRole("region", { name: "Cookies" })
+    expect(document.body.style.paddingBottom).toBe("100px")
+    altura = 180 // girou: o texto quebrou em mais linhas
+    act(() => aoRedimensionar())
+    expect(document.body.style.paddingBottom).toBe("180px")
+    await userEvent.click(screen.getByRole("button", { name: "Recusar" }))
+    expect(document.body.style.paddingBottom).toBe("")
+    expect(disconnect).toHaveBeenCalled()
+    vi.unstubAllGlobals()
   })
 })

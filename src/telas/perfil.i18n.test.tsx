@@ -53,12 +53,11 @@ afterEach(cleanup)
 const PORTUGUES = /Salvar|Nome|Cidade|Perfil|perfil|Setor|Visibilidade|Membros|membros|Empresa|Sobre você|Sair|Carregando|Selecione|Assinatura|assinatura|conta|Excluir|Baixar|Cancelar|senha|Senha|equipe|Aguarde|Você|acesso|definitiv|reembolso|obrigação|cobrança|Quero|Corrija|Informe|Escolha|Use o|No máximo|Só /
 
 describe("Perfil em /en", () => {
-  it("não tem texto em português (inclui bloco de conta aberto e erros do Zod)", async () => {
+  it("não tem texto em português (inclui os links das configurações e erros do Zod)", async () => {
     resp.perfil = { data: { ...perfilOk, nome: "" }, error: null }
     ir("en")
     await userEvent.click(await screen.findByRole("button", { name: en["perfil.salvar"] }))
     await screen.findAllByRole("alert")
-    await userEvent.click(screen.getByRole("button", { name: en["perfil.excluir.abrir"] }))
     await screen.findByRole("button", { name: en["perfil.assinatura.gerenciar"] })
     const texto = document.body.textContent ?? ""
     expect(texto).not.toMatch(PORTUGUES)

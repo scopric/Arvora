@@ -115,8 +115,8 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
           customer_email: usuario.email,
           customer_creation: assinatura ? undefined : "always",
         }),
-        success_url: `${base}/${idioma}/perfil?checkout=ok`,
-        cancel_url: `${base}/${idioma}/perfil?checkout=cancelado`,
+        success_url: `${base}/${idioma}/checkout/sucesso`,
+        cancel_url: `${base}/${idioma}/checkout/cancelado`,
         locale: idioma === "pt" ? "pt-BR" : "en",
       },
       {

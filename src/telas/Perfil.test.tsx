@@ -1,10 +1,10 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react"
+import { cleanup, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { renderiza } from "../testeUtil"
 
 // O comportamento sob RLS de verdade é provado no pgTAP; aqui só o que a tela faz com cada resposta.
-const baixar = vi.hoisted(() => vi.fn())
-const resp = vi.hoisted(() => ({ perfil: {} as unknown, setores: {} as unknown, update: {} as unknown, clientes: {} as unknown, chamadas: 0 }))
+const resp = vi.hoisted(() => ({ perfil: {} as unknown, setores: {} as unknown, update: {} as unknown, clientes: {} as unknown, chamadas: 0, ultimo: null as unknown }))
 
 vi.mock("../lib/supabase", () => {
   const consulta = (valor: () => unknown) => {
@@ -23,18 +23,13 @@ vi.mock("../lib/supabase", () => {
             ? consulta(() => resp.clientes)
             : {
               select: () => consulta(() => resp.perfil),
-              update: () => (resp.chamadas++, { eq: () => ({ select: () => Promise.resolve(resp.update) }) }),
+              update: (v: unknown) => (resp.chamadas++, resp.ultimo = v, { eq: () => ({ select: () => Promise.resolve(resp.update) }) }),
             },
     },
   }
 })
-vi.mock("../lib/exportar", () => ({ baixarMeusDados: baixar }))
 const abrirPortal = vi.hoisted(() => vi.fn())
 vi.mock("../lib/assinatura", () => ({ abrirPortal }))
-const excluirMinhaConta = vi.hoisted(() => vi.fn())
-vi.mock("../lib/excluirConta", () => ({ excluirMinhaConta }))
-const navegar = vi.hoisted(() => vi.fn())
-vi.mock("react-router", async (original) => ({ ...(await original<typeof import("react-router")>()), useNavigate: () => navegar }))
 vi.mock("../lib/sessao", () => ({
   useAuth: () => ({ sessao: { user: { id: "u1", email: "a@b.com" } }, carregando: false }),
   sair: vi.fn(),
@@ -55,23 +50,20 @@ beforeEach(() => {
   resp.update = { data: [{ id: "u1" }], error: null }
   resp.clientes = { data: [], error: null }
   resp.chamadas = 0
-  baixar.mockReset()
   abrirPortal.mockReset()
-  excluirMinhaConta.mockReset()
-  navegar.mockReset()
 })
 
 describe("tela Meu perfil", () => {
   it("falha de leitura aparece como mensagem, não como formulário vazio", async () => {
     resp.perfil = { data: null, error: { message: "boom" } }
-    render(<Perfil />)
+    renderiza(<Perfil />)
     expect((await screen.findByRole("alert")).textContent).toMatch(/não conseguimos carregar/i)
     expect(screen.queryByLabelText("Nome")).toBeNull()
   })
 
   it("UPDATE que não casa nenhuma linha (RLS) vira erro, não 'Perfil salvo'", async () => {
     resp.update = { data: [], error: null }
-    render(<Perfil />)
+    renderiza(<Perfil />)
     await userEvent.click(await screen.findByRole("button", { name: /salvar alterações/i }))
     const alertas = await screen.findAllByRole("alert")
     expect(alertas[0].textContent).toMatch(/não conseguimos salvar/i)
@@ -79,42 +71,41 @@ describe("tela Meu perfil", () => {
   })
 
   it("salva quando o banco devolve a linha", async () => {
-    render(<Perfil />)
+    renderiza(<Perfil />)
     await userEvent.click(await screen.findByRole("button", { name: /salvar alterações/i }))
     await waitFor(() => expect(screen.getByRole("status").textContent).toBe("Perfil salvo."))
   })
 
   it("não envia nada ao banco com campo inválido", async () => {
-    render(<Perfil />)
+    renderiza(<Perfil />)
     await userEvent.type(await screen.findByRole("textbox", { name: "País" }), "x1")
     await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }))
     expect(await screen.findByText(/código de 2 letras/i)).toBeTruthy()
     expect(resp.chamadas).toBe(0)
   })
 
-  it("Meus dados: erro ao baixar aparece na tela", async () => {
-    baixar.mockResolvedValue("perfil.dados.erro")
-    render(<Perfil />)
-    await userEvent.click(await screen.findByRole("button", { name: /baixar meus dados/i }))
-    expect((await screen.findByRole("alert")).textContent).toMatch(/não conseguimos gerar/i)
+  it("exportar, excluir e visibilidade saíram: ficam só os links para as Configurações", async () => {
+    renderiza(<Perfil />)
+    await screen.findByRole("button", { name: /salvar alterações/i })
+    expect(screen.queryByRole("button", { name: /baixar meus dados/i })).toBeNull()
+    expect(screen.queryByRole("button", { name: /excluir/i })).toBeNull()
+    expect(screen.queryByRole("radio")).toBeNull()
+    expect(screen.getByRole("link", { name: /privacidade/i }).getAttribute("href")).toBe("/pt/configuracoes/privacidade")
+    expect(screen.getByRole("link", { name: /meus dados/i }).getAttribute("href")).toBe("/pt/configuracoes/dados")
   })
 
-  it("Meus dados: clique duplo não baixa duas vezes e o botão fica desabilitado", async () => {
-    let fim!: () => void
-    baixar.mockReturnValue(new Promise((r) => (fim = () => r(null))))
-    render(<Perfil />)
-    const botao = await screen.findByRole("button", { name: /baixar meus dados/i })
-    await userEvent.dblClick(botao)
-    expect(baixar).toHaveBeenCalledTimes(1)
-    expect((screen.getByRole("button", { name: /aguarde/i }) as HTMLButtonElement).disabled).toBe(true)
-    fim()
-    await screen.findByRole("button", { name: /baixar meus dados/i })
+  it("salvar não muda a visibilidade (vai a mesma que veio do banco)", async () => {
+    resp.perfil = { data: { ...perfilOk, visibilidade: "publico" }, error: null }
+    renderiza(<Perfil />)
+    await userEvent.click(await screen.findByRole("button", { name: /salvar alterações/i }))
+    await waitFor(() => expect(resp.chamadas).toBe(1))
+    expect(resp.ultimo).toMatchObject({ visibilidade: "publico" })
   })
 })
 
 describe("bloco Assinatura", () => {
   it("não aparece para quem não tem cliente no Stripe", async () => {
-    render(<Perfil />)
+    renderiza(<Perfil />)
     await screen.findByRole("button", { name: /salvar alterações/i })
     expect(screen.queryByRole("button", { name: /gerenciar assinatura/i })).toBeNull()
   })
@@ -122,7 +113,7 @@ describe("bloco Assinatura", () => {
   it("aparece para quem tem cliente e abre o portal", async () => {
     resp.clientes = { data: [{ id: 1 }], error: null }
     abrirPortal.mockResolvedValue(null)
-    render(<Perfil />)
+    renderiza(<Perfil />)
     await userEvent.click(await screen.findByRole("button", { name: /gerenciar assinatura/i }))
     expect(abrirPortal).toHaveBeenCalledWith("pt")
   })
@@ -130,70 +121,14 @@ describe("bloco Assinatura", () => {
   it("falha ao abrir o portal aparece na tela", async () => {
     resp.clientes = { data: [{ id: 1 }], error: null }
     abrirPortal.mockResolvedValue("perfil.assinatura.erroPortal")
-    render(<Perfil />)
+    renderiza(<Perfil />)
     await userEvent.click(await screen.findByRole("button", { name: /gerenciar assinatura/i }))
     expect((await screen.findByRole("alert")).textContent).toMatch(/não conseguimos abrir/i)
   })
 
   it("falha ao consultar aparece na tela, não some", async () => {
     resp.clientes = { data: null, error: { message: "boom" } }
-    render(<Perfil />)
+    renderiza(<Perfil />)
     expect((await screen.findByRole("alert")).textContent).toMatch(/verificar sua assinatura/i)
-  })
-})
-
-describe("bloco Excluir minha conta", () => {
-  const abrir = async () => {
-    render(<Perfil />)
-    await userEvent.click(await screen.findByRole("button", { name: /quero excluir minha conta/i }))
-  }
-  const preencher = async () => {
-    await userEvent.type(screen.getByLabelText(/e-mail da sua conta/i), "a@b.com")
-    await userEvent.type(screen.getByLabelText(/sua senha/i), "senha_falsa")
-  }
-
-  it("vem recolhido, e ao abrir avisa o que acontece", async () => {
-    render(<Perfil />)
-    await screen.findByRole("button", { name: /salvar alterações/i })
-    expect(screen.queryByRole("button", { name: /excluir definitivamente/i })).toBeNull()
-    await userEvent.click(screen.getByRole("button", { name: /quero excluir minha conta/i }))
-    expect(screen.getByText(/Depois de 14 dias da assinatura/i)).toBeTruthy()
-    expect(screen.getByText(/retidos por obrigação legal/i)).toBeTruthy()
-  })
-
-  it("o botão só habilita com e-mail e senha", async () => {
-    await abrir()
-    const botao = screen.getByRole("button", { name: /excluir definitivamente/i }) as HTMLButtonElement
-    expect(botao.disabled).toBe(true)
-    await userEvent.type(screen.getByLabelText(/e-mail da sua conta/i), "a@b.com")
-    expect(botao.disabled).toBe(true)
-    await userEvent.type(screen.getByLabelText(/sua senha/i), "senha_falsa")
-    expect(botao.disabled).toBe(false)
-  })
-
-  it("erro aparece na tela e a conta não sai da tela", async () => {
-    excluirMinhaConta.mockResolvedValue("erro.excluir.senha_invalida")
-    await abrir()
-    await preencher()
-    await userEvent.click(screen.getByRole("button", { name: /excluir definitivamente/i }))
-    expect((await screen.findByRole("alert")).textContent).toBe("Senha incorreta.")
-    expect(excluirMinhaConta).toHaveBeenCalledWith("a@b.com", "senha_falsa")
-    expect(navegar).not.toHaveBeenCalled()
-  })
-
-  it("sucesso navega para a página inicial do idioma", async () => {
-    excluirMinhaConta.mockResolvedValue(null)
-    await abrir()
-    await preencher()
-    await userEvent.click(screen.getByRole("button", { name: /excluir definitivamente/i }))
-    await waitFor(() => expect(navegar).toHaveBeenCalledWith("/pt", { replace: true }))
-  })
-
-  it("clique duplo envia uma vez só", async () => {
-    excluirMinhaConta.mockReturnValue(new Promise(() => {}))
-    await abrir()
-    await preencher()
-    await userEvent.dblClick(screen.getByRole("button", { name: /excluir definitivamente/i }))
-    expect(excluirMinhaConta).toHaveBeenCalledTimes(1)
   })
 })

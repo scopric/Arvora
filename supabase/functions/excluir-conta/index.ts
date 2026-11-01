@@ -25,8 +25,26 @@ Deno.serve((req) =>
       throw new Error("falha ao conferir a senha");
     },
     apagarUsuario: async (url, serviceRole, uid) => {
-      const { error } = await createClient(url, serviceRole, opcoes).auth.admin
-        .deleteUser(uid);
+      const admin = createClient(url, serviceRole, opcoes);
+      // Arquivos do titular (entregas) saem do Storage ANTES: o cascade só apaga linhas, e o banco recusa
+      // apagar o perfil se ainda houver arquivo (f4_02).
+      const { data: arquivos, error: erroLista } = await admin.rpc(
+        "arquivos_do_titular",
+        { p_uid: uid },
+      );
+      if (erroLista) throw new Error("falha ao listar os arquivos");
+      const porBucket = new Map<string, string[]>();
+      for (const a of (arquivos ?? []) as { bucket: string; nome: string }[]) {
+        porBucket.set(a.bucket, [...(porBucket.get(a.bucket) ?? []), a.nome]);
+      }
+      for (const [bucket, nomes] of porBucket) {
+        for (let i = 0; i < nomes.length; i += 100) {
+          const { error: erroRemove } = await admin.storage.from(bucket)
+            .remove(nomes.slice(i, i + 100));
+          if (erroRemove) throw new Error("falha ao apagar os arquivos");
+        }
+      }
+      const { error } = await admin.auth.admin.deleteUser(uid);
       if (error?.code === "user_not_found" || error?.status === 404) {
         throw new UsuarioInexistente();
       }
