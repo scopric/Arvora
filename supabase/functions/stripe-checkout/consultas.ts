@@ -26,6 +26,13 @@ export const consultas = (sb: Sb): Consultas => ({
       ).eq("conta_stripe_id", conta)
         .order("criado_em", { ascending: false }).limit(1).maybeSingle(),
     )?.stripe_customer_id ?? null,
+  registrarAceite: async (planoId, versao) => {
+    const { error } = await sb.rpc("registrar_aceite_checkout", {
+      p_plano_id: planoId,
+      p_versao: versao,
+    });
+    if (error) throw new Error("aceite falhou");
+  },
   temAssinaturaVigente: async (uid) =>
     (dados<{ id: number }[] | null>(
       await sb.from("assinaturas").select("id").eq("perfil_id", uid)

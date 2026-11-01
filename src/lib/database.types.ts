@@ -184,6 +184,9 @@ isOneToOne: false
 "processar_evento_stripe":
 { Args: { "p_conta_stripe_id": number,"p_evento": Json }; Returns: string
                            },
+"registrar_aceite_checkout":
+{ Args: { "p_plano_id": number,"p_versao": string }; Returns: number
+                           },
 "tem_acesso":
 { Args: { "minimo": Database["public"]['Enums']["nivel_acesso"] }; Returns: boolean
                            }
