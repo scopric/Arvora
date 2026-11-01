@@ -468,13 +468,13 @@ isOneToOne: false
                   ]
                 },"empresas": {
                   Row: {
-                    "aprovada_em": string | null,"aprovada_por": string | null,"atualizado_em": string,"cidade": string | null,"criado_em": string,"descricao": string | null,"dono_perfil_id": string | null,"id": number,"logo_path": string | null,"nome": string,"pais": string | null,"setor_id": number,"site": string | null,"slug": string,"status": Database["public"]['Enums']["status_moderacao"]
+                    "aprovada_em": string | null,"aprovada_por": string | null,"atualizado_em": string,"cidade": string | null,"criado_em": string,"descricao": string | null,"dono_perfil_id": string | null,"id": number,"logo_path": string | null,"motivo_recusa": string | null,"nome": string,"pais": string | null,"setor_id": number,"site": string | null,"slug": string,"status": Database["public"]['Enums']["status_moderacao"]
                   }
                   Insert: {
-                    "aprovada_em"?: string | null,"aprovada_por"?: string | null,"atualizado_em"?: string,"cidade"?: string | null,"criado_em"?: string,"descricao"?: string | null,"dono_perfil_id"?: string | null,"id"?: never,"logo_path"?: string | null,"nome": string,"pais"?: string | null,"setor_id": number,"site"?: string | null,"slug": string,"status"?: Database["public"]['Enums']["status_moderacao"]
+                    "aprovada_em"?: string | null,"aprovada_por"?: string | null,"atualizado_em"?: string,"cidade"?: string | null,"criado_em"?: string,"descricao"?: string | null,"dono_perfil_id"?: string | null,"id"?: never,"logo_path"?: string | null,"motivo_recusa"?: string | null,"nome": string,"pais"?: string | null,"setor_id": number,"site"?: string | null,"slug": string,"status"?: Database["public"]['Enums']["status_moderacao"]
                   }
                   Update: {
-                    "aprovada_em"?: string | null,"aprovada_por"?: string | null,"atualizado_em"?: string,"cidade"?: string | null,"criado_em"?: string,"descricao"?: string | null,"dono_perfil_id"?: string | null,"id"?: never,"logo_path"?: string | null,"nome"?: string,"pais"?: string | null,"setor_id"?: number,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["status_moderacao"]
+                    "aprovada_em"?: string | null,"aprovada_por"?: string | null,"atualizado_em"?: string,"cidade"?: string | null,"criado_em"?: string,"descricao"?: string | null,"dono_perfil_id"?: string | null,"id"?: never,"logo_path"?: string | null,"motivo_recusa"?: string | null,"nome"?: string,"pais"?: string | null,"setor_id"?: number,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["status_moderacao"]
                   }
                   Relationships: [
                     {
@@ -743,13 +743,13 @@ isOneToOne: false
                   ]
                 },"notificacoes": {
                   Row: {
-                    "criado_em": string,"id": number,"lida_em": string | null,"link": string | null,"perfil_id": string,"tipo": Database["public"]['Enums']["tipo_notificacao"],"titulo": string
+                    "criado_em": string,"id": number,"lida_em": string | null,"link": string | null,"perfil_id": string,"tipo": Database["public"]['Enums']["tipo_notificacao"],"titulo": string,"titulo_en": string | null
                   }
                   Insert: {
-                    "criado_em"?: string,"id"?: never,"lida_em"?: string | null,"link"?: string | null,"perfil_id": string,"tipo": Database["public"]['Enums']["tipo_notificacao"],"titulo": string
+                    "criado_em"?: string,"id"?: never,"lida_em"?: string | null,"link"?: string | null,"perfil_id": string,"tipo": Database["public"]['Enums']["tipo_notificacao"],"titulo": string,"titulo_en"?: string | null
                   }
                   Update: {
-                    "criado_em"?: string,"id"?: never,"lida_em"?: string | null,"link"?: string | null,"perfil_id"?: string,"tipo"?: Database["public"]['Enums']["tipo_notificacao"],"titulo"?: string
+                    "criado_em"?: string,"id"?: never,"lida_em"?: string | null,"link"?: string | null,"perfil_id"?: string,"tipo"?: Database["public"]['Enums']["tipo_notificacao"],"titulo"?: string,"titulo_en"?: string | null
                   }
                   Relationships: [
                     {
@@ -1203,13 +1203,13 @@ isOneToOne: false
                   ]
                 },"sugestoes_match": {
                   Row: {
-                    "criado_em": string,"id": number,"motivo": string,"perfil_id": string,"pontuacao": number,"semana": string,"sugerido_id": string
+                    "criado_em": string,"id": number,"motivo": string,"motivo_dados": Json | null,"perfil_id": string,"pontuacao": number,"semana": string,"sugerido_id": string
                   }
                   Insert: {
-                    "criado_em"?: string,"id"?: never,"motivo": string,"perfil_id": string,"pontuacao": number,"semana": string,"sugerido_id": string
+                    "criado_em"?: string,"id"?: never,"motivo": string,"motivo_dados"?: Json | null,"perfil_id": string,"pontuacao": number,"semana": string,"sugerido_id": string
                   }
                   Update: {
-                    "criado_em"?: string,"id"?: never,"motivo"?: string,"perfil_id"?: string,"pontuacao"?: number,"semana"?: string,"sugerido_id"?: string
+                    "criado_em"?: string,"id"?: never,"motivo"?: string,"motivo_dados"?: Json | null,"perfil_id"?: string,"pontuacao"?: number,"semana"?: string,"sugerido_id"?: string
                   }
                   Relationships: [
                     {
@@ -1383,11 +1383,14 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "aprovar_alteracao_premiado":
+            "abertura_transmissao":
+{ Args: { "aula": number }; Returns: string
+                           },
+"aprovar_alteracao_premiado":
 { Args: { "aprovar": boolean,"premiado": number }; Returns: undefined
                            },
 "aprovar_empresa":
-{ Args: { "aprovar": boolean,"empresa": number }; Returns: undefined
+{ Args: { "aprovar": boolean,"empresa": number,"motivo"?: string }; Returns: undefined
                            },
 "aprovar_material":
 { Args: { "material": number }; Returns: undefined
@@ -1425,6 +1428,9 @@ isOneToOne: false
 "corrigir_entrega":
 { Args: { "devolutiva": string,"entrega": number,"novo_status": Database["public"]['Enums']["status_entrega"] }; Returns: undefined
                            },
+"email_do_membro":
+{ Args: { "perfil": string }; Returns: string
+                           },
 "empresas_equipe":
 { Args: Record<PropertyKey, never>; Returns: {
               "aprovada_em": string | null,
@@ -1436,6 +1442,7 @@ isOneToOne: false
 "dono_perfil_id": string | null,
 "id": number,
 "logo_path": string | null,
+"motivo_recusa": string | null,
 "nome": string,
 "pais": string | null,
 "setor_id": number,
@@ -1496,6 +1503,7 @@ isOneToOne: false
 "dono_perfil_id": string | null,
 "id": number,
 "logo_path": string | null,
+"motivo_recusa": string | null,
 "nome": string,
 "pais": string | null,
 "setor_id": number,

@@ -27,6 +27,8 @@ as $$
   select p is null or (p !~ '(\.\.|//|\\)' and p !~ '^/' and length(btrim(p)) > 0);
 $$;
 revoke all on function private.caminho_seguro(text) from public, anon, authenticated;
+-- O CHECK roda com o papel de quem grava; a funcao so olha o texto.
+grant execute on function private.caminho_seguro(text) to authenticated, service_role;
 alter table public.perfis add constraint perfis_foto_path_seguro check (private.caminho_seguro(foto_path));
 alter table public.cursos add constraint cursos_capa_path_seguro check (private.caminho_seguro(capa_path));
 alter table public.materiais_aula add constraint materiais_aula_arquivo_path_seguro check (private.caminho_seguro(arquivo_path));
@@ -569,12 +571,14 @@ end $$;
 
 -- 15) Nunca fica sem super_admin: recusa remover ou rebaixar o ultimo (inclusive pela exclusao da conta dele).
 --     O lock serializa duas remocoes simultaneas, que de outro modo passariam juntas.
+--     So passa conexao direta como postgres sem SET ROLE (migrations, limpeza dos testes, recuperacao manual);
+--     o app usa authenticated/service_role e o Auth conecta como supabase_auth_admin.
 create function private.equipe_ultimo_super_admin() returns trigger
 language plpgsql security definer
 set search_path = ''
 as $$
 begin
-  if old.papel = 'super_admin' and (tg_op = 'DELETE' or new.papel <> 'super_admin') then
+  if not (session_user = 'postgres' and current_setting('role') = 'none') and old.papel = 'super_admin' and (tg_op = 'DELETE' or new.papel <> 'super_admin') then
     perform pg_advisory_xact_lock(hashtextextended('equipe:super_admin', 0));
     if not exists (select 1 from public.equipe e where e.papel = 'super_admin' and e.perfil_id <> old.perfil_id) then
       raise exception 'ultimo_super_admin' using errcode = 'P0001';
