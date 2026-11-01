@@ -1,4 +1,5 @@
 import { botaoContornoApp, botaoPrimarioApp } from "../../componentes/botaoEstilo"
+import { linkTextoApp } from "../../componentes/menuApp"
 import { SITE_URL } from "../../site"
 import { supabase } from "../../lib/supabase"
 
@@ -135,7 +136,7 @@ export const foco = "focus-visible:outline-2 focus-visible:outline-offset-2 focu
 // Botões e link de texto desta área (só existe no app): mesmo spec do Botao (botaoEstilo.ts); o link sublinha em cinza e acende no hover.
 export const botaoLink = botaoPrimarioApp
 export const botaoContorno = botaoContornoApp
-export const linkTexto = `rounded-sm font-medium text-creme underline decoration-cinza underline-offset-4 transition-colors hover:decoration-creme ${foco}`
+export const linkTexto = linkTextoApp
 // Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
 export const campoBase =
   "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"

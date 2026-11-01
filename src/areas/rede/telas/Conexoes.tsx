@@ -9,7 +9,9 @@ import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
-import { useCaminho, useIdioma, useT, useTitulo, type Chave } from "../../../i18n"
+import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
+import { linkTextoApp } from "../../../componentes/menuApp"
+import { PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -18,7 +20,8 @@ import { chaveSlug, COLUNAS_CONEXAO, dia, mudarStatus, ok, useCarga, vitrinesPor
 
 type Dados = { conexoes: Conexao[]; perfis: Map<string, Vitrine> }
 
-function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: Map<string, Vitrine>; aoMudar: () => void | Promise<void> }) {
+// `primario`: só a primeira linha com "Aceitar" ganha o botão dourado (um primário por tela).
+function Linha({ c, uid, perfis, aoMudar, primario }: { c: Conexao; uid: string; perfis: Map<string, Vitrine>; aoMudar: () => void | Promise<void>; primario?: boolean }) {
   const t = useT()
   const idioma = useIdioma()
   const caminho = useCaminho()
@@ -43,26 +46,25 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
   const recebido = c.destinatario_id === uid
   const botao = "sm:w-auto"
   return (
-    <li className="rounded-2xl border border-current/15 bg-superficie/25 p-5">
-      <div className="flex items-start gap-4">
+    <li className="p-4">
+      <div className="flex items-start gap-3">
         <Avatar nome={p?.nome ?? null} />
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-semibold">
-            {p ? <Link to={caminho(`/network/${chaveSlug(p)}`)} className="hover:underline">{p.nome}</Link> : t("rede.conexoes.membroIndisponivel")}
+          <h2 className="text-base font-medium">
+            {p ? <Link to={caminho(`/network/${chaveSlug(p)}`)} className={linkTextoApp}>{p.nome}</Link> : t("rede.conexoes.membroIndisponivel")}
           </h2>
-          {p?.empresa_nome ? <p className="text-sm opacity-80">{p.empresa_nome}</p> : null}
-          <p className="text-sm opacity-60">
-            {dia(c.pedida_em, idioma)}
+          <p className="text-legenda text-nevoa">
+            {p?.empresa_nome ? `${p.empresa_nome} · ` : ""}{dia(c.pedida_em, idioma)}
             {c.origem === "match" ? ` · ${t("rede.conexoes.viaMatch")}` : ""}
           </p>
-          {c.mensagem ? <p className="mt-2 whitespace-pre-wrap rounded-lg border border-current/15 px-3 py-2 text-sm">{c.mensagem}</p> : null}
+          {c.mensagem ? <p className="mt-2 rounded-md bg-creme/2 px-3 py-2 text-legenda whitespace-pre-wrap shadow-borda">{c.mensagem}</p> : null}
         </div>
       </div>
       {erro ? <div className="mt-3"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
-      <div className="mt-4 flex flex-wrap items-center gap-3">
+      <div className="mt-3 flex flex-wrap items-center gap-3 sm:pl-13">
         {c.status === "pendente" && recebido ? (
           <>
-            <Botao onClick={() => void agir("aceita")} ocupado={ocupado} disabled={!p} className={botao}>{t("rede.conexoes.aceitar")}</Botao>
+            <Botao variante={primario ? "primario" : "contorno"} onClick={() => void agir("aceita")} ocupado={ocupado} disabled={!p} className={botao}>{t("rede.conexoes.aceitar")}</Botao>
             <Botao variante="contorno" onClick={() => void agir("recusada")} ocupado={ocupado} className={botao}>{t("rede.conexoes.recusar")}</Botao>
           </>
         ) : null}
@@ -87,7 +89,6 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
 
 export function Conexoes() {
   const t = useT()
-  useTitulo("rede.conexoes.titulo")
   const acesso = useAcesso()
   const { sessao } = useAuth()
   const uid = sessao?.user.id ?? ""
@@ -117,7 +118,7 @@ export function Conexoes() {
       itens.length === 0 ? (
         <Vazio>{t(vazio)}</Vazio>
       ) : (
-        <ul className="space-y-4">{itens.map((c) => <Linha key={c.id} c={c} uid={uid} perfis={perfis} aoMudar={recarregar} />)}</ul>
+        <ul className="divide-y divide-grafite overflow-hidden rounded-xl shadow-borda">{itens.map((c, i) => <Linha key={c.id} c={c} uid={uid} perfis={perfis} aoMudar={recarregar} primario={i === 0} />)}</ul>
       )
     corpo = (
       <Abas
@@ -131,10 +132,8 @@ export function Conexoes() {
     )
   }
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t("rede.conexoes.titulo")}</h1>
-      <p className="mt-2 opacity-75">{t("rede.conexoes.intro")}</p>
-      <div className="mt-8">{corpo}</div>
-    </div>
+    <PaginaApp chave="rede.conexoes.titulo" intro={t("rede.conexoes.intro")} estreita>
+      {corpo}
+    </PaginaApp>
   )
 }

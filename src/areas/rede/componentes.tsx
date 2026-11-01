@@ -3,6 +3,8 @@ import { Link } from "react-router"
 import { Aviso } from "../../componentes/Aviso"
 import { Botao } from "../../componentes/Botao"
 import { Selecao } from "../../componentes/Campo"
+import { useEstiloCampo } from "../../componentes/campoEstilo"
+import { linkTextoApp } from "../../componentes/menuApp"
 import { Selo } from "../../componentes/Selo"
 import { useCaminho, useIdioma, useT, type Chave } from "../../i18n"
 import { supabase } from "../../lib/supabase"
@@ -15,7 +17,7 @@ export const campoTexto =
 // Avatar de iniciais: a foto de perfil ainda não tem bucket (fora do lançamento), então ninguém mostra imagem aqui.
 export function Avatar({ nome }: { nome: string | null }) {
   return (
-    <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-full bg-fumaca text-legenda font-medium">
+    <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-fumaca text-legenda font-medium">
       {iniciais(nome)}
     </span>
   )
@@ -39,7 +41,7 @@ export function Dialogo({ aberto, titulo, aoFechar, children }: { aberto: boolea
         e.preventDefault()
         aoFechar()
       }}
-      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-creme/20 bg-painel p-6 text-creme backdrop:bg-black/60"
+      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl bg-obsidiana p-6 text-creme shadow-flutuante backdrop:bg-breu/70"
     >
       <h2 id={id} className="text-corpo-g font-semibold">{titulo}</h2>
       {aberto ? children : null}
@@ -57,6 +59,7 @@ export function DialogoDenuncia({ alvo, aberto, aoFechar }: { alvo: AlvoDenuncia
   const [erro, setErro] = useState(false)
   const [enviado, setEnviado] = useState<"nao" | "ok" | "ja">("nao") // fica gravado enquanto a tela viver: sem reenvio
   const [ocupado, setOcupado] = useState(false)
+  const campo = useEstiloCampo()
 
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -84,7 +87,7 @@ export function DialogoDenuncia({ alvo, aberto, aoFechar }: { alvo: AlvoDenuncia
         </div>
       ) : (
         <form onSubmit={enviar} className="mt-4 space-y-5">
-          <p className="text-sm opacity-80">{t("rede.denuncia.texto")}</p>
+          <p className="text-base text-bruma">{t("rede.denuncia.texto")}</p>
           {erro ? <Aviso tipo="erro">{t("rede.denuncia.erro")}</Aviso> : null}
           <Selecao rotulo={t("rede.denuncia.motivo")} name="motivo" required defaultValue="">
             <option value="" disabled>{t("rede.denuncia.escolha")}</option>
@@ -93,7 +96,7 @@ export function DialogoDenuncia({ alvo, aberto, aoFechar }: { alvo: AlvoDenuncia
             ))}
           </Selecao>
           <div>
-            <label htmlFor="den-texto" className="mb-2 block text-sm font-semibold">{t("rede.denuncia.detalhe")}</label>
+            <label htmlFor="den-texto" className={campo.rotulo}>{t("rede.denuncia.detalhe")}</label>
             <textarea id="den-texto" name="texto" rows={3} maxLength={1000} className={campoTexto} />
           </div>
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -111,15 +114,15 @@ export function CartaoPerfil({ perfil, setor, tags, children, acoes }: { perfil:
   const caminho = useCaminho()
   const local = [setor, perfil.cidade].filter(Boolean).join(" · ")
   return (
-    <li className="rounded-2xl border border-current/15 bg-superficie/25 p-5">
-      <div className="flex items-start gap-4">
+    <li className="rounded-xl p-5 shadow-borda">
+      <div className="flex items-start gap-3">
         <Avatar nome={perfil.nome} />
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-semibold">
-            <Link to={caminho(`/network/${chaveSlug(perfil)}`)} className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">{perfil.nome}</Link>
+          <h2 className="text-base font-semibold">
+            <Link to={caminho(`/network/${chaveSlug(perfil)}`)} className="rounded-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">{perfil.nome}</Link>
           </h2>
-          {perfil.empresa_nome ? <p className="text-sm opacity-80">{perfil.empresa_nome}</p> : null}
-          {local ? <p className="text-sm opacity-60">{local}</p> : null}
+          {perfil.empresa_nome ? <p className="text-legenda text-bruma">{perfil.empresa_nome}</p> : null}
+          {local ? <p className="text-legenda text-nevoa">{local}</p> : null}
           {Children.count(tags) > 0 ? <ul className="mt-3 flex flex-wrap gap-2">{tags}</ul> : null}
         </div>
       </div>
@@ -151,22 +154,23 @@ export function Contato({ outroId }: { outroId: string }) {
         </Botao>
       </div>
     )
-  if (estado === "indisponivel") return <p className="text-sm opacity-80">{t("rede.contato.indisponivel")}</p>
-  if (estado === "vazio") return <p className="text-sm opacity-80">{t("rede.contato.vazio")}</p>
+  if (estado === "indisponivel") return <p className="text-legenda text-nevoa">{t("rede.contato.indisponivel")}</p>
+  if (estado === "vazio") return <p className="text-legenda text-nevoa">{t("rede.contato.vazio")}</p>
   return (
-    <dl className="space-y-1 text-sm">
+    <dl className="space-y-1 text-legenda">
       {estado.email ? (
-        <div className="flex gap-2"><dt className="font-semibold">{t("rede.contato.email")}</dt><dd><a href={`mailto:${estado.email}`} className="underline">{estado.email}</a></dd></div>
+        <div className="flex gap-2"><dt className="text-nevoa">{t("rede.contato.email")}</dt><dd><a href={`mailto:${estado.email}`} className={linkTextoApp}>{estado.email}</a></dd></div>
       ) : null}
       {estado.whatsapp ? (
-        <div className="flex gap-2"><dt className="font-semibold">WhatsApp</dt><dd><a href={`https://wa.me/${estado.whatsapp.replace(/\D/g, "")}`} className="underline">{estado.whatsapp}</a></dd></div>
+        <div className="flex gap-2"><dt className="text-nevoa">WhatsApp</dt><dd><a href={`https://wa.me/${estado.whatsapp.replace(/\D/g, "")}`} className={linkTextoApp}>{estado.whatsapp}</a></dd></div>
       ) : null}
     </dl>
   )
 }
 
 // Botão certo para o estado do par (Network, perfil e Match). `conexao` = linha do par, se existir.
-export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar }: { uid: string; outroId: string; nome: string; origem: Conexao["origem"]; conexao?: Conexao; aoMudar: () => void | Promise<void> }) {
+// `destaque` (padrão true): "Pedir conexão" dourado. Em listas com vários cartões (Match) vai em contorno: um primário por tela.
+export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar, destaque = true }: { uid: string; outroId: string; nome: string; origem: Conexao["origem"]; conexao?: Conexao; aoMudar: () => void | Promise<void>; destaque?: boolean }) {
   const t = useT()
   const caminho = useCaminho()
   const idioma = useIdioma()
@@ -174,6 +178,7 @@ export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar }: { 
   const [erro, setErro] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
   const [agora] = useState(() => Date.now())
+  const campo = useEstiloCampo()
 
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -200,7 +205,7 @@ export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar }: { 
   const podeAgora = !!liberaEm && liberaEm.getTime() <= agora
   let corpo: ReactNode
   if (!conexao || podeAgora) {
-    corpo = <Botao onClick={() => setAberto(true)} className="sm:w-auto">{t(conexao ? "rede.conexao.pedirDeNovo" : "rede.conexao.pedir")}</Botao>
+    corpo = <Botao variante={destaque ? "primario" : "contorno"} onClick={() => setAberto(true)} className="sm:w-auto">{t(conexao ? "rede.conexao.pedirDeNovo" : "rede.conexao.pedir")}</Botao>
   } else if (conexao.status === "pendente" && conexao.solicitante_id === uid) {
     corpo = (
       <>
@@ -212,14 +217,14 @@ export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar }: { 
     corpo = (
       <>
         <Selo tom="destaque">{t("rede.conexao.recebido")}</Selo>
-        <Link to={caminho("/conexoes")} className="inline-flex min-h-12 items-center underline">{t("rede.conexao.responder")}</Link>
+        <Link to={caminho("/conexoes")} className={`inline-flex min-h-9 items-center ${linkTextoApp}`}>{t("rede.conexao.responder")}</Link>
       </>
     )
   } else if (conexao.status === "aceita") {
     corpo = <Selo tom="destaque">{t("rede.conexao.conectados")}</Selo>
   } else {
     corpo = (
-      <p className="text-sm opacity-80">
+      <p className="text-legenda text-nevoa">
         {t(conexao.status === "recusada" && conexao.solicitante_id === uid ? "rede.conexao.naoAceito" : "rede.conexao.encerrada")}{" "}
         {liberaEm ? `${t("rede.conexao.novoPedidoEm")} ${dia(liberaEm.toISOString(), idioma)}.` : null}
       </p>
@@ -231,10 +236,10 @@ export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar }: { 
       {erro && !aberto ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
       <Dialogo aberto={aberto} titulo={`${t("rede.conexao.pedirA")} ${nome}`} aoFechar={() => setAberto(false)}>
         <form onSubmit={enviar} className="mt-4 space-y-5">
-          <p className="text-sm opacity-80">{t("rede.conexao.dica")}</p>
+          <p className="text-base text-bruma">{t("rede.conexao.dica")}</p>
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
           <div>
-            <label htmlFor="cx-msg" className="mb-2 block text-sm font-semibold">{t("rede.conexao.mensagem")}</label>
+            <label htmlFor="cx-msg" className={campo.rotulo}>{t("rede.conexao.mensagem")}</label>
             <textarea id="cx-msg" name="mensagem" rows={3} maxLength={500} className={campoTexto} />
           </div>
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
