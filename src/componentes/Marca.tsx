@@ -15,7 +15,7 @@ export function Marca({ to, className = "" }: { to?: string; className?: string 
     </>
   )
   return to ? (
-    <Link to={to} className={classes}>
+    <Link to={to} aria-label={app ? "Grupo Árvora" : undefined} className={classes}>
       {conteudo}
     </Link>
   ) : (

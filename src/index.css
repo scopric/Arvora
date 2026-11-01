@@ -72,6 +72,10 @@
     --font-weight-semibold: 590;
     --font-weight-bold: 590;
   }
+  /* O preflight põe `bolder` em b/strong (vira 700 sobre 400); dentro do app vale o teto do Linear. */
+  .app :is(b, strong) {
+    font-weight: var(--font-weight-semibold);
+  }
   body:has(.app) {
     background-color: var(--color-breu);
   }
@@ -163,4 +167,4 @@
 .cena-mascara {
   -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
   mask-image: radial-gradient(closest-side, #000 55%, transparent);
-}\n
+}

@@ -1,5 +1,6 @@
 import { useId, useState, type KeyboardEvent, type ReactNode } from "react"
 import { useApp } from "./escopo"
+import { abaApp } from "./menuApp"
 
 export type Aba = { chave: string; rotulo: string; conteudo: ReactNode }
 
@@ -8,11 +9,8 @@ const publico = {
   aba: "min-h-11 shrink-0 border-b-2 border-transparent px-4 font-semibold opacity-70 transition-colors hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-selected:border-destaque aria-selected:opacity-100",
 }
 
-// App (Linear): abas como pílulas de 32px, sem sublinhado; a ativa ganha fundo creme/5 e texto creme.
-const app = {
-  lista: "flex gap-1 overflow-x-auto",
-  aba: "inline-flex h-8 shrink-0 items-center rounded-md px-3 text-legenda font-medium text-nevoa transition-colors pointer-coarse:min-h-11 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-selected:bg-creme/5 aria-selected:text-creme",
-}
+// App (Linear): abas como pílulas de 32px; a ativa ganha fundo creme/5, texto creme e a barra dourada (menuApp).
+const app = { lista: "flex gap-1 overflow-x-auto pb-1", aba: abaApp }
 
 // Abas no padrão WAI-ARIA: setas esquerda/direita, Home e End movem e ativam; só a aba ativa entra na ordem de tab.
 export function Abas({ abas, rotulo, inicial }: { abas: Aba[]; rotulo: string; inicial?: string }) {

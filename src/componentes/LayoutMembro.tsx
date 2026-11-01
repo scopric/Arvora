@@ -10,14 +10,15 @@ import { Icone } from "./Icone"
 import { Marca } from "./Marca"
 import { SeletorIdioma } from "./SeletorIdioma"
 import { Selo } from "./Selo"
+import { focoApp, linkMenuApp, rotuloGrupoApp } from "./menuApp"
 import { ABAS, AVATAR, MAIS, SIDEBAR, type Item } from "./navegacao"
 
 // Casca do membro no molde do app do Linear (Decisão 54; telas-molde em Documentos/Refero Telas/redesenho-2026-11):
 // sidebar de 240px sobre o breu, conteúdo num painel carvão com hairline, itens de 13px com ícone de 16px, o item
 // ativo com fundo creme/5 e ícone dourado. Elevação só por hairline; nenhuma sombra externa.
-const foco = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
-const linkMenu = `flex h-8 items-center gap-2 rounded-md px-2 text-legenda font-medium text-nevoa transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme aria-[current=page]:bg-creme/5 aria-[current=page]:text-creme [&[aria-current=page]>svg:first-child]:text-dourado ${foco}`
-const rotuloGrupo = "px-2 pt-4 pb-1 text-[11px] font-medium text-nevoa"
+const foco = focoApp
+const linkMenu = linkMenuApp
+const rotuloGrupo = rotuloGrupoApp
 
 // Item bloqueado por nível continua clicável (leva à página com a prévia, PRD §17.1); o leitor de tela ouve o motivo.
 function LinkItem({ item, acesso }: { item: Item; acesso: Acesso }) {
@@ -135,7 +136,7 @@ function MenuAvatar({ acesso }: { acesso: Acesso }) {
             ))}
             <li>
               <button type="button" onClick={sairDaConta} className={`${linkMenu} w-full text-left`}>
-                <Icone nome="seta" className="size-4 shrink-0" />
+                <Icone nome="sair" className="size-4 shrink-0" />
                 {t("menu.sair")}
               </button>
             </li>
@@ -181,7 +182,7 @@ function BarraAbas({ acesso }: { acesso: Acesso }) {
   const t = useT()
   const caminho = useCaminho()
   const [mais, setMais] = useState(false)
-  const item = `flex min-h-14 min-w-11 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium text-nevoa aria-[current=page]:text-creme [&[aria-current=page]>svg]:text-dourado ${foco}`
+  const item = `relative flex min-h-14 min-w-11 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium text-nevoa aria-[current=page]:text-creme aria-[current=page]:before:absolute aria-[current=page]:before:inset-x-5 aria-[current=page]:before:top-0 aria-[current=page]:before:h-0.5 aria-[current=page]:before:rounded-full aria-[current=page]:before:bg-dourado [&[aria-current=page]>svg]:text-dourado ${foco}`
   return (
     <>
       <nav aria-label={t("menu.abas")} className="app fixed inset-x-0 bottom-0 z-20 flex border-t border-grafite bg-breu lg:hidden">
@@ -191,7 +192,7 @@ function BarraAbas({ acesso }: { acesso: Acesso }) {
             {t(a.rotulo)}
           </NavLink>
         ))}
-        <button type="button" onClick={() => setMais(true)} className={item}>
+        <button type="button" aria-haspopup="dialog" aria-expanded={mais} onClick={() => setMais(true)} className={item}>
           <Icone nome="menu" className="size-5" />
           {t("menu.mais")}
         </button>

@@ -8,12 +8,13 @@ import { Icone } from "./Icone"
 import { Mfa } from "./Mfa"
 import { NaoEncontrada } from "./NaoEncontrada"
 import { SeletorIdioma } from "./SeletorIdioma"
+import { focoApp, linkMenuApp, rotuloGrupoApp } from "./menuApp"
 import { MENU_ADMIN } from "./navegacao"
 
 // Mesma casca do membro (molde: configurações do app do Linear): sidebar no breu com grupos rotulados, conteúdo num
 // painel carvão com hairline. O tema claro do PRD §17.7.2 saiu (Decisão 54).
-const foco = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
-const linkMenu = `flex h-8 items-center gap-2 rounded-md px-2 text-legenda font-medium text-nevoa transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme aria-[current=page]:bg-creme/5 aria-[current=page]:text-creme [&[aria-current=page]>svg]:text-dourado ${foco}`
+const foco = focoApp
+const linkMenu = linkMenuApp
 
 function Menu() {
   const t = useT()
@@ -22,7 +23,7 @@ function Menu() {
     <nav aria-label={t("admin.menu")} className="flex flex-col">
       {MENU_ADMIN.map((g, i) => (
         <div key={i}>
-          {g.rotulo ? <p className="px-2 pt-4 pb-1 text-[11px] font-medium text-nevoa">{t(g.rotulo)}</p> : null}
+          {g.rotulo ? <p className={rotuloGrupoApp}>{t(g.rotulo)}</p> : null}
           <ul className="space-y-0.5">
             {g.itens.map((item) => (
               <li key={item.rota}>
@@ -66,10 +67,7 @@ export function LayoutAdmin() {
             <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-40 focus:m-2 focus:rounded-md focus:bg-creme focus:px-4 focus:py-3 focus:text-breu">{t("menu.pular")}</a>
             <aside className="shrink-0 px-3 py-3 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-60 lg:flex-col lg:overflow-y-auto">
               <div className="flex items-center justify-between gap-2 px-2 py-1">
-                <p className="flex items-center gap-2 text-[11px] font-medium text-nevoa">
-                  <span aria-hidden="true" className="size-1.5 rounded-full bg-dourado" />
-                  {t("admin.faixa")}
-                </p>
+                <p className="text-[11px] font-medium text-nevoa">{t("admin.faixa")}</p>
                 <SeletorIdioma />
               </div>
               <Link to={caminho("/inicio")} className={`${linkMenu} mt-2`}>

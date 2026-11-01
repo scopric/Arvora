@@ -143,7 +143,7 @@ export function MeuAward() {
   if (!acesso.carregando && !acesso.erro && !acesso.premiado)
     return (
       <div className="mx-auto max-w-3xl px-6 py-24">
-        <h1 className="font-conteudo text-titulo-p leading-[0.95] font-semibold tracking-normal uppercase">{t("sistema.naoEncontrada")}</h1>
+        <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t("sistema.naoEncontrada")}</h1>
         <Link to={caminho("/inicio")} className="mt-8 inline-block underline">{t("sistema.voltar")}</Link>
       </div>
     )
@@ -163,7 +163,7 @@ export function MeuAward() {
     )
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <h1 className="font-conteudo text-titulo-p leading-[0.95] font-semibold tracking-normal uppercase sm:text-titulo">{t("rede.meuAward.titulo")}</h1>
+      <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t("rede.meuAward.titulo")}</h1>
       <p className="mt-2 opacity-75">{t("rede.meuAward.intro")}</p>
       <div className="mt-8">{corpo}</div>
     </div>

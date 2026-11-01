@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { NavLink } from "react-router"
+import { abaApp } from "../../componentes/menuApp"
 import { useCaminho, useT, useTitulo, type Chave } from "../../i18n"
 
 const ABAS: { rota: string; rotulo: Chave; fim?: boolean }[] = [
@@ -20,13 +21,13 @@ export function Pagina({ titulo, menu = true, children }: { titulo: Chave; menu?
     <div className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
       <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t(titulo)}</h1>
       {menu ? (
-        <nav aria-label={t("conta.menu")} className="mt-6 flex flex-wrap gap-1">
+        <nav aria-label={t("conta.menu")} className="mt-6 flex flex-wrap gap-1 pb-1">
           {ABAS.map((a) => (
             <NavLink
               key={a.rota}
               to={caminho(a.rota)}
               end={a.fim}
-              className="inline-flex min-h-11 items-center rounded-lg px-4 text-sm font-semibold text-creme/80 transition-colors hover:bg-creme/10 hover:text-white aria-[current=page]:bg-creme/12 aria-[current=page]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
+              className={abaApp}
             >
               {t(a.rotulo)}
             </NavLink>

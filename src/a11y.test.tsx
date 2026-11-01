@@ -11,6 +11,10 @@ vi.mock("./lib/supabase", () => ({
 
 import { Rotas } from "./App"
 import { Abas } from "./componentes/Abas"
+import { Aviso } from "./componentes/Aviso"
+import { Botao } from "./componentes/Botao"
+import { Campo } from "./componentes/Campo"
+import { DialogoConfirmar } from "./componentes/DialogoConfirmar"
 import { BannerCookies } from "./componentes/BannerCookies"
 import { Bloqueado } from "./componentes/Bloqueado"
 import { Cartao } from "./componentes/Cartao"
@@ -119,6 +123,11 @@ describe("acessibilidade dos componentes comuns no escopo do app (axe)", () => {
           <Bloqueado previa={<h2>Prévia</h2>} frase="As aulas semanais fazem parte do Grupo Árvora." />
           <Abas rotulo="Aprender" abas={[{ chave: "a", rotulo: "Aulas", conteudo: <p>A</p> }, { chave: "b", rotulo: "Academy", conteudo: <p>B</p> }]} />
           <Tabela legenda="Membros" id={(m) => m.id} linhas={[{ id: 1, nome: "Ana" }]} colunas={[{ chave: "nome", titulo: "Nome", celula: (m) => m.nome }]} />
+          <Campo rotulo="Nome" ajuda="Como aparece no perfil" />
+          <Botao>Salvar</Botao>
+          <Botao variante="contorno">Cancelar</Botao>
+          <Aviso tipo="ok">Salvo.</Aviso>
+          <DialogoConfirmar aberto titulo="Confirmar" texto="Tem certeza?" aoConfirmar={() => {}} aoCancelar={() => {}} />
         </main>
       </EscopoApp>,
       `/${l}`,

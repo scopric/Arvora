@@ -103,7 +103,7 @@ export function Mfa({ children }: { children: ReactNode }) {
 
   // Molde: login do Linear — cartão centrado, texto curto, botões empilhados.
   return (
-    <div className="flex min-h-dvh items-center justify-center px-4 py-16">
+    <main className="flex min-h-dvh items-center justify-center px-4 py-16">
       <Cartao className="w-full max-w-md">
       <Titulo />
       <h1 className="text-subtitulo font-semibold">{t("mfa.titulo")}</h1>
@@ -134,6 +134,6 @@ export function Mfa({ children }: { children: ReactNode }) {
         </>
       ) : null}
       </Cartao>
-    </div>
+    </main>
   )
 }

@@ -134,5 +134,6 @@ export const foco = "focus-visible:outline-2 focus-visible:outline-offset-2 focu
 export const botaoLink = `inline-flex min-h-12 items-center justify-center rounded-lg bg-creme px-6 font-semibold text-fundo transition-colors hover:bg-white ${foco}`
 export const botaoContorno = `inline-flex min-h-12 items-center justify-center rounded-lg border border-creme/30 px-6 font-semibold text-creme transition-colors hover:border-creme/60 ${foco}`
 export const linkTexto = `underline underline-offset-4 hover:text-white ${foco}`
+// Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
 export const campoBase =
-  "w-full rounded-lg border border-creme/25 bg-transparent px-4 py-3 text-base text-creme outline-none transition-colors focus-visible:border-dourado focus-visible:ring-2 focus-visible:ring-dourado/40"
+  "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-corpo-p text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"

@@ -10,7 +10,7 @@ const publico = {
 // App (Linear pill segmentada): 28px de altura, 12px/510, hairline grafite; o atual ganha fundo creme/5.
 const app = {
   nav: "flex items-center rounded-full border border-grafite p-0.5",
-  item: "inline-flex h-7 min-w-9 items-center justify-center rounded-full px-2.5 text-xs font-medium text-nevoa transition-colors pointer-coarse:min-h-11 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-[current=true]:bg-creme/5 aria-[current=true]:text-creme",
+  item: "inline-flex h-7 min-w-9 items-center justify-center rounded-full px-2.5 text-xs font-medium text-nevoa transition-colors pointer-coarse:min-h-11 pointer-coarse:min-w-11 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-[current=true]:bg-creme/5 aria-[current=true]:text-creme aria-[current=true]:ring-1 aria-[current=true]:ring-dourado aria-[current=true]:ring-inset",
 }
 
 // Troca só o prefixo de idioma; o resto do caminho, a busca e o hash ficam. O nome completo do idioma vai no

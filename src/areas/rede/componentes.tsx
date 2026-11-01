@@ -8,8 +8,9 @@ import { useCaminho, useIdioma, useT, type Chave } from "../../i18n"
 import { supabase } from "../../lib/supabase"
 import { chaveSlug, dia, iniciais, mudarStatus, pedirConexao, podePedirDe, type Conexao, type Vitrine } from "./lib"
 
+// Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
 export const campoTexto =
-  "w-full rounded-lg border border-creme/25 bg-transparent px-4 py-3 text-base outline-none focus-visible:border-dourado focus-visible:ring-2 focus-visible:ring-dourado/40"
+  "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-corpo-p text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"
 
 // Avatar de iniciais: a foto de perfil ainda não tem bucket (fora do lançamento), então ninguém mostra imagem aqui.
 export function Avatar({ nome }: { nome: string | null }) {

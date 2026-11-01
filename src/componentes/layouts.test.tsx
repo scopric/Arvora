@@ -36,6 +36,7 @@ import { AcessoContext, type Acesso } from "../lib/acesso"
 import { LayoutAdmin } from "./LayoutAdmin"
 import { LayoutMembro } from "./LayoutMembro"
 import { LayoutPublico } from "./LayoutPublico"
+import { Botao } from "./Botao"
 import { simularDialog } from "../testeUtil"
 
 simularDialog()
@@ -117,6 +118,24 @@ describe("LayoutPublico", () => {
     expect(screen.getByRole("navigation", { name: "Menu do membro" })).toBeTruthy()
     expect(screen.getByRole("heading", { name: "Tela de dentro" })).toBeTruthy()
     expect(screen.queryByRole("contentinfo")).toBeNull()
+  })
+
+  it("com sessão, o miolo das rotas de conteúdo mantém o visual público (Decisão 54): só a casca é do app", () => {
+    render(
+      <AcessoContext value={acessoBase}>
+        <MemoryRouter initialEntries={["/pt/planos"]}>
+          <Routes>
+            <Route path="/:lang" element={<LayoutPublico />}>
+              <Route path="planos" element={<><h1>Tela de dentro</h1><Botao>Assinar</Botao></>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AcessoContext>,
+    )
+    expect(screen.getByRole("navigation", { name: "Menu do membro" })).toBeTruthy()
+    const botao = screen.getByRole("button", { name: "Assinar" })
+    expect(botao.className).toContain("min-h-12 w-full") // variante pública do Botao
+    expect(screen.getByRole("main").classList.contains("app")).toBe(false)
   })
 
   it("com sessão, termos e privacidade seguem com o topo público", () => {

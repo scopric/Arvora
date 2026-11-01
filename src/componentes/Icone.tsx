@@ -34,15 +34,15 @@ const desenhos = {
     </>
   ),
   folha: <path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19c3-4 6-7 9-9" />,
-  livro: <path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 19a2 2 0 012-2h13M8 3v14" />,
+  livro: <path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2V5zM4 19a2 2 0 012-2h13M8 3v14" />,
   filme: (
     <>
       <rect x="3" y="4" width="18" height="16" rx="2" />
       <path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4" />
     </>
   ),
-  predio: <path d="M4 21V5a2 2 0 012-2h8a2 2 0 012 2v16M16 9h2a2 2 0 012 2v10M3 21h18M8 7h2M8 11h2M8 15h2M12 7h2M12 11h2M12 15h2" />,
-  faisca: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM5 18l.7 2 2 .7-2 .7L5 23l-.7-1.6-2-.7 2-.7z" />,
+  predio: <path d="M4 21V5a2 2 0 012-2h8a2 2 0 012 2v16M16 9h2a2 2 0 012 2v10M3 21h18M8 8h6M8 12h6M8 16h6" />,
+  faisca: <path d="M12 3l2.2 6.3L20.5 12l-6.3 2.7L12 21l-2.2-6.3L3.5 12l6.3-2.7z" />,
   calendario: (
     <>
       <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -96,6 +96,7 @@ const desenhos = {
   lista: <path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01" />,
   camadas: <path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5" />,
   seta: <path d="M15 5l-7 7 7 7" />,
+  sair: <path d="M10 4H6a2 2 0 00-2 2v12a2 2 0 002 2h4M15 8l5 4-5 4M20 12H9" />,
 } satisfies Record<string, ReactNode>
 
 export type NomeIcone = keyof typeof desenhos
