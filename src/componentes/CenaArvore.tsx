@@ -210,12 +210,16 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     ro.disconnect()
     removeEventListener("pointermove", ponteiro)
     document.removeEventListener("visibilitychange", retomar)
+    gl.deleteProgram(prog)
+    gl.deleteProgram(raios)
+    gl.deleteBuffer(bufP)
+    gl.deleteBuffer(bufR)
   }
   return { fim, retomar }
 }
 
 // `className` posiciona e dimensiona a cena (precisa de altura definida).
-export default function CenaArvore({ className = "", cheia = false }: { className?: string; cheia?: boolean }) {
+export default function CenaArvore({ className = "", cheia = false, classeCanvas = "" }: { className?: string; cheia?: boolean; classeCanvas?: string }) {
   const t = useT()
   const ref = useRef<HTMLCanvasElement>(null)
   const [falhou, setFalhou] = useState(false)
@@ -238,7 +242,7 @@ export default function CenaArvore({ className = "", cheia = false }: { classNam
   if (falhou) return <FundoArvore className={className} camada="w-full" />
   return (
     <div className={`pointer-events-none absolute ${className}`}>
-      <canvas ref={ref} aria-hidden="true" className={`size-full ${cheia ? "" : "cena-mascara"}`} />
+      <canvas ref={ref} aria-hidden="true" className={`size-full ${cheia ? "" : "cena-mascara"} ${classeCanvas}`} />
       <button
         type="button"
         onClick={() => setParado(!parado)}
