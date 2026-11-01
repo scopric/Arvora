@@ -26,7 +26,7 @@ export function Caixa({ rotulo, className = "", ...resto }: Omit<ComponentProps<
   return (
     <div className="flex min-h-11 items-center gap-3">
       <input id={id} type="checkbox" className={`size-4 accent-dourado ${className}`} {...resto} />
-      <label htmlFor={id} className={`${e.rotulo} mb-0`}>{rotulo}</label>
+      <label htmlFor={id} className={e.rotulo.replace(/mb-\S+ /, "")}>{rotulo}</label>
     </div>
   )
 }

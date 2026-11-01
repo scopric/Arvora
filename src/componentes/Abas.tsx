@@ -10,7 +10,7 @@ const publico = {
 }
 
 // App (Linear): abas como pílulas de 32px; a ativa ganha fundo creme/5, texto creme e a barra dourada (menuApp).
-const app = { lista: "flex gap-1 overflow-x-auto pb-1", aba: abaApp }
+const app = { lista: "flex gap-1 overflow-x-auto p-1 -m-1", aba: abaApp }
 
 // Abas no padrão WAI-ARIA: setas esquerda/direita, Home e End movem e ativam; só a aba ativa entra na ordem de tab.
 export function Abas({ abas, rotulo, inicial }: { abas: Aba[]; rotulo: string; inicial?: string }) {

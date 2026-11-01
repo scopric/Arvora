@@ -34,7 +34,7 @@ const desenhos = {
     </>
   ),
   folha: <path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19c3-4 6-7 9-9" />,
-  livro: <path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2V5zM4 19a2 2 0 012-2h13M8 3v14" />,
+  livro: <path d="M4 19V5a2 2 0 012-2h13v14H6a2 2 0 00-2 2zM6 17h13v4H6a2 2 0 010-4M8 3v14" />,
   filme: (
     <>
       <rect x="3" y="4" width="18" height="16" rx="2" />
