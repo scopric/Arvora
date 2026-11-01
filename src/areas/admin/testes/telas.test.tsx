@@ -1,4 +1,4 @@
-import { cleanup, screen, waitFor, within } from "@testing-library/react"
+import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -6,7 +6,6 @@ vi.mock("../../../lib/supabase", async () => ({ supabase: (await import("./mockS
 vi.mock("../../../lib/sessao", () => ({ useAuth: () => ({ sessao: { user: { id: "eu" } }, carregando: false }), sair: vi.fn() }))
 
 import { simularDialog } from "../../../testeUtil"
-import type { Relatorio } from "../lib/relatorio"
 import { AulaForm } from "../telas/AulaForm"
 import { Correcao } from "../telas/Correcao"
 import { Empresas } from "../telas/Empresas"
@@ -17,6 +16,7 @@ import { PedidosDeDados } from "../telas/PedidosDeDados"
 import { RelatorioCiclo } from "../telas/RelatorioCiclo"
 import { Temas } from "../telas/Temas"
 import { VisaoGeral } from "../telas/VisaoGeral"
+import { REL } from "./fixtures"
 import { chamou, estado, reiniciar } from "./mockSupabase"
 import { montar } from "./util"
 
@@ -31,30 +31,13 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-// Números conhecidos (centavos de EUR). Conferência: 125000 - 14500 = 110500.
-const REL: Relatorio = {
-  ciclo: { inicio: "2026-09-10", fim: "2026-10-09", estado: "rascunho", ultima_versao: null },
-  cambio: { data_referencia: "2026-10-09", taxas: [{ moeda: "BRL", taxa: 6.25, data: "2026-10-09", fonte_url: "https://exemplo.invalid/bce" }] },
-  receita: { stripe: 100000, externa: 25000, bruta: 125000 },
-  deducoes: { vat: 10000, estornos: 5000, estornos_vat: 500, total: 14500 },
-  receita_base: 110500,
-  clientes_ativos: { quantidade: 42, lista: [{ chave: "cliente-1", origem: "assinatura" }] },
-  ia: { avulsa: 3000, rateio: 2000, total: 5000, por_nivel: [{ nivel: "grupo", receita_liquida: 50000, horas_ia: 2, horas_total: 10, rateio: 2000 }] },
-  faixa: { faixa: 1, limites: [100, 500], percentual: null, valor: null },
-  pendencias: [{ tipo: "faixa_percentuais_indefinidos" }],
-  linhas: [
-    { fonte: "stripe", ref_id: 1, data: "2026-09-15", conta_ou_origem: "acct_x", cliente: "a@exemplo.invalid", moeda: "EUR", bruto: 100000, vat: 10000, taxa: 1, bruto_eur: 100000, vat_eur: 10000, referencia: "in_1" },
-    { fonte: "externa", ref_id: 7, data: "2026-09-20", conta_ou_origem: "pix", cliente: "Cliente Pix", moeda: "EUR", bruto: 25000, vat: 0, taxa: 1, bruto_eur: 25000, vat_eur: 0, referencia: "2026/comp.pdf" },
-  ],
-  csv: "fonte;ref_id\nstripe;1",
-}
 const texto = () => document.body.textContent!.replace(/ /g, " ")
 
 describe("Relatório do Ciclo", () => {
   async function abrirCiclo(ciclo: string) {
     montar(<RelatorioCiclo />, "/relatorio-ciclo", "/pt/admin/relatorio-ciclo")
     await screen.findByText(/1\. Receita/)
-    await userEvent.selectOptions(screen.getByLabelText("Ciclo"), ciclo)
+    fireEvent.change(screen.getByLabelText(/Mês em que o Ciclo/), { target: { value: ciclo.slice(0, 7) } })
     await screen.findByText(/1\. Receita/)
   }
 
@@ -161,12 +144,15 @@ describe("Empresas", () => {
     await screen.findByText("Padaria Exemplo")
     await userEvent.click(screen.getByRole("button", { name: "Aprovar" }))
     await waitFor(() => expect(chamou("rpc:aprovar_empresa")).toHaveLength(1))
-    expect(chamou("rpc:aprovar_empresa")[0].args[0]).toEqual({ empresa: 9, aprovar: true })
+    expect(chamou("rpc:aprovar_empresa")[0].args[0]).toEqual({ empresa: 9, aprovar: true, motivo: null })
     await userEvent.click(screen.getByRole("button", { name: "Recusar" }))
     expect(chamou("rpc:aprovar_empresa")).toHaveLength(1)
-    await userEvent.click(within(document.querySelector("dialog[open]") as HTMLElement).getByRole("button", { name: "Recusar", hidden: true }))
+    const dialogo = within(document.querySelector("dialog[open]") as HTMLElement)
+    expect((dialogo.getByRole("button", { name: "Recusar", hidden: true }) as HTMLButtonElement).disabled).toBe(true)
+    await userEvent.type(dialogo.getByLabelText(/Motivo da recusa/), "Sem site")
+    await userEvent.click(dialogo.getByRole("button", { name: "Recusar", hidden: true }))
     await waitFor(() => expect(chamou("rpc:aprovar_empresa")).toHaveLength(2))
-    expect(chamou("rpc:aprovar_empresa")[1].args[0]).toEqual({ empresa: 9, aprovar: false })
+    expect(chamou("rpc:aprovar_empresa")[1].args[0]).toEqual({ empresa: 9, aprovar: false, motivo: "Sem site" })
   })
 })
 
@@ -266,5 +252,142 @@ describe("Pedidos de dados, Equipe, Membros, Visão geral, Temas, Moderação", 
     await userEvent.click(screen.getByRole("button", { name: "Procedente" }))
     await waitFor(() => expect(chamou("rpc:resolver_denuncia")).toHaveLength(1))
     expect(chamou("rpc:resolver_denuncia")[0].args[0]).toEqual({ denuncia: 5, procedente: true })
+  })
+})
+
+describe("Receitas fora do Stripe, estorno, acesso manual e câmbio", () => {
+  const RECEITA = { id: 3, cliente_nome: "Cliente Pix", plano_id: 7, perfil_id: null, moeda: "EUR", bruto_centavos: 25000, recebido_em: "2026-09-20" }
+  async function abrir() {
+    estado.respostas["relatorios_ciclo"] = { data: [], error: null }
+    estado.respostas["rpc:relatorio_ciclo"] = { data: REL, error: null }
+    estado.respostas["planos"] = { data: [{ id: 7, nome: "Grupo Anual" }], error: null }
+    estado.respostas["receitas_externas:select"] = { data: [RECEITA], error: null }
+    estado.respostas["receitas_externas:insert"] = { data: [{ id: 9 }], error: null }
+    montar(<RelatorioCiclo />, "/relatorio-ciclo", "/pt/admin/relatorio-ciclo")
+    await screen.findByText(/1\. Receita/)
+    fireEvent.change(screen.getByLabelText(/Mês em que o Ciclo/), { target: { value: "2026-09" } })
+    await screen.findByText(/1\. Receita/)
+    await screen.findByRole("option", { name: "Grupo Anual" })
+  }
+  // Cada formulário é achado pelo botão de enviar; rótulos são regex ancoradas no começo.
+  const preencher = async (campos: Record<string, string>, botao = "Lançar receita") => {
+    const form = screen.getByRole("button", { name: botao }).closest("form") as HTMLElement
+    for (const [rotulo, v] of Object.entries(campos)) {
+      const el = within(form).getByLabelText(new RegExp(rotulo.startsWith("^") ? rotulo : `^${rotulo}`))
+      if (el.tagName === "SELECT") await userEvent.selectOptions(el, v)
+      else fireEvent.change(el, { target: { value: v } })
+    }
+  }
+  const comprovante = () => userEvent.upload(screen.getByLabelText(/^Comprovante/), new File(["x"], "comp.pdf", { type: "application/pdf" }))
+  const base = { "Recebido em": "2026-09-20", Cliente: "Ana", "Valor bruto": "100,00", "Plano": "7" }
+  const alerta = async (re: RegExp) => { await waitFor(() => expect(screen.getAllByRole("alert").map((a) => a.textContent).join(" ")).toMatch(re)) }
+
+  it("lançar receita valida tudo ANTES do upload (moeda, VAT, data do Ciclo, plano)", async () => {
+    await abrir()
+    await comprovante()
+    await preencher({ "Recebido em": "2026-09-20", Cliente: "Ana", "Valor bruto": "100,00", "Moeda": "E1" })
+    await userEvent.click(screen.getByRole("button", { name: "Lançar receita" }))
+    await alerta(/Escolha o plano/)
+    await preencher({ "Plano": "7" })
+    await userEvent.click(screen.getByRole("button", { name: "Lançar receita" }))
+    await alerta(/Moeda inválida/)
+    await preencher({ Moeda: "EUR", "VAT incluído": "150,00" })
+    await userEvent.click(screen.getByRole("button", { name: "Lançar receita" }))
+    await alerta(/VAT não pode/)
+    await preencher({ "VAT incluído": "10,00", "Recebido em": "2026-10-20" })
+    await userEvent.click(screen.getByRole("button", { name: "Lançar receita" }))
+    await alerta(/dentro do Ciclo/)
+    expect(chamou("storage:comprovantes", "upload")).toHaveLength(0)
+    expect(chamou("receitas_externas", "insert")).toHaveLength(0)
+  })
+
+  it("lançar receita válida grava plano_id, perfil_id nulo e o comprovante", async () => {
+    await abrir()
+    await comprovante()
+    await preencher({ ...base, "VAT incluído": "10,00" })
+    await userEvent.click(screen.getByRole("button", { name: "Lançar receita" }))
+    await waitFor(() => expect(chamou("receitas_externas", "insert")).toHaveLength(1))
+    expect(chamou("storage:comprovantes", "upload")).toHaveLength(1)
+    expect(chamou("receitas_externas", "insert")[0].args[0]).toMatchObject({ plano_id: 7, perfil_id: null, moeda: "EUR", bruto_centavos: 10000, vat_centavos: 1000, recebido_em: "2026-09-20" })
+  })
+
+  it("estorno de receita externa: valor acima da receita barrado; válido grava em reembolsos com a moeda da receita", async () => {
+    await abrir()
+    estado.respostas["reembolsos:insert"] = { data: [{ id: 1 }], error: null }
+    await preencher({ "Receita estornada": "3", "Devolvido em": "2026-09-25", "Valor devolvido": "300,00" }, "Lançar estorno")
+    await userEvent.click(screen.getByRole("button", { name: "Lançar estorno" }))
+    await alerta(/não pode passar do valor da receita/)
+    expect(chamou("reembolsos")).toHaveLength(0)
+    await preencher({ "Valor devolvido": "50,00", "VAT devolvido": "5,00" }, "Lançar estorno")
+    await userEvent.click(screen.getByRole("button", { name: "Lançar estorno" }))
+    await waitFor(() => expect(chamou("reembolsos", "insert")).toHaveLength(1))
+    expect(chamou("reembolsos", "insert")[0].args[0]).toMatchObject({ tipo: "reembolso", receita_externa_id: 3, moeda: "EUR", valor_centavos: 5000, vat_centavos: 500 })
+  })
+
+  it("conceder acesso manual chama a RPC com o plano da receita", async () => {
+    await abrir()
+    estado.respostas["perfis"] = { data: [{ id: "p1", nome: "Ana Exemplo" }], error: null }
+    estado.respostas["rpc:conceder_acesso_manual"] = { data: 1, error: null }
+    const caixa = screen.getByRole("heading", { name: "Conceder acesso por receita fora do Stripe" }).closest("section") as HTMLElement
+    const q = within(caixa)
+    await userEvent.type(q.getByLabelText("Nome do membro"), "Ana")
+    await userEvent.click(q.getByRole("button", { name: "Procurar membro" }))
+    await userEvent.selectOptions(await q.findByLabelText(/^Membro/), "p1")
+    await userEvent.selectOptions(q.getByLabelText(/Receita que pagou/), "3")
+    fireEvent.change(q.getByLabelText(/Acesso vale até/), { target: { value: "2026-12-31" } })
+    await userEvent.click(q.getByRole("button", { name: "Conceder acesso" }))
+    await waitFor(() => expect(chamou("rpc:conceder_acesso_manual")).toHaveLength(1))
+    expect(chamou("rpc:conceder_acesso_manual")[0].args[0]).toEqual({ perfil: "p1", plano: 7, receita: 3, ate: "2026-12-31T23:59:00.000Z" })
+  })
+
+  it("câmbio já cadastrado: mostra atual e nova taxa e só troca depois de confirmar", async () => {
+    await abrir()
+    estado.respostas["cambio_bce:select"] = { data: [{ taxa: 6.1 }], error: null }
+    estado.respostas["cambio_bce:update"] = { data: [{ data: "2026-09-10" }], error: null }
+    await preencher({ "Data da taxa": "2026-09-10", Moeda: "BRL", "Taxa": "6.25", Fonte: "https://exemplo.invalid/bce" }, "Cadastrar taxa do BCE")
+    await userEvent.click(screen.getByRole("button", { name: "Cadastrar taxa do BCE" }))
+    const dialogo = await waitFor(() => { const d = document.querySelector("dialog[open]") as HTMLElement; expect(d).toBeTruthy(); return d })
+    expect(dialogo.textContent).toContain("6.1")
+    expect(dialogo.textContent).toContain("6.25")
+    expect(chamou("cambio_bce", "update")).toHaveLength(0)
+    await userEvent.click(within(dialogo).getByRole("button", { name: "Trocar taxa", hidden: true }))
+    await waitFor(() => expect(chamou("cambio_bce", "update")).toHaveLength(1))
+    expect(chamou("cambio_bce", "update")[0].args[0]).toMatchObject({ taxa: 6.25 })
+  })
+
+  it("versões: SHA de cada uma, 'Enviado' só na enviada e nome -vN só no fechado", async () => {
+    const fechado = { ...REL, ciclo: { ...REL.ciclo, estado: "fechado" as const, ultima_versao: 2 } }
+    estado.respostas["relatorios_ciclo"] = {
+      data: [
+        { versao: 2, dados: fechado, enviado_em: null, reaberto_em: null, motivo_reabertura: null, csv_sha256: "sha-dois", criado_em: "2026-10-12T00:00:00Z" },
+        { versao: 1, dados: { ...fechado, csv: "v1" }, enviado_em: "2026-10-11T10:00:00Z", reaberto_em: "2026-10-11T12:00:00Z", motivo_reabertura: "erro", csv_sha256: "sha-um", criado_em: "2026-10-10T00:00:00Z" },
+      ],
+      error: null,
+    }
+    montar(<RelatorioCiclo />, "/relatorio-ciclo", "/pt/admin/relatorio-ciclo")
+    await screen.findByText(/1\. Receita/)
+    fireEvent.change(screen.getByLabelText(/Mês em que o Ciclo/), { target: { value: "2026-09" } })
+    await screen.findByText("sha-um")
+    expect(screen.getByText("sha-dois", { selector: "td code" })).toBeTruthy()
+    expect(screen.getAllByRole("button", { name: "Baixar CSV congelado" })).toHaveLength(2)
+    // O selo "Enviado em" do cabeçalho não aparece: a versão vigente (v2) não foi enviada.
+    expect(screen.queryByText(/Enviado em/, { selector: "span" })).toBeNull()
+    expect(screen.getByRole("button", { name: "Marcar como enviado" })).toBeTruthy()
+  })
+})
+
+describe("Equipe", () => {
+  it("o próprio papel fica travado e trocar o de outra pessoa pede confirmação", async () => {
+    estado.respostas["equipe"] = { data: [{ perfil_id: "eu", papel: "super_admin", criado_em: "2026-01-01T00:00:00Z" }, { perfil_id: "p2", papel: "editor", criado_em: "2026-01-02T00:00:00Z" }], error: null }
+    estado.respostas["equipe:update"] = { data: [{ perfil_id: "p2" }], error: null }
+    estado.respostas["perfis"] = { data: [{ id: "eu", nome: "Eu Mesmo" }, { id: "p2", nome: "Bia Editora" }], error: null }
+    montar(<Equipe />, "/equipe", "/pt/admin/equipe")
+    const meu = (await screen.findByLabelText("Papel — Eu Mesmo")) as HTMLSelectElement
+    expect(meu.disabled).toBe(true)
+    await userEvent.selectOptions(screen.getByLabelText("Papel — Bia Editora"), "auditor")
+    expect(chamou("equipe", "update")).toHaveLength(0)
+    await userEvent.click(within(document.querySelector("dialog[open]") as HTMLElement).getByRole("button", { name: "Trocar papel", hidden: true }))
+    await waitFor(() => expect(chamou("equipe", "update")).toHaveLength(1))
+    expect(chamou("equipe", "update")[0].args[0]).toEqual({ papel: "auditor" })
   })
 })

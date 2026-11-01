@@ -1,4 +1,8 @@
-import { describe, expect, it } from "vitest"
+import { act, renderHook, waitFor } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
+
+vi.mock("../../../lib/supabase", async () => ({ supabase: (await import("./mockSupabase")).supabase }))
+import { useCarga } from "../lib/consulta"
 import { paraCarga, paraValores, type CampoDef } from "../lib/campos"
 import { cicloAnterior, cicloDe, cicloFim, decimalParaCentavos, isoParaLocal, localParaIso, slugificar } from "../lib/formato"
 import { camposParaRedes, diasAte, estadoAula, faseDe } from "../lib/regras"
@@ -72,5 +76,19 @@ describe("formulário genérico", () => {
     expect(erros).toEqual({})
     expect(carga).toMatchObject({ nome: "Árvore Nova", slug: "arvore-nova", ordem: null, inicio: "2026-07-01T11:00:00.000Z", publicado_em: "2026-01-01T00:00:00Z" })
     expect("convite" in carga).toBe(false)
+  })
+})
+
+describe("useCarga", () => {
+  it("recarregar mantém os dados na tela (sem voltar a 'carregando'); trocar as deps volta a carregar", async () => {
+    let n = 0
+    const { result, rerender } = renderHook(({ dep }) => useCarga(async () => ++n, [dep]), { initialProps: { dep: "a" } })
+    expect(result.current.fase).toBe("carregando")
+    await waitFor(() => expect(result.current.fase).toBe("pronto"))
+    act(() => result.current.recarregar())
+    expect(result.current).toMatchObject({ fase: "pronto", dados: 1, recarregando: true })
+    await waitFor(() => expect(result.current).toMatchObject({ fase: "pronto", dados: 2 }))
+    rerender({ dep: "b" })
+    expect(result.current.fase).toBe("carregando")
   })
 })

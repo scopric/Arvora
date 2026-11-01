@@ -5,7 +5,7 @@ import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { classeAcao } from "../componentes/Campos"
+import { AreaTexto, classeAcao } from "../componentes/Campos"
 import { CrudTabela } from "../componentes/CrudTabela"
 import type { CampoDef } from "../componentes/FormularioRegistro"
 import { AvisoDe, Mostrar, Pagina, Secao } from "../componentes/Pagina"
@@ -13,13 +13,14 @@ import { exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { opcoesDe } from "../lib/opcoes"
 import { APROVA_EMPRESA, EDITA, usePode } from "../lib/papel"
 
-// Fila de aprovação (ADM-02, DIR-02) e cadastro. O motivo da recusa não tem coluna no banco (lacuna reportada).
+// Fila de aprovação (ADM-02, DIR-02) e cadastro. A recusa exige motivo (empresas.motivo_recusa), que o dono vê para corrigir.
 export function Empresas() {
   const t = useT()
   const aprova = usePode(APROVA_EMPRESA)
   const edita = usePode(EDITA)
   const acao = useAcao()
   const [recusar, setRecusar] = useState<number | null>(null)
+  const [motivo, setMotivo] = useState("")
   const [versao, setVersao] = useState(0)
   const carga = useCarga(async () => {
     const [fila, setores] = await Promise.all([
@@ -29,9 +30,10 @@ export function Empresas() {
     return { fila: exigir(fila).filter((e) => e.status === "pendente").sort((a, b) => a.criado_em.localeCompare(b.criado_em)), setores: exigir(setores) }
   }, [versao])
 
-  const decidir = (id: number, aprovar: boolean) =>
+  const decidir = (id: number, aprovar: boolean, razao: string | null = null) =>
     acao.rodar(async () => {
-      exigirSemDados(await supabase.rpc("aprovar_empresa", { empresa: id, aprovar }))
+      // motivo: parâmetro novo (lote 2); se o banco ainda não o tem, o erro de função inexistente aparece na tela.
+      exigirSemDados(await supabase.rpc("aprovar_empresa", { empresa: id, aprovar, motivo: razao } as never))
       setVersao((v) => v + 1)
     }, aprovar ? "admin.empresas.aprovada" : "admin.empresas.recusada")
 
@@ -88,9 +90,12 @@ export function Empresas() {
               </Secao>
               <DialogoConfirmar
                 aberto={recusar !== null} perigo titulo={t("admin.empresas.recusarTitulo")} texto={t("admin.empresas.recusarTexto")} confirmar={t("admin.empresas.recusar")}
-                aoCancelar={() => setRecusar(null)}
-                aoConfirmar={() => { const id = recusar; setRecusar(null); if (id !== null) void decidir(id, false) }}
-              />
+                desabilitado={motivo.trim() === ""}
+                aoCancelar={() => { setRecusar(null); setMotivo("") }}
+                aoConfirmar={() => { const id = recusar; const razao = motivo.trim(); setRecusar(null); setMotivo(""); if (id !== null) void decidir(id, false, razao) }}
+              >
+                <AreaTexto rotulo={`${t("admin.empresas.motivo")} *`} ajuda={t("admin.empresas.motivoAjuda")} rows={3} value={motivo} onChange={(e) => setMotivo(e.target.value)} />
+              </DialogoConfirmar>
             </>
           )
         }}

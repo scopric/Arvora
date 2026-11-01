@@ -42,27 +42,30 @@ export const tabelaSolta = (nome: string) => supabase.from(nome as never) as unk
 export type Carga<T> =
   | { fase: "carregando"; recarregar: () => void }
   | { fase: "erro"; recarregar: () => void }
-  | { fase: "pronto"; dados: T; recarregar: () => void }
+  | { fase: "pronto"; dados: T; recarregar: () => void; recarregando?: boolean }
 
 // Carrega ao montar e quando `deps` muda. Falha vira fase "erro" (a tela mostra o erro com "tentar de novo"), nunca lista vazia.
 export function useCarga<T>(buscar: () => Promise<T>, deps: readonly unknown[]): Carga<T> {
   const [volta, setVolta] = useState(0)
-  const chave = `${JSON.stringify(deps)}#${volta}`
-  const [estado, setEstado] = useState<{ chave: string; fase: "erro" } | { chave: string; fase: "pronto"; dados: T }>({ chave: "", fase: "erro" })
+  const depsKey = JSON.stringify(deps)
+  const chave = `${depsKey}#${volta}`
+  const [estado, setEstado] = useState<{ chave: string; depsKey: string; fase: "erro" } | { chave: string; depsKey: string; fase: "pronto"; dados: T }>({ chave: "", depsKey: "", fase: "erro" })
   const recarregar = useCallback(() => setVolta((n) => n + 1), [])
   useEffect(() => {
     let ativo = true
     buscar()
-      .then((dados) => ativo && setEstado({ chave, fase: "pronto", dados }))
-      .catch(() => ativo && setEstado({ chave, fase: "erro" }))
+      .then((dados) => ativo && setEstado({ chave, depsKey, fase: "pronto", dados }))
+      .catch(() => ativo && setEstado({ chave, depsKey, fase: "erro" }))
     return () => {
       ativo = false
     }
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- `chave` resume as deps; `buscar` é recriada a cada render
   }, [chave])
-  // Enquanto o resultado guardado não é desta chave (deps mudaram ou recarregar), a tela mostra "carregando".
-  if (estado.chave !== chave) return { fase: "carregando", recarregar }
-  return { ...estado, recarregar } as Carga<T>
+  if (estado.chave === chave) return { ...estado, recarregar } as Carga<T>
+  // Só `recarregar` mudou (mesmas deps): mantém os dados na tela enquanto busca de novo, para não perder aviso de sucesso nem edição não salva.
+  if (estado.fase === "pronto" && estado.depsKey === depsKey) return { fase: "pronto", dados: estado.dados, recarregar, recarregando: true }
+  // Deps mudaram: tela de "carregando".
+  return { fase: "carregando", recarregar }
 }
 
 export type AvisoAcao = { tipo: "ok" | "erro"; texto: string } | null
@@ -91,11 +94,30 @@ const CODIGOS: Record<string, Chave> = {
   receita_ja_usada: "admin.cod.receita_ja_usada",
   receita_invalida: "admin.cod.receita_invalida",
   consentimento_de_outra_pessoa: "admin.cod.consentimento_de_outra_pessoa",
+  estorno_maior_que_pagamento: "admin.cod.estorno_maior_que_pagamento",
+  moeda_divergente: "admin.cod.moeda_divergente",
+  receita_inexistente_ou_anulada: "admin.cod.receita_inexistente_ou_anulada",
+  periodo_invalido: "admin.cod.periodo_invalido",
+  plano_invalido: "admin.cod.plano_invalido",
+  perfil_inexistente: "admin.cod.perfil_inexistente",
+  assinatura_vigente_existente_ou_receita_ja_usada: "admin.cod.assinatura_vigente",
+  assinatura_vigente_existente: "admin.cod.assinatura_vigente",
+  campo_obrigatorio: "admin.erro.obrigatorio",
+  cambio_existente: "admin.cod.cambio_existente",
+  moeda_invalida: "admin.cod.moeda_invalida",
+  vat_maior_que_bruto: "admin.cod.vat_maior_que_bruto",
+  data_fora_do_ciclo: "admin.cod.data_fora_do_ciclo",
+  plano_obrigatorio: "admin.cod.plano_obrigatorio",
+  receita_obrigatoria: "admin.cod.receita_obrigatoria",
+  membro_obrigatorio: "admin.cod.membro_obrigatorio",
+  valor_maior_que_receita: "admin.cod.valor_maior_que_receita",
 }
 
 export function textoErro(e: unknown, t: (c: Chave) => string): string {
   const err = (e ?? {}) as { code?: string; message?: string }
   if (e instanceof SemLinha) return t("admin.erro.semLinha")
+  // Função que o banco local/produção ainda não tem (migration por aplicar): erro visível, nunca silêncio.
+  if (err.code === "PGRST202" || err.code === "42883") return t("admin.erro.funcaoAusente")
   if (err.code === "42501") return t("admin.erro.permissao")
   if (err.code === "23505") return t("admin.erro.duplicado")
   if (err.message && CODIGOS[err.message]) return t(CODIGOS[err.message])
