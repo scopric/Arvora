@@ -57,11 +57,22 @@ describe("fundo animado", () => {
 })
 
 describe("conteúdo", () => {
-  it("tem um h1, os quatro pilares e a chamada para criar conta", () => {
+  it("tem um h1, uma seção por frente, as portas, a aula e a chamada para criar conta", () => {
     estado.sessao = null
     nav()
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1)
-    expect(screen.getAllByRole("listitem")).toHaveLength(11)
+    for (const n of [1, 2, 3, 4]) expect(document.getElementById(`frente-${n}`)?.tagName).toBe("SECTION")
+    expect(screen.getByRole("heading", { level: 2, name: "Duas portas, um mesmo grupo." })).toBeTruthy()
+    expect(screen.getAllByRole("listitem").length).toBeGreaterThanOrEqual(7) // 3 portas + 4 materiais
     expect(screen.getAllByRole("link", { name: "Criar conta" }).length).toBeGreaterThanOrEqual(2)
+    expect(screen.getAllByRole("link", { name: "Conhecer os planos" })).toHaveLength(2)
+  })
+
+  it("o dourado fica só no Brazilian Awards e na faixa do Hall of Fame", () => {
+    estado.sessao = null
+    nav()
+    const dourados = [...document.querySelectorAll('[class*="dourado"]')]
+    const fora = dourados.filter((e) => !e.closest("#frente-1") && !e.closest('[aria-labelledby="hof"]'))
+    expect(fora).toHaveLength(0)
   })
 })
