@@ -52,16 +52,16 @@ export function Secao({ titulo, texto, children }: { titulo: string; texto?: Rea
 // É um <input type="checkbox" role="switch"> de verdade dentro do <label>: nome acessível e teclado vêm de graça.
 // O rótulo fica num <label htmlFor> (é só ele que vira o nome acessível); a ajuda vai por aria-describedby; o trilho é um
 // segundo <label> que envolve só o input, para o clique no trilho também alternar.
-export function Interruptor({ rotulo, ajuda, idAjuda, className = "", ...resto }: Omit<ComponentProps<"input">, "type" | "role"> & { rotulo: ReactNode; ajuda?: ReactNode; idAjuda?: string }) {
+export function Interruptor({ rotulo, ajuda, idAjuda, className = "", ...resto }: Omit<ComponentProps<"input">, "type" | "role" | "id"> & { rotulo: ReactNode; ajuda?: ReactNode; idAjuda?: string }) {
   const id = useId()
   const idDesc = idAjuda ?? `${id}-ajuda`
   return (
     <div className={`flex min-h-9 items-start justify-between gap-4 pointer-coarse:min-h-11 ${className}`}>
       <div className="min-w-0">
-        <label htmlFor={id} className="block cursor-pointer text-base font-medium">{rotulo}</label>
+        <label htmlFor={id} className="block cursor-pointer text-base font-medium has-disabled:cursor-not-allowed">{rotulo}</label>
         {ajuda ? <p id={idDesc} className="mt-0.5 text-legenda text-nevoa">{ajuda}</p> : null}
       </div>
-      <label className="relative mt-0.5 flex shrink-0 cursor-pointer">
+      <label className="relative -my-2 flex min-h-9 shrink-0 cursor-pointer items-center pointer-coarse:min-h-11 has-disabled:cursor-not-allowed">
         <input id={id} type="checkbox" role="switch" aria-describedby={ajuda ? idDesc : undefined} className="peer sr-only" {...resto} />
         <span
           aria-hidden="true"

@@ -14,7 +14,7 @@ export function Emails() {
     <Pagina titulo="conta.emails.titulo">
       <Secao titulo={t("conta.emails.transacional.titulo")}>
         {/* Transacional não desliga (EML-07): o interruptor aparece ligado e travado para deixar isso claro. */}
-        <Interruptor rotulo={t("conta.emails.transacional.rotulo")} ajuda={t("conta.emails.transacional.texto")} idAjuda="emails-transacional-ajuda" checked disabled readOnly />
+        <Interruptor rotulo={t("conta.emails.transacional.rotulo")} ajuda={t("conta.emails.transacional.texto")} checked disabled readOnly />
       </Secao>
       <Secao titulo={t("conta.emails.marketing.titulo")}>
         {estado.fase === "carregando" ? <Esqueleto linhas={2} /> : null}

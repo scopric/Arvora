@@ -4,7 +4,7 @@ import { useApp } from "./escopo"
 const tons = {
   neutro: "border-current/30",
   destaque: "border-destaque text-destaque",
-  // Dourado identifica o braço Brazilian Awards (PRD §17.7.1): use este tom só nesse contexto (ex.: selo Premiado).
+  // Público: dourado identifica o braço Brazilian Awards (PRD §17.7.1). No app o tom vira indicador genérico (Premiado, Nova): Decisão 55.
   dourado: "border-dourado text-dourado",
   alerta: "border-red-300/60 text-red-200",
 }

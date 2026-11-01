@@ -102,6 +102,7 @@ function BlocoPedidos({ uid }: { uid: string }) {
   }
 
   return (
+    <>
     <Secao titulo={t("conta.dados.pedido.titulo")} texto={t("conta.dados.pedido.texto")}>
       <div className="space-y-4">
         {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
@@ -109,7 +110,21 @@ function BlocoPedidos({ uid }: { uid: string }) {
           <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exportacao")} className="sm:w-auto">{t("conta.dados.pedido.exportacao")}</Botao>
           <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exclusao")} className="sm:w-auto">{t("conta.dados.pedido.exclusao")}</Botao>
         </div>
-        <h3 className="pt-2 text-legenda font-medium text-bruma">{t("conta.dados.lista.titulo")}</h3>
+      </div>
+      <DialogoConfirmar
+        aberto={confirmar !== null}
+        titulo={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoExclusao" : "conta.dados.pedido.dialogoExportacao")}
+        texto={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoTextoExclusao" : "conta.dados.pedido.dialogoTextoExportacao")}
+        confirmar={t("conta.dados.pedido.enviar")}
+        perigo={confirmar === "exclusao"}
+        aoConfirmar={() => confirmar && void pedir(confirmar)}
+        aoCancelar={() => setConfirmar(null)}
+      />
+    </Secao>
+    {/* A lista fica fora do painel: a Tabela, o Vazio e o Erro já têm moldura própria. */}
+    <section>
+      <h2 className="text-base font-semibold">{t("conta.dados.lista.titulo")}</h2>
+      <div className="mt-4 space-y-4">
         {lista.fase === "carregando" ? <Esqueleto linhas={2} /> : null}
         {lista.fase === "erro" ? <Erro aoTentar={() => (setLista({ fase: "carregando" }), setTentativa((n) => n + 1))}>{t("conta.erroCarregar")}</Erro> : null}
         {lista.fase === "pronto" && lista.itens.length === 0 ? <Vazio>{t("conta.dados.lista.vazio")}</Vazio> : null}
@@ -127,16 +142,8 @@ function BlocoPedidos({ uid }: { uid: string }) {
           />
         ) : null}
       </div>
-      <DialogoConfirmar
-        aberto={confirmar !== null}
-        titulo={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoExclusao" : "conta.dados.pedido.dialogoExportacao")}
-        texto={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoTextoExclusao" : "conta.dados.pedido.dialogoTextoExportacao")}
-        confirmar={t("conta.dados.pedido.enviar")}
-        perigo={confirmar === "exclusao"}
-        aoConfirmar={() => confirmar && void pedir(confirmar)}
-        aoCancelar={() => setConfirmar(null)}
-      />
-    </Secao>
+    </section>
+    </>
   )
 }
 
@@ -167,8 +174,9 @@ function BlocoExcluir() {
   }
 
   return (
-    <Secao titulo={t("conta.dados.excluir.titulo")} texto={t("perfil.excluir.aviso")}>
+    <Secao titulo={t("conta.dados.excluir.titulo")}>
       <div className="space-y-2 text-base text-bruma">
+        <p>{t("perfil.excluir.aviso")}</p>
         <ul className="list-disc space-y-1 pl-5">
           <li>{t("perfil.excluir.perde")}</li>
           <li>{t("perfil.excluir.assinatura")}</li>
