@@ -253,7 +253,9 @@ select tt.como(tt.u('51'), 'aal2');
 select throws_ok($$delete from public.equipe where perfil_id = tt.u('51')$$, 'P0001', 'ultimo_super_admin', '15 nao remove o ultimo super_admin');
 select throws_ok($$update public.equipe set papel = 'editor' where perfil_id = tt.u('51')$$, 'P0001', 'ultimo_super_admin', '15 nao rebaixa o ultimo super_admin');
 reset role;
+set local role postgres; -- qualquer caminho que nao seja a conexao direta sem SET ROLE (o Auth conecta como supabase_auth_admin)
 select throws_ok($$delete from auth.users where id = tt.u('51')$$, 'P0001', 'ultimo_super_admin', '15 exclusao da conta tambem e barrada');
+reset role;
 update public.equipe set papel = 'super_admin' where perfil_id = tt.u('ed');
 select tt.como(tt.u('51'), 'aal2');
 select is(tt.afeta($q$update public.equipe set papel = 'editor' where perfil_id = tt.u('51')$q$), 1, '15 com outro super_admin, rebaixa');
