@@ -31,9 +31,9 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
   const t = useT()
   const caminho = useCaminho()
   return (
-    <header className="sticky top-0 z-20 border-b border-creme/10 bg-fundo/75 backdrop-blur-md">
+    <header className="sticky top-0 z-20 border-b border-creme/10 bg-fundo/95 backdrop-blur-md">
       <div className="flex min-h-17 items-center justify-between gap-3 px-4 sm:px-12 lg:px-20">
-        <Marca to={caminho("/")} className="max-sm:[&>span]:hidden" />
+        <Marca to={caminho("/")} className="max-sm:[&>span]:sr-only" />
         {completo ? (
           <nav aria-label={t("nav.principal")} className="hidden items-center gap-1 text-sm font-semibold md:flex">
             <ItensMenu />
@@ -88,7 +88,7 @@ export function RodapePublico({ completo = false }: { completo?: boolean }) {
           <Link to={caminho("/cookies")} className={linkPublico}>{t("cookies.politica")}</Link>
         </nav>
       </div>
-      <p className="mx-auto mt-10 max-w-6xl font-mono text-xs tracking-[0.15em] text-creme/60">© Grupo Árvora</p>
+      <p className="mx-auto mt-10 max-w-6xl font-mono text-xs tracking-[0.15em] text-creme/60">{t("home.direitos")}</p>
     </footer>
   )
 }
