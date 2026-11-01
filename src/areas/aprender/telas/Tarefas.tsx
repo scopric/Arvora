@@ -11,7 +11,7 @@ import { Pagina } from "../componentes/Pagina"
 import { SeloStatus } from "../componentes/Exercicio"
 import { carregarTarefas, type TarefaLinha } from "../tarefas"
 import { useCarga } from "../useCarga"
-import { dataCurta, foco } from "../util"
+import { dataCurta } from "../util"
 
 // Minhas tarefas (AUL-04, AUL-09): Pendentes · Enviadas · Aprovadas · Ajustar. Pendente = exercício liberado, ainda sem
 // entrega, em vertical que aceita entregas (Bem-Estar fica de fora até a decisão jurídica).
@@ -52,7 +52,7 @@ export function Tarefas() {
             <ul className="divide-y divide-grafite overflow-hidden rounded-xl shadow-borda">
               {lista.map(({ exercicio, entrega }) => (
                 <li key={exercicio.id}>
-                  <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex min-h-12 items-center gap-4 px-4 py-3 transition-colors hover:bg-creme/2 ${foco}`}>
+                  <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex min-h-12 items-center gap-4 px-4 py-3 transition-colors hover:bg-creme/2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dourado`}>
                     <span className="min-w-0 flex-1">
                       <span className="block text-base font-medium">{exercicio.aulas?.titulo}</span>
                       <span className="mt-0.5 block text-legenda text-nevoa">

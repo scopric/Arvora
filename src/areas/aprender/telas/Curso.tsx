@@ -11,7 +11,7 @@ import { carregarCurso, urlCapa } from "../curso"
 import { Pagina } from "../componentes/Pagina"
 import { nomeVertical } from "../tipos"
 import { useCarga } from "../useCarga"
-import { barraProgresso, botaoContorno, botaoLink, foco, linkTexto } from "../util"
+import { barraProgresso, botaoContorno, botaoLink, linkTexto } from "../util"
 
 // Curso: capa, descrição, módulos e aulas com progresso (ACA-01, ACA-03). O nível vale por aula: o Clube vê a amostra
 // (aulas de nível Clube) e o cadeado nas demais. Molde MasterClass (página da classe): herói com capa + título + CTA,
@@ -81,7 +81,7 @@ export function Curso() {
                   numero += 1
                   return (
                     <li key={a.id}>
-                      <Link to={caminho(`/academy/${curso.slug}/${a.slug}`)} className={`flex min-h-12 items-center gap-3 px-4 py-2.5 transition-colors hover:bg-creme/2 ${foco}`}>
+                      <Link to={caminho(`/academy/${curso.slug}/${a.slug}`)} className={`flex min-h-12 items-center gap-3 px-4 py-2.5 transition-colors hover:bg-creme/2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dourado`}>
                         <span className="w-6 shrink-0 text-legenda text-nevoa tabular-nums">{numero}</span>
                         <span className="flex-1 text-base">{a.titulo}</span>
                         {!livre ? (
