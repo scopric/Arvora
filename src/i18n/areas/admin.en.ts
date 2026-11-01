@@ -97,7 +97,7 @@ export const adminEn: Record<keyof typeof adminPt, string> = {
   "admin.visao.denuncias": "Open reports",
   "admin.visao.empresas": "Companies to approve",
   "admin.visao.entregas": "Submissions in the review queue",
-  "admin.visao.intro": "What is waiting for someone on the team. Each card shows only for the role that can act on it.",
+  "admin.visao.intro": "What is waiting for someone on the team. Each number shows only for the role that can act on it.",
   "admin.visao.pedidos": "Open data requests",
   "admin.visao.pedidosPrazo": "Data requests overdue or due within 7 days",
   "admin.aulas.intro": "Draft, scheduled or materials published. Times are Dublin time.",

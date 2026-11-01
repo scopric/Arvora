@@ -13,7 +13,7 @@ import { Pagina } from "../componentes/Pagina"
 import { QuandoAula } from "../componentes/QuandoAula"
 import { COLUNAS_AULA, type AulaLinha } from "../tipos"
 import { useCarga } from "../useCarga"
-import { botaoLink, dados, foco, linhas, linkTexto } from "../util"
+import { botaoContorno, botaoLink, dados, foco, linhas, linkTexto } from "../util"
 
 type Continua = { percentual: number; aulas: { slug: string; titulo: string; modulos: { cursos: { slug: string } | null } | null } | null }
 type Salvo = { id: number; aulas: { slug: string; titulo: string } | null; videos: { slug: string; titulo: string } | null }
@@ -21,9 +21,9 @@ type Sugestao = { id: number; sugerido_id: string; motivo: string; nome: string 
 
 // Molde Mercury (dashboard): saudação, linha de atalhos em pílula, grade de cartões em 2 colunas.
 const cartao = "rounded-xl p-5 shadow-borda"
-const atalho = `inline-flex min-h-9 items-center gap-2 rounded-full border border-grafite px-3.5 text-legenda font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme ${foco}`
+const atalho = `inline-flex min-h-9 items-center gap-2 rounded-full border border-grafite px-3 text-legenda font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme ${foco}`
 const lista = "divide-y divide-grafite"
-const item = "flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+const item = "flex flex-col items-start gap-1 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
 const meta = "shrink-0 text-legenda text-nevoa tabular-nums"
 
 export function Inicio() {
@@ -67,8 +67,8 @@ export function Inicio() {
   }, grupo ? "g" : "c")
   const [perfil] = useCarga(async () => dados(await supabase.from("perfis").select("nome, onboarding_em").eq("id", uid).maybeSingle()), uid)
 
-  if (acesso.carregando) return <Pagina chave="aprender.inicio.titulo"><Esqueleto linhas={6} /></Pagina>
-  if (acesso.erro) return <Pagina chave="aprender.inicio.titulo"><Erro aoTentar={acesso.recarregar}>{t("acesso.erro")}</Erro></Pagina>
+  if (acesso.carregando) return <Pagina chave="aprender.inicio.titulo" titulo={t("aprender.inicio.ola")}><Esqueleto linhas={6} /></Pagina>
+  if (acesso.erro) return <Pagina chave="aprender.inicio.titulo" titulo={t("aprender.inicio.ola")}><Erro aoTentar={acesso.recarregar}>{t("acesso.erro")}</Erro></Pagina>
 
   const nome = perfil.fase === "ok" ? perfil.dados?.nome?.trim().split(/\s+/)[0] : undefined
   const contaNova = perfil.fase === "ok" && perfil.dados !== null && perfil.dados.onboarding_em === null
@@ -99,7 +99,8 @@ export function Inicio() {
               <li>{t(grupo ? "aprender.inicio.passo2" : "aprender.inicio.passo2Clube")}</li>
               <li>{t("aprender.inicio.passo3")}</li>
             </ol>
-            <Link to={caminho("/bem-vindo")} className={`${botaoLink} mt-5`}>{t("aprender.inicio.comecar")}</Link>
+            {/* Um primário por tela: para o Clube o dourado é o do Bloqueado logo abaixo. */}
+            <Link to={caminho("/bem-vindo")} className={`${grupo ? botaoLink : botaoContorno} mt-5`}>{t("aprender.inicio.comecar")}</Link>
           </section>
         ) : null}
 
@@ -164,11 +165,11 @@ export function Inicio() {
                   {l.map((s) => (
                     <li key={s.id} className="py-3 first:pt-0">
                       <p className="font-medium">{s.nome}</p>
-                      <p className="mt-0.5 text-legenda text-nevoa">{s.motivo}</p>
+                      <p className="mt-1 text-legenda text-nevoa">{s.motivo}</p>
                     </li>
                   ))}
                 </ul>
-                <Link to={caminho("/match")} className={`${linkTexto} mt-2 inline-block text-legenda`}>{t("aprender.inicio.verTodas")} →</Link>
+                <Link to={caminho("/match")} className={`${linkTexto} mt-2 inline-block text-legenda`}>{t("aprender.inicio.verTodas")} <span aria-hidden="true">→</span></Link>
               </div>
             )}
           </Bloco>

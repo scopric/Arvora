@@ -11,7 +11,7 @@ import { carregarCurso, urlCapa } from "../curso"
 import { Pagina } from "../componentes/Pagina"
 import { nomeVertical } from "../tipos"
 import { useCarga } from "../useCarga"
-import { botaoLink, foco, linkTexto } from "../util"
+import { botaoContorno, botaoLink, foco, linkTexto } from "../util"
 
 // Curso: capa, descrição, módulos e aulas com progresso (ACA-01, ACA-03). O nível vale por aula: o Clube vê a amostra
 // (aulas de nível Clube) e o cadeado nas demais.
@@ -56,7 +56,7 @@ export function Curso() {
               <progress value={feitas} max={aulas.length} className="h-2 w-40 accent-destaque" />
             </label>
             {continuar ? (
-              <Link to={caminho(`/academy/${curso.slug}/${continuar.slug}`)} className={botaoLink}>
+              <Link to={caminho(`/academy/${curso.slug}/${continuar.slug}`)} className={algumBloqueio ? botaoContorno : botaoLink}>
                 {progresso.has(continuar.id) ? t("aprender.curso.continuar") : t("aprender.curso.comecar")}
               </Link>
             ) : null}

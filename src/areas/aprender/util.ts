@@ -1,4 +1,4 @@
-import { botaoApp } from "../../componentes/botaoEstilo"
+import { botaoContornoApp, botaoPrimarioApp } from "../../componentes/botaoEstilo"
 import { SITE_URL } from "../../site"
 import { supabase } from "../../lib/supabase"
 
@@ -133,8 +133,8 @@ export function linhas<T>(r: { data: T[] | null; error: unknown }): T[] {
 
 export const foco = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
 // Botões e link de texto desta área (só existe no app): mesmo spec do Botao (botaoEstilo.ts); o link sublinha em cinza e acende no hover.
-export const botaoLink = `${botaoApp.base} ${botaoApp.primario}`
-export const botaoContorno = `${botaoApp.base} ${botaoApp.contorno}`
+export const botaoLink = botaoPrimarioApp
+export const botaoContorno = botaoContornoApp
 export const linkTexto = `rounded-sm font-medium text-creme underline decoration-cinza underline-offset-4 transition-colors hover:decoration-creme ${foco}`
 // Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
 export const campoBase =

@@ -8,10 +8,12 @@ import { useIdioma, useT, type Chave } from "../../../i18n"
 import { exigirLinha, tabelaSolta, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { classeAcao } from "./Campos"
+import { contagem } from "../lib/estilo"
 import { FormularioRegistro, type CampoDef } from "./FormularioRegistro"
 import { AvisoDe, Mostrar } from "./Pagina"
 
 type Linha = Record<string, unknown>
+const LIMITE = 500
 
 export type CrudProps = {
   tabela: string
@@ -57,7 +59,7 @@ export function CrudTabela(p: CrudProps) {
     let q = tabelaSolta(p.tabela).select(p.colunas)
     if (p.filtro) q = q.eq(p.filtro.coluna, p.filtro.valor)
     for (const o of p.ordem) q = q.order(o.coluna, { ascending: o.asc !== false })
-    const r = await q.limit(500)
+    const r = await q.limit(LIMITE)
     if (r.error) throw r.error
     return r.data ?? []
   }, [p.tabela, p.filtro?.coluna, p.filtro?.valor, p.colunas])
@@ -111,14 +113,14 @@ export function CrudTabela(p: CrudProps) {
           linhas.length === 0 ? (
             <Vazio>{t(p.vazio)}</Vazio>
           ) : (
-            <Tabela colunas={colunasTabela} linhas={linhas} id={(l) => String(l[chave])} legenda={t(p.legenda)} contagem={`${linhas.length} ${t(linhas.length === 1 ? "admin.comum.linha" : "admin.comum.linhas")}`} />
+            <Tabela colunas={colunasTabela} linhas={linhas} id={(l) => String(l[chave])} legenda={t(p.legenda)} contagem={contagem(linhas.length, linhas.length >= LIMITE, t)} />
           )
         }
       </Mostrar>
       <AvisoDe aviso={acao.aviso} />
       {p.podeEditar ? (
         <Cartao>
-          <h2 className="mb-5 text-corpo-g font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</h2>
+          <p className="mb-5 text-corpo-g font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
           <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
         </Cartao>
       ) : null}

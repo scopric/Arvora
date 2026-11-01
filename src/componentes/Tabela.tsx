@@ -55,7 +55,7 @@ export function Tabela<L>({ colunas, linhas, id, legenda, contagem }: { colunas:
           ))}
         </tbody>
       </table>
-      {contagem ? <p className="border-t border-grafite px-4 py-2 text-xs text-nevoa tabular-nums">{contagem}</p> : null}
+      {contagem ? <p className="sticky left-0 border-t border-grafite px-4 py-2 text-xs text-nevoa tabular-nums">{contagem}</p> : null}
     </div>
   )
 }

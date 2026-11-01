@@ -1,5 +1,4 @@
 import { Link } from "react-router"
-import { focoApp } from "../../../componentes/menuApp"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useT, type Chave } from "../../../i18n"
 import type { PapelEquipe } from "../../../lib/acesso"
@@ -43,14 +42,14 @@ export function VisaoGeral() {
           lista.every((c) => c.n === 0) ? (
             <Vazio>{t("admin.vazio.nada")}</Vazio>
           ) : (
-            <ul className="grid overflow-hidden rounded-xl shadow-borda sm:grid-cols-2 lg:grid-cols-3">
+            <ul className={`relative grid overflow-hidden rounded-xl after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:shadow-borda ${lista.length === 1 ? "" : lista.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
               {lista.map((c) => (
-                // Células por hairline (border-b/r de cada li coincide com o inset da moldura; o espaço que sobra na última linha fica carvão).
+                // Células por hairline (border-b/r de cada li); a moldura é um ::after por cima, para o hover não a cobrir. Colunas pela quantidade.
                 // A célula inteira é clicável (link esticado por ::after); o foco contorna a célula, não só o texto.
                 <li key={c.chave} className="relative border-r border-b border-grafite p-5 transition-colors has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-dourado hover:bg-obsidiana">
                   <p className="text-legenda font-medium text-nevoa">{t(c.titulo)}</p>
                   <p className="mt-2 text-titulo-p font-medium tabular-nums">{c.n}</p>
-                  <Link className={`mt-3 inline-flex min-h-9 items-center gap-1 text-legenda font-medium text-bruma after:absolute after:inset-0 ${focoApp} focus-visible:outline-none`} to={caminho(c.rota)}>
+                  <Link className={`mt-3 inline-flex min-h-9 items-center gap-1 text-legenda font-medium text-bruma after:absolute after:inset-0 focus-visible:outline-none`} to={caminho(c.rota)}>
                     {t("admin.visao.abrir")} <span aria-hidden="true">→</span>
                   </Link>
                 </li>

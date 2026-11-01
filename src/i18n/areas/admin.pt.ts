@@ -95,7 +95,7 @@ export const adminPt = {
   "admin.visao.denuncias": "Denúncias abertas",
   "admin.visao.empresas": "Empresas a aprovar",
   "admin.visao.entregas": "Entregas na fila de correção",
-  "admin.visao.intro": "O que está esperando alguém da equipe. Cada cartão aparece só para o papel que pode agir nele.",
+  "admin.visao.intro": "O que está esperando alguém da equipe. Cada número aparece só para o papel que pode agir nele.",
   "admin.visao.pedidos": "Pedidos de dados abertos",
   "admin.visao.pedidosPrazo": "Pedidos de dados vencidos ou com prazo em até 7 dias",
   "admin.aulas.intro": "Rascunho, agendada ou com materiais publicados. Horários em hora de Dublin.",

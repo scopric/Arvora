@@ -7,3 +7,5 @@ export const botaoApp = {
   contorno: "border border-grafite text-bruma hover:bg-creme/5 hover:text-creme",
   perigo: "border border-red-300/30 text-red-300 hover:bg-red-300/10",
 }
+export const botaoPrimarioApp = `${botaoApp.base} ${botaoApp.primario}`
+export const botaoContornoApp = `${botaoApp.base} ${botaoApp.contorno}`
