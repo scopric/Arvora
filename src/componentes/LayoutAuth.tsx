@@ -16,11 +16,11 @@ export function LayoutAuth({ titulo, subtitulo, children }: { titulo: string; su
           aria-hidden="true"
           className="pointer-events-none absolute -top-1/4 -left-1/4 -z-10 size-[50rem] rounded-full bg-superficie/25 blur-3xl"
         />
-        <Cena soLarga className="inset-x-0 top-10 bottom-[52%] -z-10" />
+        <Cena soLarga className="inset-x-0 top-10 bottom-[40%] -z-10" />
         <Marca to={caminho("/")} />
         <div>
-          <span aria-hidden="true" className="mb-8 block h-px w-16 bg-dourado" />
-          <p className="max-w-md font-titulo text-6xl leading-[0.92] font-bold tracking-tight text-balance uppercase">
+          <span aria-hidden="true" className="mb-8 block h-px w-16 bg-destaque" />
+          <p className="zona-limpa max-w-md font-titulo text-h2 font-normal text-balance">
             {t("auth.layout.destaque")}
           </p>
         </div>
@@ -32,7 +32,7 @@ export function LayoutAuth({ titulo, subtitulo, children }: { titulo: string; su
       <main className="flex items-center justify-center bg-painel px-6 pt-20 pb-12 sm:px-12 lg:py-12">
         <div className="w-full max-w-md">
           <Marca to={caminho("/")} className="mb-10 lg:hidden" />
-          <h1 className="font-titulo text-5xl leading-none font-bold uppercase">{titulo}</h1>
+          <h1 className="font-titulo text-h3 leading-none font-normal sm:text-h2">{titulo}</h1>
           <p className="mt-3 text-creme/70">{subtitulo}</p>
           <div className="mt-8">{children}</div>
         </div>
