@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router"
+import { useNavigate, useParams } from "react-router"
 import { Botao } from "../../../componentes/Botao"
 import { Cartao } from "../../../componentes/Cartao"
 import { useCaminho, useT } from "../../../i18n"
@@ -37,7 +37,7 @@ export function Premiado() {
   }, [id])
 
   return (
-    <Pagina titulo={premiadoId === null ? "admin.premiadoNovo.titulo" : "admin.premiado.titulo"} acoes={<Link className="underline" to={caminho("/admin/premiados")}>{t("admin.comum.voltar")}</Link>}>
+    <Pagina titulo={premiadoId === null ? "admin.premiadoNovo.titulo" : "admin.premiado.titulo"} voltar={{ para: caminho("/admin/premiados"), rotulo: t("admin.comum.voltar") }}>
       <Mostrar carga={carga}>
         {(d) => {
           const nomeEdicao = new Map(d.edicoes.map((e) => [e.id, e.nome]))
@@ -73,9 +73,9 @@ export function Premiado() {
                     <dl className="space-y-3">
                       {Object.entries(pend).map(([k, v]) => (
                         <div key={k}>
-                          <dt className="text-sm font-semibold">{k}</dt>
-                          <dd className="text-sm whitespace-pre-wrap"><span className="opacity-60">{t("admin.premiado.atual")}: </span>{String((d.p as unknown as Json)[k] === undefined ? "" : typeof (d.p as unknown as Json)[k] === "object" ? JSON.stringify((d.p as unknown as Json)[k]) : (d.p as unknown as Json)[k])}</dd>
-                          <dd className="text-sm whitespace-pre-wrap"><span className="opacity-60">{t("admin.premiado.proposto")}: </span>{typeof v === "object" ? JSON.stringify(v) : String(v)}</dd>
+                          <dt className="text-legenda font-medium text-bruma">{k}</dt>
+                          <dd className="text-base whitespace-pre-wrap"><span className="text-nevoa">{t("admin.premiado.atual")}: </span>{String((d.p as unknown as Json)[k] === undefined ? "" : typeof (d.p as unknown as Json)[k] === "object" ? JSON.stringify((d.p as unknown as Json)[k]) : (d.p as unknown as Json)[k])}</dd>
+                          <dd className="text-base whitespace-pre-wrap"><span className="text-nevoa">{t("admin.premiado.proposto")}: </span>{typeof v === "object" ? JSON.stringify(v) : String(v)}</dd>
                         </div>
                       ))}
                     </dl>
@@ -90,7 +90,7 @@ export function Premiado() {
                 </Secao>
               ) : null}
               <Secao titulo="admin.premiado.dados">
-                {d.vinculo ? <p className="mb-4 text-sm">{t("admin.premiado.vinculado")}: {d.vinculo}</p> : d.p ? <p className="mb-4 text-sm opacity-75">{t("admin.premiado.semVinculo")}</p> : null}
+                {d.vinculo ? <p className="mb-4 text-legenda">{t("admin.premiado.vinculado")}: {d.vinculo}</p> : d.p ? <p className="mb-4 text-legenda text-nevoa">{t("admin.premiado.semVinculo")}</p> : null}
                 {pode ? (
                   <FormularioRegistro
                     campos={campos} linha={linha}

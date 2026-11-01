@@ -35,7 +35,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
     return { docs, atual }
   }, [pode, id, versao])
 
-  if (!pode) return <p className="text-sm opacity-75">{id ? `${t("admin.consent.registrado")} #${id}` : t("admin.consent.soSuper")}</p>
+  if (!pode) return <p className="text-legenda text-nevoa">{id ? `${t("admin.consent.registrado")} #${id}` : t("admin.consent.soSuper")}</p>
   return (
     <Mostrar carga={carga}>
       {(d) => {
@@ -49,10 +49,10 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
         ]
         const doc = d.docs.find((x) => x.id === d.atual?.documento_id)
         return (
-          <div className="space-y-4 rounded-2xl border border-current/15 p-5">
-            <h3 className="text-lg font-semibold">{t("admin.consent.titulo")}</h3>
+          <div className="space-y-4 rounded-xl p-5 shadow-borda">
+            <h3 className="text-base font-semibold">{t("admin.consent.titulo")}</h3>
             {d.atual ? (
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-legenda">
                 <p>
                   #{d.atual.id} · {d.atual.titular_email} · {t("admin.consent.aceitoEm")}: {dataHora(d.atual.aceito_em, lang)} · {t("admin.consent.versao")}: {doc ? `v${doc.versao}` : d.atual.documento_id}
                 </p>
@@ -68,7 +68,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
               </div>
             ) : null}
             {d.docs.length === 0 ? (
-              <p className="text-sm">{t("admin.consent.semDocumento")}</p>
+              <p className="text-legenda">{t("admin.consent.semDocumento")}</p>
             ) : (
               <>
                 <h4 className="font-semibold">{d.atual ? t("admin.consent.novoRegistro") : t("admin.consent.registrar")}</h4>

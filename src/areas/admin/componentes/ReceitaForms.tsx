@@ -13,7 +13,7 @@ import { classeAcao } from "../lib/estilo"
 
 const ORIGENS = ["ingresso", "pix", "transferencia", "evento", "outro"] as const
 const TIPOS = ["assinatura", "curso", "produto_digital", "ingresso"] as const
-const caixa = "space-y-4 rounded-2xl border border-current/15 p-5"
+const caixa = "space-y-4 rounded-xl p-5 shadow-borda"
 const grade = "grid gap-5 sm:grid-cols-2"
 
 // Escolhe um membro pelo nome (a equipe não lê e-mail em `perfis`). `valor` é o id do perfil ou "".
@@ -106,9 +106,9 @@ export function LancarReceita({ ciclo, planos, aoFeito }: { ciclo: { inicio: str
         <Campo rotulo={t("admin.comum.descricao")} value={v.descricao} onChange={muda("descricao")} />
       </div>
       <SeletorMembro rotulo="admin.rel.membroOpcional" valor={v.membro} aoMudar={(id) => setV((a) => ({ ...a, membro: id }))} />
-      <label className="block text-sm font-semibold">
+      <label className="block text-legenda font-medium text-bruma">
         {t("admin.rel.comprovante")} *
-        <input ref={ref} type="file" accept="application/pdf,image/png,image/jpeg" className="mt-2 block w-full text-sm" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
+        <input ref={ref} type="file" accept="application/pdf,image/png,image/jpeg" className="mt-2 block w-full text-legenda text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
       </label>
       <AvisoDe aviso={acao.aviso} />
       <Botao type="submit" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.lancar")}</Botao>
@@ -146,7 +146,7 @@ export function LancarEstorno({ receitas, aoFeito }: { receitas: Receita[]; aoFe
   }
   return (
     <form onSubmit={enviar} noValidate className={caixa}>
-      <p className="text-sm opacity-75">{t("admin.rel.estornoIntro")}</p>
+      <p className="text-base text-bruma">{t("admin.rel.estornoIntro")}</p>
       <div className={grade}>
         <Selecao rotulo={`${t("admin.rel.estornoTipo")} *`} value={v.tipo} onChange={muda("tipo")}>
           <option value="reembolso">{t("admin.rel.estornoTipo.reembolso")}</option>
@@ -190,7 +190,7 @@ export function ConcederAcesso({ receitas, planos, aoFeito }: { receitas: Receit
   }
   return (
     <form onSubmit={enviar} noValidate className={caixa}>
-      <p className="text-sm opacity-75">{t("admin.rel.acessoIntro")}</p>
+      <p className="text-base text-bruma">{t("admin.rel.acessoIntro")}</p>
       <SeletorMembro rotulo="admin.rel.membro" valor={membro} aoMudar={setMembro} />
       <div className={grade}>
         <Selecao rotulo={`${t("admin.rel.acessoReceita")} *`} value={receita} onChange={(e) => setReceita(e.target.value)}>
@@ -269,7 +269,7 @@ export function Anular({ id, cliente, aoFeito }: { id: number; cliente: string |
   const acao = useAcao()
   return (
     <details className="max-md:hidden">
-      <summary className="min-h-11 cursor-pointer py-2 underline" aria-label={`${t("admin.rel.anularDe")} ${cliente ?? `#${id}`}`}>{t("admin.rel.anular")}</summary>
+      <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11" aria-label={`${t("admin.rel.anularDe")} ${cliente ?? `#${id}`}`}>{t("admin.rel.anular")}</summary>
       <div className="mt-2 w-64 space-y-2">
         <AreaTexto rotulo={t("admin.rel.motivoAnulacao")} rows={2} value={motivo} onChange={(e) => setMotivo(e.target.value)} />
         <AvisoDe aviso={acao.aviso} />

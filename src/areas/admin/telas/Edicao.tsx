@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate, useParams } from "react-router"
+import { useNavigate, useParams } from "react-router"
 import { Abas } from "../../../componentes/Abas"
 import { useCaminho, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
@@ -74,7 +74,7 @@ function Indicados({ edicaoId, pode }: { edicaoId: number; pode: boolean }) {
         return (
           <div className="space-y-6">
             <ConsentimentoHof id={ultimo} aoRegistrar={async (id) => setUltimo(id)} aoMudar={() => setVersao((v) => v + 1)} />
-            {ultimo ? <p className="text-sm">{t("admin.edicao.useId")} <strong>{ultimo}</strong></p> : null}
+            {ultimo ? <p className="text-legenda">{t("admin.edicao.useId")} <strong>{ultimo}</strong></p> : null}
             <CrudTabela
               key={versao} tabela="indicados" colunas="id, edicao_id, categoria_id, nome, empresa_id, foto_path, resumo, consentimento_id, publicado_em" campos={campos} ordem={[{ coluna: "nome" }]}
               filtro={{ coluna: "edicao_id", valor: edicaoId }} fixos={{ edicao_id: edicaoId }} podeEditar={pode} podeApagar legenda="admin.edicao.indicados" vazio="admin.edicao.semIndicados"
@@ -99,12 +99,12 @@ export function Edicao() {
     <CrudTabela tabela={tabela} colunas={colunas} campos={campos} ordem={[{ coluna: ordem }]} filtro={{ coluna: "edicao_id", valor: edicaoId! }} fixos={{ edicao_id: edicaoId }} podeEditar={pode} podeApagar legenda={legenda} vazio={vazio} />
   )
   return (
-    <Pagina titulo={edicaoId === null ? "admin.edicaoNova.titulo" : "admin.edicao.titulo"} acoes={<Link className="underline" to={caminho("/admin/edicoes")}>{t("admin.comum.voltar")}</Link>}>
+    <Pagina titulo={edicaoId === null ? "admin.edicaoNova.titulo" : "admin.edicao.titulo"} voltar={{ para: caminho("/admin/edicoes"), rotulo: t("admin.comum.voltar") }}>
       <Mostrar carga={carga}>
         {(ed) => (
           <>
             <Secao titulo="admin.edicao.dados">
-              {ed ? <p className="mb-4 text-sm opacity-75">{t("admin.edicoes.fase")}: {t(`admin.edicoes.fase.${faseDe(ed)}`)}</p> : null}
+              {ed ? <p className="mb-4 text-legenda text-nevoa">{t("admin.edicoes.fase")}: {t(`admin.edicoes.fase.${faseDe(ed)}`)}</p> : null}
               {pode ? (
                 <FormularioRegistro
                   campos={EDICAO} linha={ed}

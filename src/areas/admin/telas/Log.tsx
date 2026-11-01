@@ -9,6 +9,7 @@ import { Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { FINANCEIRO, usePode } from "../lib/papel"
+import { classeLink } from "../lib/estilo"
 
 const PAGINA = 100
 
@@ -61,7 +62,7 @@ export function Log() {
                     chave: "det", titulo: t("admin.log.detalhe"),
                     celula: (l) => (
                       <details>
-                        <summary className="cursor-pointer underline">{t("admin.log.ver")}</summary>
+                        <summary className={`cursor-pointer text-legenda ${classeLink}`}>{t("admin.log.ver")}</summary>
                         <ul className="mt-2 max-w-md space-y-1 text-xs">
                           {mudancas(l.antes, l.depois).map((m) => (
                             <li key={m}><strong>{t(`admin.campo.${m}` as Chave) || m}</strong>: {valor(l.antes, m)} → {valor(l.depois, m)}</li>

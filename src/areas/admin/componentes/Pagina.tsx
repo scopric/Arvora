@@ -1,4 +1,7 @@
 import type { ReactNode } from "react"
+import { Link } from "react-router"
+import { Icone } from "../../../componentes/Icone"
+import { focoApp } from "../../../componentes/menuApp"
 import { useT, useTitulo, type Chave } from "../../../i18n"
 import { Vazio } from "../../../componentes/Vazio"
 import { Aviso } from "../../../componentes/Aviso"
@@ -7,11 +10,18 @@ import { Esqueleto } from "../../../componentes/Esqueleto"
 import type { AvisoAcao, Carga } from "../lib/consulta"
 
 // Casca de toda tela do admin: <h1> + título da aba. A tela não renderiza <main> (o LayoutAdmin tem).
-export function Pagina({ titulo, intro, acoes, children }: { titulo: Chave; intro?: Chave; acoes?: ReactNode; children: ReactNode }) {
+// `voltar` = link acima do título (molde Linear), como na PaginaApp do membro.
+export function Pagina({ titulo, intro, acoes, voltar, children }: { titulo: Chave; intro?: Chave; acoes?: ReactNode; voltar?: { para: string; rotulo: string }; children: ReactNode }) {
   const t = useT()
   useTitulo(titulo, true)
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {voltar ? (
+        <Link to={voltar.para} className={`mb-4 inline-flex min-h-9 items-center gap-1 rounded-sm text-legenda font-medium text-nevoa transition-colors pointer-coarse:min-h-11 hover:text-creme ${focoApp}`}>
+          <Icone nome="seta" className="size-4" />
+          {voltar.rotulo}
+        </Link>
+      ) : null}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t(titulo)}</h1>

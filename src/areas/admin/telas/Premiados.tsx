@@ -9,7 +9,7 @@ import { supabase } from "../../../lib/supabase"
 import { Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { EDITA, usePode } from "../lib/papel"
-import { classeAcao } from "../lib/estilo"
+import { classeAcaoPrimaria, classeLink } from "../lib/estilo"
 
 export function Premiados() {
   const t = useT()
@@ -24,7 +24,7 @@ export function Premiados() {
     return { premiados: exigir(premiados), edicoes: exigir(edicoes) }
   }, [pode])
   return (
-    <Pagina titulo="admin.premiados.titulo" intro="admin.premiados.intro" acoes={pode ? <Link className={classeAcao} to={caminho("/admin/premiados/novo")}>{t("admin.premiados.novo")}</Link> : null}>
+    <Pagina titulo="admin.premiados.titulo" intro="admin.premiados.intro" acoes={pode ? <Link className={classeAcaoPrimaria} to={caminho("/admin/premiados/novo")}>{t("admin.premiados.novo")}</Link> : null}>
       <Mostrar carga={carga}>
         {({ premiados, edicoes }) => {
           const nome = new Map(edicoes.map((e) => [e.id, e.nome]))
@@ -43,7 +43,7 @@ export function Premiados() {
                 <Tabela
                   legenda={t("admin.premiados.titulo")} linhas={linhas} id={(l) => l.id}
                   colunas={[
-                    { chave: "nome", titulo: t("admin.comum.nome"), celula: (l) => <Link className="underline" to={caminho(`/admin/premiados/${l.id}`)}>{l.nome}</Link> },
+                    { chave: "nome", titulo: t("admin.comum.nome"), celula: (l) => <Link className={classeLink} to={caminho(`/admin/premiados/${l.id}`)}>{l.nome}</Link> },
                     { chave: "edicao", titulo: t("admin.videos.edicao"), celula: (l) => nome.get(l.edicao_id) ?? "—" },
                     { chave: "pub", titulo: t("admin.comum.status"), celula: (l) => (l.publicado_em ? <Selo tom="destaque">{t("admin.comum.publicado")}</Selo> : <Selo>{t("admin.comum.rascunho")}</Selo>) },
                     { chave: "alt", titulo: t("admin.premiado.alteracao"), celula: (l) => (l.alteracao_em ? <Selo tom="alerta">{t("admin.premiado.pendente")}</Selo> : "—") },
