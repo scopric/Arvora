@@ -107,6 +107,8 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   const [uT, uAsp, uTime, uScroll, uPtr, uOff, uEsc, uHalo] = ["uT", "uAsp", "uTime", "uScroll", "uPtr", "uOff", "uEsc", "uHalo"].map((n) => gl.getUniformLocation(prog, n))
   gl.enable(gl.BLEND)
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+  // Halos não se somam nas juntas: passe de halo com MAX onde a extensão existir.
+  const mm = gl.getExtension("EXT_blend_minmax")
   gl.clearColor(0, 0, 0, 0)
 
   const alvo = { x: 0, y: 0 }
@@ -144,7 +146,9 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.uniform1f(uScroll, reduzido ? 0 : rol)
     gl.uniform2f(uPtr, atual.x, atual.y)
     gl.uniform1f(uHalo, 1)
+    if (mm) gl.blendEquation(mm.MAX_EXT)
     gl.drawArrays(gl.TRIANGLES, 0, luz)
+    if (mm) gl.blendEquation(gl.FUNC_ADD)
     gl.drawArrays(gl.TRIANGLES, luz, total - luz)
     gl.uniform1f(uHalo, 0)
     gl.drawArrays(gl.TRIANGLES, 0, luz)
@@ -161,6 +165,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   }
   const perdeu = (e: Event) => {
     e.preventDefault()
+    fim()
     falha()
   }
   canvas.addEventListener("webglcontextlost", perdeu)

@@ -16,7 +16,7 @@ export function LayoutAuth({ titulo, subtitulo, children }: { titulo: string; su
           aria-hidden="true"
           className="pointer-events-none absolute -top-1/4 -left-1/4 -z-10 size-[50rem] rounded-full bg-superficie/25 blur-3xl"
         />
-        <Cena soLarga className="inset-x-0 top-10 bottom-[40%] -z-10" />
+        <Cena soLarga className="inset-x-0 top-10 bottom-[40%] -z-10" classeCanvas="cena-fade-base" />
         <Marca to={caminho("/")} />
         <div>
           <span aria-hidden="true" className="mb-8 block h-px w-16 bg-destaque" />

@@ -41,7 +41,7 @@ export function gerar() {
       nos.push({
         x: +f(x2), y: +f(y2), prof,
         r: +(folha ? entre(2.4, 3.6) : entre(1.8, 2.4)).toFixed(1),
-        ouro: rnd() < 0.2,
+        ouro: rnd() < 0.2, // sem uso na UI desde a direção Floresta; fica para não mudar a sequência do rnd()
         ciclo: +entre(5, 9).toFixed(1),
         fase: +entre(0, 3).toFixed(1),
       })

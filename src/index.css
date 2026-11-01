@@ -115,17 +115,17 @@
 }
 
 /* Vinheta de leitura: escurece o canvas atrás do texto sobre a cena (acima do canvas -z-10, abaixo do texto). */
-.zona-limpa {
+/* Vinheta escura atrás do texto que fica sobre a cena (utilitário: participa da cascata do Tailwind). */
+@utility zona-limpa {
   position: relative;
-}
-
-.zona-limpa::before {
-  content: "";
-  position: absolute;
-  inset: -3rem -4rem;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(closest-side, color-mix(in oklab, var(--color-fundo) 88%, transparent) 55%, transparent);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -3rem -5rem;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(farthest-corner, color-mix(in oklab, var(--color-fundo) 90%, transparent) 62%, transparent);
+  }
 }
 
 .cena-mascara {
@@ -142,4 +142,10 @@
   --color-dourado: #8a6a1f;
   --color-destaque: #3f5e3f;
   --color-white: #000;
+}
+
+/* Base do canvas some em degradê: sem corte reto no tronco (login) nem na borda da seção (home). Vem depois de .cena-mascara para vencer no login. */
+.cena-fade-base {
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
 }

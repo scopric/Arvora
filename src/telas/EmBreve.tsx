@@ -40,8 +40,8 @@ export function EmBreve() {
       <main>
       <section className="relative isolate flex min-h-[calc(100dvh-4.25rem)] flex-col justify-center overflow-hidden px-6 py-[6.25rem] sm:px-16 lg:px-24">
         <div aria-hidden="true" className="absolute -top-1/4 right-0 -z-20 size-[48rem] rounded-full bg-superficie/30 blur-3xl" />
-        <div aria-hidden="true" className="absolute bottom-0 left-1/3 -z-20 size-[32rem] rounded-full bg-destaque/10 blur-3xl" />
-        <Cena cheia className="inset-0 -z-10" classeCanvas="max-lg:opacity-25" />
+        <div aria-hidden="true" className="absolute bottom-1/4 left-1/3 -z-20 size-[32rem] rounded-full bg-destaque/10 blur-3xl" />
+        <Cena cheia className="inset-0 -z-10" classeCanvas="cena-fade-base max-lg:opacity-25" />
         {/* A largura em ch fica no h1 (o ch do wrapper seria o da fonte do corpo); o wrapper encolhe ao conteúdo. */}
         <div className="zona-limpa self-start">
           <p className="animate-subir font-mono text-xs tracking-[0.08em] text-destaque uppercase" style={atraso(0)}>
@@ -53,7 +53,7 @@ export function EmBreve() {
           >
             {t("auth.layout.destaque")}
           </h1>
-          <p className="animate-subir mt-8 max-w-lg text-xl text-creme/70" style={atraso(240)}>
+          <p className="animate-subir mt-8 max-w-lg text-xl leading-normal text-creme/70" style={atraso(240)}>
             {t("inicio.descricao")}
           </p>
           {!carregando && !sessao && (
@@ -115,7 +115,7 @@ export function EmBreve() {
             {([1, 2, 3, 4] as const).map((n) => (
               <li key={n} className="revela flex min-h-28 flex-col justify-between rounded-xl border border-superficie bg-fundo p-6">
                 <span aria-hidden="true" className="font-mono text-sm text-destaque">0{n}</span>
-                <span className="text-lg font-semibold">{t(`home.aula.${n}`)}</span>
+                <span className="text-lg font-medium">{t(`home.aula.${n}`)}</span>
               </li>
             ))}
           </ol>

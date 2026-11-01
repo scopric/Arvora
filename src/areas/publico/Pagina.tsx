@@ -6,7 +6,7 @@ import { useCaminho, useT, type Chave } from "../../i18n"
 export function Pagina({ titulo, apoio, largura = "max-w-6xl", children }: { titulo: string; apoio?: ReactNode; largura?: string; children: ReactNode }) {
   return (
     <div className={`mx-auto ${largura} px-6 py-12 sm:px-12 lg:py-16`}>
-      <h1 className="font-titulo text-5xl leading-none font-bold tracking-tight text-balance uppercase sm:text-6xl">{titulo}</h1>
+      <h1 className="font-titulo text-4xl leading-none font-normal text-balance sm:text-6xl">{titulo}</h1>
       {apoio ? <p className="mt-4 max-w-prose text-lg text-creme/80">{apoio}</p> : null}
       <div className="mt-10">{children}</div>
     </div>

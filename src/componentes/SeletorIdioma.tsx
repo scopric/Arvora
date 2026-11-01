@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router"
 import { useIdioma, useT } from "../i18n"
 
 const item =
-  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 font-mono text-xs font-semibold tracking-[0.15em] text-creme/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-[current=true]:bg-creme/12 aria-[current=true]:text-white"
+  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 font-mono text-xs font-semibold tracking-[0.08em] text-creme/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque aria-[current=true]:bg-creme/12 aria-[current=true]:text-white"
 
 // Troca só o prefixo de idioma; o resto do caminho, a busca e o hash ficam. O nome completo do idioma vai no
 // aria-label e no title (WCAG 3.1.2); o texto visível é a sigla. `className` posiciona (inline por padrão).

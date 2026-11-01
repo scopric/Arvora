@@ -46,7 +46,7 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
           ) : (
             <>
               <Link to={caminho("/entrar")} className={linkPublico}>{t("nav.entrar")}</Link>
-              <Link to={caminho(completo ? "/planos" : "/cadastro")} className={`${botaoPublico} bg-destaque px-5 text-sm whitespace-nowrap text-fundo hover:shadow-brilho max-sm:hidden`}>{t(completo ? "menu.assinar" : "nav.criarConta")}</Link>
+              <Link to={caminho(completo ? "/planos" : "/cadastro")} className={`${botaoPublico} bg-destaque text-sm whitespace-nowrap text-fundo hover:shadow-brilho max-sm:hidden`}>{t(completo ? "menu.assinar" : "nav.criarConta")}</Link>
             </>
           )}
         </nav>

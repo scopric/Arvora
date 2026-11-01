@@ -64,3 +64,12 @@ describe("FundoArvore", () => {
     }
   })
 })
+
+// Fotografia da árvore: qualquer mudança na ordem das chamadas do gerador muda este número.
+it("a geometria da árvore não mudou (checksum)", () => {
+  const { fios, nos } = gerar()
+  const txt = JSON.stringify([fios.map((f) => f.d + f.op), nos])
+  let h = 7
+  for (const c of txt) h = (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0
+  expect(h).toBe(226048194)
+})
