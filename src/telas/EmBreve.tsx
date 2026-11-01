@@ -1,4 +1,5 @@
-import { Link } from "react-router"
+import { useEffect } from "react"
+import { Link, useLocation } from "react-router"
 import { Cena } from "../componentes/Cena"
 import { botaoPublico as botao, linkPublico, RodapePublico, TopoPublico } from "../componentes/LayoutPublico"
 import { useCaminho, useT, useTitulo } from "../i18n"
@@ -9,20 +10,22 @@ const FRENTES = [1, 2, 3, 4] as const
 const PORTAS = [1, 2, 3] as const
 const ghost = `${botao} border border-superficie text-creme hover:border-destaque`
 const primario = `${botao} bg-destaque text-fundo hover:shadow-brilho`
-const escuro = `${botao} bg-fundo text-creme hover:shadow-brilho`
 const eyebrow = "font-mono text-xs tracking-[0.08em] uppercase"
 
 // Para onde cada frente leva. Hall of Fame é pré-renderizado fora do app: <a> comum.
-const DESTINO: Record<number, string> = { 1: "/hall-of-fame", 2: "/biblioteca", 3: "/biblioteca", 4: "/planos" }
+const DESTINO: Record<number, string> = { 1: "/awards", 2: "/biblioteca", 3: "/biblioteca", 4: "/planos" }
+// Sobre creme o anel de foco em sálvia não passa de 3:1 (WCAG 1.4.11): anel escuro.
+const escuro = `${botao.replace("focus-visible:outline-destaque", "focus-visible:outline-fundo")} bg-fundo text-creme hover:shadow-brilho`
+// Frases gigantes: acompanham a largura no celular e só viram display a partir de 1280 px (inglês mais longo cabia mal a 1024).
+const frase = "font-titulo text-[clamp(2.25rem,11vw,3.4375rem)] font-normal text-balance xl:text-display"
 
 // Cartão-amostra: um trecho da interface da plataforma flutuando ao lado da frase (no lugar de foto).
 type ChaveAmostra = `${(typeof FRENTES)[number]}${"a" | "b"}`
-function Amostra({ chave, ouro = false, className = "", ms = 0 }: { chave: ChaveAmostra; ouro?: boolean; className?: string; ms?: number }) {
+function Amostra({ chave, ouro = false, className = "" }: { chave: ChaveAmostra; ouro?: boolean; className?: string }) {
   const t = useT()
   return (
     <div
       aria-hidden="true"
-      style={atraso(ms)}
       className={`revela w-64 rounded-xl border border-superficie bg-painel p-5 ${className}`}
     >
       <p className={`${eyebrow} ${ouro ? "text-dourado" : "text-destaque"}`}>{t(`home.amostra.${chave}.rotulo`)}</p>
@@ -44,7 +47,7 @@ function Frente({ n }: { n: (typeof FRENTES)[number] }) {
     <section
       id={`frente-${n}`}
       aria-labelledby={`frente-${n}-t`}
-      className="relative isolate scroll-mt-20 overflow-hidden px-6 py-[6.25rem] sm:px-16 lg:flex lg:min-h-[80svh] lg:items-center lg:px-24"
+      className="relative isolate scroll-mt-20 overflow-clip px-6 py-[6.25rem] sm:px-16 lg:flex lg:min-h-[80svh] lg:items-center lg:px-24"
     >
       {/* Forma orgânica desfocada atrás dos cartões (imagem do estilo-base), do lado oposto à frase. */}
       <div
@@ -56,7 +59,7 @@ function Frente({ n }: { n: (typeof FRENTES)[number] }) {
           <p className={`${eyebrow} ${ouro ? "text-dourado" : "text-destaque"}`}>
             0{n} · {t(`home.pilar.${n}.nome`)}
           </p>
-          <h2 id={`frente-${n}-t`} className="mt-6 font-titulo text-h2 font-normal text-balance lg:text-display">
+          <h2 id={`frente-${n}-t`} className={`mt-6 ${frase}`}>
             {t(`home.frente.${n}.frase`)}
           </h2>
           <p className={`mt-8 max-w-lg text-xl leading-normal text-creme/70 ${par ? "lg:ml-auto" : ""}`}>{t(`home.frente.${n}.apoio`)}</p>
@@ -70,7 +73,7 @@ function Frente({ n }: { n: (typeof FRENTES)[number] }) {
           className={`mt-12 flex flex-wrap gap-4 lg:col-span-5 lg:mt-0 lg:flex-col ${par ? "lg:col-start-1 lg:row-start-1 lg:items-start" : "lg:items-end"}`}
         >
           <Amostra chave={`${n}a` as const} ouro={ouro} className="lg:translate-y-8" />
-          <Amostra chave={`${n}b` as const} ouro={ouro} ms={120} className={par ? "lg:translate-x-16" : "lg:-translate-x-16"} />
+          <Amostra chave={`${n}b` as const} ouro={ouro} className={par ? "lg:translate-x-16" : "lg:-translate-x-16"} />
         </div>
       </div>
     </section>
@@ -82,6 +85,10 @@ export function EmBreve() {
   const t = useT()
   useTitulo("doc.titulo")
   const caminho = useCaminho()
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView()
+  }, [hash])
   // Botão principal sempre montado: a altura não muda quando a sessão termina de carregar (CLS).
   const chamada = carregando ? (
     <span aria-hidden="true" className={`${botao} invisible`}>{t("nav.criarConta")}</span>
@@ -125,8 +132,8 @@ export function EmBreve() {
       {/* Duas portas, em creme (PRD §17.5.1): três passos numerados, um botão cada. */}
       <section aria-labelledby="portas" className="bg-creme px-6 py-[6.25rem] text-fundo sm:px-16 lg:px-24">
         <div className="mx-auto max-w-6xl">
-          <h2 id="portas" className="max-w-3xl font-titulo text-h3 font-normal text-balance lg:text-h2">{t("home.portas.titulo")}</h2>
-          <ol className="mt-14 grid gap-6 md:grid-cols-3 md:gap-10">
+          <h2 id="portas" className="max-w-3xl font-titulo text-h3 font-normal text-balance lg:text-h2">{t("home.funil.titulo")}</h2>
+          <ol className="mt-14 grid gap-6 lg:grid-cols-3 lg:gap-10">
             {PORTAS.map((n) => (
               <li key={n} className="revela relative flex flex-col rounded-xl border border-fundo/15 bg-white/40 p-8">
                 <span aria-hidden="true" className="font-titulo text-h2 leading-none">0{n}</span>
@@ -138,7 +145,7 @@ export function EmBreve() {
                   <Link to={caminho("/planos")} className={`${escuro} mt-8 self-start`}>{t(`home.portas.${n}.acao`)}</Link>
                 )}
                 {n < 3 ? (
-                  <span aria-hidden="true" className="absolute top-1/2 -right-8 hidden -translate-y-1/2 text-3xl text-fundo/40 md:block">→</span>
+                  <span aria-hidden="true" className="absolute top-1/2 -right-8 hidden -translate-y-1/2 text-3xl text-fundo/40 lg:block">→</span>
                 ) : null}
               </li>
             ))}
@@ -151,7 +158,7 @@ export function EmBreve() {
         <div className="mx-auto max-w-6xl border-t border-dourado/40 pt-12 lg:grid lg:grid-cols-12 lg:items-end lg:gap-8">
           <div className="lg:col-span-7">
             <p className={`${eyebrow} text-dourado`}>{t("home.pilar.1.nome")}</p>
-            <h2 id="hof" className="mt-6 font-titulo text-h2 font-normal text-balance lg:text-display">{t("home.hof.titulo")}</h2>
+            <h2 id="hof" className={`mt-6 ${frase}`}>{t("home.hof.titulo")}</h2>
           </div>
           <div className="mt-8 lg:col-span-5 lg:mt-0">
             <p className="max-w-md text-xl leading-normal text-creme/70">{t("home.hof.texto")}</p>
@@ -165,7 +172,7 @@ export function EmBreve() {
         <div className="mx-auto max-w-6xl">
           <h2 id="aula" className="ml-auto max-w-3xl font-titulo text-h3 font-normal text-balance lg:text-right lg:text-h2">{t("home.aula.titulo")}</h2>
           <p className="mt-6 ml-auto max-w-lg text-xl leading-normal text-fundo/70 lg:text-right">{t("home.aula.apoio")}</p>
-          <ol className="mt-14 grid gap-px overflow-hidden rounded-xl border border-fundo/15 bg-fundo/15 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="mt-14 grid gap-px overflow-clip rounded-xl border border-fundo/15 bg-fundo/15 sm:grid-cols-2 lg:grid-cols-4">
             {([1, 2, 3, 4] as const).map((n) => (
               <li key={n} className="revela bg-creme p-6 lg:p-8">
                 <span aria-hidden="true" className="font-titulo text-h3 leading-none">0{n}</span>

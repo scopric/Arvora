@@ -67,39 +67,39 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
 
 const linkRodape = "inline-flex min-h-11 items-center text-sm text-creme/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
 
-function Coluna({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+function Coluna({ id, titulo, children }: { id: string; titulo: string; children: React.ReactNode }) {
   return (
-    <div>
-      <p className="font-mono text-xs tracking-[0.08em] text-creme/60 uppercase">{titulo}</p>
+    <nav aria-labelledby={id}>
+      <h2 id={id} className="font-mono text-xs font-normal tracking-[0.08em] text-creme/60 uppercase">{titulo}</h2>
       <ul className="mt-3">{children}</ul>
-    </div>
+    </nav>
   )
 }
 
-// Rodapé em colunas (direção Manifesto, Decisão 58), o mesmo em todas as páginas públicas. `completo` fica por compatibilidade.
-export function RodapePublico({ completo: _completo = false }: { completo?: boolean }) {
+// Rodapé em colunas (direção Manifesto, Decisão 58), o mesmo em todas as páginas públicas.
+export function RodapePublico() {
   const { sessao, carregando } = useAuth()
   const t = useT()
   const caminho = useCaminho()
   const inicio = caminho("/")
   return (
     <footer className="border-t border-superficie px-6 py-16 sm:px-16 lg:px-24">
-      <nav aria-label={t("nav.rodape")} className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="max-w-xs">
           <Marca to={inicio} />
           <p className="mt-4 text-sm text-creme/70">{t("auth.layout.apoio")}</p>
         </div>
-        <Coluna titulo={t("home.rodape.frentes")}>
+        <Coluna id="rodape-frentes" titulo={t("home.rodape.frentes")}>
           {([1, 2, 3, 4] as const).map((n) => (
-            <li key={n}><a href={`${inicio}#frente-${n}`} className={linkRodape}>{t(`home.pilar.${n}.nome`)}</a></li>
+            <li key={n}><Link to={{ pathname: inicio, hash: `#frente-${n}` }} className={linkRodape}>{t(`home.pilar.${n}.nome`)}</Link></li>
           ))}
         </Coluna>
-        <Coluna titulo={t("home.rodape.conta")}>
+        <Coluna id="rodape-conta" titulo={t("home.rodape.conta")}>
           {carregando ? (
             // Mesma altura do estado sem sessão: nada salta quando a sessão termina de carregar.
             <li aria-hidden="true" className="invisible"><span className={linkRodape}>{t("nav.entrar")}</span><br /><span className={linkRodape}>{t("nav.criarConta")}</span></li>
           ) : sessao ? (
-            <li><Link to={caminho("/perfil")} className={linkRodape}>{t("nav.perfil")}</Link></li>
+            <li><Link to={caminho("/inicio")} className={linkRodape}>{t("menu.painel")}</Link></li>
           ) : (
             <>
               <li><Link to={caminho("/entrar")} className={linkRodape}>{t("nav.entrar")}</Link></li>
@@ -109,13 +109,13 @@ export function RodapePublico({ completo: _completo = false }: { completo?: bool
           <li><Link to={caminho("/planos")} className={linkRodape}>{t("menu.planos")}</Link></li>
           <li><a href={caminho("/hall-of-fame")} className={linkRodape}>{t("menu.hallOfFame")}</a></li>
         </Coluna>
-        <Coluna titulo={t("home.rodape.legal")}>
+        <Coluna id="rodape-legal" titulo={t("home.rodape.legal")}>
           <li><Link to={caminho("/suporte")} className={linkRodape}>{t("menu.suporte")}</Link></li>
           <li><Link to={caminho("/termos")} className={linkRodape}>{t("publico.termos.titulo")}</Link></li>
           <li><Link to={caminho("/privacidade")} className={linkRodape}>{t("publico.privacidade.titulo")}</Link></li>
           <li><Link to={caminho("/cookies")} className={linkRodape}>{t("cookies.politica")}</Link></li>
         </Coluna>
-      </nav>
+      </div>
       <p className="mx-auto mt-12 max-w-6xl border-t border-superficie pt-6 font-mono text-xs tracking-[0.08em] text-creme/60">{t("home.direitos")}</p>
     </footer>
   )
@@ -139,7 +139,7 @@ export function LayoutPublico() {
       <main id="conteudo" tabIndex={-1}>
         <Outlet />
       </main>
-      <RodapePublico completo />
+      <RodapePublico />
     </div>
   )
 }
