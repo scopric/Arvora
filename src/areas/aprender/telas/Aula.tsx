@@ -89,7 +89,7 @@ export function Aula() {
             )}
             {aula.descricao ? <p className="max-w-prose text-base text-bruma">{aula.descricao}</p> : null}
           </div>
-          <aside className={painel}><Vazio>{t("aprender.materiais.emBreve")}</Vazio></aside>
+          <div className={painel}><Vazio>{t("aprender.materiais.emBreve")}</Vazio></div>
         </div>
       ) : uid ? (
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -102,9 +102,9 @@ export function Aula() {
               </p>
             ) : null}
           </div>
-          <aside className={`${cartao} ${painel}`}>
+          <div className={`${cartao} ${painel}`}>
             <Materiais aulaId={aula.id} uid={uid} podeEnviar={!!aula.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} />
-          </aside>
+          </div>
         </div>
       ) : null}
     </Pagina>

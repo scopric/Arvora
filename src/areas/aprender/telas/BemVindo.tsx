@@ -132,8 +132,8 @@ export function BemVindo() {
 
   return (
     <Pagina chave={chave}>
-      {/* Molde Linear (welcome): conteúdo centrado e estreito, passos com ponto dourado no atual, formulário em cartão. */}
-      <div className="mx-auto max-w-2xl">
+      {/* Molde Linear (welcome): coluna estreita, passos com ponto dourado no atual, formulário em cartão. */}
+      <div className="max-w-2xl">
       <ol className="mb-6 flex flex-wrap gap-x-5 gap-y-1 text-legenda" aria-label={t("aprender.bemVindo.passos")}>
         {(["aprender.bemVindo.passo1", grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube", "aprender.bemVindo.passo3"] as Chave[]).map((k, i) => (
           <li key={k} aria-current={etapa === i + 1 ? "step" : undefined} className={`flex items-center gap-2 ${etapa === i + 1 ? "font-medium text-creme" : "text-nevoa"}`}><span aria-hidden="true" className={`size-1.5 rounded-full ${etapa === i + 1 ? "bg-dourado" : "bg-fumaca"}`} />{i + 1}. {t(k)}</li>
