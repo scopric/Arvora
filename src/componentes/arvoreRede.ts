@@ -1,5 +1,5 @@
 // Gerador determinístico da árvore de rede do FundoArvore (arquivo à parte: componentes e funções não se misturam no Fast Refresh).
-export type Fio = { d: string; prof: number; larg: number; op: number }
+export type Fio = { d: string; prof: number; larg: number; op: number; folha: boolean }
 export type No = { x: number; y: number; r: number; ouro: boolean; prof: number; ciclo: number; fase: number }
 
 const SEMENTE = 20261022
@@ -28,13 +28,15 @@ export function gerar() {
     const dobra = entre(-0.18, 0.18) * len
     const cx = (x + x2) / 2 + Math.cos(ang) * dobra
     const cy = (y + y2) / 2 + Math.sin(ang) * dobra
+    const op = +entre(0.38, 0.58).toFixed(2)
+    const folha = prof >= PROF_MAX || (prof >= 3 && rnd() < 0.3)
     fios.push({
       d: `M${f(x)} ${f(y)}Q${f(cx)} ${f(cy)} ${f(x2)} ${f(y2)}`,
       prof,
       larg: Math.max(0.7, 3.6 * 0.7 ** prof),
-      op: +entre(0.38, 0.58).toFixed(2),
+      op,
+      folha,
     })
-    const folha = prof >= PROF_MAX || (prof >= 3 && rnd() < 0.3)
     if (folha || (prof >= 1 && rnd() < 0.25)) {
       nos.push({
         x: +f(x2), y: +f(y2), prof,

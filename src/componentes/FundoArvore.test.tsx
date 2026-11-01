@@ -36,6 +36,16 @@ describe("FundoArvore", () => {
     expect(a.fios[0].d).toBe("M200.0 600.0Q" + a.fios[0].d.split("Q")[1]) // o tronco sai sempre da base
   })
 
+  it("toda folha termina num nó e a árvore tem 71 fios (ordem do sorteio preservada)", () => {
+    const { fios, nos } = gerar()
+    expect(fios.length).toBe(71)
+    const fim = (d: string) => d.split(" ").slice(-2).join(" ")
+    const pontas = new Set(nos.map((n) => `${n.x.toFixed(1)} ${n.y.toFixed(1)}`))
+    const folhas = fios.filter((f) => f.folha)
+    expect(folhas.length).toBeGreaterThan(0)
+    for (const f of folhas) expect(pontas.has(fim(f.d))).toBe(true)
+  })
+
   it.each([["pt", pt], ["en", en]] as const)("botão de pausa traduzido (%s): o nome troca e data-parado alterna", (lang, d) => {
     const { container } = ver(lang)
     const raiz = container.firstElementChild!
