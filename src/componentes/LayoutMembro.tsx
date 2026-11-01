@@ -162,13 +162,13 @@ function FolhaMais({ acesso, aberta, fechar }: { acesso: Acesso; aberta: boolean
     <dialog ref={ref} aria-label={t("menu.mais")} onClose={fechar} onClick={(e) => e.target === e.currentTarget && fechar()} className="app m-0 mt-auto w-full max-w-none rounded-t-xl bg-obsidiana p-0 text-creme shadow-flutuante backdrop:bg-breu/70 lg:hidden">
       <div className="p-3">
         <div className="flex items-center justify-between px-2 pb-2">
-          <p className="text-corpo-p font-medium">{t("menu.mais")}</p>
+          <p className="text-base font-medium">{t("menu.mais")}</p>
           <button type="button" onClick={fechar} aria-label={t("comum.fechar")} className={`inline-flex size-11 items-center justify-center rounded-md text-nevoa hover:text-creme ${foco}`}>
             <Icone nome="fechar" className="size-5" />
           </button>
         </div>
         {/* Clicar num link navega e fecha a folha (o clique sobe até aqui). */}
-        <ul onClick={fechar} className="space-y-0.5 [&_a]:min-h-11 [&_a]:text-corpo-p">
+        <ul onClick={fechar} className="space-y-0.5 [&_a]:min-h-11 [&_a]:text-base">
           {MAIS.map((item) => (
             <li key={item.rota}><LinkItem item={item} acesso={acesso} /></li>
           ))}

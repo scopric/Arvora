@@ -111,25 +111,25 @@ export function Mfa({ children }: { children: ReactNode }) {
       {estado.fase === "erro" ? <div className="mt-8"><Erro aoTentar={carregar}>{t("mfa.erro")}</Erro></div> : null}
       {estado.fase === "cadastrar" ? (
         <>
-          <p className="mt-3 text-corpo-p text-bruma">{t("mfa.cadastrar.texto")}</p>
+          <p className="mt-3 text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
           {aviso ? <div className="mt-6"><Aviso tipo="erro">{t(aviso)}</Aviso></div> : null}
           <Botao onClick={cadastrar} ocupado={ocupado} className="mt-6">{t("mfa.cadastrar.botao")}</Botao>
         </>
       ) : null}
       {estado.fase === "qr" ? (
         <>
-          <p className="mt-3 text-corpo-p text-bruma">{t("mfa.cadastrar.texto")}</p>
+          <p className="mt-3 text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
           {/* data: URI de SVG gerado pelo Supabase; img-src do CSP já libera data: */}
           <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="mt-6 size-48 rounded-md bg-white p-2" />
           <p className="mt-4 text-legenda text-nevoa">{t("mfa.qr.segredo")}</p>
           <p className="mt-1 font-mono text-legenda break-all select-all">{estado.segredo}</p>
-          <p className="mt-6 text-corpo-p text-bruma">{t("mfa.verificar.texto")}</p>
+          <p className="mt-6 text-base text-bruma">{t("mfa.verificar.texto")}</p>
           {formulario(estado.fator)}
         </>
       ) : null}
       {estado.fase === "verificar" ? (
         <>
-          <p className="mt-3 text-corpo-p text-bruma">{t("mfa.verificar.texto")}</p>
+          <p className="mt-3 text-base text-bruma">{t("mfa.verificar.texto")}</p>
           {formulario(estado.fator)}
         </>
       ) : null}

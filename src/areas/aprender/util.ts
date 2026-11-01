@@ -136,4 +136,4 @@ export const botaoContorno = `inline-flex min-h-12 items-center justify-center r
 export const linkTexto = `underline underline-offset-4 hover:text-white ${foco}`
 // Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
 export const campoBase =
-  "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-corpo-p text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"
+  "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"

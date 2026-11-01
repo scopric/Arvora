@@ -44,7 +44,7 @@ export function DialogoConfirmar({ aberto, titulo, texto, confirmar, perigo, des
       }
     >
       <h2 id={idTitulo} className={app ? "text-corpo-g font-semibold" : "font-titulo text-3xl font-bold uppercase"}>{titulo}</h2>
-      {texto ? <p className={app ? "mt-2 text-corpo-p text-bruma" : "mt-3 opacity-80"}>{texto}</p> : null}
+      {texto ? <p className={app ? "mt-2 text-base text-bruma" : "mt-3 opacity-80"}>{texto}</p> : null}
       {children ? <div className="mt-4">{children}</div> : null}
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Botao variante="contorno" onClick={aoCancelar} className="sm:w-auto">{t("comum.cancelar")}</Botao>

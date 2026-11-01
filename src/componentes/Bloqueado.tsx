@@ -28,7 +28,7 @@ export function Bloqueado({ previa, frase, minimo = "grupo" }: { previa?: ReactN
             <Icone nome="cadeado" className="size-3.5" />
             {rotulo}
           </p>
-          <p className="max-w-prose text-corpo-p">{frase}</p>
+          <p className="max-w-prose text-base">{frase}</p>
           <Link to={caminho("/planos")} className="inline-flex min-h-9 items-center justify-center rounded-md bg-dourado px-4 text-sm font-medium text-breu transition-colors pointer-coarse:min-h-11 hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
             {cta}
           </Link>

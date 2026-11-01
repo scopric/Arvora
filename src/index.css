@@ -30,7 +30,8 @@
   --color-osso: #e5e6e2; /* Bone: hover, corpo longo */
   --font-conteudo: "Big Shoulders Display Variable", Impact, sans-serif; /* só em nome de conteúdo (padrão MasterClass) */
 
-  /* Escala do Linear com entrelinha e espaço embutidos (nomes novos: o público não os usa). */
+  /* Escala do Linear com entrelinha e espaço embutidos (nomes novos: o público não os usa).
+     legenda (13) e corpo-p (15) só em rótulo, menu, metadado, tabela e selo; texto corrido fica em 16px (PRD §17.7.3). */
   --text-legenda: 13px;
   --text-legenda--line-height: 1.5;
   --text-legenda--letter-spacing: -0.01em;
