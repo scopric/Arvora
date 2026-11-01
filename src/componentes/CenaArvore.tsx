@@ -139,7 +139,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.uniform1f(uAsp, asp)
     gl.uniform1f(uPx, dpr)
     gl.uniform1f(uEsc, Math.min(1, asp / 0.8))
-    gl.uniform1f(uOff, deslocar && asp > 1.3 ? 0.3 * asp : 0)
+    gl.uniform1f(uOff, deslocar && asp > 1.3 ? 0.42 * asp : 0)
   }
   const quadro = (agora: number) => {
     const dt = Math.min((agora - (ini || agora)) / 1000, 0.1)
