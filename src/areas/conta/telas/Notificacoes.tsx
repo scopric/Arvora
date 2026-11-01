@@ -14,7 +14,7 @@ import { dataCurta } from "../formato"
 import { Pagina } from "../Pagina"
 
 const agora = () => new Date().toISOString()
-type Item = { id: number; titulo: string; link: string | null; lida_em: string | null; criado_em: string }
+type Item = { id: number; titulo: string; titulo_en: string | null; link: string | null; lida_em: string | null; criado_em: string }
 type Estado = { fase: "carregando" } | { fase: "erro" } | { fase: "pronto"; itens: Item[] }
 
 export function Notificacoes() {
@@ -28,13 +28,16 @@ export function Notificacoes() {
   const [falhou, setFalhou] = useState(false)
   const [ocupado, setOcupado] = useState(false)
 
+  // Título em inglês quando existe (avisos antigos só têm o português).
+  const titulo = (i: Item) => (idioma === "en" && i.titulo_en) || i.titulo
+
   useEffect(() => {
     if (!uid) return
     let ativo = true
     // ponytail: as 100 mais novas; paginar quando alguém passar disso (apagar abre espaço).
     supabase
       .from("notificacoes")
-      .select("id, titulo, link, lida_em, criado_em")
+      .select("id, titulo, titulo_en, link, lida_em, criado_em")
       .eq("perfil_id", uid)
       .order("criado_em", { ascending: false })
       .limit(100)
@@ -90,7 +93,7 @@ export function Notificacoes() {
               <li key={i.id}>
                 <Cartao className="flex flex-col gap-3 !p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
-                    <p className={i.lida_em ? "text-creme/75" : "font-semibold"}>{i.titulo}</p>
+                    <p className={i.lida_em ? "text-creme/75" : "font-semibold"}>{titulo(i)}</p>
                     <p className="mt-1 flex items-center gap-2 text-sm text-creme/60">
                       <time dateTime={i.criado_em}>{dataCurta(i.criado_em, idioma)}</time>
                       {i.lida_em ? null : <Selo tom="destaque">{t("conta.notificacoes.nova")}</Selo>}
@@ -98,16 +101,16 @@ export function Notificacoes() {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {i.link ? (
-                      <Link to={caminho(i.link)} aria-label={`${t("conta.notificacoes.abrir")}: ${i.titulo}`} className="inline-flex min-h-11 items-center rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
+                      <Link to={caminho(i.link)} aria-label={`${t("conta.notificacoes.abrir")}: ${titulo(i)}`} className="inline-flex min-h-11 items-center rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
                         {t("conta.notificacoes.abrir")}
                       </Link>
                     ) : null}
                     {i.lida_em ? null : (
-                      <button type="button" disabled={ocupado} aria-label={`${t("conta.notificacoes.marcar")}: ${i.titulo}`} onClick={() => void marcar(i.id)} className="min-h-11 rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
+                      <button type="button" disabled={ocupado} aria-label={`${t("conta.notificacoes.marcar")}: ${titulo(i)}`} onClick={() => void marcar(i.id)} className="min-h-11 rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
                         {t("conta.notificacoes.marcar")}
                       </button>
                     )}
-                    <button type="button" disabled={ocupado} aria-label={`${t("conta.notificacoes.apagar")}: ${i.titulo}`} onClick={() => void apagar(i.id)} className="min-h-11 rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
+                    <button type="button" disabled={ocupado} aria-label={`${t("conta.notificacoes.apagar")}: ${titulo(i)}`} onClick={() => void apagar(i.id)} className="min-h-11 rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
                       {t("conta.notificacoes.apagar")}
                     </button>
                   </div>

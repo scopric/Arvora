@@ -17,5 +17,8 @@ export async function carregarCurso(slug: string, uid: string): Promise<CursoCom
   const ids = modulos.map((m) => m.id)
   const aulas = ids.length ? (dados(await supabase.from("aulas").select(COLUNAS_AULA).in("modulo_id", ids).order("ordem")) as AulaLinha[]) : []
   const prog = aulas.length ? (dados(await supabase.from("progresso_aula").select("aula_id, percentual").eq("perfil_id", uid).in("aula_id", aulas.map((a) => a.id))) as { aula_id: number; percentual: number }[]) : []
+  // O banco ordena só por `ordem`, que recomeça em cada módulo: a sequência do curso é módulo, depois aula.
+  const posModulo = new Map(modulos.map((m, i) => [m.id, i]))
+  aulas.sort((a, b) => (posModulo.get(a.modulo_id!) ?? 0) - (posModulo.get(b.modulo_id!) ?? 0) || a.ordem - b.ordem)
   return { curso: c, modulos, aulas, progresso: new Map(prog.map((p) => [p.aula_id, p.percentual])) }
 }

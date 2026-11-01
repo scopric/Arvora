@@ -27,7 +27,7 @@ export function Legal({ tipo, titulo }: { tipo: "termos" | "privacidade"; titulo
     `${tipo}/${idioma}`,
   )
   const d = doc.dados
-  const data = d && new Intl.DateTimeFormat(idioma === "pt" ? "pt-BR" : "en-IE", { dateStyle: "long" }).format(new Date(d.vigente_desde))
+  const data = d && new Intl.DateTimeFormat(idioma === "pt" ? "pt-BR" : "en-IE", { dateStyle: "long", timeZone: "Europe/Dublin" }).format(new Date(d.vigente_desde))
   return (
     <Pagina titulo={t(titulo)} largura="max-w-3xl">
       {doc.carregando ? (

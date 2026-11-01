@@ -135,7 +135,7 @@ function BlocoPedidos({ uid }: { uid: string }) {
       <DialogoConfirmar
         aberto={confirmar !== null}
         titulo={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoExclusao" : "conta.dados.pedido.dialogoExportacao")}
-        texto={t("conta.dados.pedido.dialogoTexto")}
+        texto={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoTextoExclusao" : "conta.dados.pedido.dialogoTextoExportacao")}
         confirmar={t("conta.dados.pedido.enviar")}
         perigo={confirmar === "exclusao"}
         aoConfirmar={() => confirmar && void pedir(confirmar)}

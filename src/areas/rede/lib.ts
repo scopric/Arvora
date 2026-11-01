@@ -76,9 +76,12 @@ export const iniciais = (nome: string | null) =>
 
 export const chaveSlug = (v: Vitrine) => v.slug ?? v.id ?? ""
 
+// Hora de Dublin, como no resto da plataforma (o navegador pode estar em outro fuso).
+const local = (idioma: string) => (idioma === "pt" ? "pt-BR" : "en-IE")
 export const quando = (iso: string, idioma: string) =>
-  new Intl.DateTimeFormat(idioma, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso))
-export const dia = (iso: string, idioma: string) => new Intl.DateTimeFormat(idioma, { dateStyle: "medium" }).format(new Date(iso))
+  new Intl.DateTimeFormat(local(idioma), { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Dublin" }).format(new Date(iso))
+export const dia = (iso: string, idioma: string) =>
+  new Intl.DateTimeFormat(local(idioma), { dateStyle: "medium", timeZone: "Europe/Dublin" }).format(new Date(iso))
 
 // Data a partir da qual um pedido recusado/cancelado pode ser refeito.
 export const podePedirDe = (c: Conexao): Date => new Date(new Date(c.respondida_em ?? c.pedida_em).getTime() + DIAS_NOVO_PEDIDO * 86_400_000)
