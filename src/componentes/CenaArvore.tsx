@@ -16,11 +16,11 @@ void main(){
   float tipo=a.z;
   bool poeira=tipo>2.5&&tipo<3.5;
   vec3 q=p;
-  if(poeira){q.y=mod(q.y+1.+uTime*.05*(.4+a.w),2.)-1.;q.x+=sin(uTime*.3+a.w*20.)*.06;}
-  q.x+=sin(uTime*.7+q.y*3.+a.w*6.28)*.006*(q.y+1.);
+  if(poeira){q.y=mod(q.y+1.+uTime*.035*(.4+a.w),2.)-1.;q.x+=sin(uTime*.2+a.w*20.)*.08;}
+  q.x+=sin(uTime*.5+q.y*3.+a.w*6.28)*.006*(q.y+1.);
   vec3 dir=vec3(h(a.w*7.1)-.5,h(a.w*13.3)*.7,h(a.w*3.7)-.5);
-  q+=dir*uScroll*uScroll*1.8;
-  float r=uPtr.x*.3+uScroll*.35+sin(uTime*.08)*.1,c=cos(r),s=sin(r);
+  q+=dir*uScroll*uScroll*1.4;
+  float r=uPtr.x*.3+uScroll*.35+sin(uTime*.05)*.1,c=cos(r),s=sin(r);
   q.xz=mat2(c,-s,s,c)*q.xz;
   q.x=q.x*uEsc+uOff;
   q.y=(q.y+1.)*uEsc-1.+uPtr.y*.08;
@@ -28,22 +28,22 @@ void main(){
   vec2 n=vec2(q.x*.98/uAsp,q.y*.98)/w;
   vec2 dv=(n-uLuz)*vec2(uAsp,1.);
   float dd=length(dv);
-  float perto=(1.-smoothstep(0.,.5,dd))*uLuzK;
-  n+=dv/max(dd,.05)*perto*.025/vec2(uAsp,1.);
+  float perto=(1.-smoothstep(0.,.7,dd))*uLuzK;
+  n+=dv/max(dd,.05)*perto*.03/vec2(uAsp,1.);
   gl_Position=vec4(n,0.,1.);
-  float des=min(1.,abs(q.z-uFoco)*1.3);
-  float e=(a.x-fract(uTime*.05)*1.6+.3)*8.;
+  float des=min(1.,abs(q.z-uFoco)*1.3)*(tipo<.5?.35:1.);
+  float e=(a.x-fract(uTime*.035)*1.6+.3)*8.;
   float pul=tipo>2.5?0.:exp(-e*e);
-  float pop=poeira?pow(max(0.,sin(uTime*1.7+a.w*60.)),40.):0.;
-  float tam=a.y*uPx*g/w*(1.+des*1.2+pul*.8+pop*2.+perto*.6);
+  float pop=poeira?pow(max(0.,sin(uTime*1.2+a.w*60.)),40.):0.;
+  float tam=a.y*uPx*g/w*(1.+des*1.4+pul*1.+pop*2.5+perto*.7);
   gl_PointSize=min(180.,max(1.,tam));
   vB=des;
   float tw=tipo>.5?.65+.35*sin(uTime*1.6+a.w*40.):1.;
   vec3 col=tipo>1.5?vec3(.79,.64,.29):tipo>.5?vec3(.62,.71,.54):vec3(.96,.96,.94);
   float al=(poeira?.55:tipo>.5?1.:.7)*tw;
-  if(tipo>3.5){col=vec3(1.,.88,.55);al=.14*pow(max(0.,sin(uTime*.5+a.w*20.)),3.);}
+  if(tipo>3.5){col=vec3(1.,.88,.55);al=.2*pow(max(0.,sin(uTime*.35+a.w*20.)),3.);}
   col=mix(col,vec3(1.,.96,.85),min(1.,pul*.8+perto*.5));
-  al=al*(1.+pul*1.2+pop*1.5+perto*.8)/(1.+des*des*3.);
+  al=al*(1.+pul*1.8+pop*2.+perto*1.)/(1.+des*des*3.);
   vC=vec4(col,al*g*(1.-uScroll*.9));
 }`
 // Raios de sol entre as copas (god rays) e o brilho do sol no canto: um triângulo de tela cheia, só gradiente; ciclos de ~18 s.
@@ -56,7 +56,7 @@ void main(){
   float f=sin(a*14.+sin(a*5.+uTime*.15)*1.6)*.5+.5;
   float g=sin(a*31.-uTime*.1)*.5+.5;
   float k=pow(f,4.)*(.6+.4*g)*(.55+.45*sin(uTime*.35+a*7.))*(1.-smoothstep(.2,2.9,length(d)))*.5*mix(.6,1.,smoothstep(.8,1.4,uAsp));
-  k=k*(.9+.1*sin(uTime*5.+a*9.))+exp(-length(d)*2.2)*.22*(.85+.15*sin(uTime*.9));
+  k=k*(.9+.1*sin(uTime*3.+a*9.))+exp(-length(d)*2.2)*.28*(.85+.15*sin(uTime*.6));
   k*=1.-uRoll*.8;
   gl_FragColor=vec4(vec3(1.,.86,.5)*k,k);}`
 // Em foco: brilho macio. Fora de foco (vB→1): disco de bokeh, mais chapado.
@@ -71,7 +71,7 @@ const pontos = () => {
   const Y = (y: number) => 1 - y / 300
   for (const f of fios) {
     const [x0, y0, cx, cy, x1, y1] = f.d.match(/-?\d+(\.\d+)?/g)!.map(Number)
-    const n = Math.max(8, Math.round(Math.hypot(x1 - x0, y1 - y0) / 1.15))
+    const n = Math.max(8, Math.round(Math.hypot(x1 - x0, y1 - y0) / 1.0))
     const z = (Math.random() - 0.5) * 0.7
     for (let i = 0; i <= n; i++) {
       const t = i / n
@@ -90,9 +90,9 @@ const pontos = () => {
       dados.push(X(n.x) + r * Math.sin(b) * Math.cos(a), Y(n.y) + r * Math.sin(b) * Math.sin(a), (Math.random() - 0.5) * 0.7 + r * Math.cos(b), ((n.prof + 1.5) / PROF) * 0.9, 2.2 + Math.random() * 2, Math.random() < 0.25 ? 2 : 1, Math.random())
     }
   }
-  for (let i = 0; i < 260; i++) dados.push((Math.random() - 0.5) * 1.8, Math.random() * 2 - 1, (Math.random() - 0.5) * 1.2, 0.85, 2 + Math.random() * 3, 3, Math.random())
+  for (let i = 0; i < 420; i++) dados.push((Math.random() - 0.5) * 1.8, Math.random() * 2 - 1, (Math.random() - 0.5) * 1.2, 0.85, 2 + Math.random() * 3, 3, Math.random())
   for (const n of nos) dados.push(X(n.x), Y(n.y), (Math.random() - 0.5) * 0.7, ((n.prof + 1) / PROF) * 0.9, n.r * 3.4, n.ouro ? 2 : 1, Math.random())
-  for (let i = 0; i < 14; i++) dados.push(Math.random() * 1.4 - 0.5, Math.random() * 1.2 - 0.5, (Math.random() - 0.5) * 0.8, 0.9, 30 + Math.random() * 40, 4, Math.random())
+  for (let i = 0; i < 22; i++) dados.push(Math.random() * 1.6 - 0.6, Math.random() * 1.4 - 0.6, (Math.random() - 0.5) * 0.8, 0.9, 36 + Math.random() * 50, 4, Math.random())
   return new Float32Array(dados)
 }
 
@@ -207,7 +207,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.uniform2f(uPtr, atual.x, atual.y)
     gl.uniform2f(uLuz, luz.x, luz.y)
     gl.uniform1f(uLuzK, luzK)
-    gl.uniform1f(uFoco, reduzido ? 0 : Math.sin(tempo * 0.1) * 0.3)
+    gl.uniform1f(uFoco, reduzido ? 0 : Math.sin(tempo * 0.06) * 0.3)
     gl.drawArrays(gl.POINTS, 0, dados.length / 7)
     raf = !reduzido && visivel && !document.hidden && !parado() ? requestAnimationFrame(quadro) : 0
   }
