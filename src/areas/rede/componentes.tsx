@@ -217,7 +217,7 @@ export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar, dest
     corpo = (
       <>
         <Selo tom="destaque">{t("rede.conexao.recebido")}</Selo>
-        <Link to={caminho("/conexoes")} className={`inline-flex min-h-9 items-center ${linkTextoApp}`}>{t("rede.conexao.responder")}</Link>
+        <Link to={caminho("/conexoes")} className={`inline-flex min-h-9 items-center pointer-coarse:min-h-11 ${linkTextoApp}`}>{t("rede.conexao.responder")}</Link>
       </>
     )
   } else if (conexao.status === "aceita") {

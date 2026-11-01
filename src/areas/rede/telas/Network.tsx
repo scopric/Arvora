@@ -96,7 +96,7 @@ export function Network() {
     corpo = (
       <div className="grid gap-8 lg:grid-cols-[16rem_1fr]">
         {/* Molde Linear (integrations): filtros numa coluna à esquerda, fixa ao rolar; resultados em grade de 2 colunas. */}
-        <form onSubmit={buscar} aria-label={t("rede.network.filtros")} className="space-y-4 lg:sticky lg:top-16 lg:self-start">
+        <form onSubmit={buscar} aria-label={t("rede.network.filtros")} className="grid gap-4 sm:grid-cols-2 lg:sticky lg:top-16 lg:grid-cols-1 lg:self-start">
           <fieldset disabled={cadeado} className="contents">
             <Selecao rotulo={t("rede.network.setor")} name="setor" defaultValue={filtros.setor}>
               <option value="">{t("rede.network.todos")}</option>
@@ -113,7 +113,7 @@ export function Network() {
               <option value="procura">{t("rede.network.procura")}</option>
             </Selecao>
             {/* Para o Clube o dourado da tela é o do Bloqueado: o botão fica em contorno. */}
-            <Botao type="submit" variante={cadeado ? "contorno" : "primario"} className="w-full">
+            <Botao type="submit" variante={cadeado ? "contorno" : "primario"} className="w-full sm:col-span-2 lg:col-span-1">
               {cadeado ? <Icone nome="cadeado" className="size-4" /> : null}
               {t("rede.network.buscar")}
             </Botao>

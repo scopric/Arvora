@@ -75,7 +75,7 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
   }
 
   return (
-    <article className={`${tipo === "posts" ? "rounded-xl p-4 shadow-borda" : "border-t border-grafite pt-3"} ${item.oculto_em ? "opacity-60" : ""}`}>
+    <article className={`${tipo === "posts" ? "rounded-xl p-4 shadow-borda" : "border-t border-grafite pt-3 first:border-t-0 first:pt-0"} ${item.oculto_em ? "opacity-60" : ""}`}>
       <header className="flex flex-wrap items-center gap-x-3 gap-y-1 text-legenda">
         <strong className="text-creme">{autor ?? t(item.autor_id ? "rede.comunidade.membro" : "rede.comunidade.exMembro")}</strong>
         <time dateTime={item.criado_em} className="text-nevoa">{quando(item.criado_em, idioma)}</time>
@@ -87,7 +87,7 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
           <label htmlFor={`ed-${tipo}-${item.id}`} className="sr-only">{t("rede.comunidade.editar")}</label>
           <textarea id={`ed-${tipo}-${item.id}`} name="corpo" defaultValue={item.corpo} rows={3} maxLength={tipo === "posts" ? 5000 : 2000} required className={campoTexto} />
           <div className="flex gap-3">
-            <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("rede.comunidade.salvar")}</Botao>
+            <Botao type="submit" variante="contorno" ocupado={ocupado} className="sm:w-auto">{t("rede.comunidade.salvar")}</Botao>
             <Botao type="button" variante="contorno" onClick={() => setEditando(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>
           </div>
         </form>

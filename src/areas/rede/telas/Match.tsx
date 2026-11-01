@@ -182,11 +182,11 @@ export function Match() {
                       acoes={
                         <>
                           <AcaoConexao uid={uid} outroId={s.sugerido_id} nome={p.nome ?? ""} origem="match" conexao={porOutro.get(s.sugerido_id)} aoMudar={recarregar} destaque={false} />
-                          <Link to={caminho(`/network/${p.slug ?? s.sugerido_id}`)} className={`inline-flex min-h-9 items-center text-legenda ${linkTextoApp}`}>{t("rede.match.verPerfil")}</Link>
+                          <Link to={caminho(`/network/${p.slug ?? s.sugerido_id}`)} className={`inline-flex min-h-9 items-center text-legenda pointer-coarse:min-h-11 ${linkTextoApp}`}>{t("rede.match.verPerfil")}</Link>
                         </>
                       }
                     >
-                      <p className="mt-4 border-l-2 border-destaque pl-3 text-legenda text-bruma">
+                      <p className="mt-4 border-l-2 border-grafite pl-3 text-legenda text-bruma">
                         <span className="block font-medium text-nevoa">{t("rede.match.porque")}</span>
                         {frase(s)}
                       </p>

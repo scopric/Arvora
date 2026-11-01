@@ -21,12 +21,14 @@ type Pendente = { alteracao_pendente: { historia?: string; materia_url?: string;
 
 const COLUNAS = "id, edicao_id, categoria_id, nome, foto_path, historia, video_entrevista_id, video_premiacao_id, materia_url, publicado_em"
 
-function Premio({ p, edicao, categoria, pendente, aoMudar }: {
+// `primario`: com mais de um prêmio, só o primeiro tem o botão dourado (um primário por tela).
+function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
   p: { id: number; nome: string; foto_path: string | null; historia: string | null; video_entrevista_id: string | null; video_premiacao_id: string | null; materia_url: string | null; publicado_em: string | null }
   edicao: string
   categoria: string
   pendente: Pendente
   aoMudar: () => void
+  primario: boolean
 }) {
   const t = useT()
   const idioma = useIdioma()
@@ -64,7 +66,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar }: {
       <section aria-labelledby={`pv-${p.id}`}>
         <h2 id={`pv-${p.id}`} className="text-legenda font-medium text-nevoa">{t("rede.meuAward.previa")}</h2>
         {/* Molde MasterClass (herói da classe): capa larga, nome em Big Shoulders, categoria · edição em dourado, selos. */}
-        <div className="mt-3 overflow-hidden rounded-xl shadow-borda">
+        <div className="relative mt-3 overflow-hidden rounded-xl after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:shadow-borda">
           {foto ? <img src={foto} alt={`${t("rede.meuAward.fotoDe")} ${p.nome}`} className="aspect-video w-full object-cover" /> : null}
           <div className="space-y-5 p-5 sm:p-6">
             <div className="flex flex-wrap items-center gap-2">
@@ -111,11 +113,11 @@ function Premio({ p, edicao, categoria, pendente, aoMudar }: {
           <Campo rotulo={t("rede.meuAward.materia")} name="materia_url" type="url" maxLength={500} defaultValue={pend?.materia_url ?? p.materia_url ?? ""} placeholder="https://" ajuda={t("rede.meuAward.materiaAjuda")} />
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Botao type="button" variante="contorno" onClick={() => setEditando(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>
-            <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("rede.meuAward.enviarPedido")}</Botao>
+            <Botao type="submit" variante={primario ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto">{t("rede.meuAward.enviarPedido")}</Botao>
           </div>
         </form>
       ) : (
-        <Botao onClick={() => { setEditando(true); setEnviado(false) }} className="sm:w-auto">{t("rede.meuAward.pedirAlteracao")}</Botao>
+        <Botao variante={primario ? "primario" : "contorno"} onClick={() => { setEditando(true); setEnviado(false) }} className="sm:w-auto">{t("rede.meuAward.pedirAlteracao")}</Botao>
       )}
     </div>
   )
@@ -161,8 +163,8 @@ export function MeuAward() {
   else
     corpo = (
       <div className="space-y-12">
-        {estado.dados.map((x) => (
-          <Premio key={x.p.id} p={x.p} edicao={x.edicao} categoria={x.categoria} pendente={x.pendente} aoMudar={recarregar} />
+        {estado.dados.map((x, i) => (
+          <Premio key={x.p.id} p={x.p} edicao={x.edicao} categoria={x.categoria} pendente={x.pendente} aoMudar={recarregar} primario={i === 0} />
         ))}
       </div>
     )

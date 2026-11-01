@@ -20,8 +20,8 @@ import { chaveSlug, COLUNAS_CONEXAO, dia, mudarStatus, ok, useCarga, vitrinesPor
 
 type Dados = { conexoes: Conexao[]; perfis: Map<string, Vitrine> }
 
-// `primario`: só a primeira linha com "Aceitar" ganha o botão dourado (um primário por tela).
-function Linha({ c, uid, perfis, aoMudar, primario }: { c: Conexao; uid: string; perfis: Map<string, Vitrine>; aoMudar: () => void | Promise<void>; primario?: boolean }) {
+// Ações em contorno em toda a lista (molde Linear members): a mesma ação não muda de peso de uma linha para outra.
+function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: Map<string, Vitrine>; aoMudar: () => void | Promise<void> }) {
   const t = useT()
   const idioma = useIdioma()
   const caminho = useCaminho()
@@ -57,14 +57,14 @@ function Linha({ c, uid, perfis, aoMudar, primario }: { c: Conexao; uid: string;
             {p?.empresa_nome ? `${p.empresa_nome} · ` : ""}{dia(c.pedida_em, idioma)}
             {c.origem === "match" ? ` · ${t("rede.conexoes.viaMatch")}` : ""}
           </p>
-          {c.mensagem ? <p className="mt-2 rounded-md bg-creme/2 px-3 py-2 text-legenda whitespace-pre-wrap shadow-borda">{c.mensagem}</p> : null}
+          {c.mensagem ? <p className="mt-2 rounded-md bg-creme/2 px-3 py-2 text-base whitespace-pre-wrap shadow-borda">{c.mensagem}</p> : null}
         </div>
       </div>
       {erro ? <div className="mt-3"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
       <div className="mt-3 flex flex-wrap items-center gap-3 sm:pl-13">
         {c.status === "pendente" && recebido ? (
           <>
-            <Botao variante={primario ? "primario" : "contorno"} onClick={() => void agir("aceita")} ocupado={ocupado} disabled={!p} className={botao}>{t("rede.conexoes.aceitar")}</Botao>
+            <Botao variante="contorno" onClick={() => void agir("aceita")} ocupado={ocupado} disabled={!p} className={botao}>{t("rede.conexoes.aceitar")}</Botao>
             <Botao variante="contorno" onClick={() => void agir("recusada")} ocupado={ocupado} className={botao}>{t("rede.conexoes.recusar")}</Botao>
           </>
         ) : null}
@@ -118,7 +118,7 @@ export function Conexoes() {
       itens.length === 0 ? (
         <Vazio>{t(vazio)}</Vazio>
       ) : (
-        <ul className="divide-y divide-grafite overflow-hidden rounded-xl shadow-borda">{itens.map((c, i) => <Linha key={c.id} c={c} uid={uid} perfis={perfis} aoMudar={recarregar} primario={i === 0} />)}</ul>
+        <ul className="divide-y divide-grafite rounded-xl shadow-borda">{itens.map((c) => <Linha key={c.id} c={c} uid={uid} perfis={perfis} aoMudar={recarregar} />)}</ul>
       )
     corpo = (
       <Abas

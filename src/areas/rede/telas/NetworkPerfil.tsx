@@ -70,14 +70,14 @@ export function NetworkPerfil() {
             {lista(tipo).map((i) => (
               <li key={i.categoria_id} className="py-2.5 first:pt-0 last:pb-0">
                 <p className="text-base font-medium">{nomeCategoria(categorias, i.categoria_id, idioma)}</p>
-                {i.texto ? <p className="mt-0.5 text-legenda text-nevoa">{i.texto}</p> : null}
+                {i.texto ? <p className="mt-1 text-base text-bruma">{i.texto}</p> : null}
               </li>
             ))}
           </ul>
         )}
       </section>
     )
-    nome = perfil.nome ?? undefined
+    nome = perfil.nome || undefined
     corpo = (
       <div className="space-y-6">
         <div className="flex items-start gap-3">
