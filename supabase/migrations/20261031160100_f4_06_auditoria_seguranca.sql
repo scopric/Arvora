@@ -13,6 +13,9 @@ using (
   )
 );
 
+-- O exists acima procura por foto_path a cada leitura do bucket.
+create index perfis_foto_path_idx on public.perfis (foto_path) where foto_path is not null;
+
 -- B1) Parte de conexao recusada ou cancelada deixa de ver a outra pessoa por esse caminho.
 drop policy perfis_conexao_le on public.perfis;
 create policy perfis_conexao_le on public.perfis for select to authenticated

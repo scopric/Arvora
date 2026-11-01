@@ -1,7 +1,7 @@
 -- Auditoria de seguranca (f4_06): avatar so de perfil visivel, conexao recusada nao abre perfil,
 -- material de curso nao publicado nao sai. Transacao desfeita.
 begin;
-select plan(9);
+select plan(10);
 
 -- O seed de desenvolvimento (supabase/seed.sql) nao entra no teste: apagado aqui, dentro da transacao desfeita no fim.
 truncate public.verticais, public.edicoes, public.temas, public.categorias_rede, public.espacos, public.empresas,
@@ -60,6 +60,11 @@ select tt.como(tt.u('c1'));
 select is(tt.n($q$select 1 from storage.objects where bucket_id = 'avatares'$q$), 1, 'M1 Clube so ve a foto de perfil que ele pode ver');
 select is(tt.n($q$select 1 from storage.objects where bucket_id = 'avatares' and name like tt.u('b1')::text || '/%'$q$), 1, 'M1 e a do membro ativo');
 reset role;
+update public.perfis set suspenso_em = now() where id = tt.u('b1');
+select tt.como(tt.u('c1'));
+select is(tt.n($q$select 1 from storage.objects where bucket_id = 'avatares'$q$), 0, 'M1 membro suspenso: foto some');
+reset role;
+update public.perfis set suspenso_em = null where id = tt.u('b1');
 select tt.como(tt.u('f1'));
 select is(tt.n($q$select 1 from storage.objects where bucket_id = 'avatares'$q$), 1, 'M1 dono ve a propria foto');
 reset role;
