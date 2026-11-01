@@ -3,81 +3,75 @@ import { useT } from "../i18n"
 import { FundoArvore } from "./FundoArvore"
 import { gerar } from "./arvoreRede"
 
-// Árvore sólida que brilha por dentro, em WebGL puro (sem biblioteca): os mesmos fios de arvoreRede.ts viram fitas
-// afuniladas (halo gaussiano por baixo, núcleo claro por cima) e a copa vira volumes macios. Geometria 100% determinística.
-// Cresce uma vez, inclina com o ponteiro e gira com a rolagem. Sem WebGL: cai no SVG de FundoArvore.
-const VERT = `attribute vec3 p;attribute vec2 d;attribute vec4 a;
-uniform float uT,uTime,uAsp,uEsc,uOff,uScroll,uHalo;uniform vec2 uPtr;
-varying vec2 vUv;varying float vTipo,vA,vH;
+// Árvore de luz em WebGL puro (sem biblioteca): os mesmos fios e nós de arvoreRede.ts viram pontos com
+// profundidade. Cresce uma vez, inclina com o ponteiro e gira com a rolagem. Sem WebGL: cai no SVG de FundoArvore.
+const VERT = `attribute vec3 p;attribute vec4 a;
+uniform float uT,uAsp,uPx,uTime,uScroll,uOff,uEsc;uniform vec2 uPtr;
+varying vec4 vC;
 void main(){
-  float g=smoothstep(a.x,a.x+.04,uT);
-  float esp=a.w>1.5?1.:mix(1.,3.2,uHalo);
-  vec3 q=p+vec3(d*g*esp,0.);
-  q.x+=sin(uTime*.5+q.y*2.)*.004*(q.y+1.);
-  float r=uPtr.x*.25+uScroll*.3,c=cos(r),s=sin(r);
+  float g=smoothstep(a.x,a.x+.05,uT);
+  vec3 q=p;
+  if(a.z>2.5&&a.z<3.5)q.y=mod(q.y+1.+uTime*.05*(.4+a.w),2.)-1.;
+  q.x+=sin(uTime*.7+q.y*3.+a.w*6.28)*.006*(q.y+1.);
+  float r=uPtr.x*.3+uScroll*.35,c=cos(r),s=sin(r);
   q.xz=mat2(c,-s,s,c)*q.xz;
-  q.x=q.x*uEsc+uOff;q.y=(q.y+1.)*uEsc-1.+uPtr.y*.06;
-  gl_Position=vec4(q.x*.98/uAsp,q.y*.98,0.,1.+q.z*.45);
-  vUv=a.yz;vTipo=a.w;vH=uHalo;vA=g*(1.-uScroll*.8);
+  q.x=q.x*uEsc+uOff;
+  q.y=(q.y+1.)*uEsc-1.;
+  q.y+=uPtr.y*.08;
+  float w=1.+q.z*.45;
+  gl_Position=vec4(q.x*.98/uAsp,q.y*.98,0.,w);
+  gl_PointSize=max(1.,a.y*uPx*g/w);
+  float tw=a.z>.5?.65+.35*sin(uTime*1.6+a.w*40.):1.;
+  vec3 col=a.z>1.5?vec3(.79,.64,.29):a.z>.5?vec3(.62,.71,.54):vec3(.96,.96,.94);
+  float al=(a.z>2.5?.55:a.z>.5?1.:.8)*tw;
+  if(a.z>3.5){col=vec3(1.,.88,.55);al=.14*pow(max(0.,sin(uTime*.5+a.w*20.)),3.);}
+  vC=vec4(col,al*g*(1.-uScroll*.8));
 }`
-const FRAG = `precision mediump float;
-varying vec2 vUv;varying float vTipo,vA,vH;
-const vec3 S=vec3(.616,.71,.541),C=vec3(.957,.957,.937);
+// Raios de sol entre as copas (god rays): um triângulo de tela cheia, só gradiente; muda em ciclos de ~18 s.
+const VERT_R = `attribute vec2 q;varying vec2 v;void main(){v=q;gl_Position=vec4(q,0.,1.);}`
+const FRAG_R = `precision mediump float;uniform float uTime,uAsp,uRoll;uniform vec2 uPtr;varying vec2 v;
 void main(){
-  float r=length(vUv);
-  float k;
-  if(vTipo>1.5)k=exp(-r*r*4.)*(1.-smoothstep(.9,1.,r))*.09*vA;
-  else if(vH>.5)k=exp(-r*r*5.)*.3*vA;
-  else{k=(1.-smoothstep(.55,1.,r))*vA;gl_FragColor=vec4(mix(S,C,(1.-r)*(1.-r)*.55)*k,k);return;}
-  gl_FragColor=vec4(S*k,k);
-}`
+  vec2 p=vec2(v.x*uAsp,v.y);
+  vec2 d=p-vec2(1.1*uAsp+uPtr.x*.15,1.5);
+  float a=atan(d.x,-d.y);
+  float f=sin(a*14.+sin(a*5.+uTime*.15)*1.6)*.5+.5;
+  float g=sin(a*31.-uTime*.1)*.5+.5;
+  float k=pow(f,4.)*(.6+.4*g)*(.55+.45*sin(uTime*.35+a*7.))*smoothstep(2.9,.2,length(d))*.5*mix(.6,1.,smoothstep(.8,1.4,uAsp))*(1.-uRoll*.8);
+  gl_FragColor=vec4(vec3(1.,.86,.5)*k,k);}`
+const FRAG = `precision mediump float;varying vec4 vC;
+void main(){float d=length(gl_PointCoord-.5);float k=smoothstep(.5,.05,d);gl_FragColor=vec4(vC.rgb*vC.a*k,k*vC.a);}`
 
 const PROF = 7
-const SEG = 12 // segmentos por fio
-const LARG = 4 // ponytail: botão de calibração da espessura (1 = traço do SVG)
-const FLOATS = 9 // p(3) d(2) a(4) = 36 B por vértice
-const X = (x: number) => (x - 200) / 250
-const Y = (y: number) => 1 - y / 300
-const profundidade = (x: number, y: number) => 0.3 * Math.sin(3.1 * x) * Math.cos(2.3 * y)
-const larg = (prof: number) => Math.max(0.7, 3.6 * 0.7 ** prof)
-const CANTOS: [number, number][] = [[-1, -1], [1, -1], [1, 1], [-1, -1], [1, 1], [-1, 1]]
-
-// Buffer único [galhos | juntas | copa]; `luz` = vértices de galhos + juntas.
-const geometria = () => {
+const pontos = () => {
   const { fios, nos } = gerar()
   const dados: number[] = []
-  const v = (x: number, y: number, z: number, dx: number, dy: number, t0: number, u: number, w: number, tipo: number) => dados.push(x, y, z, dx, dy, t0, u, w, tipo)
-  const juntas: number[][] = []
+  const X = (x: number) => (x - 200) / 250
+  const Y = (y: number) => 1 - y / 300
   for (const f of fios) {
     const [x0, y0, cx, cy, x1, y1] = f.d.match(/-?\d+(\.\d+)?/g)!.map(Number)
-    const [px0, py0, pcx, pcy, px1, py1] = [X(x0), Y(y0), X(cx), Y(cy), X(x1), Y(y1)]
-    const ponta = f.folha ? 0.2 * larg(f.prof) : larg(f.prof + 1)
-    const hw = (t: number) => ((1 - t) * larg(f.prof) + t * ponta) * LARG / 250
-    const ponto = (i: number) => {
-      const t = i / SEG
+    const n = Math.max(8, Math.round(Math.hypot(x1 - x0, y1 - y0) / 1.3))
+    const z = (Math.random() - 0.5) * 0.7
+    for (let i = 0; i <= n; i++) {
+      const t = i / n
       const u = 1 - t
-      const x = u * u * px0 + 2 * u * t * pcx + t * t * px1
-      const y = u * u * py0 + 2 * u * t * pcy + t * t * py1
-      const tx = 2 * u * (pcx - px0) + 2 * t * (px1 - pcx)
-      const ty = 2 * u * (pcy - py0) + 2 * t * (py1 - pcy)
-      const n = Math.hypot(tx, ty) || 1
-      const h = hw(t)
-      return { x, y, z: profundidade(x, y), nx: (-ty / n) * h, ny: (tx / n) * h, t0: ((f.prof + t) / PROF) * 0.9 }
+      const x = u * u * x0 + 2 * u * t * cx + t * t * x1
+      const y = u * u * y0 + 2 * u * t * cy + t * t * y1
+      const e = f.larg * 0.02
+      dados.push(X(x) + (Math.random() - 0.5) * e, Y(y) + (Math.random() - 0.5) * e, z + (Math.random() - 0.5) * 0.04, ((f.prof + t) / PROF) * 0.9, 1.8 + f.larg * 0.8, 0, Math.random())
     }
-    for (let i = 0; i < SEG; i++) {
-      const a = ponto(i), b = ponto(i + 1)
-      for (const [P, s] of [[a, -1], [b, -1], [b, 1], [a, -1], [b, 1], [a, 1]] as const) v(P.x, P.y, P.z, P.nx * s, P.ny * s, P.t0, 0, s, 0)
-    }
-    juntas.push([px0, py0, hw(0), ((f.prof) / PROF) * 0.9])
   }
-  for (const [x, y, r, t0] of juntas) for (const [cx, cy] of CANTOS) v(x, y, profundidade(x, y), cx * r, cy * r, t0, cx, cy, 1)
-  const luz = dados.length / FLOATS // galhos + juntas: desenhados duas vezes (halo e núcleo)
   for (const n of nos) {
-    if (n.prof < 4) continue
-    const x = X(n.x), y = Y(n.y), r = 0.1 + ((n.r - 1.8) / 1.8) * 0.06
-    for (const [cx, cy] of CANTOS) v(x, y, profundidade(x, y), cx * r, cy * r, ((n.prof + 1.5) / PROF) * 0.9, cx, cy, 2)
+    for (let i = 0; i < 36; i++) {
+      const r = 0.08 * Math.cbrt(Math.random())
+      const a = Math.random() * 6.283
+      const b = Math.acos(2 * Math.random() - 1)
+      dados.push(X(n.x) + r * Math.sin(b) * Math.cos(a), Y(n.y) + r * Math.sin(b) * Math.sin(a), (Math.random() - 0.5) * 0.7 + r * Math.cos(b), ((n.prof + 1.5) / PROF) * 0.9, 2.2 + Math.random() * 2, Math.random() < 0.25 ? 2 : 1, Math.random())
+    }
   }
-  return { dados: new Float32Array(dados), luz, total: dados.length / FLOATS }
+  for (let i = 0; i < 140; i++) dados.push((Math.random() - 0.5) * 1.8, Math.random() * 2 - 1, (Math.random() - 0.5) * 1.2, 0.85, 2 + Math.random() * 3, 3, Math.random())
+  for (const n of nos) dados.push(X(n.x), Y(n.y), (Math.random() - 0.5) * 0.7, ((n.prof + 1) / PROF) * 0.9, n.r * 3.4, n.ouro ? 2 : 1, Math.random())
+  for (let i = 0; i < 14; i++) dados.push(Math.random() * 1.4 - 0.5, Math.random() * 1.2 - 0.5, (Math.random() - 0.5) * 0.8, 0.9, 30 + Math.random() * 40, 4, Math.random())
+  return new Float32Array(dados)
 }
 
 function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boolean, deslocar: boolean, falha: () => void) {
@@ -94,21 +88,37 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG))
   gl.linkProgram(prog)
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null
+  const compila = (v: string, f: string) => {
+    const o = gl.createProgram()!
+    gl.attachShader(o, sh(gl.VERTEX_SHADER, v))
+    gl.attachShader(o, sh(gl.FRAGMENT_SHADER, f))
+    gl.bindAttribLocation(o, 2, "q")
+    gl.linkProgram(o)
+    return gl.getProgramParameter(o, gl.LINK_STATUS) ? o : null
+  }
+  const raios = compila(VERT_R, FRAG_R)
+  if (!raios) return null
+  const bufR = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufR)
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
+  const ur = (n: string) => gl.getUniformLocation(raios, n)
+  const [rTime, rAsp, rRoll, rPtr] = ["uTime", "uAsp", "uRoll", "uPtr"].map(ur)
   gl.useProgram(prog)
-  const { dados, luz, total } = geometria()
-  const buf = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf)
+  const dados = pontos()
+  const bufP = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufP)
   gl.bufferData(gl.ARRAY_BUFFER, dados, gl.STATIC_DRAW)
-  for (const [nome, tam, desl] of [["p", 3, 0], ["d", 2, 3], ["a", 4, 5]] as const) {
+  const liga = (nome: string, tam: number, desl: number) => {
     const l = gl.getAttribLocation(prog, nome)
     gl.enableVertexAttribArray(l)
-    gl.vertexAttribPointer(l, tam, gl.FLOAT, false, FLOATS * 4, desl * 4)
+    gl.vertexAttribPointer(l, tam, gl.FLOAT, false, 28, desl * 4)
   }
-  const [uT, uAsp, uTime, uScroll, uPtr, uOff, uEsc, uHalo] = ["uT", "uAsp", "uTime", "uScroll", "uPtr", "uOff", "uEsc", "uHalo"].map((n) => gl.getUniformLocation(prog, n))
+  liga("p", 3, 0)
+  liga("a", 4, 3)
+  const u = (n: string) => gl.getUniformLocation(prog, n)
+  const [uT, uAsp, uPx, uTime, uScroll, uPtr, uOff, uEsc] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr", "uOff", "uEsc"].map(u)
   gl.enable(gl.BLEND)
-  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
-  // Halos não se somam nas juntas: passe de halo com MAX onde a extensão existir.
-  const mm = gl.getExtension("EXT_blend_minmax")
+  gl.blendFunc(gl.ONE, gl.ONE)
   gl.clearColor(0, 0, 0, 0)
 
   const alvo = { x: 0, y: 0 }
@@ -116,16 +126,19 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   let raf = 0
   let ini = 0
   let tempo = 0
-  let rol = 0
   let visivel = true
+  let asp = 1
+  let rolagem = 0
   const medir = () => {
     const dpr = Math.min(devicePixelRatio || 1, 2)
     const { width, height } = canvas.getBoundingClientRect()
     canvas.width = Math.max(1, Math.round(width * dpr))
     canvas.height = Math.max(1, Math.round(height * dpr))
     gl.viewport(0, 0, canvas.width, canvas.height)
-    const asp = width / Math.max(height, 1)
+    asp = width / Math.max(height, 1)
+    gl.useProgram(prog)
     gl.uniform1f(uAsp, asp)
+    gl.uniform1f(uPx, dpr)
     gl.uniform1f(uEsc, Math.min(1, asp / 0.8))
     gl.uniform1f(uOff, deslocar && asp > 1.3 ? 0.42 * asp : 0)
   }
@@ -136,22 +149,33 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     if (!reduzido && !parado()) {
       atual.x += (alvo.x - atual.x) * 0.06
       atual.y += (alvo.y - atual.y) * 0.06
+    }
+    if (!parado()) {
       const r = canvas.getBoundingClientRect()
-      rol += (Math.min(1, Math.max(0, -r.top / Math.max(r.height, 1))) - rol) * 0.1
+      rolagem = Math.min(1, Math.max(0, -r.top / Math.max(r.height, 1)))
     }
     const cresce = reduzido ? 1 : Math.min(1, tempo / 3.6)
+    const roll = reduzido ? 0 : rolagem
     gl.clear(gl.COLOR_BUFFER_BIT)
+    gl.useProgram(raios)
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufR)
+    gl.enableVertexAttribArray(2)
+    gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 0, 0)
+    gl.uniform1f(rTime, reduzido ? 0 : tempo % (40 * Math.PI))
+    gl.uniform1f(rAsp, asp)
+    gl.uniform1f(rRoll, roll)
+    gl.uniform2f(rPtr, atual.x, atual.y)
+    gl.drawArrays(gl.TRIANGLES, 0, 3)
+    gl.useProgram(prog)
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufP)
+    gl.disableVertexAttribArray(2)
+    liga("p", 3, 0)
+    liga("a", 4, 3)
     gl.uniform1f(uT, 1 - (1 - cresce) ** 3)
     gl.uniform1f(uTime, reduzido ? 0 : tempo)
-    gl.uniform1f(uScroll, reduzido ? 0 : rol)
+    gl.uniform1f(uScroll, roll)
     gl.uniform2f(uPtr, atual.x, atual.y)
-    gl.uniform1f(uHalo, 1)
-    if (mm) gl.blendEquation(mm.MAX_EXT)
-    gl.drawArrays(gl.TRIANGLES, 0, luz)
-    if (mm) gl.blendEquation(gl.FUNC_ADD)
-    gl.drawArrays(gl.TRIANGLES, luz, total - luz)
-    gl.uniform1f(uHalo, 0)
-    gl.drawArrays(gl.TRIANGLES, 0, luz)
+    gl.drawArrays(gl.POINTS, 0, dados.length / 7)
     raf = !reduzido && visivel && !document.hidden && !parado() ? requestAnimationFrame(quadro) : 0
   }
   const retomar = () => {
@@ -177,6 +201,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   const ro = new ResizeObserver(() => {
     medir()
     if (reduzido) quadro(performance.now())
+    else retomar() // um quadro mesmo pausado: redimensionar apaga o canvas
   })
   ro.observe(canvas)
   medir()
@@ -191,7 +216,9 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     removeEventListener("pointermove", ponteiro)
     document.removeEventListener("visibilitychange", retomar)
     gl.deleteProgram(prog)
-    gl.deleteBuffer(buf)
+    gl.deleteProgram(raios)
+    gl.deleteBuffer(bufP)
+    gl.deleteBuffer(bufR)
   }
   return { fim, retomar }
 }
