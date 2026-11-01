@@ -35,14 +35,14 @@ export function Academy() {
     <Pagina chave="aprender.academy.titulo">
       <div className={filtro ? "grid gap-8 lg:grid-cols-[14rem_1fr]" : ""}>
         {filtro ? (
-          <aside className="lg:sticky lg:top-16 lg:self-start">
+          <div className="lg:sticky lg:top-16 lg:self-start">
             <Selecao rotulo={t("aprender.academy.trilha")} value={trilha} onChange={(e) => setTrilha(e.target.value)}>
               <option value="">{t("aprender.aulas.todas")}</option>
               {trilhas.map(([id, v]) => (
                 <option key={id} value={id}>{nomeVertical(v, lang)}</option>
               ))}
             </Selecao>
-          </aside>
+          </div>
         ) : null}
         {cursos.length === 0 ? (
           <Vazio>{t("aprender.academy.vazio")}</Vazio>

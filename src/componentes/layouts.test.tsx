@@ -120,7 +120,7 @@ describe("LayoutPublico", () => {
     expect(screen.queryByRole("contentinfo")).toBeNull()
   })
 
-  it("com sessão, o miolo das rotas de conteúdo mantém o visual público (Decisão 54): só a casca é do app", () => {
+  it("com sessão, o miolo das rotas de conteúdo mantém o visual público (Decisão 55): só a casca é do app", () => {
     render(
       <AcessoContext value={acessoBase}>
         <MemoryRouter initialEntries={["/pt/planos"]}>

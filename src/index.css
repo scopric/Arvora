@@ -15,7 +15,7 @@
   --font-titulo: "Big Shoulders Display Variable", Impact, sans-serif;
   --font-corpo: "Schibsted Grotesk Variable", system-ui, sans-serif;
 
-  /* App (membro e admin), estilo-base Linear com a paleta Árvora (Decisão 54; fontes em
+  /* App (membro e admin), estilo-base Linear com a paleta Árvora (Decisão 55; fontes em
      Arvora/Documentos/Refero Styles/linear/). Cada cinza do Linear virou um tom da Árvora com a MESMA luminosidade
      (L em OKLCH) e a mesma relação de camadas; só a matiz muda (do verde-floresta #112019 até a do creme).
      Contraste sobre carvao: nevoa 5,9 · bruma 13,1 · osso 15,2 · creme 17,3 · dourado 7,9. `cinza` (3,35) nunca é texto. */

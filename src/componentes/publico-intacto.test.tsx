@@ -21,7 +21,7 @@ import { Vazio } from "./Vazio"
 simularDialog()
 afterEach(cleanup)
 
-// Trava do redesenho (Decisão 54): fora do EscopoApp, o HTML dos componentes compartilhados tem de ficar byte a byte
+// Trava do redesenho (Decisão 55): fora do EscopoApp, o HTML dos componentes compartilhados tem de ficar byte a byte
 // igual ao do site público aprovado. Se este teste quebrar, o público mudou: ou foi de propósito (atualize o snapshot
 // e diga no commit), ou vazou.
 const html = (ui: ReactNode) =>

@@ -13,7 +13,7 @@ import { Selo } from "./Selo"
 import { focoApp, linkMenuApp, rotuloGrupoApp } from "./menuApp"
 import { ABAS, AVATAR, MAIS, SIDEBAR, type Item } from "./navegacao"
 
-// Casca do membro no molde do app do Linear (Decisão 54; telas-molde arquivadas no cofre do projeto):
+// Casca do membro no molde do app do Linear (Decisão 55; telas-molde arquivadas no cofre do projeto):
 // sidebar de 240px sobre o breu, conteúdo num painel carvão com hairline, itens de 13px com ícone de 16px, o item
 // ativo com fundo creme/5 e ícone dourado. Elevação só por hairline; nenhuma sombra externa.
 const foco = focoApp
@@ -206,7 +206,7 @@ function BarraAbas({ acesso }: { acesso: Acesso }) {
 // A proteção por login fica em App.tsx (RotaProtegida acima deste layout). A tela de dentro não renderiza <main>.
 // Carregando/erro do acesso aparecem aqui; quando chega a tela, o nível já é conhecido (useAcesso).
 // `conteudoPublico`: páginas públicas abertas com sessão (planos, biblioteca…) ficam com o visual público dentro
-// da casca (Decisão 54): o escopo do app vale só para sidebar, topo e tab bar.
+// da casca (Decisão 55): o escopo do app vale só para sidebar, topo e tab bar.
 export function LayoutMembro({ conteudoPublico = false }: { conteudoPublico?: boolean }) {
   const t = useT()
   const caminho = useCaminho()

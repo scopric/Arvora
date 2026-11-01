@@ -30,4 +30,3 @@ export function Caixa({ rotulo, className = "", ...resto }: Omit<ComponentProps<
     </div>
   )
 }
-
