@@ -8,7 +8,7 @@ import { gerar } from "./arvoreRede"
 // Plano focal passeia (bokeh fora de foco), pulsos de luz sobem da raiz às pontas e o cursor é uma fonte de luz.
 // Sem WebGL: cai no SVG de FundoArvore.
 const VERT = `attribute vec3 p;attribute vec4 a;
-uniform float uT,uAsp,uPx,uTime,uScroll,uOff,uEsc,uFoco;uniform vec2 uPtr,uLuz;
+uniform float uT,uAsp,uPx,uTime,uScroll,uOff,uEsc,uFoco,uLuzK;uniform vec2 uPtr,uLuz;
 varying vec4 vC;varying float vB;
 float h(float n){return fract(sin(n)*43758.5453);}
 void main(){
@@ -28,11 +28,12 @@ void main(){
   vec2 n=vec2(q.x*.98/uAsp,q.y*.98)/w;
   vec2 dv=(n-uLuz)*vec2(uAsp,1.);
   float dd=length(dv);
-  float perto=1.-smoothstep(0.,.5,dd);
-  n+=dv/max(dd,.05)*perto*.025;
+  float perto=(1.-smoothstep(0.,.5,dd))*uLuzK;
+  n+=dv/max(dd,.05)*perto*.025/vec2(uAsp,1.);
   gl_Position=vec4(n,0.,1.);
   float des=min(1.,abs(q.z-uFoco)*1.3);
-  float pul=tipo>2.5?0.:exp(-pow((a.x-fract(uTime*.07)*1.15+.1)*8.,2.));
+  float e=(a.x-fract(uTime*.05)*1.6+.3)*8.;
+  float pul=tipo>2.5?0.:exp(-e*e);
   float pop=poeira?pow(max(0.,sin(uTime*1.7+a.w*60.)),40.):0.;
   float tam=a.y*uPx*g/w*(1.+des*1.2+pul*.8+pop*2.+perto*.6);
   gl_PointSize=min(180.,max(1.,tam));
@@ -54,7 +55,7 @@ void main(){
   float a=atan(d.x,-d.y);
   float f=sin(a*14.+sin(a*5.+uTime*.15)*1.6)*.5+.5;
   float g=sin(a*31.-uTime*.1)*.5+.5;
-  float k=pow(f,4.)*(.6+.4*g)*(.55+.45*sin(uTime*.35+a*7.))*smoothstep(2.9,.2,length(d))*.5*mix(.6,1.,smoothstep(.8,1.4,uAsp));
+  float k=pow(f,4.)*(.6+.4*g)*(.55+.45*sin(uTime*.35+a*7.))*(1.-smoothstep(.2,2.9,length(d)))*.5*mix(.6,1.,smoothstep(.8,1.4,uAsp));
   k=k*(.9+.1*sin(uTime*5.+a*9.))+exp(-length(d)*2.2)*.22*(.85+.15*sin(uTime*.9));
   k*=1.-uRoll*.8;
   gl_FragColor=vec4(vec3(1.,.86,.5)*k,k);}`
@@ -137,15 +138,16 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   liga("p", 3, 0)
   liga("a", 4, 3)
   const u = (n: string) => gl.getUniformLocation(prog, n)
-  const [uT, uAsp, uPx, uTime, uScroll, uPtr, uOff, uEsc, uFoco, uLuz] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr", "uOff", "uEsc", "uFoco", "uLuz"].map(u)
+  const [uT, uAsp, uPx, uTime, uScroll, uPtr, uOff, uEsc, uFoco, uLuz, uLuzK] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr", "uOff", "uEsc", "uFoco", "uLuz", "uLuzK"].map(u)
   gl.enable(gl.BLEND)
   gl.blendFunc(gl.ONE, gl.ONE)
   gl.clearColor(0, 0, 0, 0)
 
   const alvo = { x: 0, y: 0 }
   const atual = { x: 0, y: 0 }
-  const luzAlvo = { x: 9, y: 9 } // fora da tela até o ponteiro entrar
-  const luz = { x: 9, y: 9 }
+  const mouse = { x: 0, y: 0, dentro: false } // posição em px; só mouse (no toque a luz ficaria presa no último dedo)
+  const luz = { x: 9, y: 9 } // NDC do canvas; começa fora da tela
+  let luzK = 0
   let raf = 0
   let ini = 0
   let tempo = 0
@@ -172,10 +174,15 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     if (!reduzido && !parado()) {
       atual.x += (alvo.x - atual.x) * 0.06
       atual.y += (alvo.y - atual.y) * 0.06
-      luz.x += (luzAlvo.x - luz.x) * 0.1
-      luz.y += (luzAlvo.y - luz.y) * 0.1
       const r = canvas.getBoundingClientRect()
       rolagem = Math.min(1, Math.max(0, -r.top / Math.max(r.height, 1)))
+      // Alvo recalculado a cada quadro: a rolagem move o canvas sob o mouse parado.
+      const ax = ((mouse.x - r.left) / Math.max(r.width, 1)) * 2 - 1
+      const ay = 1 - ((mouse.y - r.top) / Math.max(r.height, 1)) * 2
+      if (luz.x > 5) [luz.x, luz.y] = [ax, ay] // entra já no lugar, sem atravessar a copa
+      luz.x += (ax - luz.x) * 0.1
+      luz.y += (ay - luz.y) * 0.1
+      luzK += ((mouse.dentro ? 1 : 0) - luzK) * 0.1 // sai apagando, não voando
     }
     const cresce = reduzido ? 1 : Math.min(1, tempo / 3.6)
     const roll = reduzido ? 0 : rolagem
@@ -199,6 +206,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.uniform1f(uScroll, roll)
     gl.uniform2f(uPtr, atual.x, atual.y)
     gl.uniform2f(uLuz, luz.x, luz.y)
+    gl.uniform1f(uLuzK, luzK)
     gl.uniform1f(uFoco, reduzido ? 0 : Math.sin(tempo * 0.1) * 0.3)
     gl.drawArrays(gl.POINTS, 0, dados.length / 7)
     raf = !reduzido && visivel && !document.hidden && !parado() ? requestAnimationFrame(quadro) : 0
@@ -210,13 +218,11 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   const ponteiro = (e: PointerEvent) => {
     alvo.x = (e.clientX / innerWidth) * 2 - 1
     alvo.y = (e.clientY / innerHeight) * 2 - 1
-    const r = canvas.getBoundingClientRect()
-    luzAlvo.x = ((e.clientX - r.left) / Math.max(r.width, 1)) * 2 - 1
-    luzAlvo.y = 1 - ((e.clientY - r.top) / Math.max(r.height, 1)) * 2
+    if (e.pointerType === "mouse") Object.assign(mouse, { x: e.clientX, y: e.clientY, dentro: true })
     retomar()
   }
   const saiu = () => {
-    luzAlvo.x = luzAlvo.y = 9
+    mouse.dentro = false
     retomar()
   }
   const perdeu = (e: Event) => {
