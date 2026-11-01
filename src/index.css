@@ -121,10 +121,12 @@
   &::before {
     content: "";
     position: absolute;
-    inset: -3rem -5rem;
+    inset: -2rem -3rem;
     z-index: -1;
     pointer-events: none;
-    background: radial-gradient(farthest-corner, color-mix(in oklab, var(--color-fundo) 90%, transparent) 62%, transparent);
+    border-radius: 3rem;
+    background: color-mix(in oklab, var(--color-fundo) 92%, transparent);
+    filter: blur(28px);
   }
 }
 
