@@ -5,9 +5,9 @@ import { supabase } from "../../../lib/supabase"
 import { exigir, exigirLinha, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { EDITA, usePode } from "../lib/papel"
-import { classeAcao } from "./Campos"
 import { FormularioRegistro, type CampoDef } from "./FormularioRegistro"
 import { AvisoDe, Mostrar } from "./Pagina"
+import { classeAcao } from "../lib/estilo"
 
 // Consentimento do Hall of Fame (HOF-04): data e versão do documento ficam em `consentimentos`. Super_admin e editor registram e revogam
 // (RLS). Premiado/indicado só publica com consentimento vigente do PRÓPRIO titular: use o e-mail dele (o banco confere).

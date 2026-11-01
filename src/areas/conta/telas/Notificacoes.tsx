@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
-import { Cartao } from "../../../componentes/Cartao"
+import { botaoPequenoApp } from "../../../componentes/botaoEstilo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
@@ -17,6 +17,7 @@ const agora = () => new Date().toISOString()
 type Item = { id: number; titulo: string; titulo_en: string | null; link: string | null; lida_em: string | null; criado_em: string }
 type Estado = { fase: "carregando" } | { fase: "erro" } | { fase: "pronto"; itens: Item[] }
 
+// Molde Attio/Linear (notificações): lista densa; a não lida tem peso 510 e o selo "Nova" (ponto dourado); ações pequenas por linha.
 export function Notificacoes() {
   const t = useT()
   const idioma = useIdioma()
@@ -84,37 +85,37 @@ export function Notificacoes() {
         <>
           {falhou ? <Aviso tipo="erro">{t("conta.notificacoes.erroAcao")}</Aviso> : null}
           {naoLidas.length > 0 ? (
-            <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => void marcarTodas(naoLidas)} className="sm:w-auto">
-              {t("conta.notificacoes.marcarTodas")}
-            </Botao>
+            <div className="flex justify-end">
+              <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => void marcarTodas(naoLidas)} className="sm:w-auto">
+                {t("conta.notificacoes.marcarTodas")}
+              </Botao>
+            </div>
           ) : null}
-          <ul aria-label={t("conta.notificacoes.lista")} className="space-y-3">
+          <ul aria-label={t("conta.notificacoes.lista")} className="divide-y divide-grafite rounded-xl shadow-borda">
             {estado.itens.map((i) => (
-              <li key={i.id}>
-                <Cartao className="flex flex-col gap-3 !p-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <p className={i.lida_em ? "text-creme/75" : "font-semibold"}>{titulo(i)}</p>
-                    <p className="mt-1 flex items-center gap-2 text-sm text-creme/60">
-                      <time dateTime={i.criado_em}>{dataCurta(i.criado_em, idioma)}</time>
-                      {i.lida_em ? null : <Selo tom="destaque">{t("conta.notificacoes.nova")}</Selo>}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {i.link ? (
-                      <Link to={caminho(i.link)} aria-label={`${t("conta.notificacoes.abrir")}: ${titulo(i)}`} className="inline-flex min-h-11 items-center rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
-                        {t("conta.notificacoes.abrir")}
-                      </Link>
-                    ) : null}
-                    {i.lida_em ? null : (
-                      <button type="button" disabled={ocupado} aria-label={`${t("conta.notificacoes.marcar")}: ${titulo(i)}`} onClick={() => void marcar(i.id)} className="min-h-11 rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
-                        {t("conta.notificacoes.marcar")}
-                      </button>
-                    )}
-                    <button type="button" disabled={ocupado} aria-label={`${t("conta.notificacoes.apagar")}: ${titulo(i)}`} onClick={() => void apagar(i.id)} className="min-h-11 rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
-                      {t("conta.notificacoes.apagar")}
+              <li key={i.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <p className={i.lida_em ? "text-base text-bruma" : "text-base font-medium"}>{titulo(i)}</p>
+                  <p className="mt-1 flex flex-wrap items-center gap-2 text-legenda text-nevoa">
+                    <time dateTime={i.criado_em}>{dataCurta(i.criado_em, idioma)}</time>
+                    {i.lida_em ? null : <Selo tom="dourado">{t("conta.notificacoes.nova")}</Selo>}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {i.link ? (
+                    <Link to={caminho(i.link)} aria-label={`${t("conta.notificacoes.abrir")}: ${titulo(i)}`} className={botaoPequenoApp}>
+                      {t("conta.notificacoes.abrir")}
+                    </Link>
+                  ) : null}
+                  {i.lida_em ? null : (
+                    <button type="button" disabled={ocupado} aria-label={`${t("conta.notificacoes.marcar")}: ${titulo(i)}`} onClick={() => void marcar(i.id)} className={botaoPequenoApp}>
+                      {t("conta.notificacoes.marcar")}
                     </button>
-                  </div>
-                </Cartao>
+                  )}
+                  <button type="button" disabled={ocupado} aria-label={`${t("conta.notificacoes.apagar")}: ${titulo(i)}`} onClick={() => void apagar(i.id)} className={botaoPequenoApp}>
+                    {t("conta.notificacoes.apagar")}
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

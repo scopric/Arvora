@@ -5,13 +5,14 @@ import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { AreaTexto, classeAcao } from "../componentes/Campos"
+import { AreaTexto } from "../componentes/Campos"
 import { CrudTabela } from "../componentes/CrudTabela"
 import type { CampoDef } from "../componentes/FormularioRegistro"
 import { AvisoDe, Mostrar, Pagina, Secao } from "../componentes/Pagina"
 import { exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { opcoesDe } from "../lib/opcoes"
 import { APROVA_EMPRESA, EDITA, usePode } from "../lib/papel"
+import { classeAcao } from "../lib/estilo"
 
 // Fila de aprovação (ADM-02, DIR-02) e cadastro. A recusa exige motivo (empresas.motivo_recusa), que o dono vê para corrigir.
 export function Empresas() {

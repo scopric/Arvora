@@ -6,11 +6,11 @@ import { Vazio } from "../../../componentes/Vazio"
 import { Abas } from "../../../componentes/Abas"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { classeAcao } from "../componentes/Campos"
 import { AvisoDe, Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
 import { exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { MODERA, usePode } from "../lib/papel"
+import { classeAcao } from "../lib/estilo"
 
 type Denuncia = { id: number; motivo: string; texto: string | null; criado_em: string; perfil_denunciado_id: string | null; post_id: number | null; comentario_id: number | null; empresa_id: number | null; conexao_id: number | null }
 type Pergunta = { texto: Chave; aoConfirmar: () => void } | null

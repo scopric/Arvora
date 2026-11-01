@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type SubmitEvent } from "react"
 import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
-import { Cartao } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
@@ -15,7 +14,9 @@ import { supabase } from "../../../lib/supabase"
 import { BlocoConsentimento } from "../BlocoConsentimento"
 import { revogar, useConsentimentos, type Aceite } from "../consentimentos"
 import { dataCurta } from "../formato"
-import { Pagina } from "../Pagina"
+import { Pagina, Secao } from "../Pagina"
+import { botaoPequenoApp } from "../../../componentes/botaoEstilo"
+import { linkTextoApp } from "../../../componentes/menuApp"
 
 // Retirar vale para o que é escolha do titular. Termos, privacidade, reembolso e arrependimento são condição da conta
 // (para retirar, a pessoa exclui a conta); a escolha de cookies é feita no banner e em /cookies, não aqui.
@@ -35,12 +36,9 @@ export function Privacidade() {
       {estado.fase === "erro" ? <Erro aoTentar={recarregar}>{t("conta.erroCarregar")}</Erro> : null}
       {estado.fase === "pronto" ? (
         <>
-          <Cartao>
-            <h2 className="text-corpo-g font-semibold">{t("conta.privacidade.match.titulo")}</h2>
-            <div className="mt-4">
-              <BlocoConsentimento tipo="match" rotulo="conta.privacidade.match.rotulo" ajuda="conta.privacidade.match.texto" docs={estado.docs} aceites={estado.aceites} aoMudar={recarregar} />
-            </div>
-          </Cartao>
+          <Secao titulo={t("conta.privacidade.match.titulo")}>
+            <BlocoConsentimento tipo="match" rotulo="conta.privacidade.match.rotulo" ajuda="conta.privacidade.match.texto" docs={estado.docs} aceites={estado.aceites} aoMudar={recarregar} />
+          </Secao>
           <ListaConsentimentos aceites={estado.aceites} aoMudar={recarregar} />
         </>
       ) : null}
@@ -84,32 +82,30 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
   }
 
   return (
-    <Cartao>
-      <h2 className="text-corpo-g font-semibold">{t("conta.privacidade.visib.titulo")}</h2>
-      {estado.fase === "carregando" ? <Esqueleto linhas={2} className="mt-4" /> : null}
-      {estado.fase === "erro" ? <div className="mt-4"><Erro aoTentar={() => (setEstado({ fase: "carregando" }), setTentativa((n) => n + 1))}>{t("conta.erroCarregar")}</Erro></div> : null}
+    <Secao titulo={t("conta.privacidade.visib.titulo")} texto={t("conta.privacidade.visib.aviso")}>
+      {estado.fase === "carregando" ? <Esqueleto linhas={2} /> : null}
+      {estado.fase === "erro" ? <div><Erro aoTentar={() => (setEstado({ fase: "carregando" }), setTentativa((n) => n + 1))}>{t("conta.erroCarregar")}</Erro></div> : null}
       {estado.fase === "pronto" ? (
-        <form key={estado.visibilidade} onSubmit={salvar} className="mt-4 space-y-4">
+        <form key={estado.visibilidade} onSubmit={salvar} className="space-y-4">
           {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
           <fieldset className="space-y-3">
             <legend className="sr-only">{t("conta.privacidade.visib.titulo")}</legend>
-            <label className="flex min-h-11 items-center gap-3 text-sm">
-              <input type="radio" name="visibilidade" value="membros" defaultChecked={estado.visibilidade === "membros"} className="size-5 accent-dourado" />
+            <label className="flex min-h-9 items-center gap-3 text-base pointer-coarse:min-h-11">
+              <input type="radio" name="visibilidade" value="membros" defaultChecked={estado.visibilidade === "membros"} className="size-4 accent-dourado" />
               {t("conta.privacidade.visib.membros")}
             </label>
-            <label className="flex min-h-11 items-center gap-3 text-sm">
-              <input type="radio" name="visibilidade" value="publico" defaultChecked={estado.visibilidade === "publico"} className="size-5 accent-dourado" />
+            <label className="flex min-h-9 items-center gap-3 text-base pointer-coarse:min-h-11">
+              <input type="radio" name="visibilidade" value="publico" defaultChecked={estado.visibilidade === "publico"} className="size-4 accent-dourado" />
               {t("conta.privacidade.visib.publico")}
             </label>
           </fieldset>
           {estado.visibilidade === "publico" ? (
-            <p className="text-sm text-creme/70">{t(estado.aprovado ? "conta.privacidade.visib.aprovado" : "conta.privacidade.visib.aguarda")}</p>
+            <p className="text-legenda text-nevoa">{t(estado.aprovado ? "conta.privacidade.visib.aprovado" : "conta.privacidade.visib.aguarda")}</p>
           ) : null}
-          <p className="text-sm text-creme/60">{t("conta.privacidade.visib.aviso")}</p>
           <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("conta.privacidade.visib.salvar")}</Botao>
         </form>
       ) : null}
-    </Cartao>
+    </Secao>
   )
 }
 
@@ -136,10 +132,10 @@ function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar:
   }
 
   return (
-    <Cartao>
-      <h2 ref={titulo} tabIndex={-1} className="text-corpo-g font-semibold outline-none">{t("conta.consent.lista.titulo")}</h2>
-      <p className="mt-3 text-sm text-creme/70">{t("conta.consent.lista.texto")}</p>
-      <div className="mt-5 space-y-4">
+    <section>
+      <h2 ref={titulo} tabIndex={-1} className="text-base font-semibold outline-none">{t("conta.consent.lista.titulo")}</h2>
+      <p className="mt-1 text-legenda text-nevoa">{t("conta.consent.lista.texto")}</p>
+      <div className="mt-4 space-y-4">
         {falhou ? <Aviso tipo="erro">{t("conta.consent.erro")}</Aviso> : null}
         {aceites.length === 0 ? (
           <Vazio>{t("conta.consent.lista.vazio")}</Vazio>
@@ -162,13 +158,13 @@ function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar:
                 titulo: t("conta.consent.col.acao"),
                 celula: (a) =>
                   a.revogado_em ? null : REVOGAVEIS.includes(a.documentos_legais?.tipo ?? "") ? (
-                    <button type="button" disabled={ocupado} aria-label={`${t("conta.consent.retirar")}: ${a.documentos_legais?.titulo ?? ""}`} onClick={() => setAlvo(a)} className="min-h-11 rounded-lg border border-creme/30 px-4 font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
+                    <button type="button" disabled={ocupado} aria-label={`${t("conta.consent.retirar")}: ${a.documentos_legais?.titulo ?? ""}`} onClick={() => setAlvo(a)} className={botaoPequenoApp}>
                       {t("conta.consent.retirar")}
                     </button>
                   ) : a.documentos_legais?.tipo === "cookies" ? (
-                    <Link to={caminho("/cookies")} className="underline underline-offset-4">{t("conta.consent.cookies")}</Link>
+                    <Link to={caminho("/cookies")} className={linkTextoApp}>{t("conta.consent.cookies")}</Link>
                   ) : (
-                    <span className="text-creme/70">{t("conta.consent.condicao")}</span>
+                    <span className="text-nevoa">{t("conta.consent.condicao")}</span>
                   ),
               },
             ]}
@@ -184,6 +180,6 @@ function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar:
         aoConfirmar={() => void retirar()}
         aoCancelar={() => setAlvo(null)}
       />
-    </Cartao>
+    </section>
   )
 }

@@ -7,11 +7,11 @@ import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { classeAcao } from "../componentes/Campos"
 import { AvisoDe, Mostrar, Pagina, Secao } from "../componentes/Pagina"
 import { exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { dataCurta } from "../lib/formato"
 import { FINANCEIRO, MODERA, SUPER, usePode } from "../lib/papel"
+import { classeAcao } from "../lib/estilo"
 
 // Detalhe só leitura (ADM-04). Pagamento: ação no Stripe. Suspender é da moderação (suspender_perfil).
 export function Membro() {

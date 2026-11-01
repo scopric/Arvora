@@ -9,3 +9,6 @@ export const botaoApp = {
 }
 export const botaoPrimarioApp = `${botaoApp.base} ${botaoApp.primario}`
 export const botaoContornoApp = `${botaoApp.base} ${botaoApp.contorno}`
+// Botão pequeno de ação em linha (tabela, lista de notificações): ghost de 32px, 44 no toque.
+export const botaoPequenoApp =
+  "inline-flex min-h-8 items-center justify-center rounded-md border border-grafite px-2.5 text-xs font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado disabled:cursor-not-allowed disabled:opacity-60"

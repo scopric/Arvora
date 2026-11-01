@@ -7,8 +7,9 @@ import { supabase } from "../../../lib/supabase"
 import { enviarArquivo, exigir, exigirLinha, exigirSemDados, useAcao } from "../lib/consulta"
 import { decimalParaCentavos, localParaIso, moeda } from "../lib/formato"
 import type { Plano, Receita } from "../lib/relatorio"
-import { AreaTexto, classeAcao } from "./Campos"
+import { AreaTexto } from "./Campos"
 import { AvisoDe } from "./Pagina"
+import { classeAcao } from "../lib/estilo"
 
 const ORIGENS = ["ingresso", "pix", "transferencia", "evento", "outro"] as const
 const TIPOS = ["assinatura", "curso", "produto_digital", "ingresso"] as const

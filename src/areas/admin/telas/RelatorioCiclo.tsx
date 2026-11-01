@@ -8,7 +8,7 @@ import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { AreaTexto, classeAcao } from "../componentes/Campos"
+import { AreaTexto } from "../componentes/Campos"
 import { AvisoDe, Mostrar, Pagina, Secao, SemPermissao } from "../componentes/Pagina"
 import { Anular, Cambio, ConcederAcesso, LancarEstorno, LancarReceita } from "../componentes/ReceitaForms"
 import { exigir, exigirSemDados, abrirAssinado, useAcao, useCarga } from "../lib/consulta"
@@ -16,6 +16,7 @@ import { cicloDe, cicloFim, dataCurta, dataHora, hojeEmDublin, moeda } from "../
 import { FINANCEIRO, SUPER, usePode } from "../lib/papel"
 import { bloqueia } from "../lib/regras"
 import type { LinhaRel, Plano, Receita, Relatorio, Versao } from "../lib/relatorio"
+import { classeAcao } from "../lib/estilo"
 
 function baixar(nome: string, csv: string) {
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }))

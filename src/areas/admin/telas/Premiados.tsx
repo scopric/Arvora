@@ -6,10 +6,10 @@ import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { classeAcao } from "../componentes/Campos"
 import { Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { EDITA, usePode } from "../lib/papel"
+import { classeAcao } from "../lib/estilo"
 
 export function Premiados() {
   const t = useT()

@@ -31,6 +31,3 @@ export function Caixa({ rotulo, className = "", ...resto }: Omit<ComponentProps<
   )
 }
 
-// Botão pequeno de ação em linha de tabela (ghost do Linear; 44px no toque).
-export const classeAcao =
-  "inline-flex min-h-8 items-center justify-center rounded-md border border-grafite px-2.5 text-xs font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado disabled:cursor-not-allowed disabled:opacity-60"
