@@ -66,6 +66,7 @@ export const pt = {
   "home.faq.2.r": "Crie sua conta e confirme o e-mail que enviamos para você.",
   "home.faq.3.p": "O site tem versão em inglês?",
   "home.faq.3.r": "Sim. Troque entre PT e EN no topo da página.",
+  "home.direitos": "© Grupo Árvora",
   "home.saiba": "Conhecer as frentes",
   "home.cta.titulo": "Comece pela sua conta.",
   "comum.aguarde": "Aguarde…",

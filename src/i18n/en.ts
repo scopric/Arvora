@@ -69,6 +69,7 @@ export const en: Record<keyof typeof pt, string> = {
   "home.faq.2.r": "Create your account and confirm the e-mail we send you.",
   "home.faq.3.p": "Is the site available in English?",
   "home.faq.3.r": "Yes. Switch between PT and EN at the top of the page.",
+  "home.direitos": "© Grupo Árvora",
   "home.saiba": "See the four fronts",
   "home.cta.titulo": "Start with your account.",
   "comum.aguarde": "Please wait…",

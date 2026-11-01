@@ -39,7 +39,7 @@ export function EmBreve() {
       <TopoPublico />
       <main>
       <section className="relative isolate flex min-h-[calc(100dvh-4.25rem)] flex-col justify-center overflow-hidden px-6 py-16 sm:px-16 lg:px-24">
-        <Cena cheia className="inset-0 -z-10 max-lg:opacity-25" />
+        <Cena cheia className="inset-0 -z-10" classeCanvas="max-lg:opacity-25" />
         <p className="animate-subir font-mono text-xs font-semibold tracking-[0.3em] text-destaque uppercase" style={atraso(0)}>
           {t("inicio.embreve")}
         </p>
@@ -63,7 +63,7 @@ export function EmBreve() {
       <section aria-labelledby="pilares" className="px-6 py-24 sm:px-16 lg:px-24">
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_1.6fr]">
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <h2 id="pilares" className="font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">
+            <h2 id="pilares" className="scroll-mt-24 font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">
               {t("home.pilares.titulo")}
             </h2>
             <div className="mt-8 size-40 sm:size-56"><Aneis ativo={ativo} /></div>
