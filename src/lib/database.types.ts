@@ -1535,6 +1535,9 @@ isOneToOne: false
 "reabrir_ciclo":
 { Args: { "ciclo_inicio": string,"motivo": string }; Returns: undefined
                            },
+"registrar_aceite_checkout":
+{ Args: { "p_plano_id": number,"p_versao": string }; Returns: number
+                           },
 "relatorio_ciclo":
 { Args: { "ciclo_inicio": string }; Returns: Json
                            },
