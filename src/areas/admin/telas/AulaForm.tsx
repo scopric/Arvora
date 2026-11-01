@@ -101,13 +101,14 @@ export function AulaForm() {
             <div className="grid gap-8 xl:grid-cols-[1fr_20rem]">
               <div className="space-y-8">
                 <Secao titulo="admin.aula.dados">
-                  {pode ? <FormularioRegistro campos={campos} linha={aula} aoSalvar={salvarAula} /> : <p>{aula?.titulo}</p>}
+                  {pode ? <FormularioRegistro campos={campos} linha={aula} aoSalvar={salvarAula} variante={aulaId === null ? "primario" : "contorno"} /> : <p>{aula?.titulo}</p>}
                 </Secao>
                 {aula ? (
                   <>
                     {aula.tipo === "ao_vivo" && pode ? (
                       <Secao titulo="admin.aula.transmissao">
                         <FormularioRegistro
+                          variante="contorno"
                           campos={TRANSMISSAO} linha={d.transmissao ?? { abre_min_antes: 15 }}
                           aoSalvar={async (c) => {
                             if (d.transmissao) exigirLinha(await supabase.from("transmissoes").update(c as never).eq("aula_id", aula.id).select("aula_id"))
@@ -122,6 +123,7 @@ export function AulaForm() {
                     </Secao>
                     <Secao titulo="admin.aula.exercicios">
                       <CrudTabela
+                        variante="contorno"
                         tabela="exercicios" colunas="id, aula_id, ordem, enunciado_md, prazo_dias, aceita_arquivo" campos={EXERCICIO} ordem={[{ coluna: "ordem" }]}
                         filtro={{ coluna: "aula_id", valor: aula.id }} fixos={{ aula_id: aula.id }} podeEditar={pode} podeApagar legenda="admin.aula.exercicios" vazio="admin.aula.semExercicios"
                       />

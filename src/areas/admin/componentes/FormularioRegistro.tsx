@@ -13,13 +13,15 @@ export type { CampoDef, OpcaoSel, Valores } from "../lib/campos"
 
 // Formulário genérico de um registro. `aoSalvar` faz a escrita (insert/update/RPC) e lança erro se falhar.
 export function FormularioRegistro({
-  campos, linha, aoSalvar, salvar, aoCancelar,
+  campos, linha, aoSalvar, salvar, aoCancelar, variante = "primario",
 }: {
   campos: CampoDef[]
   linha: Linha | null
   aoSalvar: (carga: Linha) => Promise<void>
   salvar?: Chave
   aoCancelar?: () => void
+  // "contorno" nos formulários secundários da tela: só um botão dourado por tela.
+  variante?: "primario" | "contorno"
 }) {
   const t = useT()
   const [v, setV] = useState<Valores>(() => paraValores(campos, linha))
@@ -59,7 +61,7 @@ export function FormularioRegistro({
       </div>
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-3">
-        <Botao type="submit" ocupado={acao.ocupado} className="sm:w-auto">{t(salvar ?? "admin.comum.salvar")}</Botao>
+        <Botao type="submit" variante={variante} ocupado={acao.ocupado} className="sm:w-auto">{t(salvar ?? "admin.comum.salvar")}</Botao>
         {aoCancelar ? <Botao type="button" variante="contorno" onClick={aoCancelar} className="sm:w-auto">{t("comum.cancelar")}</Botao> : null}
       </div>
     </form>

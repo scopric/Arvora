@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useParams } from "react-router"
+import { Botao } from "../../../componentes/Botao"
 import { Cartao } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Selo } from "../../../componentes/Selo"
@@ -11,7 +12,7 @@ import { AvisoDe, Mostrar, Pagina, Secao } from "../componentes/Pagina"
 import { exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { dataCurta } from "../lib/formato"
 import { FINANCEIRO, MODERA, SUPER, usePode } from "../lib/papel"
-import { classeAcao, classeLink } from "../lib/estilo"
+import { classeLink } from "../lib/estilo"
 
 // Detalhe só leitura (ADM-04). Pagamento: ação no Stripe. Suspender é da moderação (suspender_perfil).
 export function Membro() {
@@ -63,7 +64,7 @@ export function Membro() {
               {perfil.bio ? <p className="mt-4 max-w-prose text-base text-bruma">{perfil.bio}</p> : null}
               <div className="mt-4 space-y-3">
                 <AvisoDe aviso={acao.aviso} />
-                {modera ? <button type="button" className={classeAcao} disabled={acao.ocupado} onClick={() => setConfirmar(true)}>{perfil.suspenso_em ? t("admin.membro.reativar") : t("admin.membro.suspender")}</button> : null}
+                {modera ? <Botao type="button" variante={perfil.suspenso_em ? "contorno" : "perigo"} disabled={acao.ocupado} onClick={() => setConfirmar(true)} className="sm:w-auto">{perfil.suspenso_em ? t("admin.membro.reativar") : t("admin.membro.suspender")}</Botao> : null}
               </div>
             </Cartao>
             {financeiro ? (

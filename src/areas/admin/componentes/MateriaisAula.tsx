@@ -48,11 +48,11 @@ function Um({ aulaId, tipo, atual, aoMudar }: { aulaId: number; tipo: Material["
         <input type="file" accept="application/pdf,application/epub+zip" className="mt-2 block w-full text-legenda text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
       </label>
       {atual?.arquivo_path ? (
-        <button type="button" className={`text-legenda ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("materiais", atual.arquivo_path!))}>{t("admin.aula.materialAbrir")}</button>
+        <button type="button" className={`inline-flex min-h-9 items-center text-legenda pointer-coarse:min-h-11 ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("materiais", atual.arquivo_path!))}>{t("admin.aula.materialAbrir")}</button>
       ) : null}
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-3">
-        <Botao type="button" ocupado={acao.ocupado} onClick={salvar} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
+        <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={salvar} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
         {atual?.status === "rascunho" ? <button type="button" disabled={acao.ocupado} className={classeAcao} onClick={aprovar}>{t("admin.aula.aprovarMaterial")}</button> : null}
       </div>
     </div>

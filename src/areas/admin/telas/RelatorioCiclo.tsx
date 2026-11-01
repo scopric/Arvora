@@ -217,7 +217,7 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
               { chave: "quando", titulo: t("admin.log.quando"), celula: (x) => dataHora(x.criado_em, lang) },
               { chave: "sit", titulo: t("admin.rel.versaoSituacao"), celula: (x) => (x.reaberto_em ? `${t("admin.rel.versaoReaberta")} ${dataHora(x.reaberto_em, lang)}` : x === versoes[0] ? t("admin.rel.versaoAtual") : "—") },
               { chave: "env", titulo: t("admin.rel.enviado"), celula: (x) => (x.enviado_em ? dataHora(x.enviado_em, lang) : "—") },
-              { chave: "sha", titulo: "SHA-256", celula: (x) => <code className="break-all text-xs">{x.csv_sha256}</code> },
+              { chave: "sha", titulo: "SHA-256", celula: (x) => <code className="text-legenda break-all">{x.csv_sha256}</code> },
               { chave: "csv", titulo: "CSV", celula: (x) => <button type="button" className={classeAcao} onClick={() => baixar(`relatorio-ciclo-${rel.ciclo.inicio}-v${x.versao}.csv`, x.dados.csv)}>{t("admin.rel.baixarVersao")}</button> },
             ]}
           />

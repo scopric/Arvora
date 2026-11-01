@@ -56,6 +56,7 @@ export function Curso() {
             </Secao>
             <Secao titulo="admin.curso.modulos">
               <CrudTabela
+                variante="contorno"
                 tabela="modulos" colunas="id, curso_id, titulo, ordem" campos={MODULO} ordem={[{ coluna: "ordem" }]} filtro={{ coluna: "curso_id", valor: d.curso.id }}
                 fixos={{ curso_id: d.curso.id }} podeEditar={pode} podeApagar legenda="admin.curso.modulos" vazio="admin.curso.semModulos" aoMudar={carga.recarregar}
               />

@@ -73,6 +73,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
               <>
                 <h4 className="font-semibold">{d.atual ? t("admin.consent.novoRegistro") : t("admin.consent.registrar")}</h4>
                 <FormularioRegistro
+                  variante="contorno"
                   campos={campos} linha={{ titular_email: emailInicial ?? "", titular_nome: nomeInicial ?? "", documento_id: d.docs[0]?.id }}
                   aoSalvar={async (c) => {
                     const r = await supabase.from("consentimentos").insert(c as never).select("id")

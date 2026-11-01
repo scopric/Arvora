@@ -34,6 +34,8 @@ export type CrudProps = {
   aoEditar?: (l: Linha) => Promise<Linha>
   // chamado depois de gravar/apagar (ex.: recarregar a página-mãe)
   aoMudar?: () => void
+  // "contorno" quando a tabela é secundária na tela (um primário por tela)
+  variante?: "primario" | "contorno"
 }
 
 function mostrar(c: CampoDef, l: Linha, lang: string, t: (c: Chave) => string): ReactNode {
@@ -121,7 +123,7 @@ export function CrudTabela(p: CrudProps) {
       {p.podeEditar ? (
         <Cartao>
           <p className="mb-5 text-corpo-g font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
-          <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
+          <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} variante={p.variante} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
         </Cartao>
       ) : null}
       <DialogoConfirmar

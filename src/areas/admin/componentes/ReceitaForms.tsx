@@ -111,7 +111,7 @@ export function LancarReceita({ ciclo, planos, aoFeito }: { ciclo: { inicio: str
         <input ref={ref} type="file" accept="application/pdf,image/png,image/jpeg" className="mt-2 block w-full text-legenda text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
       </label>
       <AvisoDe aviso={acao.aviso} />
-      <Botao type="submit" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.lancar")}</Botao>
+      <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.lancar")}</Botao>
     </form>
   )
 }
@@ -161,7 +161,7 @@ export function LancarEstorno({ receitas, aoFeito }: { receitas: Receita[]; aoFe
         <Campo rotulo={`${t("admin.rel.devolvidoEm")} *`} type="date" value={v.devolvido_em} onChange={muda("devolvido_em")} />
       </div>
       <AvisoDe aviso={acao.aviso} />
-      <Botao type="submit" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.estornoLancar")}</Botao>
+      <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.estornoLancar")}</Botao>
     </form>
   )
 }
@@ -200,7 +200,7 @@ export function ConcederAcesso({ receitas, planos, aoFeito }: { receitas: Receit
         <Campo rotulo={`${t("admin.rel.acessoAte")} *`} type="date" value={ate} onChange={(e) => setAte(e.target.value)} />
       </div>
       <AvisoDe aviso={acao.aviso} />
-      <Botao type="submit" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.acessoConceder")}</Botao>
+      <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.acessoConceder")}</Botao>
     </form>
   )
 }
@@ -242,7 +242,7 @@ export function Cambio({ aoFeito }: { aoFeito: () => void }) {
         </div>
         <AvisoDe aviso={acao.aviso} />
         <AvisoDe aviso={confirma.aviso} />
-        <Botao type="submit" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.cadastrarCambio")}</Botao>
+        <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.cadastrarCambio")}</Botao>
       </form>
       <DialogoConfirmar
         aberto={pendente !== null} titulo={t("admin.rel.cambioConfirmarTitulo")} confirmar={t("admin.rel.cambioTrocar")}

@@ -82,7 +82,7 @@ export function Premiado() {
                     <AvisoDe aviso={acao.aviso} />
                     {pode ? (
                       <div className="mt-4 flex flex-wrap gap-3">
-                        <Botao type="button" ocupado={acao.ocupado} onClick={() => void decidir(true)} className="sm:w-auto">{t("admin.premiado.aprovar")}</Botao>
+                        <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={() => void decidir(true)} className="sm:w-auto">{t("admin.premiado.aprovar")}</Botao>
                         <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => void decidir(false)} className="sm:w-auto">{t("admin.premiado.recusar")}</Botao>
                       </div>
                     ) : null}
