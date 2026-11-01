@@ -106,15 +106,15 @@ describe("rotas com idioma", () => {
 
   it("o seletor troca só o prefixo", () => {
     ir("/pt?a=1")
-    expect(screen.getByRole("link", { name: "English" }).getAttribute("href")).toBe("/en?a=1")
+    expect(screen.getByRole("link", { name: "EN – English" }).getAttribute("href")).toBe("/en?a=1")
   })
 })
 
 describe("seletor na home", () => {
   it("marca o idioma atual e troca só o prefixo", () => {
     ir("/pt")
-    expect(screen.getByRole("link", { name: "Português" }).getAttribute("aria-current")).toBe("true")
-    expect(screen.getByRole("link", { name: "English" }).getAttribute("href")).toBe("/en")
+    expect(screen.getByRole("link", { name: "PT – Português" }).getAttribute("aria-current")).toBe("true")
+    expect(screen.getByRole("link", { name: "EN – English" }).getAttribute("href")).toBe("/en")
     expect(screen.getByRole("navigation", { name: pt["idioma.rotulo"] })).toBeTruthy()
   })
 })

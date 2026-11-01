@@ -21,8 +21,9 @@ export function SeletorIdioma({ className = "" }: { className?: string }) {
   const e = useApp() ? app : publico
   const { pathname, search, hash } = useLocation()
   const resto = pathname.replace(/^\/[^/]*/, "") + search + hash
+  // O nome acessível contém o texto visível ("PT") e o nome completo (WCAG 2.5.3 e 3.1.2).
   const link = (lang: "pt" | "en", nome: string, html: string) => (
-    <Link to={`/${lang}${resto}`} hrefLang={lang} lang={html} aria-label={nome} title={nome} aria-current={atual === lang ? "true" : undefined} className={e.item}>
+    <Link to={`/${lang}${resto}`} hrefLang={lang} lang={html} aria-label={`${lang.toUpperCase()} – ${nome}`} title={nome} aria-current={atual === lang ? "true" : undefined} className={e.item}>
       {lang.toUpperCase()}
     </Link>
   )

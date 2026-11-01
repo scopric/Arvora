@@ -117,7 +117,7 @@ describe("idioma no cadastro", () => {
 describe("seletor nas telas de auth", () => {
   it("troca só o prefixo, mantendo busca e hash", () => {
     ir("/pt/entrar?a=1#x")
-    expect(screen.getByRole("link", { name: "English" }).getAttribute("href")).toBe("/en/entrar?a=1#x")
-    expect(screen.getByRole("link", { name: "Português" }).getAttribute("aria-current")).toBe("true")
+    expect(screen.getByRole("link", { name: "EN – English" }).getAttribute("href")).toBe("/en/entrar?a=1#x")
+    expect(screen.getByRole("link", { name: "PT – Português" }).getAttribute("aria-current")).toBe("true")
   })
 })
