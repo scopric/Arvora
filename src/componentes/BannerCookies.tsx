@@ -36,7 +36,7 @@ export function BannerCookies() {
     <section
       ref={ref}
       aria-labelledby="cookies-titulo"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-creme/20 bg-fundo p-4 text-creme shadow-lg"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-superficie bg-fundo p-4 text-creme"
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-4 sm:flex-row sm:items-center">
         <div className="flex-1 text-sm">

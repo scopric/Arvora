@@ -18,7 +18,7 @@ export function Pagina({ titulo, menu = true, children }: { titulo: Chave; menu?
   useTitulo(titulo, true)
   return (
     <div className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
-      <h1 className="font-titulo text-5xl leading-none font-bold uppercase">{t(titulo)}</h1>
+      <h1 className="font-titulo text-4xl leading-none font-normal text-balance sm:text-5xl">{t(titulo)}</h1>
       {menu ? (
         <nav aria-label={t("conta.menu")} className="mt-6 flex flex-wrap gap-1">
           {ABAS.map((a) => (

@@ -103,7 +103,7 @@ export function Mfa({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto max-w-md px-6 py-16">
       <Titulo />
-      <h1 className="font-titulo text-5xl leading-none font-bold uppercase">{t("mfa.titulo")}</h1>
+      <h1 className="font-titulo text-4xl leading-none font-normal text-balance sm:text-5xl">{t("mfa.titulo")}</h1>
       {estado.fase === "carregando" ? <Esqueleto className="mt-8" /> : null}
       {estado.fase === "erro" ? <div className="mt-8"><Erro aoTentar={carregar}>{t("mfa.erro")}</Erro></div> : null}
       {estado.fase === "cadastrar" ? (
