@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@fontsource-variable/big-shoulders-display";
+@import "@fontsource-variable/newsreader/opsz.css";
 @import "@fontsource-variable/schibsted-grotesk";
 
 /* Hex aproximados do deck (22/10/2026); confirmar com o contratante. */
@@ -12,8 +12,17 @@
   --color-fundo-ba: #151719;
   --color-painel: #17281f; /* superfície de card do deck */
 
-  --font-titulo: "Big Shoulders Display Variable", Impact, sans-serif;
+  --font-titulo: "Newsreader Variable", Georgia, serif;
   --font-corpo: "Schibsted Grotesk Variable", system-ui, sans-serif;
+
+  --shadow-brilho: 0 0 20px 5px rgb(157 181 138 / 0.35);
+
+  --text-display: 5.625rem;
+  --text-display--line-height: 0.85;
+  --text-h2: 3.4375rem;
+  --text-h2--line-height: 1;
+  --text-h3: 2.1875rem;
+  --text-h3--line-height: 1.3;
 }
 
 @layer base {
@@ -103,6 +112,20 @@
       animation-range: entry 0% entry 60%;
     }
   }
+}
+
+/* Vinheta de leitura: escurece o canvas atrás do texto sobre a cena (acima do canvas -z-10, abaixo do texto). */
+.zona-limpa {
+  position: relative;
+}
+
+.zona-limpa::before {
+  content: "";
+  position: absolute;
+  inset: -3rem -4rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--color-fundo) 88%, transparent) 55%, transparent);
 }
 
 .cena-mascara {
