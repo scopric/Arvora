@@ -128,6 +128,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   let tempo = 0
   let visivel = true
   let asp = 1
+  let rolagem = 0
   const medir = () => {
     const dpr = Math.min(devicePixelRatio || 1, 2)
     const { width, height } = canvas.getBoundingClientRect()
@@ -149,8 +150,10 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
       atual.x += (alvo.x - atual.x) * 0.06
       atual.y += (alvo.y - atual.y) * 0.06
     }
-    const r = canvas.getBoundingClientRect()
-    const rolagem = Math.min(1, Math.max(0, -r.top / Math.max(r.height, 1)))
+    if (!parado()) {
+      const r = canvas.getBoundingClientRect()
+      rolagem = Math.min(1, Math.max(0, -r.top / Math.max(r.height, 1)))
+    }
     const cresce = reduzido ? 1 : Math.min(1, tempo / 3.6)
     const roll = reduzido ? 0 : rolagem
     gl.clear(gl.COLOR_BUFFER_BIT)
@@ -165,9 +168,9 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.drawArrays(gl.TRIANGLES, 0, 3)
     gl.useProgram(prog)
     gl.bindBuffer(gl.ARRAY_BUFFER, bufP)
+    gl.disableVertexAttribArray(2)
     liga("p", 3, 0)
     liga("a", 4, 3)
-    gl.disableVertexAttribArray(2)
     gl.uniform1f(uT, 1 - (1 - cresce) ** 3)
     gl.uniform1f(uTime, reduzido ? 0 : tempo)
     gl.uniform1f(uScroll, roll)
@@ -198,6 +201,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   const ro = new ResizeObserver(() => {
     medir()
     if (reduzido) quadro(performance.now())
+    else retomar() // um quadro mesmo pausado: redimensionar apaga o canvas
   })
   ro.observe(canvas)
   medir()

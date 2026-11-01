@@ -146,8 +146,15 @@
   --color-white: #000;
 }
 
-/* Base do canvas some em degradê: sem corte reto no tronco (login) nem na borda da seção (home). Vem depois de .cena-mascara para vencer no login. */
+/* Base do canvas some em degradê: sem corte reto na borda da seção (home). No login, junta com a máscara radial (interseção),
+   para os raios de sol não mostrarem a borda de cima do canvas. */
 .cena-fade-base {
   -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
   mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+.cena-mascara.cena-fade-base {
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent), linear-gradient(to bottom, #000 72%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: radial-gradient(closest-side, #000 55%, transparent), linear-gradient(to bottom, #000 72%, transparent);
+  mask-composite: intersect;
 }
