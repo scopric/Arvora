@@ -19,7 +19,7 @@ type Nivel = "clube" | "grupo"
 type Ciclo = "mes" | "ano"
 type Plano = { id: number; nivel: string | null; intervalo: string; valor_centavos: number; moeda: string; criado_em: string }
 
-// PROVISÓRIO: o que cada nível inclui segue o deck/PRD (§7, §17.3.5) e precisa da validação do Rafael; preço vem só do banco.
+// PROVISÓRIO: o que cada nível inclui segue o deck/PRD (§7, §17.3.5) e precisa da validação do cliente; preço vem só do banco.
 const LINHAS: { rotulo: Chave; clube: boolean; grupo: boolean }[] = [
   { rotulo: "publico.planos.linha.biblioteca", clube: true, grupo: true },
   { rotulo: "publico.planos.linha.directory", clube: true, grupo: true },

@@ -1,5 +1,5 @@
 // Textos da área publico. Prefixo "publico." em toda chave (o teste de i18n barra chave repetida entre áreas).
-// PROVISÓRIO: promessas comerciais, preço e textos legais marcados abaixo dependem do Rafael e do solicitor.
+// PROVISÓRIO: promessas comerciais, preço e textos legais marcados abaixo dependem do cliente e do solicitor.
 export const publicoPt = {
   "publico.planos.titulo": "Planos",
   "publico.checkoutSucesso.titulo": "Assinatura confirmada",
@@ -18,7 +18,7 @@ export const publicoPt = {
   "publico.evento.titulo": "Evento",
   "publico.semRegistro.titulo": "Não encontramos esta página",
   "publico.semRegistro.texto": "O endereço pode estar errado ou o conteúdo não está mais publicado.",
-  "publico.planos.apoio": "Escolha o nível e o ciclo de cobrança. Você revisa o valor antes de pagar.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.planos.apoio": "Escolha o nível e o ciclo de cobrança. Você revisa o valor antes de pagar.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.planos.ciclo": "Ciclo de cobrança",
   "publico.planos.mensal": "Mensal",
   "publico.planos.anual": "Anual",
@@ -26,38 +26,38 @@ export const publicoPt = {
   "publico.planos.porAno": "por ano",
   "publico.planos.indisponivel": "Indisponível neste ciclo",
   "publico.planos.recomendado": "Recomendado",
-  "publico.planos.clube.resumo": "Para conhecer a Árvora e a comunidade.",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.grupo.resumo": "A experiência completa, com aulas e rede.",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.clube.b1": "Biblioteca e Directory",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.clube.b2": "Comunidade do Clube",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.clube.b3": "Academy",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.grupo.b1": "Tudo do Clube",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.grupo.b2": "Aulas semanais ao vivo e Árvora Bem-Estar",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.grupo.b3": "Business Network e Business Match",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.planos.clube.resumo": "Para conhecer a Árvora e a comunidade.",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.grupo.resumo": "A experiência completa, com aulas e rede.",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.clube.b1": "Biblioteca e Directory",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.clube.b2": "Comunidade do Clube",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.clube.b3": "Academy",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.grupo.b1": "Tudo do Clube",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.grupo.b2": "Aulas semanais ao vivo e Árvora Bem-Estar",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.grupo.b3": "Business Network e Business Match",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.planos.assinarClube": "Assinar o Clube",
   "publico.planos.assinarGrupo": "Assinar o Grupo Árvora",
   "publico.planos.jaTemConta": "Já tem conta?",
   "publico.planos.atual": "Seu plano atual",
   "publico.planos.trocar": "Para trocar de plano, use \"Gerenciar assinatura\" em",
-  "publico.planos.vat": "Preços com IVA incluído (para consumidores). Valores exatos aparecem antes do pagamento.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.planos.vat": "Preços com IVA incluído (para consumidores). Valores exatos aparecem antes do pagamento.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.planos.comparar": "Compare os planos",
   "publico.planos.colItem": "Incluído",
   "publico.planos.sim": "Sim",
   "publico.planos.nao": "Não",
-  "publico.planos.linha.biblioteca": "Biblioteca (Brazilian Awards Talks)",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.linha.directory": "Directory",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.linha.comunidade": "Comunidade",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.linha.academy": "Academy (cursos gravados)",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.linha.aulas": "Aulas semanais ao vivo",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.linha.bemEstar": "Árvora Bem-Estar",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.linha.network": "Business Network (busca e conexões)",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.linha.match": "Business Match",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.planos.linha.biblioteca": "Biblioteca (Brazilian Awards Talks)",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.linha.directory": "Directory",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.linha.comunidade": "Comunidade",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.linha.academy": "Academy (cursos gravados)",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.linha.aulas": "Aulas semanais ao vivo",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.linha.bemEstar": "Árvora Bem-Estar",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.linha.network": "Business Network (busca e conexões)",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.linha.match": "Business Match",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.planos.semPlanos.titulo": "Falar com suporte",
   "publico.planos.semPlanos.texto": "Não conseguimos mostrar os planos agora. Fale com o suporte e ajudamos você a assinar.",
   "publico.planos.falarSuporte": "Falar com suporte",
-  "publico.planos.aceite.titulo": "Antes de ir ao pagamento",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.aceite.imediato": "Peço que meu acesso comece imediatamente, assim que o pagamento for confirmado.",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.aceite.perda": "Entendo que, depois que o acesso começar, posso perder o direito de cancelar em 14 dias, nos termos da lei e dos Termos de uso.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.planos.aceite.titulo": "Antes de ir ao pagamento",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.aceite.imediato": "Peço que meu acesso comece imediatamente, assim que o pagamento for confirmado.",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.aceite.perda": "Entendo que, depois que o acesso começar, posso perder o direito de cancelar em 14 dias, nos termos da lei e dos Termos de uso.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.planos.aceite.termos": "Leia os",
   "publico.planos.aceite.continuar": "Continuar para o pagamento",
   "publico.planos.aceite.falta": "Marque as duas confirmações para continuar.",
@@ -65,14 +65,14 @@ export const publicoPt = {
   "publico.planos.erroLimite": "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.",
   "publico.planos.erroJaAssina": "Você já tem uma assinatura. Para trocar de plano, use \"Gerenciar assinatura\" no seu perfil.",
   "publico.planos.faq.titulo": "Perguntas sobre cobrança",
-  "publico.planos.faq.q1": "Quando sou cobrado?",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.faq.a1": "A primeira cobrança acontece ao concluir o pagamento. Depois a assinatura renova a cada mês ou a cada ano, conforme o ciclo escolhido.",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.faq.q2": "Posso cancelar?",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.faq.a2": "Sim. Você gerencia e cancela a assinatura sozinho, no seu perfil. Prazos e reembolso seguem os Termos de uso e a lei aplicável.",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.faq.q3": "O pagamento é seguro?",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.faq.a3": "O pagamento é feito na página do Stripe. Os dados do seu cartão não passam pelos nossos servidores.",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.faq.q4": "Como funciona o IVA?",  // PROVISÓRIO: validar com o Rafael/solicitor
-  "publico.planos.faq.a4": "Para consumidores, o preço mostrado já inclui o IVA. A fatura traz os dados do vendedor.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.planos.faq.q1": "Quando sou cobrado?",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.faq.a1": "A primeira cobrança acontece ao concluir o pagamento. Depois a assinatura renova a cada mês ou a cada ano, conforme o ciclo escolhido.",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.faq.q2": "Posso cancelar?",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.faq.a2": "Sim. Você gerencia e cancela a assinatura sozinho, no seu perfil. Prazos e reembolso seguem os Termos de uso e a lei aplicável.",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.faq.q3": "O pagamento é seguro?",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.faq.a3": "O pagamento é feito na página do Stripe. Os dados do seu cartão não passam pelos nossos servidores.",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.faq.q4": "Como funciona o IVA?",  // PROVISÓRIO: validar com o cliente/solicitor
+  "publico.planos.faq.a4": "Para consumidores, o preço mostrado já inclui o IVA. A fatura traz os dados do vendedor.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.checkoutSucesso.semSessao": "Entre na sua conta para ver o estado da sua assinatura.",
   "publico.checkoutSucesso.confirmando": "Estamos confirmando seu pagamento.",
   "publico.checkoutSucesso.demora": "Estamos confirmando seu pagamento. Pode levar alguns minutos. Você pode verificar de novo ou falar com o suporte.",
@@ -87,9 +87,9 @@ export const publicoPt = {
   "publico.suporte.semCanal": "O canal de suporte por e-mail está em definição. Enquanto isso, as respostas abaixo cobrem as dúvidas mais comuns.",
   "publico.suporte.t1": "Planos e cobrança",
   "publico.suporte.t1.q1": "Como assino?",
-  "publico.suporte.t1.a1": "Crie sua conta, escolha o nível em Planos e conclua o pagamento na página do Stripe.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.suporte.t1.a1": "Crie sua conta, escolha o nível em Planos e conclua o pagamento na página do Stripe.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.suporte.t1.q2": "Como troco de plano ou cancelo?",
-  "publico.suporte.t1.a2": "No seu perfil, em \"Gerenciar assinatura\". Prazos e reembolso seguem os Termos de uso.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.suporte.t1.a2": "No seu perfil, em \"Gerenciar assinatura\". Prazos e reembolso seguem os Termos de uso.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.suporte.t2": "Conta e acesso",
   "publico.suporte.t2.q1": "Não recebi o e-mail de confirmação.",
   "publico.suporte.t2.a1": "Olhe a caixa de spam e confira se o endereço está certo. Se continuar sem chegar, fale com o suporte.",
@@ -99,12 +99,12 @@ export const publicoPt = {
   "publico.suporte.t3.q1": "O vídeo não abre.",
   "publico.suporte.t3.a1": "Tente de novo em instantes e atualize a página. Se continuar, fale com o suporte dizendo qual vídeo é.",
   "publico.suporte.t3.q2": "Por que alguns conteúdos têm cadeado?",
-  "publico.suporte.t3.a2": "O cadeado indica o nível necessário (Clube ou Grupo Árvora). Você vê um trecho e o restante abre com o nível indicado.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.suporte.t3.a2": "O cadeado indica o nível necessário (Clube ou Grupo Árvora). Você vê um trecho e o restante abre com o nível indicado.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.suporte.t4": "Privacidade e dados",
   "publico.suporte.t4.q1": "Como peço meus dados ou a exclusão da conta?",
-  "publico.suporte.t4.a1": "No seu perfil você baixa seus dados e pode pedir a exclusão da conta. A Política de privacidade explica o que guardamos.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.suporte.t4.a1": "No seu perfil você baixa seus dados e pode pedir a exclusão da conta. A Política de privacidade explica o que guardamos.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.suporte.t4.q2": "Posso aparecer no Hall of Fame sem querer?",
-  "publico.suporte.t4.a2": "Não. A publicação de um premiado só acontece com o consentimento registrado, e você pode revogá-lo.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.suporte.t4.a2": "Não. A publicação de um premiado só acontece com o consentimento registrado, e você pode revogá-lo.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.legal.versao": "Versão",
   "publico.legal.vigenteDesde": "vigente desde",
   "publico.legal.emRevisao": "Este texto está em revisão e será publicado em breve.",
@@ -150,7 +150,7 @@ export const publicoPt = {
   "publico.directoryEmpresa.parecidas": "Empresas parecidas",
   "publico.directoryEmpresa.voltar": "Voltar ao Directory",
   "publico.cadastrarEmpresa.apoio": "Cadastre a sua empresa no Directory. A equipe revisa antes de publicar.",
-  "publico.cadastrarEmpresa.revisao": "Revisamos cada cadastro antes de publicar. Se você editar depois, a empresa volta para revisão.",  // PROVISÓRIO: validar com o Rafael/solicitor
+  "publico.cadastrarEmpresa.revisao": "Revisamos cada cadastro antes de publicar. Se você editar depois, a empresa volta para revisão.",  // PROVISÓRIO: validar com o cliente/solicitor
   "publico.cadastrarEmpresa.entrar": "Entre na sua conta para cadastrar uma empresa.",
   "publico.cadastrarEmpresa.bloqueado": "Cadastrar empresa é para quem tem o Clube ou o Grupo Árvora.",
   "publico.cadastrarEmpresa.minhas": "Suas empresas",

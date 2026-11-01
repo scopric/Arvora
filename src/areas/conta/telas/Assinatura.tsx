@@ -133,7 +133,7 @@ function Plano({ a }: { a: Linha }) {
 }
 
 // PROVISÓRIO: validar com o solicitor (Decisão 50; Consumer Rights Act 2022, Parte 5). Texto de cancelamento em 14 dias
-// e reembolso é regra comercial do Rafael e leitura jurídica do solicitor; não é parecer.
+// e reembolso é regra comercial do cliente e leitura jurídica do solicitor; não é parecer.
 function DireitoDeCancelar({ a }: { a: Linha | null }) {
   const t = useT()
   const idioma = useIdioma()

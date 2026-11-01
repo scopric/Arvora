@@ -7,7 +7,7 @@ import { Pagina, linkPrimario } from "../Pagina"
 const EMAIL = import.meta.env.VITE_EMAIL_SUPORTE as string | undefined
 const emailValido = (v: string | undefined): v is string => Boolean(v) && /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(v as string)
 
-// PROVISÓRIO: respostas sem promessa comercial; prazos, reembolso e preços dependem do Rafael e do solicitor.
+// PROVISÓRIO: respostas sem promessa comercial; prazos, reembolso e preços dependem do cliente e do solicitor.
 const TEMAS: { tema: Chave; perguntas: [Chave, Chave][] }[] = [
   {
     tema: "publico.suporte.t1",

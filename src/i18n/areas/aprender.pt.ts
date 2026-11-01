@@ -1,5 +1,5 @@
 // Textos da área aprender. Prefixo "aprender." em toda chave (o teste de i18n barra chave repetida entre áreas).
-// PROVISÓRIO: textos de aulas, tarefas e Bem-Estar seguem o microcopy do PRD §17.8; prazos e janelas citados são do Rafael.
+// PROVISÓRIO: textos de aulas, tarefas e Bem-Estar seguem o microcopy do PRD §17.8; prazos e janelas citados são do cliente.
 export const aprenderPt = {
   "aprender.inicio.titulo": "Início",
   "aprender.bemVindo.titulo": "Bem-vindo",

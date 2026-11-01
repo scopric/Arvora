@@ -57,7 +57,7 @@ export function Materiais({ aulaId, uid, podeEnviar }: { aulaId: number; uid: st
   const de = (tipo: Material["tipo"]) => materiais.find((m) => m.tipo === tipo)
   const resumo = de("resumo")
   const ebook = de("ebook")
-  // Aba sem material: a aula já está publicada, então só falta este item. PROVISÓRIO: o "sai até [data]" do PRD §17.5.3 é prazo do Rafael.
+  // Aba sem material: a aula já está publicada, então só falta este item. PROVISÓRIO: o "sai até [data]" do PRD §17.5.3 é prazo do cliente.
   const vazio = <Vazio>{t("aprender.materiais.vazio")}</Vazio>
 
   return (

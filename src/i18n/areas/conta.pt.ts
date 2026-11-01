@@ -125,7 +125,7 @@ export const contaPt = {
   "conta.dados.pedido.enviar": "Enviar pedido",
   "conta.assinatura.gerenciar": "Gerenciar no Stripe",
   "conta.assinatura.gerenciarAjuda": "Trocar cartão, ver faturas, fazer upgrade ou cancelar.",
-  // PROVISÓRIO: validar com o solicitor (Decisão 50; Consumer Rights Act 2022, Parte 5). Regra comercial é do Rafael.
+  // PROVISÓRIO: validar com o solicitor (Decisão 50; Consumer Rights Act 2022, Parte 5). Regra comercial é do cliente.
   "conta.direito.titulo": "Seu direito de cancelar em 14 dias",
   "conta.direito.p1": "Você pode cancelar a assinatura em até 14 dias depois de contratar, sem dar motivo.",
   "conta.direito.p2":

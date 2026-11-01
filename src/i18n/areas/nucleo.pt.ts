@@ -70,7 +70,7 @@ export const nucleoPt = {
   "mfa.codigo": "Código de 6 dígitos",
   "mfa.botao": "Verificar",
   "mfa.erroCodigo": "Código incorreto ou vencido. Confira o aplicativo e tente de novo.",
-  "mfa.erro": "Não conseguimos concluir a verificação agora. Tente de novo; se persistir, fale com o Ricardo.",
+  "mfa.erro": "Não conseguimos concluir a verificação agora. Tente de novo; se persistir, fale com o suporte técnico.",
   "admin.faixa": "Administração",
   "admin.menu": "Menu da administração",
   "admin.voltar": "Voltar ao site",
