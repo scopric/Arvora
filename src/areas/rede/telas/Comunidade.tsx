@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from "react"
+import { useId, useState, type SubmitEvent } from "react"
 import { Abas } from "../../../componentes/Abas"
 import { Aviso } from "../../../componentes/Aviso"
 import { Bloqueado } from "../../../componentes/Bloqueado"
@@ -33,7 +33,7 @@ async function apagarTexto({ tipo, id }: Alvo) {
 }
 
 // Um post ou comentário: autor, data, "em análise" (oculto pela moderação), editar (15 min), apagar ou denunciar.
-function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item; autor: string | null; uid: string; aoMudar: () => void }) {
+function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item; autor: string | null; uid: string; aoMudar: () => void | Promise<void> }) {
   const t = useT()
   const idioma = useIdioma()
   const [editando, setEditando] = useState(false)
@@ -45,6 +45,7 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
   const meu = item.autor_id === uid
   const podeEditar = meu && !item.oculto_em && agora - new Date(item.criado_em).getTime() < JANELA_EDICAO_MS
   const alvo = { tipo, id: item.id }
+  const quem = `${t("rede.comunidade.postDe")} ${autor ?? t("rede.comunidade.membro")}, ${quando(item.criado_em, idioma)}`
 
   async function salvar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -53,10 +54,13 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
     setOcupado(true)
     // .select('id'): fora da janela de 15 min o RLS não casa linha e o UPDATE volta vazio (Erros 2.5).
     const { data, error } = await salvarTexto(alvo, corpo)
-    setOcupado(false)
-    if (error || !data || data.length === 0) return setErro(error ? "rede.comunidade.erroSalvar" : "rede.comunidade.prazoEdicao")
+    if (error || !data || data.length === 0) {
+      setOcupado(false)
+      return setErro(error ? "rede.comunidade.erroSalvar" : "rede.comunidade.prazoEdicao")
+    }
     setEditando(false)
-    aoMudar()
+    await aoMudar()
+    setOcupado(false)
   }
   async function apagar() {
     setApagando(false)
@@ -91,9 +95,9 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
       {erro ? <div className="mt-3"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
       {!editando ? (
         <div className="mt-3 flex flex-wrap gap-2">
-          {podeEditar ? <Botao variante="contorno" onClick={() => setEditando(true)} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.editar")}</Botao> : null}
-          {meu && !item.oculto_em ? <Botao variante="contorno" onClick={() => setApagando(true)} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.apagar")}</Botao> : null}
-          {!meu && item.autor_id ? <Botao variante="contorno" onClick={() => setDenunciando(true)} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.denunciar")}</Botao> : null}
+          {podeEditar ? <Botao variante="contorno" onClick={() => setEditando(true)} aria-label={`${t("rede.comunidade.editar")} ${quem}`} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.editar")}</Botao> : null}
+          {meu && !item.oculto_em ? <Botao variante="contorno" onClick={() => setApagando(true)} aria-label={`${t("rede.comunidade.apagar")} ${quem}`} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.apagar")}</Botao> : null}
+          {!meu && item.autor_id ? <Botao variante="contorno" onClick={() => setDenunciando(true)} aria-label={`${t("rede.comunidade.denunciar")} ${quem}`} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.denunciar")}</Botao> : null}
         </div>
       ) : null}
       <DialogoConfirmar aberto={apagando} titulo={t("rede.comunidade.apagarTitulo")} texto={t("rede.comunidade.apagarTexto")} confirmar={t("rede.comunidade.apagar")} perigo aoConfirmar={() => void apagar()} aoCancelar={() => setApagando(false)} />
@@ -107,6 +111,7 @@ function Caixa({ rotulo, botao, maximo, aoEnviar }: { rotulo: string; botao: str
   const t = useT()
   const [erro, setErro] = useState(false)
   const [ocupado, setOcupado] = useState(false)
+  const id = useId()
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = e.currentTarget
@@ -121,8 +126,8 @@ function Caixa({ rotulo, botao, maximo, aoEnviar }: { rotulo: string; botao: str
   }
   return (
     <form onSubmit={enviar} className="space-y-3">
-      <label htmlFor={`cx-${rotulo}`} className="block text-sm font-semibold">{rotulo}</label>
-      <textarea id={`cx-${rotulo}`} name="corpo" rows={3} maxLength={maximo} required className={campoTexto} />
+      <label htmlFor={id} className="block text-sm font-semibold">{rotulo}</label>
+      <textarea id={id} name="corpo" rows={3} maxLength={maximo} required className={campoTexto} />
       {erro ? <Aviso tipo="erro">{t("rede.comunidade.erroPublicar")}</Aviso> : null}
       <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{botao}</Botao>
     </form>
@@ -132,7 +137,9 @@ function Caixa({ rotulo, botao, maximo, aoEnviar }: { rotulo: string; botao: str
 function Comentarios({ postId, uid }: { postId: number; uid: string }) {
   const t = useT()
   const { estado, recarregar } = useCarga(async () => {
-    const lista = ok(await supabase.from("comentarios").select("id, autor_id, corpo, oculto_em, editado_em, criado_em").eq("post_id", postId).order("criado_em").limit(100))
+    // ponytail: os 100 mais recentes (desc + limite) e inverte para ler do mais antigo; paginar comentários antigos se algum post passar disso.
+    const recentes = ok(await supabase.from("comentarios").select("id, autor_id, corpo, oculto_em, editado_em, criado_em").eq("post_id", postId).order("criado_em", { ascending: false }).limit(100))
+    const lista = [...recentes].reverse()
     return { lista, autores: await vitrinesPorId(lista.map((c) => c.autor_id)) }
   }, postId)
   if (estado.fase === "carregando") return <Esqueleto linhas={2} />

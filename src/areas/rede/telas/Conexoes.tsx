@@ -18,7 +18,7 @@ import { chaveSlug, COLUNAS_CONEXAO, dia, mudarStatus, ok, useCarga, vitrinesPor
 
 type Dados = { conexoes: Conexao[]; perfis: Map<string, Vitrine> }
 
-function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: Map<string, Vitrine>; aoMudar: () => void }) {
+function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: Map<string, Vitrine>; aoMudar: () => void | Promise<void> }) {
   const t = useT()
   const idioma = useIdioma()
   const caminho = useCaminho()
@@ -33,9 +33,12 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
     setErro(null)
     setOcupado(true)
     const r = await mudarStatus(c.id, status)
+    if (r) {
+      setErro(r)
+      return setOcupado(false)
+    }
+    await aoMudar()
     setOcupado(false)
-    if (r) return setErro(r)
-    aoMudar()
   }
   const recebido = c.destinatario_id === uid
   const botao = "sm:w-auto"
@@ -59,7 +62,7 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
       <div className="mt-4 flex flex-wrap items-center gap-3">
         {c.status === "pendente" && recebido ? (
           <>
-            <Botao onClick={() => void agir("aceita")} ocupado={ocupado} className={botao}>{t("rede.conexoes.aceitar")}</Botao>
+            <Botao onClick={() => void agir("aceita")} ocupado={ocupado} disabled={!p} className={botao}>{t("rede.conexoes.aceitar")}</Botao>
             <Botao variante="contorno" onClick={() => void agir("recusada")} ocupado={ocupado} className={botao}>{t("rede.conexoes.recusar")}</Botao>
           </>
         ) : null}

@@ -1,4 +1,5 @@
 import { useState, type SubmitEvent } from "react"
+import { Aviso } from "../../../componentes/Aviso"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Botao } from "../../../componentes/Botao"
 import { Campo, Selecao } from "../../../componentes/Campo"
@@ -29,37 +30,55 @@ export function Network() {
   const liberado = !acesso.erro && (grupo || clube)
 
   const [filtros, setFiltros] = useState<Filtros>(SEM_FILTROS) // os aplicados; o formulário só os troca ao enviar
-  const [pagina, setPagina] = useState(1)
+  const chave = `${liberado}-${grupo}-${JSON.stringify(filtros)}`
+  // Páginas fixas de 30 pela RPC (limite + pular); "Ver mais" acrescenta sem recarregar a lista nem perder o foco.
+  async function buscarPagina(pular: number) {
+    const membros = ok(
+      await supabase.rpc("buscar_membros", {
+        filtro_setor: filtros.setor ? Number(filtros.setor) : undefined,
+        filtro_cidade: filtros.cidade.trim() || undefined,
+        filtro_categoria: filtros.categoria ? Number(filtros.categoria) : undefined,
+        filtro_tipo: filtros.tipo ? (filtros.tipo as "procura" | "oferece") : undefined,
+        limite: POR_PAGINA,
+        pular,
+      }),
+    )
+    const ids = membros.map((m) => m.id).filter((i): i is string => !!i)
+    const itens: Item[] = ids.length ? ok(await supabase.from("network_itens").select("perfil_id, tipo, categoria_id, texto").in("perfil_id", ids)) : []
+    return { membros: membros as Vitrine[], itens }
+  }
   const { estado, recarregar } = useCarga(async () => {
     if (!liberado) return null
     const [setores, categorias] = await Promise.all([
       supabase.from("setores").select("id, nome, nome_en").eq("ativo", true).order("ordem").order("nome"),
       supabase.from("categorias_rede").select("id, nome, nome_en").order("ordem").order("nome"),
     ])
-    let membros: Vitrine[]
-    let itens: Item[] = []
-    if (grupo) {
-      const r = await supabase.rpc("buscar_membros", {
-        filtro_setor: filtros.setor ? Number(filtros.setor) : undefined,
-        filtro_cidade: filtros.cidade.trim() || undefined,
-        filtro_categoria: filtros.categoria ? Number(filtros.categoria) : undefined,
-        filtro_tipo: filtros.tipo ? (filtros.tipo as "procura" | "oferece") : undefined,
-        limite: POR_PAGINA * pagina,
-      })
-      membros = ok(r)
-      const ids = membros.map((m) => m.id).filter((i): i is string => !!i)
-      if (ids.length) itens = ok(await supabase.from("network_itens").select("perfil_id, tipo, categoria_id, texto").in("perfil_id", ids))
-    } else {
-      // Clube: lista simples pela vitrine, sem filtros nem itens (matriz §5).
-      membros = ok(await supabase.from("perfis_vitrine").select(VITRINE).neq("id", uid).order("nome").limit(POR_PAGINA))
+    const primeira = grupo
+      ? await buscarPagina(0)
+      : // Clube: lista simples pela vitrine, sem filtros nem itens (matriz §5); só os 30 primeiros.
+        { membros: ok(await supabase.from("perfis_vitrine").select(VITRINE).neq("id", uid).order("nome").limit(POR_PAGINA)), itens: [] as Item[] }
+    return { setores: ok(setores) as Setor[], categorias: ok(categorias) as Categoria[], ...primeira }
+  }, chave)
+  const [mais, setMais] = useState<{ k: string; membros: Vitrine[]; itens: Item[]; fim: boolean }>({ k: "", membros: [], itens: [], fim: false })
+  const [carregandoMais, setCarregandoMais] = useState(false)
+  const [erroMais, setErroMais] = useState(false)
+  const extra = mais.k === chave ? mais : { membros: [], itens: [], fim: false }
+
+  async function verMais(total: number) {
+    setErroMais(false)
+    setCarregandoMais(true)
+    try {
+      const p = await buscarPagina(total)
+      setMais({ k: chave, membros: [...extra.membros, ...p.membros], itens: [...extra.itens, ...p.itens], fim: p.membros.length < POR_PAGINA })
+    } catch {
+      setErroMais(true)
     }
-    return { setores: ok(setores) as Setor[], categorias: ok(categorias) as Categoria[], membros, itens }
-  }, `${liberado}-${grupo}-${JSON.stringify(filtros)}-${pagina}`)
+    setCarregandoMais(false)
+  }
 
   function buscar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const f = new FormData(e.currentTarget)
-    setPagina(1)
     setFiltros({ setor: String(f.get("setor")), cidade: String(f.get("cidade")), categoria: String(f.get("categoria")), tipo: String(f.get("tipo")) })
   }
 
@@ -68,7 +87,9 @@ export function Network() {
   else if (acesso.erro) corpo = <Erro aoTentar={acesso.recarregar}>{t("acesso.erro")}</Erro>
   else if (!liberado) corpo = <Bloqueado minimo="clube" frase={t("rede.network.bloqueadoVisitante")} />
   else {
-    const dados = estado.fase === "pronto" ? estado.dados : null
+    const base = estado.fase === "pronto" ? estado.dados : null
+    const dados = base && { ...base, membros: [...base.membros, ...extra.membros], itens: [...base.itens, ...extra.itens] }
+    const temMais = grupo && !!base && !extra.fim && base.membros.length >= POR_PAGINA && (extra.membros.length === 0 || extra.membros.length % POR_PAGINA === 0)
     const setores = dados?.setores ?? []
     const categorias = dados?.categorias ?? []
     const cadeado = clube
@@ -123,9 +144,11 @@ export function Network() {
                   />
                 ))}
               </ul>
-              {grupo && dados.membros.length >= POR_PAGINA * pagina ? (
-                <div className="mt-6 flex justify-center">
-                  <Botao variante="contorno" onClick={() => setPagina(pagina + 1)} className="sm:w-auto">{t("rede.network.verMais")}</Botao>
+              {clube && dados.membros.length >= POR_PAGINA ? <p className="mt-6 text-sm opacity-75">{t("rede.network.soPrimeiros")}</p> : null}
+              {temMais ? (
+                <div className="mt-6 flex flex-col items-center gap-3">
+                  {erroMais ? <Aviso tipo="erro">{t("rede.network.erro")}</Aviso> : null}
+                  <Botao variante="contorno" ocupado={carregandoMais} onClick={() => void verMais(dados.membros.length)} className="sm:w-auto">{t("rede.network.verMais")}</Botao>
                 </div>
               ) : null}
             </>
