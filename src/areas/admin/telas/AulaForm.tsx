@@ -130,7 +130,7 @@ export function AulaForm() {
                 ) : null}
               </div>
               {aula ? (
-                <aside className="space-y-4">
+                <div className="space-y-4">
                   <Cartao>
                     <h2 className="text-corpo-g font-semibold">{t("admin.aula.previa")}</h2>
                     <p className="mt-3 text-base font-semibold">{aula.titulo}</p>
@@ -160,7 +160,7 @@ export function AulaForm() {
                       {falta ? <p className="text-legenda text-nevoa">{t(falta)}</p> : null}
                     </div>
                   ) : null}
-                </aside>
+                </div>
               ) : null}
               <DialogoConfirmar
                 aberto={confirmar} titulo={t("admin.aula.publicarTitulo")} texto={t("admin.aula.publicarTexto")} confirmar={t("admin.aula.publicarMateriais")}
