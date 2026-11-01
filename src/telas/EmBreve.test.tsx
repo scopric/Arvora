@@ -57,11 +57,40 @@ describe("fundo animado", () => {
 })
 
 describe("conteúdo", () => {
-  it("tem um h1, os quatro pilares e a chamada para criar conta", () => {
+  it("tem um h1, uma seção por frente, as portas, a aula e a chamada para criar conta", () => {
     estado.sessao = null
     nav()
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1)
-    expect(screen.getAllByRole("listitem")).toHaveLength(11)
+    for (const n of [1, 2, 3, 4]) expect(document.getElementById(`frente-${n}`)?.tagName).toBe("SECTION")
+    expect(screen.getByRole("heading", { level: 2, name: "Do palco à comunidade." })).toBeTruthy()
+    expect(document.querySelectorAll("main ol > li")).toHaveLength(7) // 3 portas + 4 materiais
     expect(screen.getAllByRole("link", { name: "Criar conta" }).length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByRole("link", { name: "Conhecer o Clube" }).getAttribute("href")).toBe("/pt/planos")
+    expect(screen.getByRole("link", { name: "Conhecer o Grupo Árvora" }).getAttribute("href")).toBe("/pt/planos")
+  })
+
+  it("chegando com #frente-3 na URL, rola até a seção (o App carrega sob demanda)", () => {
+    estado.sessao = null
+    const rolar = vi.fn()
+    Element.prototype.scrollIntoView = rolar
+    render(
+      <MemoryRouter initialEntries={["/pt#frente-3"]}>
+        <Routes>
+          <Route path="/:lang" element={<EmBreve />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    expect(rolar).toHaveBeenCalledTimes(1)
+    expect((rolar.mock.contexts[0] as Element).id).toBe("frente-3")
+  })
+
+  it("o dourado fica só no Brazilian Awards e na faixa do Hall of Fame", () => {
+    estado.sessao = null
+    nav()
+    const dourados = [...document.querySelectorAll('[class*="dourado"]')]
+    expect(dourados.some((e) => e.closest("#frente-1"))).toBe(true)
+    expect(dourados.some((e) => e.closest('[aria-labelledby="hof"]'))).toBe(true)
+    const fora = dourados.filter((e) => !e.closest("#frente-1") && !e.closest('[aria-labelledby="hof"]'))
+    expect(fora).toHaveLength(0)
   })
 })
