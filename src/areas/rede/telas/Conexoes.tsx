@@ -132,7 +132,7 @@ export function Conexoes() {
   }
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <h1 className="font-titulo text-4xl font-medium">{t("rede.conexoes.titulo")}</h1>
+      <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t("rede.conexoes.titulo")}</h1>
       <p className="mt-2 opacity-75">{t("rede.conexoes.intro")}</p>
       <div className="mt-8">{corpo}</div>
     </div>

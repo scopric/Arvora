@@ -36,7 +36,7 @@ export function Privacidade() {
       {estado.fase === "pronto" ? (
         <>
           <Cartao>
-            <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.privacidade.match.titulo")}</h2>
+            <h2 className="text-corpo-g font-semibold">{t("conta.privacidade.match.titulo")}</h2>
             <div className="mt-4">
               <BlocoConsentimento tipo="match" rotulo="conta.privacidade.match.rotulo" ajuda="conta.privacidade.match.texto" docs={estado.docs} aceites={estado.aceites} aoMudar={recarregar} />
             </div>
@@ -85,7 +85,7 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
 
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.privacidade.visib.titulo")}</h2>
+      <h2 className="text-corpo-g font-semibold">{t("conta.privacidade.visib.titulo")}</h2>
       {estado.fase === "carregando" ? <Esqueleto linhas={2} className="mt-4" /> : null}
       {estado.fase === "erro" ? <div className="mt-4"><Erro aoTentar={() => (setEstado({ fase: "carregando" }), setTentativa((n) => n + 1))}>{t("conta.erroCarregar")}</Erro></div> : null}
       {estado.fase === "pronto" ? (
@@ -137,7 +137,7 @@ function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar:
 
   return (
     <Cartao>
-      <h2 ref={titulo} tabIndex={-1} className="font-titulo text-2xl font-bold uppercase outline-none">{t("conta.consent.lista.titulo")}</h2>
+      <h2 ref={titulo} tabIndex={-1} className="text-corpo-g font-semibold outline-none">{t("conta.consent.lista.titulo")}</h2>
       <p className="mt-3 text-sm text-creme/70">{t("conta.consent.lista.texto")}</p>
       <div className="mt-5 space-y-4">
         {falhou ? <Aviso tipo="erro">{t("conta.consent.erro")}</Aviso> : null}

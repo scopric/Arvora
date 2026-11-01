@@ -15,6 +15,7 @@ import { BannerCookies } from "./componentes/BannerCookies"
 import { Bloqueado } from "./componentes/Bloqueado"
 import { Cartao } from "./componentes/Cartao"
 import { Erro } from "./componentes/Erro"
+import { EscopoApp } from "./componentes/escopo"
 import { Esqueleto } from "./componentes/Esqueleto"
 import { PlayerVideo } from "./componentes/PlayerVideo"
 import { Selo } from "./componentes/Selo"
@@ -98,6 +99,28 @@ describe("acessibilidade dos componentes comuns (axe)", () => {
         <Tabela legenda="Membros" id={(m) => m.id} linhas={[{ id: 1, nome: "Ana" }]} colunas={[{ chave: "nome", titulo: "Nome", celula: (m) => m.nome }]} />
         <PlayerVideo titulo="Aula 1" tipo="arquivo" src="https://exemplo.invalid/a.mp4" legendas={[{ src: "https://exemplo.invalid/a.vtt", idioma: "pt", rotulo: "Português", padrao: true }]} />
       </main>,
+      `/${l}`,
+    )
+    expect(await violacoes()).toEqual([])
+  })
+})
+
+describe("acessibilidade dos componentes comuns no escopo do app (axe)", () => {
+  it.each(["pt", "en"])("componentes do app (%s) sem violações", async (l) => {
+    renderiza(
+      <EscopoApp value>
+        <main className="app">
+          <h1>Componentes</h1>
+          <Esqueleto />
+          <Vazio titulo="Tudo em dia">Nada pendente.</Vazio>
+          <Erro aoTentar={() => {}} />
+          <Cartao><p>Cartão</p></Cartao>
+          <Selo tom="dourado">Premiado</Selo>
+          <Bloqueado previa={<h2>Prévia</h2>} frase="As aulas semanais fazem parte do Grupo Árvora." />
+          <Abas rotulo="Aprender" abas={[{ chave: "a", rotulo: "Aulas", conteudo: <p>A</p> }, { chave: "b", rotulo: "Academy", conteudo: <p>B</p> }]} />
+          <Tabela legenda="Membros" id={(m) => m.id} linhas={[{ id: 1, nome: "Ana" }]} colunas={[{ chave: "nome", titulo: "Nome", celula: (m) => m.nome }]} />
+        </main>
+      </EscopoApp>,
       `/${l}`,
     )
     expect(await violacoes()).toEqual([])

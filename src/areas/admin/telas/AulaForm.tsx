@@ -132,7 +132,7 @@ export function AulaForm() {
               {aula ? (
                 <aside className="space-y-4">
                   <Cartao>
-                    <h2 className="font-titulo text-2xl font-bold uppercase">{t("admin.aula.previa")}</h2>
+                    <h2 className="text-corpo-g font-semibold">{t("admin.aula.previa")}</h2>
                     <p className="mt-3 text-lg font-semibold">{aula.titulo}</p>
                     <p className="mt-1 text-sm opacity-75">
                       {t(`admin.aulas.tipo.${aula.tipo}`)} · {t(`nivel.${aula.nivel_minimo}`)}

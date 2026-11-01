@@ -58,7 +58,7 @@ function BlocoExportar() {
   }
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.dados.exportar.titulo")}</h2>
+      <h2 className="text-corpo-g font-semibold">{t("conta.dados.exportar.titulo")}</h2>
       <p className="mt-3 text-sm text-creme/70">{t("conta.dados.exportar.texto")}</p>
       {erro ? <div className="mt-4"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
       <Botao type="button" variante="contorno" ocupado={baixando} onClick={() => void baixar()} className="mt-5 sm:w-auto">{t("conta.dados.exportar.botao")}</Botao>
@@ -106,7 +106,7 @@ function BlocoPedidos({ uid }: { uid: string }) {
 
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.dados.pedido.titulo")}</h2>
+      <h2 className="text-corpo-g font-semibold">{t("conta.dados.pedido.titulo")}</h2>
       <p className="mt-3 text-sm text-creme/70">{t("conta.dados.pedido.texto")}</p>
       <div className="mt-5 space-y-4">
         {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
@@ -173,7 +173,7 @@ function BlocoExcluir() {
 
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.dados.excluir.titulo")}</h2>
+      <h2 className="text-corpo-g font-semibold">{t("conta.dados.excluir.titulo")}</h2>
       <div className="mt-3 space-y-2 text-sm text-creme/80">
         <p>{t("perfil.excluir.aviso")}</p>
         <ul className="list-disc space-y-1 pl-5">

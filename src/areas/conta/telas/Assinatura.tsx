@@ -94,7 +94,7 @@ function Plano({ a }: { a: Linha }) {
   return (
     <Cartao>
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="font-titulo text-2xl font-bold uppercase">{a.planos?.nome ?? t("conta.assinatura.titulo")}</h2>
+        <h2 className="text-corpo-g font-semibold">{a.planos?.nome ?? t("conta.assinatura.titulo")}</h2>
         <Selo tom={sit.tom}>{t(sit.selo)}</Selo>
       </div>
       <dl className="mt-5 space-y-2 text-sm">
@@ -142,7 +142,7 @@ function DireitoDeCancelar({ a }: { a: Linha | null }) {
   const prazo = vigenteStripe ? prazoArrependimento(a.stripe_criada_em ?? a.criado_em) : null
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.direito.titulo")}</h2>
+      <h2 className="text-corpo-g font-semibold">{t("conta.direito.titulo")}</h2>
       <div className="mt-4 space-y-3 text-sm text-creme/80">
         <p>{t("conta.direito.p1")}</p>
         <p>{t("conta.direito.p2")}</p>

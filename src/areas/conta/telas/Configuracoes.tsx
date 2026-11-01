@@ -51,7 +51,7 @@ function BlocoEmail() {
 
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.email.titulo")}</h2>
+      <h2 className="text-corpo-g font-semibold">{t("conta.email.titulo")}</h2>
       <p className="mt-3 text-sm text-creme/70">{t("conta.email.atual")}: <span className="font-semibold text-creme">{sessao?.user.email}</span></p>
       <form onSubmit={trocar} noValidate className="mt-5 space-y-5">
         {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
@@ -120,7 +120,7 @@ function BlocoSenha() {
 
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.senha.titulo")}</h2>
+      <h2 className="text-corpo-g font-semibold">{t("conta.senha.titulo")}</h2>
       <form onSubmit={trocar} noValidate className="mt-5 space-y-5">
         {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
         <Campo rotulo={t("conta.senha.nova")} name="senha" type="password" autoComplete="new-password" erro={erros.senha} />
@@ -234,7 +234,7 @@ function DoisFatores() {
 
   return (
     <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.dois.titulo")}</h2>
+      <h2 className="text-corpo-g font-semibold">{t("conta.dois.titulo")}</h2>
       <p className="mt-3 text-sm text-creme/70">{t("conta.dois.texto")}</p>
       <div className="mt-5 space-y-4">
         {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}

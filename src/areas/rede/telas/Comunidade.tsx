@@ -243,7 +243,7 @@ export function Comunidade() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <h1 className="font-titulo text-4xl font-medium">{t("rede.comunidade.titulo")}</h1>
+      <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t("rede.comunidade.titulo")}</h1>
       <details className="mt-4 rounded-xl border border-current/15 px-4 py-3">
         <summary className="min-h-11 cursor-pointer py-2 font-semibold">{t("rede.comunidade.regrasTitulo")}</summary>
         {/* PROVISÓRIO: regras de convivência a validar pelo cliente (PRD COM-02) */}

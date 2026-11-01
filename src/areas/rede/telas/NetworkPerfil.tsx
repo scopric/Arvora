@@ -81,7 +81,7 @@ export function NetworkPerfil() {
         <div className="flex items-start gap-4">
           <Avatar nome={perfil.nome} />
           <div>
-            <h1 className="font-titulo text-4xl font-medium">{perfil.nome}</h1>
+            <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{perfil.nome}</h1>
             {perfil.empresa_nome ? <p className="opacity-80">{perfil.empresa_nome}</p> : null}
             {local ? <p className="text-sm opacity-60">{local}</p> : null}
           </div>
@@ -123,7 +123,7 @@ export function NetworkPerfil() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
       <Link to={caminho("/network")} className="underline">{t("rede.networkPerfil.voltar")}</Link>
-      {temPerfil ? null : <h1 className="mt-6 font-titulo text-4xl font-medium">{t("rede.networkPerfil.titulo")}</h1>}
+      {temPerfil ? null : <h1 className="mt-6 text-subtitulo font-semibold sm:text-titulo-p">{t("rede.networkPerfil.titulo")}</h1>}
       <div className="mt-6">{corpo}</div>
     </div>
   )

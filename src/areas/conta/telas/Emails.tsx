@@ -14,7 +14,7 @@ export function Emails() {
   return (
     <Pagina titulo="conta.emails.titulo">
       <Cartao>
-        <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.emails.transacional.titulo")}</h2>
+        <h2 className="text-corpo-g font-semibold">{t("conta.emails.transacional.titulo")}</h2>
         {/* Transacional não desliga (EML-07): o interruptor aparece ligado e travado para deixar isso claro. */}
         <label className="mt-4 flex min-h-11 items-center gap-3 font-semibold">
           <input type="checkbox" role="switch" checked disabled readOnly className="size-5 accent-dourado" />
@@ -23,7 +23,7 @@ export function Emails() {
         <p className="mt-2 text-sm text-creme/70">{t("conta.emails.transacional.texto")}</p>
       </Cartao>
       <Cartao>
-        <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.emails.marketing.titulo")}</h2>
+        <h2 className="text-corpo-g font-semibold">{t("conta.emails.marketing.titulo")}</h2>
         <div className="mt-4">
           {estado.fase === "carregando" ? <Esqueleto linhas={2} /> : null}
           {estado.fase === "erro" ? <Erro aoTentar={recarregar}>{t("conta.erroCarregar")}</Erro> : null}

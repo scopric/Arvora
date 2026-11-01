@@ -14,7 +14,7 @@ export const campoTexto =
 // Avatar de iniciais: a foto de perfil ainda não tem bucket (fora do lançamento), então ninguém mostra imagem aqui.
 export function Avatar({ nome }: { nome: string | null }) {
   return (
-    <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-full border border-creme/25 bg-superficie/40 font-titulo text-xl">
+    <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-full bg-fumaca text-legenda font-medium">
       {iniciais(nome)}
     </span>
   )
@@ -40,7 +40,7 @@ export function Dialogo({ aberto, titulo, aoFechar, children }: { aberto: boolea
       }}
       className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-creme/20 bg-painel p-6 text-creme backdrop:bg-black/60"
     >
-      <h2 id={id} className="font-titulo text-3xl font-bold uppercase">{titulo}</h2>
+      <h2 id={id} className="text-corpo-g font-semibold">{titulo}</h2>
       {aberto ? children : null}
     </dialog>
   )

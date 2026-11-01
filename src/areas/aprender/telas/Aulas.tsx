@@ -83,7 +83,7 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
 
   const bloco = (titulo: string, lista: AulaLinha[]) => (
       <section className="space-y-6">
-        <h2 className="font-titulo text-3xl font-bold uppercase">{titulo}</h2>
+        <h2 className="text-corpo-g font-semibold">{titulo}</h2>
         {semanas(lista).map(([segunda, itens]) => (
           <div key={segunda}>
             <h3 className="mb-3 text-sm font-semibold opacity-75">

@@ -70,7 +70,7 @@ export function Inicio() {
       <div className="grid gap-10 lg:grid-cols-2">
         {contaNova ? (
           <section className={`${cartao} lg:col-span-2`}>
-            <h2 className="font-titulo text-2xl font-bold uppercase">{t("aprender.inicio.comece")}</h2>
+            <h2 className="text-corpo-g font-semibold">{t("aprender.inicio.comece")}</h2>
             <ol className="mt-3 list-decimal space-y-1 pl-5">
               <li>{t("aprender.inicio.passo1")}</li>
               <li>{t(grupo ? "aprender.inicio.passo2" : "aprender.inicio.passo2Clube")}</li>
@@ -98,7 +98,7 @@ export function Inicio() {
           ) : (
             // Um cadeado só para os dois blocos do Grupo: dois "Bloqueado" iguais repetem o landmark (axe: landmark-unique).
             <section className="space-y-4">
-              <h2 className="font-titulo text-2xl font-bold uppercase">{t("aprender.inicio.proximaESugestoes")}</h2>
+              <h2 className="text-corpo-g font-semibold">{t("aprender.inicio.proximaESugestoes")}</h2>
               <Bloqueado frase={t("aprender.inicio.parteDoGrupo")} />
             </section>
           )}
@@ -175,7 +175,7 @@ export function Inicio() {
 
         {acesso.premiado ? (
           <section className={`${cartao} space-y-2`}>
-            <h2 className="font-titulo text-2xl font-bold uppercase">{t("menu.meuAward")}</h2>
+            <h2 className="text-corpo-g font-semibold">{t("menu.meuAward")}</h2>
             <Link to={caminho("/meu-award")} className={linkTexto}>{t("aprender.inicio.verMeuAward")}</Link>
           </section>
         ) : null}

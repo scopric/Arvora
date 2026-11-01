@@ -8,7 +8,7 @@ import type { Carga } from "../useCarga"
 export function Bloco<T>({ titulo, carga, recarregar, vazio, children }: { titulo: string; carga: Carga<T>; recarregar: () => void; vazio: string; children: (dados: T) => ReactNode }) {
   return (
     <section className="space-y-4">
-      <h2 className="font-titulo text-2xl font-bold uppercase">{titulo}</h2>
+      <h2 className="text-corpo-g font-semibold">{titulo}</h2>
       {carga.fase === "carregando" ? <Esqueleto linhas={3} /> : null}
       {carga.fase === "erro" ? <Erro aoTentar={recarregar} /> : null}
       {carga.fase === "ok" ? (Array.isArray(carga.dados) && carga.dados.length === 0 ? <Vazio>{vazio}</Vazio> : carga.dados === null ? <Vazio>{vazio}</Vazio> : children(carga.dados)) : null}

@@ -46,7 +46,7 @@ export function VisaoGeral() {
               {lista.map((c) => (
                 <li key={c.chave}>
                   <Cartao>
-                    <p className="font-titulo text-6xl leading-none font-bold">{c.n}</p>
+                    <p className="text-titulo font-medium tabular-nums">{c.n}</p>
                     <p className="mt-3">{t(c.titulo)}</p>
                     <Link className="mt-4 inline-flex min-h-11 items-center underline" to={caminho(c.rota)}>{t("admin.visao.abrir")}</Link>
                   </Cartao>

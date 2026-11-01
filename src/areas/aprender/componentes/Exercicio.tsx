@@ -95,7 +95,7 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, ra
   return (
     <article className="rounded-2xl border border-current/15 bg-superficie/25 p-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="font-titulo text-2xl font-bold uppercase">
+        <h3 className="text-corpo-g font-semibold">
           {t("aprender.exercicio.n")} {exercicio.ordem}
         </h3>
         {entrega ? <SeloStatus status={entrega.status} /> : <Selo>{t("aprender.exercicio.naoEnviado")}</Selo>}

@@ -67,7 +67,7 @@ export function Curso() {
         ) : (
           ordenadas.map(({ modulo, itens }) => (
             <section key={modulo.id}>
-              <h2 className="font-titulo text-2xl font-bold uppercase">{modulo.titulo}</h2>
+              <h2 className="text-corpo-g font-semibold">{modulo.titulo}</h2>
               <ol className="mt-3 divide-y divide-current/15 rounded-2xl border border-current/15">
                 {itens.map((a) => {
                   const livre = temNivel(acesso.nivel, a.nivel_minimo)

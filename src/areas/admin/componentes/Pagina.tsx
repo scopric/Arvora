@@ -14,7 +14,7 @@ export function Pagina({ titulo, intro, acoes, children }: { titulo: Chave; intr
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-titulo text-4xl leading-none font-bold uppercase sm:text-5xl">{t(titulo)}</h1>
+          <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t(titulo)}</h1>
           {intro ? <p className="mt-3 max-w-prose opacity-75">{t(intro)}</p> : null}
         </div>
         {acoes}
@@ -28,7 +28,7 @@ export function Secao({ titulo, children }: { titulo: Chave; children: ReactNode
   const t = useT()
   return (
     <section>
-      <h2 className="mb-4 font-titulo text-2xl font-bold uppercase">{t(titulo)}</h2>
+      <h2 className="mb-4 text-corpo-g font-semibold">{t(titulo)}</h2>
       {children}
     </section>
   )

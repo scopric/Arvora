@@ -6,7 +6,7 @@ import { useApp } from "./escopo"
 export function Marca({ to, className = "" }: { to?: string; className?: string }) {
   const app = useApp()
   const classes = app
-    ? `inline-flex min-h-9 items-center gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado ${className}`
+    ? `inline-flex min-h-9 items-center gap-2 rounded-md pointer-coarse:min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado ${className}`
     : `inline-flex min-h-11 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado ${className}`
   const conteudo = (
     <>
