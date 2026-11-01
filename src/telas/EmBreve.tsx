@@ -38,48 +38,53 @@ export function EmBreve() {
     <div>
       <TopoPublico />
       <main>
-      <section className="relative isolate flex min-h-[calc(100dvh-4.25rem)] flex-col justify-center overflow-hidden px-6 py-16 sm:px-16 lg:px-24">
+      <section className="relative isolate flex min-h-[calc(100dvh-4.25rem)] flex-col justify-center overflow-hidden px-6 py-[6.25rem] sm:px-16 lg:px-24">
+        <div aria-hidden="true" className="absolute -top-1/4 right-0 -z-20 size-[48rem] rounded-full bg-superficie/30 blur-3xl" />
+        <div aria-hidden="true" className="absolute bottom-0 left-1/3 -z-20 size-[32rem] rounded-full bg-destaque/10 blur-3xl" />
         <Cena cheia className="inset-0 -z-10" classeCanvas="max-lg:opacity-25" />
-        <p className="animate-subir font-mono text-xs font-semibold tracking-[0.3em] text-destaque uppercase" style={atraso(0)}>
-          {t("inicio.embreve")}
-        </p>
-        <h1
-          className="animate-subir mt-6 max-w-[12ch] font-titulo text-[clamp(3.4rem,8.5vw,7rem)] leading-[0.9] font-bold tracking-tight text-balance uppercase lg:max-w-[10ch]"
-          style={atraso(100)}
-        >
-          {t("auth.layout.destaque")}
-        </h1>
-        <p className="animate-subir mt-8 max-w-lg text-lg leading-relaxed text-creme/90" style={atraso(240)}>
-          {t("inicio.descricao")}
-        </p>
-        {!carregando && !sessao && (
-          <div className="animate-subir mt-10 flex flex-wrap gap-3" style={atraso(360)}>
-            <Link to={caminho("/cadastro")} className={`${botao} bg-creme text-fundo hover:bg-white`}>{t("nav.criarConta")}</Link>
-            <a href="#pilares" className={`${botao} border border-creme/30 text-creme hover:border-creme/60`}>{t("home.saiba")}</a>
-          </div>
-        )}
+        {/* A largura em ch fica no h1 (o ch do wrapper seria o da fonte do corpo); o wrapper encolhe ao conteúdo. */}
+        <div className="zona-limpa self-start">
+          <p className="animate-subir font-mono text-xs tracking-[0.08em] text-destaque uppercase" style={atraso(0)}>
+            {t("inicio.embreve")}
+          </p>
+          <h1
+            className="animate-subir mt-6 max-w-[13ch] font-titulo text-h2 font-normal text-balance lg:max-w-[14ch] lg:text-display"
+            style={atraso(100)}
+          >
+            {t("auth.layout.destaque")}
+          </h1>
+          <p className="animate-subir mt-8 max-w-lg text-xl text-creme/70" style={atraso(240)}>
+            {t("inicio.descricao")}
+          </p>
+          {!carregando && !sessao && (
+            <div className="animate-subir mt-10 flex flex-wrap gap-3" style={atraso(360)}>
+              <Link to={caminho("/cadastro")} className={`${botao} bg-destaque text-fundo hover:shadow-brilho`}>{t("nav.criarConta")}</Link>
+              <a href="#pilares" className={`${botao} border border-superficie text-creme hover:border-destaque`}>{t("home.saiba")}</a>
+            </div>
+          )}
+        </div>
       </section>
 
-      <section aria-labelledby="pilares" className="px-6 py-24 sm:px-16 lg:px-24">
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_1.6fr]">
+      <section aria-labelledby="pilares" className="px-6 py-[6.25rem] sm:px-16 lg:px-24">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1fr_1.6fr]">
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <h2 id="pilares" className="scroll-mt-24 font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">
+            <h2 id="pilares" className="scroll-mt-24 font-titulo text-h3 font-normal text-balance lg:text-h2">
               {t("home.pilares.titulo")}
             </h2>
             <div className="mt-8 size-40 sm:size-56"><Aneis ativo={ativo} /></div>
           </div>
-          <ol className="divide-y divide-creme/15 border-y border-creme/15">
+          <ol className="divide-y divide-superficie border-y border-superficie">
             {PILARES.map((n) => (
               <li
                 key={n}
                 onPointerEnter={() => setAtivo(n)}
                 onPointerLeave={() => setAtivo(0)}
-                className="revela grid grid-cols-[3.5rem_1fr] gap-4 py-8"
+                className="revela grid grid-cols-[3.5rem_1fr] gap-4 py-6"
               >
                 <span aria-hidden="true" className={`font-mono text-sm ${n === 1 ? "text-dourado" : "text-destaque"}`}>0{n}</span>
                 <div>
-                  <h3 className="font-titulo text-4xl leading-none font-bold uppercase sm:text-5xl">{t(`home.pilar.${n}.nome`)}</h3>
-                  <p className="mt-3 max-w-md text-creme/75">{t(`home.pilar.${n}.texto`)}</p>
+                  <h3 className="font-titulo text-h3 font-normal">{t(`home.pilar.${n}.nome`)}</h3>
+                  <p className="mt-3 max-w-md text-creme/70">{t(`home.pilar.${n}.texto`)}</p>
                 </div>
               </li>
             ))}
@@ -87,29 +92,29 @@ export function EmBreve() {
         </div>
       </section>
 
-      <section aria-labelledby="funil" className="px-6 py-24 sm:px-16 lg:px-24">
+      <section aria-labelledby="funil" className="px-6 py-[6.25rem] sm:px-16 lg:px-24">
         <div className="mx-auto max-w-6xl">
-          <h2 id="funil" className="max-w-3xl font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">{t("home.funil.titulo")}</h2>
-          <ol className="relative mt-14 grid gap-10 border-l border-destaque/40 pl-8 md:grid-cols-3 md:gap-8 md:border-t md:border-l-0 md:pt-10 md:pl-0">
+          <h2 id="funil" className="max-w-3xl font-titulo text-h3 font-normal text-balance lg:text-h2">{t("home.funil.titulo")}</h2>
+          <ol className="relative mt-14 grid gap-10 border-l border-superficie pl-8 md:grid-cols-3 md:gap-8 md:border-t md:border-l-0 md:pt-10 md:pl-0">
             {([1, 2, 3] as const).map((n) => (
               <li key={n} className="revela relative">
-                <span aria-hidden="true" className="absolute top-1.5 -left-[2.4rem] size-3 rounded-full bg-destaque md:-top-[2.9rem] md:left-0" />
+                <span aria-hidden="true" className="absolute top-1.5 -left-[2.4rem] size-3 rounded-full bg-destaque shadow-brilho md:-top-[2.9rem] md:left-0" />
                 <p aria-hidden="true" className="font-mono text-sm text-destaque">0{n}</p>
-                <h3 className="mt-2 font-titulo text-4xl leading-none font-bold uppercase">{t(`home.funil.${n}.nome`)}</h3>
-                <p className="mt-3 max-w-xs text-creme/75">{t(`home.funil.${n}.texto`)}</p>
+                <h3 className="mt-2 font-titulo text-h3 font-normal">{t(`home.funil.${n}.nome`)}</h3>
+                <p className="mt-3 max-w-xs text-creme/70">{t(`home.funil.${n}.texto`)}</p>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      <section aria-labelledby="aula" className="px-6 py-24 sm:px-16 lg:px-24">
-        <div className="mx-auto grid max-w-6xl gap-12 rounded-2xl border border-creme/15 p-8 sm:p-14 lg:grid-cols-2">
-          <h2 id="aula" className="font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">{t("home.aula.titulo")}</h2>
-          <ol className="grid gap-4 sm:grid-cols-2">
+      <section aria-labelledby="aula" className="px-6 py-[6.25rem] sm:px-16 lg:px-24">
+        <div className="mx-auto grid max-w-6xl gap-6 rounded-xl border border-superficie bg-painel p-6 shadow-brilho sm:p-14 lg:grid-cols-2">
+          <h2 id="aula" className="font-titulo text-h3 font-normal text-balance lg:text-h2">{t("home.aula.titulo")}</h2>
+          <ol className="grid gap-6 sm:grid-cols-2">
             {([1, 2, 3, 4] as const).map((n) => (
-              <li key={n} className="revela flex min-h-28 flex-col justify-between rounded-xl bg-painel p-5">
-                <span aria-hidden="true" className="font-mono text-sm text-dourado">0{n}</span>
+              <li key={n} className="revela flex min-h-28 flex-col justify-between rounded-xl border border-superficie bg-fundo p-6">
+                <span aria-hidden="true" className="font-mono text-sm text-destaque">0{n}</span>
                 <span className="text-lg font-semibold">{t(`home.aula.${n}`)}</span>
               </li>
             ))}
@@ -117,17 +122,17 @@ export function EmBreve() {
         </div>
       </section>
 
-      <section aria-labelledby="faq" className="bg-creme px-6 py-24 text-fundo sm:px-16 lg:px-24">
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_2fr]">
-          <h2 id="faq" className="font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-6xl">{t("home.faq.titulo")}</h2>
-          <div className="divide-y divide-fundo/20 border-y border-fundo/20">
+      <section aria-labelledby="faq" className="px-6 py-[6.25rem] sm:px-16 lg:px-24">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1fr_2fr]">
+          <h2 id="faq" className="font-titulo text-h3 font-normal text-balance lg:text-h2">{t("home.faq.titulo")}</h2>
+          <div className="divide-y divide-superficie border-y border-superficie">
             {([1, 2, 3] as const).map((n) => (
               <details key={n} className="group py-5">
-                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-xl font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fundo [&::-webkit-details-marker]:hidden">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-xl font-medium text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque [&::-webkit-details-marker]:hidden">
                   {t(`home.faq.${n}.p`)}
-                  <span aria-hidden="true" className="text-2xl transition-transform group-open:rotate-45">+</span>
+                  <span aria-hidden="true" className="text-2xl text-destaque transition-transform group-open:rotate-45">+</span>
                 </summary>
-                <p className="mt-3 max-w-xl text-fundo/80">{t(`home.faq.${n}.r`)}</p>
+                <p className="mt-3 max-w-xl text-creme/70">{t(`home.faq.${n}.r`)}</p>
               </details>
             ))}
           </div>
@@ -136,9 +141,9 @@ export function EmBreve() {
 
       {!carregando && !sessao && (
         <section className="px-6 pt-8 pb-32 sm:px-16 lg:px-24">
-          <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 border-t border-dourado/60 pt-12">
-            <h2 className="max-w-3xl font-titulo text-5xl leading-[0.95] font-bold text-balance uppercase sm:text-7xl">{t("home.cta.titulo")}</h2>
-            <Link to={caminho("/cadastro")} className={`${botao} bg-creme text-fundo hover:bg-white`}>{t("nav.criarConta")}</Link>
+          <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 border-t border-superficie pt-12">
+            <h2 className="max-w-3xl font-titulo text-h3 font-normal text-balance sm:text-h2">{t("home.cta.titulo")}</h2>
+            <Link to={caminho("/cadastro")} className={`${botao} bg-destaque text-fundo hover:shadow-brilho`}>{t("nav.criarConta")}</Link>
           </div>
         </section>
       )}
