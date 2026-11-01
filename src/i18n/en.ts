@@ -17,6 +17,7 @@ export const en: Record<keyof typeof pt, string> = {
   "sistema.naoEncontradaTexto": "The address may have changed or never existed. Head back home and pick up from there.",
   "sistema.erro": "Something went wrong",
   "sistema.voltar": "Back to home",
+  "sistema.falarConosco": "Talk to us",
   "idioma.rotulo": "Language",
   "nav.principal": "Main",
   "nav.entrar": "Log in",

@@ -14,6 +14,7 @@ export const pt = {
   "sistema.naoEncontradaTexto": "O endereço pode ter mudado ou nunca ter existido. Volte ao início e continue de lá.",
   "sistema.erro": "Algo deu errado",
   "sistema.voltar": "Voltar ao início",
+  "sistema.falarConosco": "Falar com a gente",
   "idioma.rotulo": "Idioma",
   "nav.principal": "Principal",
   "nav.entrar": "Entrar",
