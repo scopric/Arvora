@@ -101,7 +101,7 @@ function Plano({ a }: { a: Linha }) {
             <dd className="mt-1"><Selo tom={sit.tom}>{t(sit.selo)}</Selo></dd>
           </div>
           {a.planos && !manual ? (
-            <div><dt className="text-legenda text-nevoa">{t("conta.assinatura.valor")}:</dt><dd className="mt-0.5 text-corpo-g font-medium tabular-nums">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} <span className="text-legenda text-nevoa">/ {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</span></dd></div>
+            <div><dt className="text-legenda text-nevoa">{t("conta.assinatura.valor")}:</dt><dd className="mt-0.5 text-corpo-g font-medium">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} <span className="text-legenda text-nevoa">/ {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</span></dd></div>
           ) : null}
           <div>
             <dt className="text-legenda text-nevoa">{t(sit.data)}:</dt>
