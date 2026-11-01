@@ -14,6 +14,7 @@ export const en: Record<keyof typeof pt, string> = {
   "sistema.carregando": "Loading…",
   "titulo.naoEncontrada": "Page not found",
   "sistema.naoEncontrada": "Page not found",
+  "sistema.naoEncontradaTexto": "The address may have changed or never existed. Head back home and pick up from there.",
   "sistema.erro": "Something went wrong",
   "sistema.voltar": "Back to home",
   "idioma.rotulo": "Language",

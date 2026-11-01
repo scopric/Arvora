@@ -11,6 +11,7 @@ export const pt = {
   "sistema.carregando": "Carregando…",
   "titulo.naoEncontrada": "Página não encontrada",
   "sistema.naoEncontrada": "Página não encontrada",
+  "sistema.naoEncontradaTexto": "O endereço pode ter mudado ou nunca ter existido. Volte ao início e continue de lá.",
   "sistema.erro": "Algo deu errado",
   "sistema.voltar": "Voltar ao início",
   "idioma.rotulo": "Idioma",
