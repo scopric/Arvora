@@ -62,7 +62,7 @@ export function Log() {
                     chave: "det", titulo: t("admin.log.detalhe"),
                     celula: (l) => (
                       <details>
-                        <summary className={`inline-flex min-h-9 cursor-pointer items-center text-legenda pointer-coarse:min-h-11 ${classeLink}`}>{t("admin.log.ver")}</summary>
+                        <summary className={`min-h-9 cursor-pointer py-2 text-legenda pointer-coarse:min-h-11 ${classeLink}`}>{t("admin.log.ver")}</summary>
                         <ul className="mt-2 max-w-md space-y-1 text-legenda">
                           {mudancas(l.antes, l.depois).map((m) => (
                             <li key={m}><strong>{t(`admin.campo.${m}` as Chave) || m}</strong>: {valor(l.antes, m)} → {valor(l.depois, m)}</li>

@@ -94,7 +94,7 @@ export function Membro() {
               </Secao>
             ) : null}
             <DialogoConfirmar
-              aberto={confirmar} perigo titulo={perfil.suspenso_em ? t("admin.membro.reativar") : t("admin.membro.suspender")} texto={t("admin.membro.suspenderTexto")}
+              aberto={confirmar} perigo={!perfil.suspenso_em} titulo={perfil.suspenso_em ? t("admin.membro.reativar") : t("admin.membro.suspender")} texto={t("admin.membro.suspenderTexto")}
               aoCancelar={() => setConfirmar(false)}
               aoConfirmar={() => { setConfirmar(false); void acao.rodar(async () => { exigirSemDados(await supabase.rpc("suspender_perfil", { perfil: perfil.id, suspender: !perfil.suspenso_em })); carga.recarregar() }, "admin.comum.salvo") }}
             />
