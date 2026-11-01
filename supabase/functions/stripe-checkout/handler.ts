@@ -19,6 +19,7 @@ export type Consultas = {
   plano(id: number): Promise<Plano | null>; // só ativo
   customer(uid: string, contaId: number): Promise<string | null>;
   temAssinaturaVigente(uid: string): Promise<boolean>; // em qualquer conta
+  registrarAceite(planoId: number, versao: string): Promise<void>; // prova do pedido expresso (banco decide o tipo)
 };
 // Limite real (max e janela) é do banco: public.consumir_limite. A janela aqui serve só ao Retry-After;
 // mantenha igual ao limite em consumir_limite no banco.
@@ -50,19 +51,28 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
   } catch {
     return json({ erro: "json_invalido" }, 400, site);
   }
-  // Só plano_id e idioma são lidos; qualquer outro campo (perfil, client_reference_id...) é ignorado.
-  const { plano_id, idioma = "pt" } = (corpo ?? {}) as Record<string, unknown>;
+  // Só plano_id, idioma e aceite são lidos; qualquer outro campo (perfil, client_reference_id...) é ignorado.
+  const { plano_id, idioma = "pt", aceite } = (corpo ?? {}) as Record<
+    string,
+    unknown
+  >;
   if (
     !Number.isSafeInteger(plano_id) || (plano_id as number) <= 0 ||
     (idioma !== "pt" && idioma !== "en")
   ) {
     return json({ erro: "entrada_invalida" }, 400, site);
   }
-
   try {
     const db = deps.db(authorization);
     const usuario = await db.usuario();
     if (!usuario) return json({ erro: "nao_autenticado" }, 401, site);
+
+    // Pedido expresso (assinatura) / consentimento com perda do direito (curso avulso): a tela manda a versão do
+    // texto que a pessoa viu e marcou. Sem isso não há sessão de pagamento. O tipo quem decide é o banco, pelo plano.
+    const versao = (aceite as { versao?: unknown } | null | undefined)?.versao;
+    if (typeof versao !== "string" || !/^[A-Za-z0-9._-]{1,32}$/.test(versao)) {
+      return json({ erro: "aceite_obrigatorio" }, 400, site);
+    }
 
     // Antes de qualquer consulta cara ou chamada ao Stripe. Erro do RPC lança (500): nunca libera.
     if (!(await db.consumirLimite(LIMITE.acao))) {
@@ -87,6 +97,9 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     if (assinatura && (await db.temAssinaturaVigente(usuario.id))) {
       return json({ erro: "assinatura_existente" }, 409, site);
     }
+
+    // Guarda a prova antes de criar a sessão. Erro lança (500): nunca segue sem a prova gravada.
+    await db.registrarAceite(plano_id as number, versao);
 
     const customer = await db.customer(usuario.id, plano.conta_stripe_id);
     const base = site.replace(/\/+$/, "");
