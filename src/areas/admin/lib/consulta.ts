@@ -147,17 +147,19 @@ export function useAcao() {
   return { ocupado, aviso, rodar, limpar: () => setAviso(null) }
 }
 
-// Envia arquivo ao bucket e devolve o caminho. Nome saneado; prefixo de tempo evita colisão.
+// Envia arquivo ao bucket e devolve o caminho. Nome aleatório (o original pode ter nome de pessoa, e o bucket
+// `imagens` é público): só a extensão do arquivo é aproveitada.
 export async function enviarArquivo(bucket: string, pasta: string, arquivo: File): Promise<string> {
-  const nome = arquivo.name.normalize("NFD").replace(/[^\w.-]+/g, "-").replace(/-+/g, "-").slice(-80)
-  const caminho = `${pasta}/${Date.now()}-${nome}`
+  const ext = /\.[A-Za-z0-9]{1,8}$/.exec(arquivo.name)?.[0].toLowerCase() ?? ""
+  const caminho = `${pasta}/${crypto.randomUUID()}${ext}`
   const r = await supabase.storage.from(bucket).upload(caminho, arquivo, { upsert: false })
   if (r.error) throw r.error
   return caminho
 }
 
+// Sempre como download: o arquivo de entrega vem do membro, com o tipo que ele declarou.
 export async function abrirAssinado(bucket: string, caminho: string) {
-  const r = await supabase.storage.from(bucket).createSignedUrl(caminho, 300)
+  const r = await supabase.storage.from(bucket).createSignedUrl(caminho, 300, { download: true })
   if (r.error || !r.data) throw r.error ?? new SemLinha()
   window.open(r.data.signedUrl, "_blank", "noopener,noreferrer")
 }
