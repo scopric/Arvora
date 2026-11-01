@@ -103,46 +103,46 @@ function BlocoPedidos({ uid }: { uid: string }) {
 
   return (
     <>
-    <Secao titulo={t("conta.dados.pedido.titulo")} texto={t("conta.dados.pedido.texto")}>
-      <div className="space-y-4">
-        {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exportacao")} className="sm:w-auto">{t("conta.dados.pedido.exportacao")}</Botao>
-          <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exclusao")} className="sm:w-auto">{t("conta.dados.pedido.exclusao")}</Botao>
+      <Secao titulo={t("conta.dados.pedido.titulo")} texto={t("conta.dados.pedido.texto")}>
+        <div className="space-y-4">
+          {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exportacao")} className="sm:w-auto">{t("conta.dados.pedido.exportacao")}</Botao>
+            <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exclusao")} className="sm:w-auto">{t("conta.dados.pedido.exclusao")}</Botao>
+          </div>
         </div>
-      </div>
-      <DialogoConfirmar
-        aberto={confirmar !== null}
-        titulo={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoExclusao" : "conta.dados.pedido.dialogoExportacao")}
-        texto={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoTextoExclusao" : "conta.dados.pedido.dialogoTextoExportacao")}
-        confirmar={t("conta.dados.pedido.enviar")}
-        perigo={confirmar === "exclusao"}
-        aoConfirmar={() => confirmar && void pedir(confirmar)}
-        aoCancelar={() => setConfirmar(null)}
-      />
-    </Secao>
-    {/* A lista fica fora do painel: a Tabela, o Vazio e o Erro já têm moldura própria. */}
-    <section>
-      <h2 className="text-base font-semibold">{t("conta.dados.lista.titulo")}</h2>
-      <div className="mt-4 space-y-4">
-        {lista.fase === "carregando" ? <Esqueleto linhas={2} /> : null}
-        {lista.fase === "erro" ? <Erro aoTentar={() => (setLista({ fase: "carregando" }), setTentativa((n) => n + 1))}>{t("conta.erroCarregar")}</Erro> : null}
-        {lista.fase === "pronto" && lista.itens.length === 0 ? <Vazio>{t("conta.dados.lista.vazio")}</Vazio> : null}
-        {lista.fase === "pronto" && lista.itens.length > 0 ? (
-          <Tabela
-            legenda={t("conta.dados.lista.titulo")}
-            linhas={lista.itens}
-            id={(p) => p.id}
-            colunas={[
-              { chave: "tipo", titulo: t("conta.dados.col.tipo"), celula: (p) => (TIPOS[p.tipo] ? t(TIPOS[p.tipo]) : p.tipo) },
-              { chave: "status", titulo: t("conta.dados.col.status"), celula: (p) => (STATUS[p.status] ? t(STATUS[p.status]) : p.status) },
-              { chave: "recebido", titulo: t("conta.dados.col.recebido"), celula: (p) => dataCurta(p.criado_em, idioma) },
-              { chave: "prazo", titulo: t("conta.dados.col.prazo"), celula: (p) => dataDoDia(p.prazo_em, idioma) },
-            ]}
-          />
-        ) : null}
-      </div>
-    </section>
+        <DialogoConfirmar
+          aberto={confirmar !== null}
+          titulo={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoExclusao" : "conta.dados.pedido.dialogoExportacao")}
+          texto={t(confirmar === "exclusao" ? "conta.dados.pedido.dialogoTextoExclusao" : "conta.dados.pedido.dialogoTextoExportacao")}
+          confirmar={t("conta.dados.pedido.enviar")}
+          perigo={confirmar === "exclusao"}
+          aoConfirmar={() => confirmar && void pedir(confirmar)}
+          aoCancelar={() => setConfirmar(null)}
+        />
+      </Secao>
+      {/* A lista fica fora do painel: a Tabela, o Vazio e o Erro já têm moldura própria. */}
+      <section>
+        <h2 className="text-base font-semibold">{t("conta.dados.lista.titulo")}</h2>
+        <div className="mt-4 space-y-4">
+          {lista.fase === "carregando" ? <Esqueleto linhas={2} /> : null}
+          {lista.fase === "erro" ? <Erro aoTentar={() => (setLista({ fase: "carregando" }), setTentativa((n) => n + 1))}>{t("conta.erroCarregar")}</Erro> : null}
+          {lista.fase === "pronto" && lista.itens.length === 0 ? <Vazio>{t("conta.dados.lista.vazio")}</Vazio> : null}
+          {lista.fase === "pronto" && lista.itens.length > 0 ? (
+            <Tabela
+              legenda={t("conta.dados.lista.titulo")}
+              linhas={lista.itens}
+              id={(p) => p.id}
+              colunas={[
+                { chave: "tipo", titulo: t("conta.dados.col.tipo"), celula: (p) => (TIPOS[p.tipo] ? t(TIPOS[p.tipo]) : p.tipo) },
+                { chave: "status", titulo: t("conta.dados.col.status"), celula: (p) => (STATUS[p.status] ? t(STATUS[p.status]) : p.status) },
+                { chave: "recebido", titulo: t("conta.dados.col.recebido"), celula: (p) => dataCurta(p.criado_em, idioma) },
+                { chave: "prazo", titulo: t("conta.dados.col.prazo"), celula: (p) => dataDoDia(p.prazo_em, idioma) },
+              ]}
+            />
+          ) : null}
+        </div>
+      </section>
     </>
   )
 }

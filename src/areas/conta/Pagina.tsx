@@ -56,12 +56,12 @@ export function Interruptor({ rotulo, ajuda, idAjuda, className = "", ...resto }
   const id = useId()
   const idDesc = idAjuda ?? `${id}-ajuda`
   return (
-    <div className={`flex min-h-9 items-start justify-between gap-4 pointer-coarse:min-h-11 ${className}`}>
+    <div className={`group flex min-h-9 items-start justify-between gap-4 pointer-coarse:min-h-11 ${className}`}>
       <div className="min-w-0">
-        <label htmlFor={id} className="block cursor-pointer text-base font-medium has-disabled:cursor-not-allowed">{rotulo}</label>
+        <label htmlFor={id} className="block cursor-pointer text-base font-medium group-has-disabled:cursor-not-allowed">{rotulo}</label>
         {ajuda ? <p id={idDesc} className="mt-0.5 text-legenda text-nevoa">{ajuda}</p> : null}
       </div>
-      <label className="relative -my-2 flex min-h-9 shrink-0 cursor-pointer items-center pointer-coarse:min-h-11 has-disabled:cursor-not-allowed">
+      <label className="relative -my-1.5 flex min-h-9 shrink-0 cursor-pointer items-center pointer-coarse:-my-2.5 pointer-coarse:min-h-11 has-disabled:cursor-not-allowed">
         <input id={id} type="checkbox" role="switch" aria-describedby={ajuda ? idDesc : undefined} className="peer sr-only" {...resto} />
         <span
           aria-hidden="true"
