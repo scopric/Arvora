@@ -12,7 +12,7 @@ import { focoApp, linkMenuApp, rotuloGrupoApp } from "./menuApp"
 import { MENU_ADMIN } from "./navegacao"
 
 // Mesma casca do membro (molde: configurações do app do Linear): sidebar no breu com grupos rotulados, conteúdo num
-// painel carvão com hairline. O tema claro do PRD §17.7.2 saiu (Decisão 55).
+// painel carvão com hairline. O tema claro do PRD §17.7.2 saiu (Decisão 53).
 const foco = focoApp
 const linkMenu = linkMenuApp
 
