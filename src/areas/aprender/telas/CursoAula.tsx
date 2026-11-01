@@ -45,7 +45,7 @@ export function CursoAula() {
   const permitido = temNivel(acesso.nivel, aula.nivel_minimo)
 
   return (
-    <Pagina chave={chave} titulo={aula.titulo} conteudo rotulo={curso.titulo} voltar={{ para: caminho(`/academy/${curso.slug}`), rotulo: curso.titulo }}>
+    <Pagina chave={chave} titulo={aula.titulo} conteudo voltar={{ para: caminho(`/academy/${curso.slug}`), rotulo: curso.titulo }}>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-6">
           {permitido ? (
@@ -62,7 +62,7 @@ export function CursoAula() {
             <Bloqueado previa={<p className="text-base">{aula.descricao ?? aula.titulo}</p>} frase={t("aprender.academy.continuaNoGrupo")} />
           )}
         </div>
-        <nav aria-label={t("aprender.curso.lista")} className="rounded-xl p-2 shadow-borda lg:sticky lg:top-6 lg:self-start">
+        <nav aria-label={t("aprender.curso.lista")} className="rounded-xl p-2 shadow-borda lg:sticky lg:top-16 lg:self-start">
           {modulos.map((m) => (
             <section key={m.id}>
               <h2 className={rotuloGrupoApp}>{m.titulo}</h2>
@@ -77,9 +77,9 @@ export function CursoAula() {
                           <span className="sr-only">{t("bloqueado.rotulo")}</span>
                         </>
                       ) : pct(a.id) === 100 ? (
-                        <span className="text-xs text-destaque">{t("aprender.assistida")}</span>
+                        <span className="text-legenda text-destaque">{t("aprender.assistida")}</span>
                       ) : pct(a.id) > 0 ? (
-                        <span className="text-xs tabular-nums">{pct(a.id)}%</span>
+                        <span className="text-legenda tabular-nums">{pct(a.id)}%</span>
                       ) : null}
                     </Link>
                   </li>

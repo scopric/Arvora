@@ -121,7 +121,7 @@ export function BemVindo() {
       <legend className="mb-2 text-legenda font-medium text-bruma">{t(legenda)}</legend>
       <div className="flex flex-wrap gap-2">
         {categorias.map((c) => (
-          <label key={c.id} className="flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-grafite px-3 text-legenda font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:text-creme has-[:checked]:border-dourado has-[:checked]:bg-creme/5 has-[:checked]:text-creme has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-dourado">
+          <label key={c.id} className="flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-grafite px-3 text-legenda font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:text-creme has-[:checked]:border-bruma has-[:checked]:bg-creme/5 has-[:checked]:text-creme has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-dourado">
             <input type="checkbox" checked={sel.has(`${tipo}:${c.id}`)} onChange={() => alternar(`${tipo}:${c.id}`)} className="size-4 accent-dourado" />
             {nomeDe(c)}
           </label>
@@ -211,7 +211,7 @@ export function BemVindo() {
           )}
           <div className="flex flex-wrap items-center gap-4">
             <button type="button" onClick={() => setEtapa(2)} className={botaoContorno}>{t("aprender.bemVindo.voltar")}</button>
-            <Botao ocupado={ocupado} className="sm:w-auto" onClick={() => void concluir()}>{t("aprender.bemVindo.concluir")}</Botao>
+            <Botao variante={grupo ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto" onClick={() => void concluir()}>{t("aprender.bemVindo.concluir")}</Botao>
           </div>
         </div>
       ) : null}

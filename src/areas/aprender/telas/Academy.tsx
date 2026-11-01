@@ -35,7 +35,7 @@ export function Academy() {
     <Pagina chave="aprender.academy.titulo">
       <div className={filtro ? "grid gap-8 lg:grid-cols-[14rem_1fr]" : ""}>
         {filtro ? (
-          <aside className="lg:sticky lg:top-6 lg:self-start">
+          <aside className="lg:sticky lg:top-16 lg:self-start">
             <Selecao rotulo={t("aprender.academy.trilha")} value={trilha} onChange={(e) => setTrilha(e.target.value)}>
               <option value="">{t("aprender.aulas.todas")}</option>
               {trilhas.map(([id, v]) => (
@@ -52,7 +52,7 @@ export function Academy() {
               const bloqueado = !temNivel(acesso.nivel, c.nivel_minimo)
               const capa = urlCapa(c.capa_path)
               return (
-                <li key={c.id} className="group">
+                <li key={c.id} className="group relative">
                   {capa ? (
                     <img src={capa} alt="" loading="lazy" className="aspect-video w-full rounded-md object-cover" />
                   ) : (
@@ -60,7 +60,7 @@ export function Academy() {
                       <Icone nome="aprender" className="size-8" />
                     </div>
                   )}
-                  <p className="mt-3 flex items-center gap-2 text-xs text-nevoa">
+                  <p className="mt-3 flex items-center gap-2 text-legenda text-nevoa">
                     {c.verticais ? <span>{nomeVertical(c.verticais, lang)}</span> : null}
                     {bloqueado ? (
                       <span className="flex items-center gap-1">
@@ -71,7 +71,7 @@ export function Academy() {
                     ) : null}
                   </p>
                   <h2 className="mt-1 font-conteudo text-subtitulo leading-none font-semibold tracking-normal uppercase">
-                    <Link to={caminho(`/academy/${c.slug}`)} className={`rounded-sm underline-offset-4 group-hover:underline ${foco}`}>{c.titulo}</Link>
+                    <Link to={caminho(`/academy/${c.slug}`)} className={`rounded-sm underline-offset-4 group-hover:underline after:absolute after:inset-0 ${foco}`}>{c.titulo}</Link>
                   </h2>
                   {c.descricao ? <p className="mt-1.5 line-clamp-2 text-legenda text-nevoa">{c.descricao}</p> : null}
                 </li>

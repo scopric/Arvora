@@ -74,14 +74,14 @@ export function Curso() {
           ordenadas.map(({ modulo, itens }) => (
             <section key={modulo.id}>
               <h2 className="text-corpo-g font-semibold">{modulo.titulo}</h2>
-              <ol className="mt-3 divide-y divide-grafite rounded-xl shadow-borda">
+              <ol className="mt-3 divide-y divide-grafite overflow-hidden rounded-xl shadow-borda">
                 {itens.map((a) => {
                   const livre = temNivel(acesso.nivel, a.nivel_minimo)
                   const pct = progresso.get(a.id) ?? 0
                   numero += 1
                   return (
                     <li key={a.id}>
-                      <Link to={caminho(`/academy/${curso.slug}/${a.slug}`)} className={`flex min-h-12 items-center gap-3 px-4 py-2.5 transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-creme/2 ${foco}`}>
+                      <Link to={caminho(`/academy/${curso.slug}/${a.slug}`)} className={`flex min-h-12 items-center gap-3 px-4 py-2.5 transition-colors hover:bg-creme/2 ${foco}`}>
                         <span className="w-6 shrink-0 text-legenda text-nevoa tabular-nums">{numero}</span>
                         <span className="flex-1 text-base">{a.titulo}</span>
                         {!livre ? (

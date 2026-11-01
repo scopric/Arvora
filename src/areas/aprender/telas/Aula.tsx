@@ -15,7 +15,7 @@ import { QuandoAula } from "../componentes/QuandoAula"
 import { SalaAoVivo } from "../componentes/SalaAoVivo"
 import { COLUNAS_AULA, nomeVertical, type AulaLinha, type Vertical } from "../tipos"
 import { useCarga } from "../useCarga"
-import { cartao, dados, linkTexto } from "../util"
+import { dados, linkTexto } from "../util"
 
 type AulaComVertical = AulaLinha & { verticais: Vertical | null }
 
@@ -69,7 +69,7 @@ export function Aula() {
       {aula.duracao_min ? <> · {aula.duracao_min} {t("aprender.min")}</> : null}
     </>
   ) : undefined
-  const painel = "lg:sticky lg:top-6 lg:self-start"
+  const painel = "lg:sticky lg:top-16 lg:self-start"
 
   return (
     <Pagina chave="aprender.aula.titulo" titulo={aula.titulo} conteudo rotulo={rotulo} meta={meta} voltar={{ para: caminho("/aulas"), rotulo: t("aprender.voltarAulas") }}>
@@ -102,7 +102,7 @@ export function Aula() {
               </p>
             ) : null}
           </div>
-          <div className={`${cartao} ${painel}`}>
+          <div className={painel}>
             <Materiais aulaId={aula.id} uid={uid} podeEnviar={!!aula.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} />
           </div>
         </div>

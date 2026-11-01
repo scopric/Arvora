@@ -22,7 +22,7 @@ export function Pagina({ chave, titulo, rotulo, conteudo, meta, voltar, acoes, c
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       {voltar ? (
-        <Link to={voltar.para} className={`mb-4 inline-flex min-h-9 items-center gap-1 rounded-sm text-legenda font-medium text-nevoa transition-colors hover:text-creme ${foco}`}>
+        <Link to={voltar.para} className={`mb-4 inline-flex min-h-9 items-center gap-1 rounded-sm text-legenda font-medium text-nevoa transition-colors pointer-coarse:min-h-11 hover:text-creme ${foco}`}>
           <Icone nome="seta" className="size-4" />
           {voltar.rotulo}
         </Link>

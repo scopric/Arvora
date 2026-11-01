@@ -49,10 +49,10 @@ export function Tarefas() {
           chave: k,
           rotulo: `${t(rotulo)} (${lista.length})`,
           conteudo: lista.length ? (
-            <ul className="divide-y divide-grafite rounded-xl shadow-borda">
+            <ul className="divide-y divide-grafite overflow-hidden rounded-xl shadow-borda">
               {lista.map(({ exercicio, entrega }) => (
                 <li key={exercicio.id}>
-                  <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex min-h-12 items-center gap-4 px-4 py-3 transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-creme/2 ${foco}`}>
+                  <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex min-h-12 items-center gap-4 px-4 py-3 transition-colors hover:bg-creme/2 ${foco}`}>
                     <span className="min-w-0 flex-1">
                       <span className="block text-base font-medium">{exercicio.aulas?.titulo}</span>
                       <span className="mt-0.5 block text-legenda text-nevoa">

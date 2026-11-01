@@ -34,7 +34,8 @@ async function abrirArquivo(caminho: string): Promise<boolean> {
 // `podeEnviar` = vertical aceita entregas e o membro é do Grupo (o RLS confere de novo).
 // `rascunho`/`aoDigitar` (opcionais): quem hospeda o exercício em abas guarda o texto fora daqui, porque a aba inativa é
 // desmontada. `aoDigitar(undefined)` = apagar o rascunho (depois de enviar).
-export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, rascunho, aoDigitar }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void }) {
+// `primario` (padrão true): só o primeiro formulário aberto da tela ganha o botão dourado; os demais ficam em contorno.
+export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, rascunho, aoDigitar, primario = true }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void; primario?: boolean }) {
   const t = useT()
   const lang = useIdioma()
   const id = useId()
@@ -156,7 +157,7 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, ra
             </div>
           ) : null}
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
-          <Botao type="submit" ocupado={ocupado} className="sm:w-auto">
+          <Botao type="submit" variante={primario ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto">
             {reenvio ? t("aprender.exercicio.reenviar") : t("aprender.exercicio.enviar")}
           </Botao>
         </form>
