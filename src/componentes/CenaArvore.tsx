@@ -217,7 +217,7 @@ export default function CenaArvore({ className = "", cheia = false, classeCanvas
     return cena.fim
   }, [cheia])
 
-  if (falhou) return <FundoArvore className={className} camada="w-full" />
+  if (falhou) return <FundoArvore className={`${className} ${classeCanvas}`} camada="w-full" />
   return (
     <div className={`pointer-events-none absolute ${className}`}>
       <canvas ref={ref} aria-hidden="true" className={`size-full ${cheia ? "" : "cena-mascara"} ${classeCanvas}`} />

@@ -41,7 +41,12 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
         ) : null}
         <nav aria-label={completo ? t("menu.conta") : t("nav.principal")} className="flex items-center gap-2 text-sm font-semibold">
           <SeletorIdioma />
-          {carregando ? null : sessao ? (
+          {carregando ? (
+            <span aria-hidden="true" className="invisible flex items-center gap-2">
+              <span className={linkPublico}>{t("nav.entrar")}</span>
+              <span className={`${botaoPublico} text-sm whitespace-nowrap max-sm:hidden`}>{t(completo ? "menu.assinar" : "nav.criarConta")}</span>
+            </span>
+          ) : sessao ? (
             <Link to={caminho(completo ? "/inicio" : "/perfil")} className={linkPublico}>{t(completo ? "menu.painel" : "nav.perfil")}</Link>
           ) : (
             <>
