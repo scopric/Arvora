@@ -96,8 +96,8 @@ export function Network() {
     corpo = (
       <div className="grid gap-8 lg:grid-cols-[16rem_1fr]">
         {/* Molde Linear (integrations): filtros numa coluna à esquerda, fixa ao rolar; resultados em grade de 2 colunas. */}
-        <form onSubmit={buscar} aria-label={t("rede.network.filtros")} className="grid gap-4 sm:grid-cols-2 lg:sticky lg:top-16 lg:grid-cols-1 lg:self-start">
-          <fieldset disabled={cadeado} className="contents">
+        <form onSubmit={buscar} aria-label={t("rede.network.filtros")} className="lg:sticky lg:top-16 lg:self-start">
+          <fieldset disabled={cadeado} className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-1">
             <Selecao rotulo={t("rede.network.setor")} name="setor" defaultValue={filtros.setor}>
               <option value="">{t("rede.network.todos")}</option>
               {setores.map((s) => <option key={s.id} value={s.id}>{nomeDe(s, idioma)}</option>)}

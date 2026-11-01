@@ -77,11 +77,12 @@ export function NetworkPerfil() {
         )}
       </section>
     )
-    nome = perfil.nome || undefined
+    const nomeOk = perfil.nome || null
+    nome = nomeOk ?? undefined
     corpo = (
       <div className="space-y-6">
         <div className="flex items-start gap-3">
-          <Avatar nome={perfil.nome} />
+          <Avatar nome={nomeOk} />
           <div>
             {perfil.empresa_nome ? <p className="text-base text-bruma">{perfil.empresa_nome}</p> : null}
             {local ? <p className="text-legenda text-nevoa">{local}</p> : null}
@@ -101,7 +102,7 @@ export function NetworkPerfil() {
           <div className="space-y-4 border-t border-grafite pt-6">
             <div className="flex flex-wrap items-center gap-3">
               {grupo && perfil.id ? (
-                <AcaoConexao uid={uid} outroId={perfil.id} nome={perfil.nome ?? ""} origem="busca" conexao={conexao ?? undefined} aoMudar={recarregar} />
+                <AcaoConexao uid={uid} outroId={perfil.id} nome={nomeOk ?? ""} origem="busca" conexao={conexao ?? undefined} aoMudar={recarregar} />
               ) : (
                 <span className="inline-flex items-center gap-2 text-legenda text-nevoa"><Icone nome="cadeado" className="size-4 text-cinza" />{t("rede.network.conectarBloqueado")}</span>
               )}
