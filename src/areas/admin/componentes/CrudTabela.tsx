@@ -59,7 +59,8 @@ export function CrudTabela(p: CrudProps) {
     let q = tabelaSolta(p.tabela).select(p.colunas)
     if (p.filtro) q = q.eq(p.filtro.coluna, p.filtro.valor)
     for (const o of p.ordem) q = q.order(o.coluna, { ascending: o.asc !== false })
-    const r = await q.limit(LIMITE)
+    // Busca LIMITE+1 só para saber se há mais; mostra LIMITE.
+    const r = await q.limit(LIMITE + 1)
     if (r.error) throw r.error
     return r.data ?? []
   }, [p.tabela, p.filtro?.coluna, p.filtro?.valor, p.colunas])
@@ -113,7 +114,7 @@ export function CrudTabela(p: CrudProps) {
           linhas.length === 0 ? (
             <Vazio>{t(p.vazio)}</Vazio>
           ) : (
-            <Tabela colunas={colunasTabela} linhas={linhas} id={(l) => String(l[chave])} legenda={t(p.legenda)} contagem={contagem(linhas.length, linhas.length >= LIMITE, t)} />
+            <Tabela colunas={colunasTabela} linhas={linhas.slice(0, LIMITE)} id={(l) => String(l[chave])} legenda={t(p.legenda)} contagem={contagem(Math.min(linhas.length, LIMITE), linhas.length > LIMITE, t)} />
           )
         }
       </Mostrar>

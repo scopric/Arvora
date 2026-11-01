@@ -23,10 +23,12 @@ export function Aulas() {
   const [filtro, setFiltro] = useState("")
   const carga = useCarga(async () => {
     const [aulas, verticais] = await Promise.all([
-      supabase.from("aulas").select("id, titulo, tipo, vertical_id, nivel_minimo, inicio_em, agendada_em, materiais_publicados_em").order("criado_em", { ascending: false }).limit(LIMITE),
+      supabase.from("aulas").select("id, titulo, tipo, vertical_id, nivel_minimo, inicio_em, agendada_em, materiais_publicados_em").order("criado_em", { ascending: false }).limit(LIMITE + 1),
       supabase.from("verticais").select("id, nome"),
     ])
-    return { aulas: exigir(aulas), verticais: exigir(verticais) }
+    // Busca LIMITE+1 só para saber se há mais; mostra LIMITE.
+    const todas = exigir(aulas)
+    return { aulas: todas.slice(0, LIMITE), haMais: todas.length > LIMITE, verticais: exigir(verticais) }
   }, [])
   return (
     <Pagina titulo="admin.aulas.titulo" intro="admin.aulas.intro">
@@ -40,7 +42,7 @@ export function Aulas() {
         </div>
       </Barra>
       <Mostrar carga={carga}>
-        {({ aulas, verticais }) => {
+        {({ aulas, haMais, verticais }) => {
           const nomeVertical = new Map(verticais.map((v) => [v.id, v.nome]))
           const linhas = aulas.filter((a) => !filtro || estadoAula(a) === filtro)
           return linhas.length === 0 ? (
@@ -48,7 +50,7 @@ export function Aulas() {
           ) : (
             <Tabela
               legenda={t("admin.aulas.titulo")} linhas={linhas} id={(l) => l.id}
-              contagem={contagem(linhas.length, aulas.length >= LIMITE, t)}
+              contagem={contagem(linhas.length, haMais, t)}
               colunas={[
                 { chave: "titulo", titulo: t("admin.comum.titulo"), celula: (l) => <Link className={classeLink} to={caminho(`/admin/aulas/${l.id}`)}>{l.titulo}</Link> },
                 { chave: "tipo", titulo: t("admin.comum.tipo"), celula: (l) => t(`admin.aulas.tipo.${l.tipo}`) },
