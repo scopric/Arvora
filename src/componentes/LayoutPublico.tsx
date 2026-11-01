@@ -6,9 +6,9 @@ import { Marca } from "./Marca"
 import { SeletorIdioma } from "./SeletorIdioma"
 
 export const linkPublico =
-  "inline-flex min-h-11 items-center rounded-lg px-4 text-creme transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
+  "inline-flex min-h-11 items-center rounded-full px-4 text-creme transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
 export const botaoPublico =
-  "inline-flex min-h-12 items-center justify-center rounded-lg px-7 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
+  "inline-flex min-h-11 items-center justify-center rounded-full px-6 text-base font-medium transition-[box-shadow,border-color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
 
 // Topo e rodapé da home (extraídos de EmBreve sem mudar o visual). `completo` acrescenta o menu do site público (PRD §17.3.1),
 // usado nas demais páginas públicas; a home segue como estava.
@@ -31,7 +31,7 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
   const t = useT()
   const caminho = useCaminho()
   return (
-    <header className="sticky top-0 z-20 border-b border-creme/10 bg-fundo/95 backdrop-blur-md">
+    <header className="sticky top-0 z-20 border-b border-superficie bg-fundo/95 backdrop-blur-md">
       <div className="flex min-h-17 items-center justify-between gap-3 px-4 sm:px-12 lg:px-20">
         <Marca to={caminho("/")} className="max-sm:[&>span]:sr-only" />
         {completo ? (
@@ -46,7 +46,7 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
           ) : (
             <>
               <Link to={caminho("/entrar")} className={linkPublico}>{t("nav.entrar")}</Link>
-              <Link to={caminho(completo ? "/planos" : "/cadastro")} className={`${botaoPublico} min-h-11 bg-creme px-5 text-sm whitespace-nowrap text-fundo hover:bg-white max-sm:hidden`}>{t(completo ? "menu.assinar" : "nav.criarConta")}</Link>
+              <Link to={caminho(completo ? "/planos" : "/cadastro")} className={`${botaoPublico} bg-destaque px-5 text-sm whitespace-nowrap text-fundo hover:shadow-brilho max-sm:hidden`}>{t(completo ? "menu.assinar" : "nav.criarConta")}</Link>
             </>
           )}
         </nav>
@@ -65,7 +65,7 @@ export function RodapePublico({ completo = false }: { completo?: boolean }) {
   const t = useT()
   const caminho = useCaminho()
   return (
-    <footer className="border-t border-creme/10 px-6 py-12 sm:px-16 lg:px-24">
+    <footer className="border-t border-superficie px-6 py-12 sm:px-16 lg:px-24">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-xs">
           <Marca to={caminho("/")} />
@@ -88,7 +88,7 @@ export function RodapePublico({ completo = false }: { completo?: boolean }) {
           <Link to={caminho("/cookies")} className={linkPublico}>{t("cookies.politica")}</Link>
         </nav>
       </div>
-      <p className="mx-auto mt-10 max-w-6xl font-mono text-xs tracking-[0.15em] text-creme/60">{t("home.direitos")}</p>
+      <p className="mx-auto mt-10 max-w-6xl font-mono text-xs tracking-[0.08em] text-creme/60">{t("home.direitos")}</p>
     </footer>
   )
 }
