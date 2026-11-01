@@ -6,9 +6,10 @@ import { gerar } from "./arvoreRede"
 // Árvore de luz em WebGL puro (sem biblioteca): os mesmos fios e nós de arvoreRede.ts viram pontos com
 // profundidade. Cresce uma vez, inclina com o ponteiro e gira com a rolagem. Sem WebGL: cai no SVG de FundoArvore.
 const VERT = `attribute vec3 p;attribute vec4 a;
-uniform float uT,uAsp,uPx,uTime,uScroll,uOff,uEsc;uniform vec2 uPtr;
-varying vec4 vC;
+uniform float uT,uAsp,uPx,uTime,uScroll,uOff,uEsc,uLinha;uniform vec2 uPtr;
+varying vec4 vC;varying float vL;
 void main(){
+  vL=uLinha;
   float g=smoothstep(a.x,a.x+.05,uT);
   vec3 q=p;
   if(a.z>2.5&&a.z<3.5)q.y=mod(q.y+1.+uTime*.05*(.4+a.w),2.)-1.;
@@ -25,6 +26,7 @@ void main(){
   vec3 col=a.z>1.5?vec3(.79,.64,.29):a.z>.5?vec3(.62,.71,.54):vec3(.96,.96,.94);
   float al=(a.z>2.5?.55:a.z>.5?1.:.8)*tw;
   if(a.z>3.5){col=vec3(1.,.88,.55);al=.14*pow(max(0.,sin(uTime*.5+a.w*20.)),3.);}
+  if(uLinha>.5){col=vec3(.62,.71,.54);al=.5*smoothstep(.0,.04,uT-a.x);}
   vC=vec4(col,al*g*(1.-uScroll*.8));
 }`
 // Raios de sol entre as copas (god rays): um triângulo de tela cheia, só gradiente; muda em ciclos de ~18 s.
@@ -38,19 +40,21 @@ void main(){
   float g=sin(a*31.-uTime*.1)*.5+.5;
   float k=pow(f,4.)*(.6+.4*g)*(.55+.45*sin(uTime*.35+a*7.))*smoothstep(2.9,.2,length(d))*.5*mix(.6,1.,smoothstep(.8,1.4,uAsp))*(1.-uRoll*.8);
   gl_FragColor=vec4(vec3(1.,.86,.5)*k,k);}`
-const FRAG = `precision mediump float;varying vec4 vC;
-void main(){float d=length(gl_PointCoord-.5);float k=smoothstep(.5,.05,d);gl_FragColor=vec4(vC.rgb*vC.a*k,k*vC.a);}`
+const FRAG = `precision mediump float;varying vec4 vC;varying float vL;
+void main(){float d=length(gl_PointCoord-.5);float k=vL>.5?1.:smoothstep(.5,.05,d);gl_FragColor=vec4(vC.rgb*vC.a*k,k*vC.a);}`
 
 const PROF = 7
 const pontos = () => {
   const { fios, nos } = gerar()
   const dados: number[] = []
+  const trechoZ = new Map<object, number>()
   const X = (x: number) => (x - 200) / 250
   const Y = (y: number) => 1 - y / 300
   for (const f of fios) {
     const [x0, y0, cx, cy, x1, y1] = f.d.match(/-?\d+(\.\d+)?/g)!.map(Number)
-    const n = Math.max(8, Math.round(Math.hypot(x1 - x0, y1 - y0) / 1.3))
+    const n = Math.max(8, Math.round(Math.hypot(x1 - x0, y1 - y0) / 0.8))
     const z = (Math.random() - 0.5) * 0.7
+    trechoZ.set(f, z)
     for (let i = 0; i <= n; i++) {
       const t = i / n
       const u = 1 - t
@@ -71,7 +75,21 @@ const pontos = () => {
   for (let i = 0; i < 140; i++) dados.push((Math.random() - 0.5) * 1.8, Math.random() * 2 - 1, (Math.random() - 0.5) * 1.2, 0.85, 2 + Math.random() * 3, 3, Math.random())
   for (const n of nos) dados.push(X(n.x), Y(n.y), (Math.random() - 0.5) * 0.7, ((n.prof + 1) / PROF) * 0.9, n.r * 3.4, n.ouro ? 2 : 1, Math.random())
   for (let i = 0; i < 14; i++) dados.push(Math.random() * 1.4 - 0.5, Math.random() * 1.2 - 0.5, (Math.random() - 0.5) * 0.8, 0.9, 30 + Math.random() * 40, 4, Math.random())
-  return new Float32Array(dados)
+  // Fios contínuos: vértices limpos (sem tremor) ao final do buffer, um trecho por galho.
+  const inicioLinhas = dados.length / 7
+  const trechos: [number, number][] = []
+  for (const f of fios) {
+    const [x0, y0, cx, cy, x1, y1] = f.d.match(/-?\d+(\.\d+)?/g)!.map(Number)
+    const ini = dados.length / 7
+    const z = trechoZ.get(f) ?? 0
+    for (let i = 0; i <= 12; i++) {
+      const t = i / 12
+      const u = 1 - t
+      dados.push(X(u * u * x0 + 2 * u * t * cx + t * t * x1), Y(u * u * y0 + 2 * u * t * cy + t * t * y1), z, ((f.prof + t) / PROF) * 0.9, 1, 0, 0)
+    }
+    trechos.push([ini, 13])
+  }
+  return { dados: new Float32Array(dados), trechos, inicioLinhas }
 }
 
 function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boolean, deslocar: boolean, falha: () => void) {
@@ -104,7 +122,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   const ur = (n: string) => gl.getUniformLocation(raios, n)
   const [rTime, rAsp, rRoll, rPtr] = ["uTime", "uAsp", "uRoll", "uPtr"].map(ur)
   gl.useProgram(prog)
-  const dados = pontos()
+  const { dados, trechos, inicioLinhas } = pontos()
   const bufP = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, bufP)
   gl.bufferData(gl.ARRAY_BUFFER, dados, gl.STATIC_DRAW)
@@ -116,7 +134,7 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
   liga("p", 3, 0)
   liga("a", 4, 3)
   const u = (n: string) => gl.getUniformLocation(prog, n)
-  const [uT, uAsp, uPx, uTime, uScroll, uPtr, uOff, uEsc] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr", "uOff", "uEsc"].map(u)
+  const [uT, uAsp, uPx, uTime, uScroll, uPtr, uOff, uEsc, uLinha] = ["uT", "uAsp", "uPx", "uTime", "uScroll", "uPtr", "uOff", "uEsc", "uLinha"].map(u)
   gl.enable(gl.BLEND)
   gl.blendFunc(gl.ONE, gl.ONE)
   gl.clearColor(0, 0, 0, 0)
@@ -172,7 +190,10 @@ function iniciar(canvas: HTMLCanvasElement, parado: () => boolean, reduzido: boo
     gl.uniform1f(uTime, reduzido ? 0 : tempo)
     gl.uniform1f(uScroll, roll)
     gl.uniform2f(uPtr, atual.x, atual.y)
-    gl.drawArrays(gl.POINTS, 0, dados.length / 7)
+    gl.uniform1f(uLinha, 1)
+    for (const [ini, n] of trechos) gl.drawArrays(gl.LINE_STRIP, ini, n)
+    gl.uniform1f(uLinha, 0)
+    gl.drawArrays(gl.POINTS, 0, inicioLinhas)
     raf = !reduzido && visivel && !document.hidden && !parado() ? requestAnimationFrame(quadro) : 0
   }
   const retomar = () => {
