@@ -56,12 +56,17 @@ export function EmBreve() {
           <p className="animate-subir mt-8 max-w-lg text-xl leading-normal text-creme/70" style={atraso(240)}>
             {t("inicio.descricao")}
           </p>
-          {!carregando && !sessao && (
-            <div className="animate-subir mt-10 flex flex-wrap gap-3" style={atraso(360)}>
+          {/* Sempre montado: a altura não muda quando a sessão termina de carregar (CLS). */}
+          <div className="animate-subir mt-10 flex flex-wrap gap-3" style={atraso(360)}>
+            {carregando ? (
+              <span aria-hidden="true" className={`${botao} invisible`}>{t("nav.criarConta")}</span>
+            ) : sessao ? (
+              <Link to={caminho("/perfil")} className={`${botao} bg-destaque text-fundo hover:shadow-brilho`}>{t("nav.perfil")}</Link>
+            ) : (
               <Link to={caminho("/cadastro")} className={`${botao} bg-destaque text-fundo hover:shadow-brilho`}>{t("nav.criarConta")}</Link>
-              <a href="#pilares" className={`${botao} border border-superficie text-creme hover:border-destaque`}>{t("home.saiba")}</a>
-            </div>
-          )}
+            )}
+            <a href="#pilares" className={`${botao} border border-superficie text-creme hover:border-destaque`}>{t("home.saiba")}</a>
+          </div>
         </div>
       </section>
 
@@ -139,14 +144,18 @@ export function EmBreve() {
         </div>
       </section>
 
-      {!carregando && !sessao && (
-        <section className="px-6 pt-8 pb-32 sm:px-16 lg:px-24">
-          <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 border-t border-superficie pt-12">
-            <h2 className="max-w-3xl font-titulo text-h3 font-normal text-balance sm:text-h2">{t("home.cta.titulo")}</h2>
+      <section className="px-6 pt-8 pb-32 sm:px-16 lg:px-24">
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 border-t border-superficie pt-12">
+          <h2 className="max-w-3xl font-titulo text-h3 font-normal text-balance sm:text-h2">{t("home.cta.titulo")}</h2>
+          {carregando ? (
+            <span aria-hidden="true" className={`${botao} invisible`}>{t("nav.criarConta")}</span>
+          ) : sessao ? (
+            <Link to={caminho("/perfil")} className={`${botao} bg-destaque text-fundo hover:shadow-brilho`}>{t("nav.perfil")}</Link>
+          ) : (
             <Link to={caminho("/cadastro")} className={`${botao} bg-destaque text-fundo hover:shadow-brilho`}>{t("nav.criarConta")}</Link>
-          </div>
-        </section>
-      )}
+          )}
+        </div>
+      </section>
       </main>
       <RodapePublico />
     </div>

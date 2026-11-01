@@ -42,7 +42,7 @@ describe("página inicial", () => {
   it("com sessão, mostra o link do perfil no lugar", () => {
     estado.sessao = { user: { id: "u1" } }
     nav()
-    expect(screen.getByRole("link", { name: "Meu perfil" }).getAttribute("href")).toBe("/pt/perfil")
+    expect(screen.getAllByRole("link", { name: "Meu perfil" })[0]?.getAttribute("href")).toBe("/pt/perfil")
     expect(screen.queryByRole("link", { name: "Entrar" })).toBeNull()
   })
 })
