@@ -285,7 +285,8 @@ describe("/inicio", () => {
     falso.atual = criarFalso(base({ salvos: falha }))
     montar("inicio", <Inicio />, "/pt/inicio")
     expect((await screen.findByRole("alert")).textContent).toMatch(/algo deu errado/i)
-    expect(await screen.findByText("2 pedidos de conexão")).toBeTruthy()
+    expect(await screen.findByText("pedidos de conexão", { exact: false })).toBeTruthy()
+    expect(screen.getByText("2")).toBeTruthy()
   })
   it("premiado vê Meu Award", async () => {
     falso.atual = criarFalso(base())

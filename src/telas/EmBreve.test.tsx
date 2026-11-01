@@ -52,7 +52,7 @@ describe("fundo animado", () => {
     estado.sessao = null
     nav()
     expect(await screen.findByRole("button", { name: "Pausar movimento" }, { timeout: 4000 })).toBeTruthy()
-    expect(screen.getByRole("link", { name: "English" })).toBeTruthy()
+    expect(screen.getByRole("link", { name: "EN – English" })).toBeTruthy()
   })
 })
 

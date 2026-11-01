@@ -12,6 +12,7 @@ import { FormularioRegistro } from "../componentes/FormularioRegistro"
 import { COLUNAS_CURSO, camposCurso } from "../lib/camposCurso"
 import { useOpcoesNivel } from "../lib/opcoes"
 import { estadoAula } from "../lib/regras"
+import { classeLink } from "../lib/estilo"
 
 const MODULO: CampoDef[] = [
   { chave: "titulo", rotulo: "admin.comum.titulo", tipo: "texto", obrigatorio: true, naTabela: true },
@@ -39,7 +40,7 @@ export function Curso() {
   }, [id])
 
   return (
-    <Pagina titulo="admin.curso.titulo" acoes={<Link className="underline" to={caminho("/admin/cursos")}>{t("admin.comum.voltar")}</Link>}>
+    <Pagina titulo="admin.curso.titulo" voltar={{ para: caminho("/admin/cursos"), rotulo: t("admin.comum.voltar") }}>
       <Mostrar carga={carga}>
         {(d) => (
           <>
@@ -55,6 +56,7 @@ export function Curso() {
             </Secao>
             <Secao titulo="admin.curso.modulos">
               <CrudTabela
+                variante="contorno"
                 tabela="modulos" colunas="id, curso_id, titulo, ordem" campos={MODULO} ordem={[{ coluna: "ordem" }]} filtro={{ coluna: "curso_id", valor: d.curso.id }}
                 fixos={{ curso_id: d.curso.id }} podeEditar={pode} podeApagar legenda="admin.curso.modulos" vazio="admin.curso.semModulos" aoMudar={carga.recarregar}
               />
@@ -62,11 +64,11 @@ export function Curso() {
             <Secao titulo="admin.curso.aulas">
               {d.modulos.length === 0 ? <Vazio>{t("admin.curso.semModulos")}</Vazio> : d.modulos.map((m) => (
                 <div key={m.id} className="mb-4">
-                  <h3 className="font-semibold">{m.titulo}</h3>
+                  <h3 className="text-base font-semibold">{m.titulo}</h3>
                   <ul className="mt-2 space-y-1">
                     {d.aulas.filter((a) => a.modulo_id === m.id).map((a) => (
                       <li key={a.id} className="flex items-center gap-3">
-                        <Link className="underline" to={caminho(`/admin/aulas/${a.id}`)}>{a.titulo}</Link>
+                        <Link className={classeLink} to={caminho(`/admin/aulas/${a.id}`)}>{a.titulo}</Link>
                         <Selo>{t(`admin.aulas.estado.${estadoAula(a)}`)}</Selo>
                       </li>
                     ))}

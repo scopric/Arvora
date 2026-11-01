@@ -7,7 +7,7 @@ import { Esqueleto } from "../../../componentes/Esqueleto"
 import { useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { useCarga } from "../useCarga"
-import { dados, gravarProgresso, minutosParaTexto, videoDe } from "../util"
+import { barraProgresso, dados, gravarProgresso, minutosParaTexto, videoDe } from "../util"
 
 const A_CADA_SEG = 15 // não grava a cada quadro: no máximo um UPDATE a cada 15 s de vídeo...
 const MIN_ENTRE_GRAVACOES_MS = 10_000 // ...e nunca dois em menos de 10 s reais (arrastar a barra dispara timeupdate em rajada)
@@ -71,11 +71,11 @@ export function Gravacao({ aulaId, titulo, uid, aoMudarPercentual }: { aulaId: n
       )}
       {falhou ? <Aviso tipo="erro">{t("aprender.erroProgresso")}</Aviso> : null}
       <div className="flex flex-wrap items-center gap-4">
-        <label className="flex items-center gap-3 text-sm">
-          <span>{t("aprender.progresso")}: {atual}%</span>
-          <progress value={atual} max={100} className="h-2 w-40 accent-destaque" />
+        <label className="flex items-center gap-3 text-legenda text-nevoa">
+          <progress value={atual} max={100} className={barraProgresso} />
+          <span className="tabular-nums">{t("aprender.progresso")}: {atual}%</span>
         </label>
-        {posicaoSalva > 5 && atual < 100 ? <span className="text-sm opacity-75">{t("aprender.parouEm")} {minutosParaTexto(posicaoSalva)}</span> : null}
+        {posicaoSalva > 5 && atual < 100 ? <span className="text-legenda text-nevoa">{t("aprender.parouEm")} {minutosParaTexto(posicaoSalva)}</span> : null}
         {atual < 100 ? (
           <Botao variante="contorno" className="sm:w-auto" onClick={() => void salvar(100, posicaoSalva)}>
             {t("aprender.marcarConcluida")}

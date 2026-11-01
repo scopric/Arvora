@@ -8,6 +8,8 @@ export const EDICAO_ATUAL = "2026"
 export type Item = {
   rotulo: Chave
   rota: string
+  // Ícone de 16px ao lado do rótulo (molde Linear); sempre decorativo.
+  icone: NomeIcone
   // Nível mínimo para abrir de fato; abaixo disso o item aparece com cadeado e leva à página com a prévia (PRD §17.1).
   minimo?: Exclude<Nivel, "visitante">
   // Só para premiado (Meu Award): some para os demais.
@@ -15,36 +17,35 @@ export type Item = {
   // Link para página pré-renderizada fora do app (carga nova em vez de <Link>).
   externo?: boolean
 }
-export type Grupo = { rotulo?: Chave; dourado?: boolean; itens: Item[] }
+export type Grupo = { rotulo?: Chave; itens: Item[] }
 
 // Sidebar do membro, na ordem do PRD §17.3.1. Cadeados por nível: PRD §17.3.5.
 export const SIDEBAR: Grupo[] = [
   {
     itens: [
-      { rotulo: "menu.inicio", rota: "/inicio" },
-      { rotulo: "menu.aulas", rota: "/aulas", minimo: "grupo" },
-      { rotulo: "menu.academy", rota: "/academy" },
-      { rotulo: "menu.bemEstar", rota: "/bem-estar", minimo: "grupo" },
+      { rotulo: "menu.inicio", rota: "/inicio", icone: "casa" },
+      { rotulo: "menu.aulas", rota: "/aulas", icone: "video", minimo: "grupo" },
+      { rotulo: "menu.academy", rota: "/academy", icone: "aprender" },
+      { rotulo: "menu.bemEstar", rota: "/bem-estar", icone: "folha", minimo: "grupo" },
     ],
   },
   {
     rotulo: "menu.awards",
-    dourado: true,
     itens: [
-      { rotulo: "menu.hallOfFame", rota: "/hall-of-fame", externo: true },
-      { rotulo: "menu.biblioteca", rota: "/biblioteca" },
-      { rotulo: "menu.originals", rota: "/originals" },
-      { rotulo: "menu.directory", rota: "/directory" },
-      { rotulo: "menu.network", rota: "/network", minimo: "clube" },
-      { rotulo: "menu.match", rota: "/match", minimo: "grupo" },
-      { rotulo: "menu.evento", rota: `/evento/${EDICAO_ATUAL}` },
-      { rotulo: "menu.meuAward", rota: "/meu-award", soPremiado: true },
+      { rotulo: "menu.hallOfFame", rota: "/hall-of-fame", icone: "award", externo: true },
+      { rotulo: "menu.biblioteca", rota: "/biblioteca", icone: "livro" },
+      { rotulo: "menu.originals", rota: "/originals", icone: "filme" },
+      { rotulo: "menu.directory", rota: "/directory", icone: "predio" },
+      { rotulo: "menu.network", rota: "/network", icone: "rede", minimo: "clube" },
+      { rotulo: "menu.match", rota: "/match", icone: "faisca", minimo: "grupo" },
+      { rotulo: "menu.evento", rota: `/evento/${EDICAO_ATUAL}`, icone: "calendario" },
+      { rotulo: "menu.meuAward", rota: "/meu-award", icone: "award", soPremiado: true },
     ],
   },
   {
     itens: [
-      { rotulo: "menu.comunidade", rota: "/comunidade", minimo: "clube" },
-      { rotulo: "menu.tarefas", rota: "/tarefas", minimo: "grupo" },
+      { rotulo: "menu.comunidade", rota: "/comunidade", icone: "balao", minimo: "clube" },
+      { rotulo: "menu.tarefas", rota: "/tarefas", icone: "check", minimo: "grupo" },
     ],
   },
 ]
@@ -60,63 +61,63 @@ export const ABAS: Aba[] = [
 
 // Folha "Mais" (mobile) e menu do avatar (desktop).
 export const MAIS: Item[] = [
-  { rotulo: "menu.perfil", rota: "/perfil" },
-  { rotulo: "menu.notificacoes", rota: "/notificacoes" },
-  { rotulo: "menu.comunidade", rota: "/comunidade", minimo: "clube" },
-  { rotulo: "menu.tarefas", rota: "/tarefas", minimo: "grupo" },
-  { rotulo: "menu.configuracoes", rota: "/configuracoes" },
-  { rotulo: "menu.suporte", rota: "/suporte" },
-  { rotulo: "menu.meuPlano", rota: "/configuracoes/assinatura" },
+  { rotulo: "menu.perfil", rota: "/perfil", icone: "pessoa" },
+  { rotulo: "menu.notificacoes", rota: "/notificacoes", icone: "sino" },
+  { rotulo: "menu.comunidade", rota: "/comunidade", icone: "balao", minimo: "clube" },
+  { rotulo: "menu.tarefas", rota: "/tarefas", icone: "check", minimo: "grupo" },
+  { rotulo: "menu.configuracoes", rota: "/configuracoes", icone: "engrenagem" },
+  { rotulo: "menu.suporte", rota: "/suporte", icone: "ajuda" },
+  { rotulo: "menu.meuPlano", rota: "/configuracoes/assinatura", icone: "cartao" },
 ]
 export const AVATAR: Item[] = [
-  { rotulo: "menu.perfil", rota: "/perfil" },
-  { rotulo: "menu.conexoes", rota: "/conexoes" },
-  { rotulo: "menu.meuAward", rota: "/meu-award", soPremiado: true },
-  { rotulo: "menu.notificacoes", rota: "/notificacoes" },
-  { rotulo: "menu.configuracoes", rota: "/configuracoes" },
-  { rotulo: "menu.assinatura", rota: "/configuracoes/assinatura" },
-  { rotulo: "menu.suporte", rota: "/suporte" },
+  { rotulo: "menu.perfil", rota: "/perfil", icone: "pessoa" },
+  { rotulo: "menu.conexoes", rota: "/conexoes", icone: "elo" },
+  { rotulo: "menu.meuAward", rota: "/meu-award", icone: "award", soPremiado: true },
+  { rotulo: "menu.notificacoes", rota: "/notificacoes", icone: "sino" },
+  { rotulo: "menu.configuracoes", rota: "/configuracoes", icone: "engrenagem" },
+  { rotulo: "menu.assinatura", rota: "/configuracoes/assinatura", icone: "cartao" },
+  { rotulo: "menu.suporte", rota: "/suporte", icone: "ajuda" },
 ]
 
-export type ItemAdmin = { rotulo: Chave; rota: string }
+export type ItemAdmin = { rotulo: Chave; rota: string; icone: NomeIcone }
 export type GrupoAdmin = { rotulo?: Chave; itens: ItemAdmin[] }
 // Menu do admin (PRD §17.3.4). Correção de tarefas não consta no desenho do menu do PRD: entrou em PESSOAS para a rota ter entrada.
 export const MENU_ADMIN: GrupoAdmin[] = [
-  { itens: [{ rotulo: "admin.visaoGeral", rota: "/admin" }] },
+  { itens: [{ rotulo: "admin.visaoGeral", rota: "/admin", icone: "painel" }] },
   {
     rotulo: "admin.grupo.conteudo",
     itens: [
-      { rotulo: "admin.item.aulas", rota: "/admin/aulas" },
-      { rotulo: "admin.item.cursos", rota: "/admin/cursos" },
-      { rotulo: "admin.item.videos", rota: "/admin/videos" },
-      { rotulo: "admin.item.temas", rota: "/admin/temas" },
+      { rotulo: "admin.item.aulas", rota: "/admin/aulas", icone: "video" },
+      { rotulo: "admin.item.cursos", rota: "/admin/cursos", icone: "aprender" },
+      { rotulo: "admin.item.videos", rota: "/admin/videos", icone: "filme" },
+      { rotulo: "admin.item.temas", rota: "/admin/temas", icone: "etiqueta" },
     ],
   },
   {
     rotulo: "admin.grupo.awards",
     itens: [
-      { rotulo: "admin.item.edicoes", rota: "/admin/edicoes" },
-      { rotulo: "admin.item.premiados", rota: "/admin/premiados" },
-      { rotulo: "admin.item.empresas", rota: "/admin/empresas" },
+      { rotulo: "admin.item.edicoes", rota: "/admin/edicoes", icone: "calendario" },
+      { rotulo: "admin.item.premiados", rota: "/admin/premiados", icone: "award" },
+      { rotulo: "admin.item.empresas", rota: "/admin/empresas", icone: "predio" },
     ],
   },
   {
     rotulo: "admin.grupo.pessoas",
     itens: [
-      { rotulo: "admin.item.membros", rota: "/admin/membros" },
-      { rotulo: "admin.item.correcao", rota: "/admin/correcao" },
-      { rotulo: "admin.item.moderacao", rota: "/admin/moderacao" },
-      { rotulo: "admin.item.pedidosDeDados", rota: "/admin/pedidos-de-dados" },
+      { rotulo: "admin.item.membros", rota: "/admin/membros", icone: "rede" },
+      { rotulo: "admin.item.correcao", rota: "/admin/correcao", icone: "check" },
+      { rotulo: "admin.item.moderacao", rota: "/admin/moderacao", icone: "escudo" },
+      { rotulo: "admin.item.pedidosDeDados", rota: "/admin/pedidos-de-dados", icone: "arquivo" },
     ],
   },
-  { rotulo: "admin.grupo.financeiro", itens: [{ rotulo: "admin.item.relatorioCiclo", rota: "/admin/relatorio-ciclo" }] },
+  { rotulo: "admin.grupo.financeiro", itens: [{ rotulo: "admin.item.relatorioCiclo", rota: "/admin/relatorio-ciclo", icone: "grafico" }] },
   {
     rotulo: "admin.grupo.sistema",
     itens: [
-      { rotulo: "admin.item.equipe", rota: "/admin/equipe" },
-      { rotulo: "admin.item.log", rota: "/admin/log" },
-      { rotulo: "admin.item.ia", rota: "/admin/ia" },
-      { rotulo: "admin.item.verticais", rota: "/admin/verticais" },
+      { rotulo: "admin.item.equipe", rota: "/admin/equipe", icone: "pessoa" },
+      { rotulo: "admin.item.log", rota: "/admin/log", icone: "lista" },
+      { rotulo: "admin.item.ia", rota: "/admin/ia", icone: "faisca" },
+      { rotulo: "admin.item.verticais", rota: "/admin/verticais", icone: "camadas" },
     ],
   },
 ]

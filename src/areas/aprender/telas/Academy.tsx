@@ -15,6 +15,7 @@ import { useCarga } from "../useCarga"
 import { dados, foco } from "../util"
 
 // Catálogo (ACA-01): cursos publicados, filtro por trilha. O Clube vê todos; o cadeado marca o que é do Grupo.
+// Molde MasterClass (library): filtros à esquerda, grade de capas 16:9 sem moldura, nome do curso em Big Shoulders.
 export function Academy() {
   const t = useT()
   const lang = useIdioma()
@@ -29,11 +30,12 @@ export function Academy() {
 
   const trilhas = [...new Map(estado.dados.filter((c) => c.verticais).map((c) => [c.vertical_id, c.verticais!])).entries()]
   const cursos = estado.dados.filter((c) => !trilha || c.vertical_id === Number(trilha))
+  const filtro = trilhas.length > 1
   return (
     <Pagina chave="aprender.academy.titulo">
-      <div className="space-y-8">
-        {trilhas.length > 1 ? (
-          <div className="max-w-xs">
+      <div className={filtro ? "grid gap-8 lg:grid-cols-[14rem_1fr]" : ""}>
+        {filtro ? (
+          <div className="lg:sticky lg:top-16 lg:self-start">
             <Selecao rotulo={t("aprender.academy.trilha")} value={trilha} onChange={(e) => setTrilha(e.target.value)}>
               <option value="">{t("aprender.aulas.todas")}</option>
               {trilhas.map(([id, v]) => (
@@ -45,26 +47,33 @@ export function Academy() {
         {cursos.length === 0 ? (
           <Vazio>{t("aprender.academy.vazio")}</Vazio>
         ) : (
-          <ul className="grid gap-5 sm:grid-cols-2">
+          <ul className={`grid gap-x-5 gap-y-8 sm:grid-cols-2 ${filtro ? "xl:grid-cols-3" : "lg:grid-cols-3"}`}>
             {cursos.map((c) => {
               const bloqueado = !temNivel(acesso.nivel, c.nivel_minimo)
               const capa = urlCapa(c.capa_path)
               return (
-                <li key={c.id} className="overflow-hidden rounded-2xl border border-current/15 bg-superficie/25">
-                  {capa ? <img src={capa} alt="" loading="lazy" className="aspect-video w-full object-cover" /> : null}
-                  <div className="space-y-2 p-5">
-                    {c.verticais ? <p className="font-mono text-xs font-semibold tracking-[0.2em] text-destaque uppercase">{nomeVertical(c.verticais, lang)}</p> : null}
-                    <h2 className="text-xl font-semibold">
-                      <Link to={caminho(`/academy/${c.slug}`)} className={`underline-offset-4 hover:underline ${foco}`}>{c.titulo}</Link>
-                    </h2>
-                    {c.descricao ? <p className="line-clamp-3 text-sm opacity-80">{c.descricao}</p> : null}
+                <li key={c.id} className="group relative">
+                  {capa ? (
+                    <img src={capa} alt="" loading="lazy" className="aspect-video w-full rounded-md object-cover" />
+                  ) : (
+                    <div aria-hidden="true" className="flex aspect-video w-full items-center justify-center rounded-md bg-fumaca text-cinza">
+                      <Icone nome="aprender" className="size-8" />
+                    </div>
+                  )}
+                  <p className="mt-3 flex items-center gap-2 text-legenda text-nevoa">
+                    {c.verticais ? <span>{nomeVertical(c.verticais, lang)}</span> : null}
                     {bloqueado ? (
-                      <p className="flex items-center gap-2 text-sm text-destaque">
-                        <Icone nome="cadeado" className="size-4" />
+                      <span className="flex items-center gap-1">
+                        {c.verticais ? <span aria-hidden="true">·</span> : null}
+                        <Icone nome="cadeado" className="size-3.5" />
                         {t("aprender.academy.parteGrupo")}
-                      </p>
+                      </span>
                     ) : null}
-                  </div>
+                  </p>
+                  <h2 className="mt-1 font-conteudo text-subtitulo leading-none font-normal tracking-normal">
+                    <Link to={caminho(`/academy/${c.slug}`)} className={`rounded-sm underline-offset-4 group-hover:underline after:absolute after:inset-0 ${foco}`}>{c.titulo}</Link>
+                  </h2>
+                  {c.descricao ? <p className="mt-1.5 line-clamp-2 text-legenda text-nevoa">{c.descricao}</p> : null}
                 </li>
               )
             })}

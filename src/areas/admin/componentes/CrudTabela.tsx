@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react"
+import { Cartao } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Selo } from "../../../componentes/Selo"
 import { Tabela, type Coluna } from "../../../componentes/Tabela"
@@ -6,11 +7,12 @@ import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { exigirLinha, tabelaSolta, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
-import { classeAcao } from "./Campos"
+import { classeAcao, contagem } from "../lib/estilo"
 import { FormularioRegistro, type CampoDef } from "./FormularioRegistro"
 import { AvisoDe, Mostrar } from "./Pagina"
 
 type Linha = Record<string, unknown>
+const LIMITE = 500
 
 export type CrudProps = {
   tabela: string
@@ -32,6 +34,8 @@ export type CrudProps = {
   aoEditar?: (l: Linha) => Promise<Linha>
   // chamado depois de gravar/apagar (ex.: recarregar a página-mãe)
   aoMudar?: () => void
+  // "contorno" quando a tabela é secundária na tela (um primário por tela)
+  variante?: "primario" | "contorno"
 }
 
 function mostrar(c: CampoDef, l: Linha, lang: string, t: (c: Chave) => string): ReactNode {
@@ -56,7 +60,8 @@ export function CrudTabela(p: CrudProps) {
     let q = tabelaSolta(p.tabela).select(p.colunas)
     if (p.filtro) q = q.eq(p.filtro.coluna, p.filtro.valor)
     for (const o of p.ordem) q = q.order(o.coluna, { ascending: o.asc !== false })
-    const r = await q.limit(500)
+    // Busca LIMITE+1 só para saber se há mais; mostra LIMITE.
+    const r = await q.limit(LIMITE + 1)
     if (r.error) throw r.error
     return r.data ?? []
   }, [p.tabela, p.filtro?.coluna, p.filtro?.valor, p.colunas])
@@ -110,16 +115,16 @@ export function CrudTabela(p: CrudProps) {
           linhas.length === 0 ? (
             <Vazio>{t(p.vazio)}</Vazio>
           ) : (
-            <Tabela colunas={colunasTabela} linhas={linhas} id={(l) => String(l[chave])} legenda={t(p.legenda)} />
+            <Tabela colunas={colunasTabela} linhas={linhas.slice(0, LIMITE)} id={(l) => String(l[chave])} legenda={t(p.legenda)} contagem={contagem(Math.min(linhas.length, LIMITE), linhas.length > LIMITE, t)} />
           )
         }
       </Mostrar>
       <AvisoDe aviso={acao.aviso} />
       {p.podeEditar ? (
-        <div className="rounded-2xl border border-current/15 p-5">
-          <p className="mb-4 text-lg font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
-          <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
-        </div>
+        <Cartao>
+          <p className="mb-5 text-corpo-g font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
+          <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} variante={p.variante} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
+        </Cartao>
       ) : null}
       <DialogoConfirmar
         aberto={apagar !== null}

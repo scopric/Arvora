@@ -8,10 +8,10 @@ import { useT } from "../../../i18n"
 import { useAcesso, type PapelEquipe } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
-import { classeAcao } from "../componentes/Campos"
 import { AvisoDe, Mostrar, Pagina, Secao, SemPermissao } from "../componentes/Pagina"
 import { exigir, exigirLinha, useAcao, useCarga } from "../lib/consulta"
 import { SUPER, usePode } from "../lib/papel"
+import { classeAcao } from "../lib/estilo"
 
 const PAPEIS: PapelEquipe[] = ["super_admin", "editor", "corretor", "moderador", "auditor"]
 

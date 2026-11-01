@@ -7,18 +7,21 @@ import { enviarArquivo, useAcao } from "../lib/consulta"
 import { paraCarga, paraValores, type CampoDef, type Linha, type Valores } from "../lib/campos"
 import { AvisoDe } from "./Pagina"
 import { AreaTexto, Caixa } from "./Campos"
+import { classeLink } from "../lib/estilo"
 
 export type { CampoDef, OpcaoSel, Valores } from "../lib/campos"
 
 // Formulário genérico de um registro. `aoSalvar` faz a escrita (insert/update/RPC) e lança erro se falhar.
 export function FormularioRegistro({
-  campos, linha, aoSalvar, salvar, aoCancelar,
+  campos, linha, aoSalvar, salvar, aoCancelar, variante = "primario",
 }: {
   campos: CampoDef[]
   linha: Linha | null
   aoSalvar: (carga: Linha) => Promise<void>
   salvar?: Chave
   aoCancelar?: () => void
+  // "contorno" nos formulários secundários da tela: só um botão dourado por tela.
+  variante?: "primario" | "contorno"
 }) {
   const t = useT()
   const [v, setV] = useState<Valores>(() => paraValores(campos, linha))
@@ -58,7 +61,7 @@ export function FormularioRegistro({
       </div>
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-3">
-        <Botao type="submit" ocupado={acao.ocupado} className="sm:w-auto">{t(salvar ?? "admin.comum.salvar")}</Botao>
+        <Botao type="submit" variante={variante} ocupado={acao.ocupado} className="sm:w-auto">{t(salvar ?? "admin.comum.salvar")}</Botao>
         {aoCancelar ? <Botao type="button" variante="contorno" onClick={aoCancelar} className="sm:w-auto">{t("comum.cancelar")}</Botao> : null}
       </div>
     </form>
@@ -71,12 +74,12 @@ function CampoImagem({ rotulo, pasta, valor, aoMudar }: { rotulo: string; pasta:
   const acao = useAcao()
   return (
     <div>
-      <label className="mb-2 block text-sm font-semibold text-creme">
+      <label className="mb-1.5 block text-legenda font-medium text-bruma">
         {rotulo}
         <input
           type="file"
           accept="image/png,image/jpeg,image/webp"
-          className="mt-2 block w-full text-sm"
+          className="mt-2 block w-full text-legenda text-bruma"
           onChange={(e) => {
             const arq = e.target.files?.[0]
             if (arq) void acao.rodar(async () => aoMudar(await enviarArquivo("imagens", pasta, arq)), "admin.comum.enviado")
@@ -84,10 +87,10 @@ function CampoImagem({ rotulo, pasta, valor, aoMudar }: { rotulo: string; pasta:
         />
       </label>
       {valor ? (
-        <p className="mt-2 flex items-center gap-3 text-sm text-creme/70">
+        <p className="mt-2 flex items-center gap-3 text-legenda text-nevoa">
           <img src={supabase.storage.from("imagens").getPublicUrl(valor).data.publicUrl} alt="" className="size-12 rounded object-cover" />
           <span className="break-all">{valor}</span>
-          <button type="button" className="underline" onClick={() => aoMudar("")}>{t("admin.comum.remover")}</button>
+          <button type="button" className={classeLink} onClick={() => aoMudar("")}>{t("admin.comum.remover")}</button>
         </p>
       ) : null}
       <AvisoDe aviso={acao.aviso} />

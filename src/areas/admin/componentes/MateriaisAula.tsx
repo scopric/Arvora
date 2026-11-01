@@ -5,8 +5,9 @@ import { useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { abrirAssinado, enviarArquivo, exigirLinha, exigirSemDados, useAcao } from "../lib/consulta"
 import { TIPOS_MATERIAL } from "../lib/regras"
-import { AreaTexto, classeAcao } from "./Campos"
+import { AreaTexto } from "./Campos"
 import { AvisoDe } from "./Pagina"
+import { classeAcao, classeLink } from "../lib/estilo"
 
 export type Material = { id: number; tipo: "resumo" | "ebook" | "exercicios"; conteudo_md: string | null; arquivo_path: string | null; status: "rascunho" | "aprovado" }
 // Um material (resumo, e-book ou exercícios): texto e/ou PDF/EPUB no bucket `materiais/{aula_id}/`. Editar volta a rascunho (banco);
@@ -36,22 +37,22 @@ function Um({ aulaId, tipo, atual, aoMudar }: { aulaId: number; tipo: Material["
     }, "admin.aula.materialAprovado")
 
   return (
-    <div className="space-y-3 rounded-2xl border border-current/15 p-5">
+    <div className="space-y-3 rounded-xl p-5 shadow-borda">
       <div className="flex flex-wrap items-center gap-3">
-        <h3 className="text-lg font-semibold">{t(`admin.aula.material.${tipo}`)}</h3>
+        <h3 className="text-base font-semibold">{t(`admin.aula.material.${tipo}`)}</h3>
         <Selo tom={atual?.status === "aprovado" ? "destaque" : "neutro"}>{atual ? t(`admin.aula.materialStatus.${atual.status}`) : t("admin.aula.materialStatus.vazio")}</Selo>
       </div>
       <AreaTexto rotulo={t("admin.aula.materialTexto")} value={texto} onChange={(e) => setTexto(e.target.value)} />
-      <label className="block text-sm font-semibold">
+      <label className="block text-legenda font-medium text-bruma">
         {t("admin.aula.materialArquivo")}
-        <input type="file" accept="application/pdf,application/epub+zip" className="mt-2 block w-full text-sm" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
+        <input type="file" accept="application/pdf,application/epub+zip" className="mt-2 block w-full text-legenda text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
       </label>
       {atual?.arquivo_path ? (
-        <button type="button" className="text-sm underline" onClick={() => void acao.rodar(() => abrirAssinado("materiais", atual.arquivo_path!))}>{t("admin.aula.materialAbrir")}</button>
+        <button type="button" className={`inline-flex min-h-9 items-center text-legenda pointer-coarse:min-h-11 ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("materiais", atual.arquivo_path!))}>{t("admin.aula.materialAbrir")}</button>
       ) : null}
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-3">
-        <Botao type="button" ocupado={acao.ocupado} onClick={salvar} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
+        <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={salvar} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
         {atual?.status === "rascunho" ? <button type="button" disabled={acao.ocupado} className={classeAcao} onClick={aprovar}>{t("admin.aula.aprovarMaterial")}</button> : null}
       </div>
     </div>

@@ -12,6 +12,7 @@ import { exigir, useCarga } from "../lib/consulta"
 import { dataCurta } from "../lib/formato"
 import { FINANCEIRO, usePode } from "../lib/papel"
 import { VIGENTES } from "../lib/regras"
+import { classeLink } from "../lib/estilo"
 
 const PAGINA = 50
 // Membros (ADM-04): perfis + nível/status da assinatura. Pagamento só leitura; assinatura só para super_admin e auditor (RLS).
@@ -81,7 +82,7 @@ export function Membros() {
               <Tabela
                 legenda={t("admin.membros.titulo")} linhas={linhas} id={(l) => l.id}
                 colunas={[
-                  { chave: "nome", titulo: t("admin.comum.nome"), celula: (l) => <Link className="underline" to={caminho(`/admin/membros/${l.id}`)}>{l.nome}</Link> },
+                  { chave: "nome", titulo: t("admin.comum.nome"), celula: (l) => <Link className={classeLink} to={caminho(`/admin/membros/${l.id}`)}>{l.nome}</Link> },
                   { chave: "empresa", titulo: t("admin.membros.empresa"), celula: (l) => l.empresa_nome ?? "—" },
                   { chave: "local", titulo: t("admin.comum.cidade"), celula: (l) => [l.cidade, l.pais].filter(Boolean).join(", ") || "—" },
                   ...(financeiro ? [{ chave: "plano", titulo: t("admin.membros.plano"), celula: (l: (typeof linhas)[number]) => { const n = niveis.get(l.id); return n ? <Selo tom="destaque">{n.nivel ? t(`nivel.${n.nivel as "clube"}`) : "—"} · {t(`admin.assinatura.${n.status as "active"}`)}</Selo> : <Selo>{t("admin.membros.semAssinatura")}</Selo> } }] : []),

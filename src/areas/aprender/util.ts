@@ -1,3 +1,5 @@
+import { botaoContornoApp, botaoPrimarioApp } from "../../componentes/botaoEstilo"
+import { linkTextoApp } from "../../componentes/menuApp"
 import { SITE_URL } from "../../site"
 import { supabase } from "../../lib/supabase"
 
@@ -131,8 +133,15 @@ export function linhas<T>(r: { data: T[] | null; error: unknown }): T[] {
 }
 
 export const foco = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
-export const botaoLink = `inline-flex min-h-12 items-center justify-center rounded-lg bg-creme px-6 font-semibold text-fundo transition-colors hover:bg-white ${foco}`
-export const botaoContorno = `inline-flex min-h-12 items-center justify-center rounded-lg border border-creme/30 px-6 font-semibold text-creme transition-colors hover:border-creme/60 ${foco}`
-export const linkTexto = `underline underline-offset-4 hover:text-white ${foco}`
+// Botões e link de texto desta área (só existe no app): mesmo spec do Botao (botaoEstilo.ts); o link sublinha em cinza e acende no hover.
+export const botaoLink = botaoPrimarioApp
+export const botaoContorno = botaoContornoApp
+export const linkTexto = linkTextoApp
+// Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
 export const campoBase =
-  "w-full rounded-lg border border-creme/25 bg-transparent px-4 py-3 text-base text-creme outline-none transition-colors focus-visible:border-dourado focus-visible:ring-2 focus-visible:ring-dourado/40"
+  "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"
+// Cartão, caixa sutil e barra de progresso do app (molde Linear). <progress> nativo pintado: trilho fumaça, valor dourado.
+export const cartao = "rounded-xl p-5 shadow-borda"
+export const caixaSutil = "rounded-md bg-creme/2 px-4 py-3 text-base shadow-borda"
+export const barraProgresso =
+  "h-1 w-40 appearance-none overflow-hidden rounded-full bg-fumaca accent-dourado [&::-moz-progress-bar]:bg-dourado [&::-webkit-progress-bar]:bg-fumaca [&::-webkit-progress-value]:bg-dourado"

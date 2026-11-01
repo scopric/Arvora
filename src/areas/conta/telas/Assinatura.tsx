@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
-import { Cartao } from "../../../componentes/Cartao"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
@@ -12,7 +11,8 @@ import { abrirPortal } from "../../../lib/assinatura"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { dataCurta, dinheiro, prazoArrependimento } from "../formato"
-import { Pagina } from "../Pagina"
+import { Pagina, Secao } from "../Pagina"
+import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 
 type Linha = {
   status: string
@@ -63,7 +63,7 @@ export function Assinatura() {
       {estado.fase === "carregando" ? <Esqueleto linhas={4} /> : null}
       {estado.fase === "erro" ? <Erro aoTentar={() => (setEstado({ fase: "carregando" }), setTentativa(tentativa + 1))}>{t("conta.assinatura.erro")}</Erro> : null}
       {estado.fase === "pronto" && estado.a === null ? (
-        <Vazio acao={<Link to={caminho("/planos")} className="inline-flex min-h-12 items-center rounded-lg bg-creme px-6 font-semibold text-fundo hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">{t("conta.assinatura.verPlanos")}</Link>}>
+        <Vazio acao={<Link to={caminho("/planos")} className={botaoPrimarioApp}>{t("conta.assinatura.verPlanos")}</Link>}>
           {t("conta.assinatura.vazio")}
         </Vazio>
       ) : null}
@@ -92,18 +92,19 @@ function Plano({ a }: { a: Linha }) {
   const sit = situacao(a)
 
   return (
-    <Cartao>
-      <div className="flex flex-wrap items-center gap-3">
-        <h2 className="font-titulo text-2xl font-bold uppercase">{a.planos?.nome ?? t("conta.assinatura.titulo")}</h2>
-        <Selo tom={sit.tom}>{t(sit.selo)}</Selo>
-      </div>
-      <dl className="mt-5 space-y-2 text-sm">
+    <Secao titulo={a.planos?.nome ?? t("conta.assinatura.titulo")}>
+      {/* Molde Mercury (Plan & Billing): situação, preço e data em células lado a lado; "Gerenciar" abaixo. */}
+      <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-3">
+        <div>
+          <dt className="text-legenda text-nevoa">{t("conta.assinatura.situacao")}</dt>
+          <dd className="mt-1"><Selo tom={sit.tom}>{t(sit.selo)}</Selo></dd>
+        </div>
         {a.planos && !manual ? (
-          <div className="flex gap-2"><dt className="text-creme/70">{t("conta.assinatura.valor")}:</dt><dd className="font-semibold">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} / {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</dd></div>
+          <div><dt className="text-legenda text-nevoa">{t("conta.assinatura.valor")}</dt><dd className="mt-0.5 text-corpo-g font-medium">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} <span className="text-legenda text-nevoa">/ {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</span></dd></div>
         ) : null}
-        <div className="flex gap-2">
-          <dt className="text-creme/70">{t(sit.data)}:</dt>
-          <dd className="font-semibold"><time dateTime={a.periodo_fim}>{dataCurta(a.periodo_fim, idioma)}</time></dd>
+        <div>
+          <dt className="text-legenda text-nevoa">{t(sit.data)}</dt>
+          <dd className="mt-0.5 text-corpo-g font-medium tabular-nums"><time dateTime={a.periodo_fim}>{dataCurta(a.periodo_fim, idioma)}</time></dd>
         </div>
       </dl>
       {sit.aviso ? <div className="mt-5"><Aviso tipo="erro">{t(sit.aviso)}</Aviso></div> : null}
@@ -125,10 +126,10 @@ function Plano({ a }: { a: Linha }) {
           >
             {t("conta.assinatura.gerenciar")}
           </Botao>
-          <p className="mt-2 text-sm text-creme/60">{t("conta.assinatura.gerenciarAjuda")}</p>
+          <p className="mt-2 text-legenda text-nevoa">{t("conta.assinatura.gerenciarAjuda")}</p>
         </div>
       ) : null}
-    </Cartao>
+    </Secao>
   )
 }
 
@@ -141,23 +142,22 @@ function DireitoDeCancelar({ a }: { a: Linha | null }) {
   const vigenteStripe = a !== null && VIGENTES.includes(a.status) && a.origem === "stripe"
   const prazo = vigenteStripe ? prazoArrependimento(a.stripe_criada_em ?? a.criado_em) : null
   return (
-    <Cartao>
-      <h2 className="font-titulo text-2xl font-bold uppercase">{t("conta.direito.titulo")}</h2>
-      <div className="mt-4 space-y-3 text-sm text-creme/80">
+    <Secao titulo={t("conta.direito.titulo")}>
+      <div className="space-y-3 text-base text-bruma">
         <p>{t("conta.direito.p1")}</p>
         <p>{t("conta.direito.p2")}</p>
         <p>{t("conta.direito.p3")}</p>
         <p>{t("conta.direito.p4")}</p>
         {prazo ? (
-          <p className="font-semibold text-creme">
+          <p className="font-medium text-creme">
             {t(prazo.aberto ? "conta.direito.ate" : "conta.direito.passou")}
             {prazo.aberto ? <> <time dateTime={prazo.fim}>{dataCurta(prazo.fim, idioma)}</time>.</> : null}
           </p>
         ) : null}
       </div>
-      <Link to={caminho("/suporte")} className="mt-5 inline-flex min-h-11 items-center rounded-lg border border-creme/30 px-4 text-sm font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
+      <Link to={caminho("/suporte")} className={`mt-5 ${botaoContornoApp}`}>
         {t("conta.direito.suporte")}
       </Link>
-    </Cartao>
+    </Secao>
   )
 }

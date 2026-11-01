@@ -8,7 +8,9 @@ import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
-import { useIdioma, useT, useTitulo, type Chave } from "../../../i18n"
+import { useIdioma, useT, type Chave } from "../../../i18n"
+import { useEstiloCampo } from "../../../componentes/campoEstilo"
+import { PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -73,11 +75,11 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
   }
 
   return (
-    <article className={`rounded-xl border border-current/15 p-4 ${item.oculto_em ? "opacity-60" : ""}`}>
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-        <strong>{autor ?? t(item.autor_id ? "rede.comunidade.membro" : "rede.comunidade.exMembro")}</strong>
-        <time dateTime={item.criado_em} className="opacity-60">{quando(item.criado_em, idioma)}</time>
-        {item.editado_em ? <span className="opacity-60">{t("rede.comunidade.editado")}</span> : null}
+    <article className={`${tipo === "posts" ? "rounded-xl p-4 shadow-borda" : "border-t border-grafite pt-3 first:border-t-0 first:pt-0"} ${item.oculto_em ? "opacity-60" : ""}`}>
+      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 text-legenda">
+        <strong className="text-creme">{autor ?? t(item.autor_id ? "rede.comunidade.membro" : "rede.comunidade.exMembro")}</strong>
+        <time dateTime={item.criado_em} className="text-nevoa">{quando(item.criado_em, idioma)}</time>
+        {item.editado_em ? <span className="text-nevoa">{t("rede.comunidade.editado")}</span> : null}
         {item.oculto_em ? <Selo tom="alerta">{t("rede.comunidade.emAnalise")}</Selo> : null}
       </header>
       {editando ? (
@@ -85,19 +87,19 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
           <label htmlFor={`ed-${tipo}-${item.id}`} className="sr-only">{t("rede.comunidade.editar")}</label>
           <textarea id={`ed-${tipo}-${item.id}`} name="corpo" defaultValue={item.corpo} rows={3} maxLength={tipo === "posts" ? 5000 : 2000} required className={campoTexto} />
           <div className="flex gap-3">
-            <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("rede.comunidade.salvar")}</Botao>
+            <Botao type="submit" variante="contorno" ocupado={ocupado} className="sm:w-auto">{t("rede.comunidade.salvar")}</Botao>
             <Botao type="button" variante="contorno" onClick={() => setEditando(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>
           </div>
         </form>
       ) : (
-        <p className="mt-3 whitespace-pre-wrap break-words">{item.corpo}</p>
+        <p className="mt-2 text-base break-words whitespace-pre-wrap">{item.corpo}</p>
       )}
       {erro ? <div className="mt-3"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
       {!editando ? (
         <div className="mt-3 flex flex-wrap gap-2">
-          {podeEditar ? <Botao variante="contorno" onClick={() => setEditando(true)} aria-label={`${t("rede.comunidade.editar")} ${quem}`} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.editar")}</Botao> : null}
-          {meu && !item.oculto_em ? <Botao variante="contorno" onClick={() => setApagando(true)} aria-label={`${t("rede.comunidade.apagar")} ${quem}`} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.apagar")}</Botao> : null}
-          {!meu && item.autor_id ? <Botao variante="contorno" onClick={() => setDenunciando(true)} aria-label={`${t("rede.comunidade.denunciar")} ${quem}`} className="min-h-11 w-auto px-4 text-sm">{t("rede.comunidade.denunciar")}</Botao> : null}
+          {podeEditar ? <Botao variante="contorno" onClick={() => setEditando(true)} aria-label={`${t("rede.comunidade.editar")} ${quem}`}>{t("rede.comunidade.editar")}</Botao> : null}
+          {meu && !item.oculto_em ? <Botao variante="contorno" onClick={() => setApagando(true)} aria-label={`${t("rede.comunidade.apagar")} ${quem}`}>{t("rede.comunidade.apagar")}</Botao> : null}
+          {!meu && item.autor_id ? <Botao variante="contorno" onClick={() => setDenunciando(true)} aria-label={`${t("rede.comunidade.denunciar")} ${quem}`}>{t("rede.comunidade.denunciar")}</Botao> : null}
         </div>
       ) : null}
       <DialogoConfirmar aberto={apagando} titulo={t("rede.comunidade.apagarTitulo")} texto={t("rede.comunidade.apagarTexto")} confirmar={t("rede.comunidade.apagar")} perigo aoConfirmar={() => void apagar()} aoCancelar={() => setApagando(false)} />
@@ -107,11 +109,13 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
 }
 
 // Caixa de texto + Publicar (post novo ou comentário).
-function Caixa({ rotulo, botao, maximo, aoEnviar }: { rotulo: string; botao: string; maximo: number; aoEnviar: (corpo: string) => Promise<boolean> }) {
+// `primario`: a caixa de post novo é o único botão dourado da tela; a de comentário fica em contorno, dentro do post.
+function Caixa({ rotulo, botao, maximo, aoEnviar, primario }: { rotulo: string; botao: string; maximo: number; aoEnviar: (corpo: string) => Promise<boolean>; primario?: boolean }) {
   const t = useT()
   const [erro, setErro] = useState(false)
   const [ocupado, setOcupado] = useState(false)
   const id = useId()
+  const campo = useEstiloCampo()
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = e.currentTarget
@@ -125,11 +129,11 @@ function Caixa({ rotulo, botao, maximo, aoEnviar }: { rotulo: string; botao: str
     if (feito) form.reset()
   }
   return (
-    <form onSubmit={enviar} className="space-y-3">
-      <label htmlFor={id} className="block text-sm font-semibold">{rotulo}</label>
+    <form onSubmit={enviar} className={`space-y-3 ${primario ? "rounded-xl p-4 shadow-borda" : ""}`}>
+      <label htmlFor={id} className={campo.rotulo}>{rotulo}</label>
       <textarea id={id} name="corpo" rows={3} maxLength={maximo} required className={campoTexto} />
       {erro ? <Aviso tipo="erro">{t("rede.comunidade.erroPublicar")}</Aviso> : null}
-      <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{botao}</Botao>
+      <div className="flex justify-end"><Botao type="submit" variante={primario ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto">{botao}</Botao></div>
     </form>
   )
 }
@@ -145,7 +149,7 @@ function Comentarios({ postId, uid }: { postId: number; uid: string }) {
   if (estado.fase === "carregando") return <Esqueleto linhas={2} />
   if (estado.fase === "erro") return <Erro aoTentar={recarregar}>{t("rede.comunidade.erroComentarios")}</Erro>
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 border-l-2 border-grafite pl-4">
       {estado.dados.lista.map((c) => (
         <Mensagem key={c.id} tipo="comentarios" item={c} autor={estado.dados.autores.get(c.autor_id ?? "")?.nome ?? null} uid={uid} aoMudar={recarregar} />
       ))}
@@ -170,8 +174,8 @@ function Post({ item, autor, uid, aoMudar }: { item: Item; autor: string | null;
     <li className="space-y-3">
       <Mensagem tipo="posts" item={item} autor={autor} uid={uid} aoMudar={aoMudar} />
       {!item.oculto_em ? (
-        <div className="pl-4 sm:pl-8">
-          <Botao variante="contorno" aria-expanded={aberto} onClick={() => setAberto(!aberto)} className="min-h-11 w-auto px-4 text-sm">
+        <div className="pl-4">
+          <Botao variante="contorno" aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
             {t(aberto ? "rede.comunidade.fecharComentarios" : "rede.comunidade.verComentarios")}
           </Botao>
           {aberto ? <div className="mt-3"><Comentarios postId={item.id} uid={uid} /></div> : null}
@@ -194,6 +198,7 @@ function Espaco({ espacoId, uid }: { espacoId: number; uid: string }) {
         rotulo={t("rede.comunidade.novoPost")}
         botao={t("rede.comunidade.publicar")}
         maximo={5000}
+        primario
         aoEnviar={async (corpo) => {
           const { error } = await supabase.from("posts").insert({ espaco_id: espacoId, corpo }).select("id")
           if (!error) recarregar()
@@ -204,7 +209,7 @@ function Espaco({ espacoId, uid }: { espacoId: number; uid: string }) {
       {estado.fase === "erro" ? <Erro aoTentar={recarregar}>{t("rede.comunidade.erroPosts")}</Erro> : null}
       {estado.fase === "pronto" && estado.dados.lista.length === 0 ? <Vazio>{t("rede.comunidade.vazio")}</Vazio> : null}
       {estado.fase === "pronto" && estado.dados.lista.length > 0 ? (
-        <ul className="space-y-6">
+        <ul className="space-y-4">
           {estado.dados.lista.map((p) => (
             <Post key={p.id} item={p} autor={estado.dados.autores.get(p.autor_id ?? "")?.nome ?? null} uid={uid} aoMudar={recarregar} />
           ))}
@@ -217,7 +222,6 @@ function Espaco({ espacoId, uid }: { espacoId: number; uid: string }) {
 export function Comunidade() {
   const t = useT()
   const idioma = useIdioma()
-  useTitulo("rede.comunidade.titulo")
   const acesso = useAcesso()
   const { sessao } = useAuth()
   const uid = sessao?.user.id ?? ""
@@ -242,12 +246,11 @@ export function Comunidade() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <h1 className="font-titulo text-4xl font-medium">{t("rede.comunidade.titulo")}</h1>
-      <details className="mt-4 rounded-xl border border-current/15 px-4 py-3">
-        <summary className="min-h-11 cursor-pointer py-2 font-semibold">{t("rede.comunidade.regrasTitulo")}</summary>
+    <PaginaApp chave="rede.comunidade.titulo" estreita>
+      <details className="rounded-md bg-creme/2 px-4 py-1 shadow-borda">
+        <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11">{t("rede.comunidade.regrasTitulo")}</summary>
         {/* PROVISÓRIO: regras de convivência a validar pelo cliente (PRD COM-02) */}
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-85">
+        <ul className="mt-1 mb-3 list-disc space-y-1 pl-5 text-base text-bruma">
           <li>{t("rede.comunidade.regra1")}</li>
           <li>{t("rede.comunidade.regra2")}</li>
           <li>{t("rede.comunidade.regra3")}</li>
@@ -255,6 +258,6 @@ export function Comunidade() {
         </ul>
       </details>
       <div className="mt-8">{corpo}</div>
-    </div>
+    </PaginaApp>
   )
 }

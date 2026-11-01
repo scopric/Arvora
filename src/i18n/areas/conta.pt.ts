@@ -98,6 +98,7 @@ export const contaPt = {
   "conta.assinatura.erro": "Não conseguimos carregar sua assinatura agora. Tente de novo.",
   "conta.assinatura.vazio": "Você ainda não tem uma assinatura.",
   "conta.assinatura.verPlanos": "Ver planos",
+  "conta.assinatura.situacao": "Situação",
   "conta.assinatura.estado.ativa": "Ativa",
   "conta.assinatura.estado.pendente": "Pagamento pendente",
   "conta.assinatura.estado.cancelada": "Cancelada",

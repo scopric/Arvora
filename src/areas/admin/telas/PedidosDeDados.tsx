@@ -36,7 +36,7 @@ function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
       <AreaTexto rotulo={t("admin.pedidos.observacao")} rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-2">
-        <Botao type="button" ocupado={acao.ocupado} onClick={() => void salvar(status)} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
+        <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={() => void salvar(status)} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
         {p.status !== "concluido" ? <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => void salvar("concluido")} className="sm:w-auto">{t("admin.pedidos.atendido")}</Botao> : null}
       </div>
     </div>

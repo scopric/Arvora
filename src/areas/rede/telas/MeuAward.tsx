@@ -3,12 +3,14 @@ import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
 import { Campo } from "../../../componentes/Campo"
-import { Cartao } from "../../../componentes/Cartao"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
-import { useCaminho, useIdioma, useT, useTitulo, type Chave } from "../../../i18n"
+import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
+import { useEstiloCampo } from "../../../componentes/campoEstilo"
+import { linkTextoApp } from "../../../componentes/menuApp"
+import { PaginaApp } from "../../../componentes/PaginaApp"
 import { useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -19,12 +21,14 @@ type Pendente = { alteracao_pendente: { historia?: string; materia_url?: string;
 
 const COLUNAS = "id, edicao_id, categoria_id, nome, foto_path, historia, video_entrevista_id, video_premiacao_id, materia_url, publicado_em"
 
-function Premio({ p, edicao, categoria, pendente, aoMudar }: {
+// `primario`: com mais de um prêmio, só o primeiro tem o botão dourado (um primário por tela).
+function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
   p: { id: number; nome: string; foto_path: string | null; historia: string | null; video_entrevista_id: string | null; video_premiacao_id: string | null; materia_url: string | null; publicado_em: string | null }
   edicao: string
   categoria: string
   pendente: Pendente
   aoMudar: () => void
+  primario: boolean
 }) {
   const t = useT()
   const idioma = useIdioma()
@@ -32,6 +36,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar }: {
   const [erro, setErro] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
   const [enviado, setEnviado] = useState(false)
+  const campo = useEstiloCampo()
   const foto = p.foto_path ? supabase.storage.from("imagens").getPublicUrl(p.foto_path).data.publicUrl : null
   const pend = pendente.alteracao_pendente
 
@@ -59,56 +64,60 @@ function Premio({ p, edicao, categoria, pendente, aoMudar }: {
   return (
     <div className="space-y-6">
       <section aria-labelledby={`pv-${p.id}`}>
-        <h2 id={`pv-${p.id}`} className="font-mono text-xs font-semibold tracking-[0.2em] text-dourado uppercase">{t("rede.meuAward.previa")}</h2>
-        <Cartao className="mt-3 space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <Selo tom="dourado">{t("selo.premiado")}</Selo>
-            <Selo tom={p.publicado_em ? "destaque" : "neutro"}>{t(p.publicado_em ? "rede.meuAward.publicado" : "rede.meuAward.naoPublicado")}</Selo>
-          </div>
-          {foto ? <img src={foto} alt={`${t("rede.meuAward.fotoDe")} ${p.nome}`} className="max-h-72 rounded-xl object-cover" /> : <p className="text-sm opacity-70">{t("rede.meuAward.semFoto")}</p>}
-          <div>
-            <h3 className="font-titulo text-3xl font-medium">{p.nome}</h3>
-            <p className="text-dourado">{categoria} · {edicao}</p>
-          </div>
-          {p.historia ? <p className="whitespace-pre-wrap">{p.historia}</p> : <p className="text-sm opacity-70">{t("rede.meuAward.semHistoria")}</p>}
-          <dl className="grid gap-2 text-sm sm:grid-cols-3">
-            <div><dt className="font-semibold">{t("rede.meuAward.videoEntrevista")}</dt><dd className="opacity-80">{t(p.video_entrevista_id ? "rede.meuAward.cadastrado" : "rede.meuAward.naoCadastrado")}</dd></div>
-            <div><dt className="font-semibold">{t("rede.meuAward.videoPremiacao")}</dt><dd className="opacity-80">{t(p.video_premiacao_id ? "rede.meuAward.cadastrado" : "rede.meuAward.naoCadastrado")}</dd></div>
-            <div>
-              <dt className="font-semibold">{t("rede.meuAward.materia")}</dt>
-              <dd>{p.materia_url?.startsWith("https://") ? <a href={p.materia_url} rel="noopener noreferrer" className="underline">{t("rede.meuAward.abrirMateria")}</a> : <span className="opacity-80">{t("rede.meuAward.naoCadastrada")}</span>}</dd>
+        <h2 id={`pv-${p.id}`} className="text-legenda font-medium text-nevoa">{t("rede.meuAward.previa")}</h2>
+        {/* Molde MasterClass (herói da classe): capa larga, nome em Big Shoulders, categoria · edição em dourado, selos. */}
+        <div className="relative mt-3 overflow-hidden rounded-xl after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:shadow-borda">
+          {foto ? <img src={foto} alt={`${t("rede.meuAward.fotoDe")} ${p.nome}`} className="aspect-video w-full object-cover" /> : null}
+          <div className="space-y-5 p-5 sm:p-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <Selo tom="dourado">{t("selo.premiado")}</Selo>
+              <Selo tom={p.publicado_em ? "destaque" : "neutro"}>{t(p.publicado_em ? "rede.meuAward.publicado" : "rede.meuAward.naoPublicado")}</Selo>
             </div>
-          </dl>
-        </Cartao>
+            <div>
+              <h3 className="font-conteudo text-titulo-p leading-none font-normal tracking-normal text-balance sm:text-titulo">{p.nome}</h3>
+              <p className="mt-2 text-legenda font-medium text-dourado">{categoria} · {edicao}</p>
+            </div>
+            {!foto ? <p className="text-legenda text-nevoa">{t("rede.meuAward.semFoto")}</p> : null}
+            {p.historia ? <p className="max-w-prose text-base whitespace-pre-wrap">{p.historia}</p> : <p className="text-base text-nevoa">{t("rede.meuAward.semHistoria")}</p>}
+            <dl className="grid gap-4 border-t border-grafite pt-5 sm:grid-cols-3">
+              <div><dt className="text-legenda text-nevoa">{t("rede.meuAward.videoEntrevista")}</dt><dd className="mt-0.5 text-base">{t(p.video_entrevista_id ? "rede.meuAward.cadastrado" : "rede.meuAward.naoCadastrado")}</dd></div>
+              <div><dt className="text-legenda text-nevoa">{t("rede.meuAward.videoPremiacao")}</dt><dd className="mt-0.5 text-base">{t(p.video_premiacao_id ? "rede.meuAward.cadastrado" : "rede.meuAward.naoCadastrado")}</dd></div>
+              <div>
+                <dt className="text-legenda text-nevoa">{t("rede.meuAward.materia")}</dt>
+                <dd className="mt-0.5 text-base">{p.materia_url?.startsWith("https://") ? <a href={p.materia_url} rel="noopener noreferrer" className={linkTextoApp}>{t("rede.meuAward.abrirMateria")}</a> : <span>{t("rede.meuAward.naoCadastrada")}</span>}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
       </section>
 
       {pend ? (
-        <section aria-labelledby={`an-${p.id}`} className="rounded-2xl border border-destaque/50 p-5">
-          <h2 id={`an-${p.id}`} className="flex items-center gap-3 text-lg font-semibold"><Selo tom="destaque">{t("rede.meuAward.emAnalise")}</Selo>{pendente.alteracao_em ? <span className="text-sm font-normal opacity-70">{quando(pendente.alteracao_em, idioma)}</span> : null}</h2>
-          <p className="mt-2 text-sm opacity-85">{t("rede.meuAward.emAnaliseTexto")}</p>
-          {pend.historia ? <p className="mt-3 whitespace-pre-wrap text-sm"><strong>{t("rede.meuAward.historia")}: </strong>{pend.historia}</p> : null}
-          {pend.materia_url ? <p className="mt-2 text-sm break-all"><strong>{t("rede.meuAward.materia")}: </strong>{pend.materia_url}</p> : null}
+        <section aria-labelledby={`an-${p.id}`} className="rounded-xl p-5 shadow-borda">
+          <h2 id={`an-${p.id}`} className="flex items-center gap-3 text-base font-semibold"><Selo tom="destaque">{t("rede.meuAward.emAnalise")}</Selo>{pendente.alteracao_em ? <span className="text-legenda font-normal text-nevoa">{quando(pendente.alteracao_em, idioma)}</span> : null}</h2>
+          <p className="mt-2 text-base text-bruma">{t("rede.meuAward.emAnaliseTexto")}</p>
+          {pend.historia ? <p className="mt-3 text-base whitespace-pre-wrap"><strong>{t("rede.meuAward.historia")}: </strong>{pend.historia}</p> : null}
+          {pend.materia_url ? <p className="mt-2 text-base break-all"><strong>{t("rede.meuAward.materia")}: </strong>{pend.materia_url}</p> : null}
         </section>
       ) : null}
       {enviado && !pend ? <Aviso tipo="ok">{t("rede.meuAward.enviado")}</Aviso> : null}
 
       {editando ? (
-        <form onSubmit={pedir} className="space-y-5 rounded-2xl border border-current/15 p-5">
-          <h2 className="text-lg font-semibold">{t("rede.meuAward.pedirAlteracao")}</h2>
-          <p className="text-sm opacity-80">{t(pend ? "rede.meuAward.substitui" : "rede.meuAward.passaPorAprovacao")}</p>
+        <form onSubmit={pedir} className="space-y-5 rounded-xl p-5 shadow-borda">
+          <h2 className="text-corpo-g font-semibold">{t("rede.meuAward.pedirAlteracao")}</h2>
+          <p className="text-base text-bruma">{t(pend ? "rede.meuAward.substitui" : "rede.meuAward.passaPorAprovacao")}</p>
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
           <div>
-            <label htmlFor={`hi-${p.id}`} className="mb-2 block text-sm font-semibold">{t("rede.meuAward.historia")}</label>
+            <label htmlFor={`hi-${p.id}`} className={campo.rotulo}>{t("rede.meuAward.historia")}</label>
             <textarea id={`hi-${p.id}`} name="historia" rows={6} maxLength={10000} defaultValue={pend?.historia ?? p.historia ?? ""} className={campoTexto} />
           </div>
           <Campo rotulo={t("rede.meuAward.materia")} name="materia_url" type="url" maxLength={500} defaultValue={pend?.materia_url ?? p.materia_url ?? ""} placeholder="https://" ajuda={t("rede.meuAward.materiaAjuda")} />
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Botao type="button" variante="contorno" onClick={() => setEditando(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>
-            <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("rede.meuAward.enviarPedido")}</Botao>
+            <Botao type="submit" variante={primario ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto">{t("rede.meuAward.enviarPedido")}</Botao>
           </div>
         </form>
       ) : (
-        <Botao onClick={() => { setEditando(true); setEnviado(false) }} className="sm:w-auto">{t("rede.meuAward.pedirAlteracao")}</Botao>
+        <Botao variante={primario ? "primario" : "contorno"} onClick={() => { setEditando(true); setEnviado(false) }} className="sm:w-auto">{t("rede.meuAward.pedirAlteracao")}</Botao>
       )}
     </div>
   )
@@ -117,7 +126,6 @@ function Premio({ p, edicao, categoria, pendente, aoMudar }: {
 export function MeuAward() {
   const t = useT()
   const caminho = useCaminho()
-  useTitulo("rede.meuAward.titulo")
   const acesso = useAcesso()
   const { sessao } = useAuth()
   const uid = sessao?.user.id ?? ""
@@ -142,10 +150,9 @@ export function MeuAward() {
   // Sem registro de premiado a rota não existe (PRD 17.4.3): 404 dentro do layout, sem outro <main>.
   if (!acesso.carregando && !acesso.erro && !acesso.premiado)
     return (
-      <div className="mx-auto max-w-3xl px-6 py-24">
-        <h1 className="font-titulo text-4xl">{t("sistema.naoEncontrada")}</h1>
-        <Link to={caminho("/inicio")} className="mt-8 inline-block underline">{t("sistema.voltar")}</Link>
-      </div>
+      <PaginaApp chave="rede.meuAward.titulo" titulo={t("sistema.naoEncontrada")} estreita>
+        <Link to={caminho("/inicio")} className={linkTextoApp}>{t("sistema.voltar")}</Link>
+      </PaginaApp>
     )
 
   let corpo
@@ -156,16 +163,14 @@ export function MeuAward() {
   else
     corpo = (
       <div className="space-y-12">
-        {estado.dados.map((x) => (
-          <Premio key={x.p.id} p={x.p} edicao={x.edicao} categoria={x.categoria} pendente={x.pendente} aoMudar={recarregar} />
+        {estado.dados.map((x, i) => (
+          <Premio key={x.p.id} p={x.p} edicao={x.edicao} categoria={x.categoria} pendente={x.pendente} aoMudar={recarregar} primario={i === 0} />
         ))}
       </div>
     )
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <h1 className="font-titulo text-4xl font-medium">{t("rede.meuAward.titulo")}</h1>
-      <p className="mt-2 opacity-75">{t("rede.meuAward.intro")}</p>
-      <div className="mt-8">{corpo}</div>
-    </div>
+    <PaginaApp chave="rede.meuAward.titulo" intro={t("rede.meuAward.intro")} estreita>
+      {corpo}
+    </PaginaApp>
   )
 }

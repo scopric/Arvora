@@ -9,6 +9,7 @@ import { AvisoDe, Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
 import { abrirAssinado, exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { CORRIGE, usePode } from "../lib/papel"
+import { classeLink } from "../lib/estilo"
 
 type Entrega = { id: number; exercicio_id: number; perfil_id: string; texto: string | null; arquivo_path: string | null; enviada_em: string }
 
@@ -30,19 +31,19 @@ function Item({ e, titulo, membro, enunciado, aoMudar }: { e: Entrega; titulo: s
   const dias = Math.max(0, Math.floor((agora - Date.parse(e.enviada_em)) / 86400000))
   return (
     <Cartao>
-      <h2 className="text-lg font-semibold">{membro} · {titulo}</h2>
-      <p className="mt-1 text-sm opacity-75">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}</p>
-      <p className="mt-3 text-sm opacity-75">{enunciado}</p>
+      <h2 className="text-base font-semibold">{membro} · {titulo}</h2>
+      <p className="mt-1 text-legenda text-nevoa">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}</p>
+      <p className="mt-3 text-base text-bruma">{enunciado}</p>
       {e.texto ? <p className="mt-3 whitespace-pre-wrap">{e.texto}</p> : null}
       {e.arquivo_path ? (
-        <button type="button" className="mt-3 text-sm underline" onClick={() => void acao.rodar(() => abrirAssinado("entregas", e.arquivo_path!))}>{t("admin.correcao.abrirArquivo")}</button>
+        <button type="button" className={`mt-3 inline-flex min-h-9 items-center text-legenda pointer-coarse:min-h-11 ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("entregas", e.arquivo_path!))}>{t("admin.correcao.abrirArquivo")}</button>
       ) : null}
       <div className="mt-4">
         <AreaTexto rotulo={t("admin.correcao.devolutiva")} rows={3} value={devolutiva} erro={erro} onChange={(x) => setDevolutiva(x.target.value)} />
       </div>
       <div className="mt-3"><AvisoDe aviso={acao.aviso} /></div>
       <div className="mt-3 flex flex-wrap gap-3">
-        <Botao type="button" ocupado={acao.ocupado} onClick={() => corrigir("aprovada")} className="sm:w-auto">{t("admin.correcao.aprovar")}</Botao>
+        <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={() => corrigir("aprovada")} className="sm:w-auto">{t("admin.correcao.aprovar")}</Botao>
         <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => corrigir("ajustar")} className="sm:w-auto">{t("admin.correcao.pedirAjuste")}</Botao>
       </div>
     </Cartao>
