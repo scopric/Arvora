@@ -15,11 +15,21 @@ export function Pagina({ titulo, intro, acoes, children }: { titulo: Chave; intr
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t(titulo)}</h1>
-          {intro ? <p className="mt-3 max-w-prose opacity-75">{t(intro)}</p> : null}
+          {intro ? <p className="mt-3 max-w-prose text-base text-nevoa">{t(intro)}</p> : null}
         </div>
         {acoes}
       </div>
       <div className="mt-8 space-y-8">{children}</div>
+    </div>
+  )
+}
+
+// Barra acima de uma tabela (molde Attio/Linear): filtros e busca à esquerda, ações à direita (o primário fica aqui).
+export function Barra({ acoes, children }: { acoes?: ReactNode; children?: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end gap-3">{children}</div>
+      {acoes ? <div className="flex flex-wrap gap-2">{acoes}</div> : null}
     </div>
   )
 }

@@ -24,6 +24,8 @@ export const adminPt = {
   "admin.log.titulo": "Log de ações",
   "admin.ia.titulo": "Revisão de IA",
   "admin.comum.acoes": "Ações",
+  "admin.comum.linha": "linha",
+  "admin.comum.linhas": "linhas",
   "admin.comum.apagado": "Registro apagado.",
   "admin.comum.apagar": "Apagar",
   "admin.comum.apagarTexto": "O registro some do banco. Isto não pode ser desfeito.",

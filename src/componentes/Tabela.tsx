@@ -26,8 +26,8 @@ const app = {
 }
 
 // Tabela simples: <table> de verdade (cabeçalho com scope), rolagem lateral no celular dentro de região focável (teclado alcança).
-// `id` da linha para a key; `legenda` fica visível para leitor de tela (sr-only).
-export function Tabela<L>({ colunas, linhas, id, legenda }: { colunas: Coluna<L>[]; linhas: L[]; id: (linha: L) => string | number; legenda: string }) {
+// `id` da linha para a key; `legenda` fica visível para leitor de tela (sr-only). `contagem` = rodapé "N linhas" (molde Attio), só no app.
+export function Tabela<L>({ colunas, linhas, id, legenda, contagem }: { colunas: Coluna<L>[]; linhas: L[]; id: (linha: L) => string | number; legenda: string; contagem?: string }) {
   const t = useT()
   const e = useApp() ? app : publico
   return (
@@ -55,6 +55,7 @@ export function Tabela<L>({ colunas, linhas, id, legenda }: { colunas: Coluna<L>
           ))}
         </tbody>
       </table>
+      {contagem ? <p className="border-t border-grafite px-4 py-2 text-xs text-nevoa tabular-nums">{contagem}</p> : null}
     </div>
   )
 }

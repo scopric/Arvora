@@ -1,5 +1,5 @@
 import { Link } from "react-router"
-import { Cartao } from "../../../componentes/Cartao"
+import { focoApp } from "../../../componentes/menuApp"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useT, type Chave } from "../../../i18n"
 import type { PapelEquipe } from "../../../lib/acesso"
@@ -13,7 +13,8 @@ import { useAcesso } from "../../../lib/acesso"
 type CartaoDef = { chave: string; titulo: Chave; rota: string; papeis: PapelEquipe[]; contar: () => PromiseLike<{ count: number | null; error: unknown }> }
 const contar = { count: "exact", head: true } as const
 
-// Visão geral: o que está esperando alguém da equipe. Cada cartão só aparece para o papel que pode agir nele.
+// Visão geral: o que está esperando alguém da equipe. Cada célula só aparece para o papel que pode agir nela.
+// Molde Polar/Stripe: um painel só, dividido em células por hairline; número grande 510, rótulo 13px.
 export function VisaoGeral() {
   const t = useT()
   const caminho = useCaminho()
@@ -42,14 +43,16 @@ export function VisaoGeral() {
           lista.every((c) => c.n === 0) ? (
             <Vazio>{t("admin.vazio.nada")}</Vazio>
           ) : (
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid overflow-hidden rounded-xl shadow-borda sm:grid-cols-2 lg:grid-cols-3">
               {lista.map((c) => (
-                <li key={c.chave}>
-                  <Cartao>
-                    <p className="text-titulo font-medium tabular-nums">{c.n}</p>
-                    <p className="mt-3">{t(c.titulo)}</p>
-                    <Link className="mt-4 inline-flex min-h-11 items-center underline" to={caminho(c.rota)}>{t("admin.visao.abrir")}</Link>
-                  </Cartao>
+                // Células por hairline (border-b/r de cada li coincide com o inset da moldura; o espaço que sobra na última linha fica carvão).
+                // A célula inteira é clicável (link esticado por ::after); o foco contorna a célula, não só o texto.
+                <li key={c.chave} className="relative border-r border-b border-grafite p-5 transition-colors has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-dourado hover:bg-obsidiana">
+                  <p className="text-legenda font-medium text-nevoa">{t(c.titulo)}</p>
+                  <p className="mt-2 text-titulo-p font-medium tabular-nums">{c.n}</p>
+                  <Link className={`mt-3 inline-flex min-h-9 items-center gap-1 text-legenda font-medium text-bruma after:absolute after:inset-0 ${focoApp} focus-visible:outline-none`} to={caminho(c.rota)}>
+                    {t("admin.visao.abrir")} <span aria-hidden="true">→</span>
+                  </Link>
                 </li>
               ))}
             </ul>

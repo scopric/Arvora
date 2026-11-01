@@ -1,3 +1,4 @@
+import { botaoApp } from "../../componentes/botaoEstilo"
 import { SITE_URL } from "../../site"
 import { supabase } from "../../lib/supabase"
 
@@ -131,9 +132,10 @@ export function linhas<T>(r: { data: T[] | null; error: unknown }): T[] {
 }
 
 export const foco = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
-export const botaoLink = `inline-flex min-h-12 items-center justify-center rounded-lg bg-creme px-6 font-semibold text-fundo transition-colors hover:bg-white ${foco}`
-export const botaoContorno = `inline-flex min-h-12 items-center justify-center rounded-lg border border-creme/30 px-6 font-semibold text-creme transition-colors hover:border-creme/60 ${foco}`
-export const linkTexto = `underline underline-offset-4 hover:text-white ${foco}`
+// Botões e link de texto desta área (só existe no app): mesmo spec do Botao (botaoEstilo.ts); o link sublinha em cinza e acende no hover.
+export const botaoLink = `${botaoApp.base} ${botaoApp.primario}`
+export const botaoContorno = `${botaoApp.base} ${botaoApp.contorno}`
+export const linkTexto = `rounded-sm font-medium text-creme underline decoration-cinza underline-offset-4 transition-colors hover:decoration-creme ${foco}`
 // Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
 export const campoBase =
   "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"

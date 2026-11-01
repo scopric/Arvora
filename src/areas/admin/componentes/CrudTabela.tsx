@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react"
+import { Cartao } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Selo } from "../../../componentes/Selo"
 import { Tabela, type Coluna } from "../../../componentes/Tabela"
@@ -110,16 +111,16 @@ export function CrudTabela(p: CrudProps) {
           linhas.length === 0 ? (
             <Vazio>{t(p.vazio)}</Vazio>
           ) : (
-            <Tabela colunas={colunasTabela} linhas={linhas} id={(l) => String(l[chave])} legenda={t(p.legenda)} />
+            <Tabela colunas={colunasTabela} linhas={linhas} id={(l) => String(l[chave])} legenda={t(p.legenda)} contagem={`${linhas.length} ${t(linhas.length === 1 ? "admin.comum.linha" : "admin.comum.linhas")}`} />
           )
         }
       </Mostrar>
       <AvisoDe aviso={acao.aviso} />
       {p.podeEditar ? (
-        <div className="rounded-2xl border border-current/15 p-5">
-          <p className="mb-4 text-lg font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
+        <Cartao>
+          <h2 className="mb-5 text-corpo-g font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</h2>
           <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
-        </div>
+        </Cartao>
       ) : null}
       <DialogoConfirmar
         aberto={apagar !== null}

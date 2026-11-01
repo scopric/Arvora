@@ -6,8 +6,8 @@ import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { classeAcao } from "../componentes/Campos"
-import { Mostrar, Pagina } from "../componentes/Pagina"
+import { classeAcaoPrimaria, classeLink } from "../componentes/Campos"
+import { Barra, Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { EDITA, usePode } from "../lib/papel"
@@ -27,29 +27,29 @@ export function Aulas() {
     return { aulas: exigir(aulas), verticais: exigir(verticais) }
   }, [])
   return (
-    <Pagina
-      titulo="admin.aulas.titulo" intro="admin.aulas.intro"
-      acoes={pode ? <Link className={classeAcao} to={caminho("/admin/aulas/nova")}>{t("admin.aulas.nova")}</Link> : null}
-    >
+    <Pagina titulo="admin.aulas.titulo" intro="admin.aulas.intro">
       <Mostrar carga={carga}>
         {({ aulas, verticais }) => {
           const nomeVertical = new Map(verticais.map((v) => [v.id, v.nome]))
           const linhas = aulas.filter((a) => !filtro || estadoAula(a) === filtro)
           return (
             <>
-              <div className="max-w-xs">
-                <Selecao rotulo={t("admin.aulas.filtroEstado")} value={filtro} onChange={(e) => setFiltro(e.target.value)}>
-                  <option value="">{t("admin.comum.todos")}</option>
-                  {(["rascunho", "agendada", "publicados"] as const).map((e) => <option key={e} value={e}>{t(`admin.aulas.estado.${e}`)}</option>)}
-                </Selecao>
-              </div>
+              <Barra acoes={pode ? <Link className={classeAcaoPrimaria} to={caminho("/admin/aulas/nova")}>{t("admin.aulas.nova")}</Link> : null}>
+                <div className="w-56">
+                  <Selecao rotulo={t("admin.aulas.filtroEstado")} value={filtro} onChange={(e) => setFiltro(e.target.value)}>
+                    <option value="">{t("admin.comum.todos")}</option>
+                    {(["rascunho", "agendada", "publicados"] as const).map((e) => <option key={e} value={e}>{t(`admin.aulas.estado.${e}`)}</option>)}
+                  </Selecao>
+                </div>
+              </Barra>
               {linhas.length === 0 ? (
                 <Vazio>{t("admin.aulas.vazio")}</Vazio>
               ) : (
                 <Tabela
                   legenda={t("admin.aulas.titulo")} linhas={linhas} id={(l) => l.id}
+                  contagem={`${linhas.length} ${t(linhas.length === 1 ? "admin.comum.linha" : "admin.comum.linhas")}`}
                   colunas={[
-                    { chave: "titulo", titulo: t("admin.comum.titulo"), celula: (l) => <Link className="underline" to={caminho(`/admin/aulas/${l.id}`)}>{l.titulo}</Link> },
+                    { chave: "titulo", titulo: t("admin.comum.titulo"), celula: (l) => <Link className={classeLink} to={caminho(`/admin/aulas/${l.id}`)}>{l.titulo}</Link> },
                     { chave: "tipo", titulo: t("admin.comum.tipo"), celula: (l) => t(`admin.aulas.tipo.${l.tipo}`) },
                     { chave: "vertical", titulo: t("admin.comum.vertical"), celula: (l) => nomeVertical.get(l.vertical_id) ?? "—" },
                     { chave: "nivel", titulo: t("admin.comum.nivelMinimo"), celula: (l) => t(`nivel.${l.nivel_minimo}`) },

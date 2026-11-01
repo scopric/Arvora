@@ -26,6 +26,8 @@ export const adminEn: Record<keyof typeof adminPt, string> = {
   "admin.log.titulo": "Action log",
   "admin.ia.titulo": "AI review",
   "admin.comum.acoes": "Actions",
+  "admin.comum.linha": "row",
+  "admin.comum.linhas": "rows",
   "admin.comum.apagado": "Record deleted.",
   "admin.comum.apagar": "Delete",
   "admin.comum.apagarTexto": "The record is removed from the database. This cannot be undone.",
