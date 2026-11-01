@@ -139,3 +139,8 @@ export const linkTexto = `rounded-sm font-medium text-creme underline decoration
 // Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
 export const campoBase =
   "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"
+// Cartão, caixa sutil e barra de progresso do app (molde Linear). <progress> nativo pintado: trilho fumaça, valor dourado.
+export const cartao = "rounded-xl p-5 shadow-borda"
+export const caixaSutil = "rounded-md bg-creme/2 px-4 py-3 text-base shadow-borda"
+export const barraProgresso =
+  "h-1 w-40 appearance-none overflow-hidden rounded-full bg-fumaca accent-dourado [&::-moz-progress-bar]:bg-dourado [&::-webkit-progress-bar]:bg-fumaca [&::-webkit-progress-value]:bg-dourado"

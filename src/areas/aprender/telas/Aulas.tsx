@@ -15,13 +15,14 @@ import { Pagina } from "../componentes/Pagina"
 import { QuandoAula } from "../componentes/QuandoAula"
 import { COLUNAS_AULA, nomeVertical, type AulaLinha } from "../tipos"
 import { useCarga } from "../useCarga"
-import { dados, formatar, foco, segundaDaSemana } from "../util"
+import { caixaSutil, dados, formatar, foco, segundaDaSemana } from "../util"
 
 type VerticalLinha = { id: number; slug: string; nome: string; nome_en: string | null }
 const LIMITE = 120 // PROVISÓRIO: sem paginação no lançamento; 120 aulas cobrem mais de um ano de duas aulas por semana
 
 // Calendário de aulas (AUL-01, AUL-06): lista por semana, filtro por vertical, .ics e Google Agenda.
 // /bem-estar usa esta mesma tela fixada na vertical `bem-estar` (MEN-01), com o aviso fixo.
+// Molde Linear (lista agrupada): "Próximas / Anteriores" → semana → linhas com selo, título e meta em 13px.
 export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
   const t = useT()
   const lang = useIdioma()
@@ -63,7 +64,7 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
           previa={
             <ul className="space-y-2">
               {visiveis.slice(0, 3).map((a) => (
-                <li key={a.id} className="text-lg">{a.titulo}</li>
+                <li key={a.id} className="text-base">{a.titulo}</li>
               ))}
             </ul>
           }
@@ -82,44 +83,45 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
   }
 
   const bloco = (titulo: string, lista: AulaLinha[]) => (
-      <section className="space-y-6">
-        <h2 className="text-corpo-g font-semibold">{titulo}</h2>
-        {semanas(lista).map(([segunda, itens]) => (
-          <div key={segunda}>
-            <h3 className="mb-3 text-sm font-semibold opacity-75">
-              {t("aprender.aulas.semanaDe")} {formatar(`${segunda}T12:00:00Z`, lang, { day: "numeric", month: "long" }, "UTC")}
-            </h3>
-            <ul className="space-y-4">
-              {itens.map((a) => (
-                <li key={a.id} className="rounded-2xl border border-current/15 bg-superficie/25 p-5">
+    <section className="space-y-6">
+      <h2 className="text-corpo-g font-semibold">{titulo}</h2>
+      {semanas(lista).map(([segunda, itens]) => (
+        <div key={segunda}>
+          <h3 className="mb-2 text-legenda font-medium text-nevoa">
+            {t("aprender.aulas.semanaDe")} {formatar(`${segunda}T12:00:00Z`, lang, { day: "numeric", month: "long" }, "UTC")}
+          </h3>
+          <ul className="divide-y divide-grafite rounded-xl shadow-borda">
+            {itens.map((a) => {
+              const live = a.tipo === "ao_vivo" && !a.materiais_publicados_em
+              return (
+                <li key={a.id} className="p-4">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Selo tom={a.tipo === "ao_vivo" && !a.materiais_publicados_em ? "destaque" : "neutro"}>
-                      {a.tipo === "ao_vivo" && !a.materiais_publicados_em ? t("aprender.aoVivo") : t("aprender.gravada")}
-                    </Selo>
+                    <Selo tom={live ? "destaque" : "neutro"}>{live ? t("aprender.aoVivo") : t("aprender.gravada")}</Selo>
                     {progresso.get(a.id) === 100 ? <Selo>{t("aprender.assistida")}</Selo> : null}
-                    <span className="text-sm opacity-75">{nomeDe(a.vertical_id)}{a.duracao_min ? ` · ${a.duracao_min} ${t("aprender.min")}` : ""}</span>
+                    <span className="text-legenda text-nevoa">{nomeDe(a.vertical_id)}{a.duracao_min ? ` · ${a.duracao_min} ${t("aprender.min")}` : ""}</span>
                   </div>
-                  <h4 className="mt-2 text-xl font-semibold">
-                    <Link to={caminho(`/aulas/${a.slug}`)} className={`underline-offset-4 hover:underline ${foco}`}>{a.titulo}</Link>
+                  <h4 className="mt-2 text-base font-medium">
+                    <Link to={caminho(`/aulas/${a.slug}`)} className={`rounded-sm underline-offset-4 hover:underline ${foco}`}>{a.titulo}</Link>
                   </h4>
-                  <p className="mt-1 text-sm opacity-80"><QuandoAula inicio={a.inicio_em!} /></p>
-                  {a.tipo === "ao_vivo" && !a.materiais_publicados_em && new Date(a.inicio_em!).getTime() > agora ? (
-                    <div className="mt-4"><Agenda aula={{ ...a, inicio_em: a.inicio_em! }} /></div>
+                  <p className="mt-1 text-legenda text-nevoa"><QuandoAula inicio={a.inicio_em!} /></p>
+                  {live && new Date(a.inicio_em!).getTime() > agora ? (
+                    <div className="mt-3"><Agenda aula={{ ...a, inicio_em: a.inicio_em! }} /></div>
                   ) : null}
                 </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+              )
+            })}
+          </ul>
+        </div>
+      ))}
+    </section>
   )
 
   return (
     <Pagina chave={chave}>
       <div className="space-y-10">
-        {bemEstar ? <p className="rounded-xl border border-destaque/60 px-4 py-3">{t("aprender.bemEstar.aviso")}</p> : null}
+        {bemEstar ? <p className={caixaSutil}>{t("aprender.bemEstar.aviso")}</p> : null}
         {!verticalFixa && verticais.length > 1 ? (
-          <div className="max-w-xs">
+          <div className="w-56">
             <Selecao rotulo={t("aprender.aulas.vertical")} value={filtro} onChange={(e) => setFiltro(e.target.value)}>
               <option value="">{t("aprender.aulas.todas")}</option>
               {verticais.map((v) => (

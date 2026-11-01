@@ -4,7 +4,7 @@ import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Erro } from "../../../componentes/Erro"
 import { useCaminho, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { botaoLink, linkTexto } from "../util"
+import { botaoLink, caixaSutil, linkTexto } from "../util"
 
 type Sala = { fase: "espera" } | { fase: "rede" } | { fase: "aberta"; url: string } | { fase: "semAcesso" } | { fase: "indisponivel" } | { fase: "erro" }
 
@@ -53,7 +53,7 @@ export function SalaAoVivo({ aulaId, inicio, duracaoMin }: { aulaId: number; ini
     }
   }, [aulaId, inicio, duracaoMin, tentativa])
 
-  if (!sala) return <p role="status" className="opacity-75">{t("comum.carregandoConteudo")}</p>
+  if (!sala) return <p role="status" className="text-legenda text-nevoa">{t("comum.carregandoConteudo")}</p>
   if (sala.fase === "semAcesso") return <Bloqueado frase={t("aprender.aulas.bloqueado")} />
   if (sala.fase === "rede") return <Erro aoTentar={() => setTentativa((n) => n + 1)}>{t("aprender.sala.rede")}</Erro>
   if (sala.fase === "indisponivel" || sala.fase === "erro")
@@ -70,8 +70,8 @@ export function SalaAoVivo({ aulaId, inicio, duracaoMin }: { aulaId: number; ini
           {t("aprender.sala.entrar")}
           <span className="sr-only"> ({t("aprender.abreFora")})</span>
         </a>
-        <p className="text-sm opacity-75">{t("aprender.sala.abreFora")}</p>
+        <p className="text-legenda text-nevoa">{t("aprender.sala.abreFora")}</p>
       </div>
     )
-  return <p className="rounded-xl border border-current/15 px-4 py-3">{t("aprender.sala.espera")}</p>
+  return <p className={caixaSutil}>{t("aprender.sala.espera")}</p>
 }

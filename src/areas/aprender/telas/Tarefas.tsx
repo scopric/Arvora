@@ -15,6 +15,7 @@ import { dataCurta, foco } from "../util"
 
 // Minhas tarefas (AUL-04, AUL-09): Pendentes · Enviadas · Aprovadas · Ajustar. Pendente = exercício liberado, ainda sem
 // entrega, em vertical que aceita entregas (Bem-Estar fica de fora até a decisão jurídica).
+// Molde Linear (lista de issues): abas em pílula, linhas com título, meta em 13px e selo de status à direita.
 export function Tarefas() {
   const t = useT()
   const lang = useIdioma()
@@ -48,13 +49,13 @@ export function Tarefas() {
           chave: k,
           rotulo: `${t(rotulo)} (${lista.length})`,
           conteudo: lista.length ? (
-            <ul className="space-y-3">
+            <ul className="divide-y divide-grafite rounded-xl shadow-borda">
               {lista.map(({ exercicio, entrega }) => (
                 <li key={exercicio.id}>
-                  <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex flex-wrap items-center gap-3 rounded-2xl border border-current/15 bg-superficie/25 p-4 hover:border-current/40 ${foco}`}>
+                  <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex min-h-12 items-center gap-4 px-4 py-3 transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-creme/2 ${foco}`}>
                     <span className="min-w-0 flex-1">
-                      <span className="block font-semibold">{exercicio.aulas?.titulo}</span>
-                      <span className="block text-sm opacity-75">
+                      <span className="block text-base font-medium">{exercicio.aulas?.titulo}</span>
+                      <span className="mt-0.5 block text-legenda text-nevoa">
                         {t("aprender.exercicio.n")} {exercicio.ordem}
                         {entrega ? ` · ${dataCurta(entrega.enviada_em, lang)}` : ""}
                       </span>
