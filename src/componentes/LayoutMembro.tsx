@@ -13,7 +13,7 @@ import { Selo } from "./Selo"
 import { focoApp, linkMenuApp, rotuloGrupoApp } from "./menuApp"
 import { ABAS, AVATAR, MAIS, SIDEBAR, type Item } from "./navegacao"
 
-// Casca do membro no molde do app do Linear (Decisão 54; telas-molde em Documentos/Refero Telas/redesenho-2026-11):
+// Casca do membro no molde do app do Linear (Decisão 54; telas-molde arquivadas no cofre do projeto):
 // sidebar de 240px sobre o breu, conteúdo num painel carvão com hairline, itens de 13px com ícone de 16px, o item
 // ativo com fundo creme/5 e ícone dourado. Elevação só por hairline; nenhuma sombra externa.
 const foco = focoApp
