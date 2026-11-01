@@ -4,7 +4,7 @@ import { useApp } from "./escopo"
 
 const publico = {
   nav: "flex items-center rounded-full border border-creme/15 p-0.5",
-  item: "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 font-mono text-xs font-semibold tracking-[0.15em] text-creme/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-[current=true]:bg-creme/12 aria-[current=true]:text-white",
+  item: "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 font-mono text-xs font-semibold tracking-[0.08em] text-creme/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque aria-[current=true]:bg-creme/12 aria-[current=true]:text-white",
 }
 
 // App (Linear pill segmentada): 28px de altura, 12px/510, hairline grafite; o atual ganha fundo creme/5.

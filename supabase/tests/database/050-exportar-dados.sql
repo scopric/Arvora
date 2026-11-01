@@ -1,6 +1,6 @@
 -- Exportacao de dados pessoais (f1_12): public.exportar_meus_dados. Transacao desfeita.
 begin;
-select plan(25);
+select plan(27);
 
 -- O seed de desenvolvimento (supabase/seed.sql) nao entra no teste: apagado aqui, dentro da transacao desfeita no fim.
 truncate public.verticais, public.edicoes, public.temas, public.categorias_rede, public.espacos, public.empresas,
@@ -42,6 +42,9 @@ insert into public.assinaturas (perfil_id, conta_stripe_id, stripe_subscription_
 select tt.u(v.id), c.id, 'sub_' || v.id, p.id, 'active', now(), now() + interval '30 days'
 from (values ('a1'), ('b1')) v(id), public.contas_stripe c, public.planos p;
 
+insert into private.aceites_checkout (perfil_id, plano_id, tipo, versao_texto)
+select tt.u(v.id), p.id, 'servico', v.t from (values ('a1', 'v1-a1'), ('b1', 'v1-b1')) v(id, t), public.planos p;
+
 -- 1) privilegios ------------------------------------------------------------------------------------
 select ok(not has_function_privilege('anon', 'public.exportar_meus_dados()', 'execute'), 'anon sem execute');
 select ok(has_function_privilege('authenticated', 'public.exportar_meus_dados()', 'execute'), 'authenticated executa');
@@ -58,7 +61,9 @@ reset role;
 select set_config('tt.a', tt.exp('a1')::text, true);
 select set_config('tt.b', tt.exp('b1')::text, true);
 select ok(current_setting('tt.a')::jsonb ?& array['versao', 'exportado_em', 'conta', 'perfil', 'equipe', 'assinaturas', 'clientes_stripe'], 'chaves esperadas presentes');
-select is(current_setting('tt.a')::jsonb -> 'versao', '3'::jsonb, 'versao 3 (f4_03: indicados, receitas, estornos, log)');
+select is(current_setting('tt.a')::jsonb -> 'versao', '4'::jsonb, 'versao 4 (f4_07: + aceites_checkout)');
+select is(current_setting('tt.a')::jsonb -> 'aceites_checkout' -> 0 ->> 'versao_texto', 'v1-a1', 'a1: o proprio aceite do checkout');
+select is(jsonb_array_length(current_setting('tt.a')::jsonb -> 'aceites_checkout'), 1, 'a1: so o proprio aceite, nao o de b1');
 select is(current_setting('tt.a')::jsonb #>> '{conta,email}', 'a1@exemplo.test', 'conta: e-mail do dono');
 select is(current_setting('tt.a')::jsonb #>> '{conta,id}', tt.u('a1')::text, 'conta: id do dono');
 select is(current_setting('tt.a')::jsonb #>> '{perfil,id}', tt.u('a1')::text, 'perfil: id do dono');

@@ -31,7 +31,7 @@ export function PaginaApp({ chave, titulo, rotulo, conteudo, meta, intro, voltar
         </Link>
       ) : null}
       {rotulo ? <p className="mb-2 text-legenda font-medium text-nevoa">{rotulo}</p> : null}
-      <h1 className={conteudo ? "font-conteudo text-titulo-p leading-[0.95] font-semibold tracking-normal uppercase sm:text-titulo lg:text-titulo-g" : "text-subtitulo font-semibold sm:text-titulo-p"}>
+      <h1 className={conteudo ? "font-conteudo text-titulo-p leading-none font-normal tracking-normal text-balance sm:text-titulo lg:text-titulo-g" : "text-subtitulo font-semibold sm:text-titulo-p"}>
         {titulo ?? t(chave)}
       </h1>
       {meta ? <p className="mt-3 text-legenda text-nevoa">{meta}</p> : null}

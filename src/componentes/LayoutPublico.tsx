@@ -6,9 +6,9 @@ import { Marca } from "./Marca"
 import { SeletorIdioma } from "./SeletorIdioma"
 
 export const linkPublico =
-  "inline-flex min-h-11 items-center rounded-lg px-4 text-creme transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
+  "inline-flex min-h-11 items-center rounded-full px-4 text-creme transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
 export const botaoPublico =
-  "inline-flex min-h-12 items-center justify-center rounded-lg px-7 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
+  "inline-flex min-h-11 items-center justify-center rounded-full px-6 text-base font-medium transition-[box-shadow,border-color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
 
 // Topo e rodapé da home (extraídos de EmBreve sem mudar o visual). `completo` acrescenta o menu do site público (PRD §17.3.1),
 // usado nas demais páginas públicas; a home segue como estava.
@@ -31,9 +31,9 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
   const t = useT()
   const caminho = useCaminho()
   return (
-    <header className="sticky top-0 z-20 border-b border-creme/10 bg-fundo/75 backdrop-blur-md">
+    <header className="sticky top-0 z-20 border-b border-superficie bg-fundo/95 backdrop-blur-md">
       <div className="flex min-h-17 items-center justify-between gap-3 px-4 sm:px-12 lg:px-20">
-        <Marca to={caminho("/")} className="max-sm:[&>span]:hidden" />
+        <Marca to={caminho("/")} className="max-sm:[&>span]:sr-only" />
         {completo ? (
           <nav aria-label={t("nav.principal")} className="hidden items-center gap-1 text-sm font-semibold md:flex">
             <ItensMenu />
@@ -41,12 +41,17 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
         ) : null}
         <nav aria-label={completo ? t("menu.conta") : t("nav.principal")} className="flex items-center gap-2 text-sm font-semibold">
           <SeletorIdioma />
-          {carregando ? null : sessao ? (
+          {carregando ? (
+            <span aria-hidden="true" className="invisible flex items-center gap-2">
+              <span className={linkPublico}>{t("nav.entrar")}</span>
+              <span className={`${botaoPublico} text-sm whitespace-nowrap max-sm:hidden`}>{t(completo ? "menu.assinar" : "nav.criarConta")}</span>
+            </span>
+          ) : sessao ? (
             <Link to={caminho(completo ? "/inicio" : "/perfil")} className={linkPublico}>{t(completo ? "menu.painel" : "nav.perfil")}</Link>
           ) : (
             <>
               <Link to={caminho("/entrar")} className={linkPublico}>{t("nav.entrar")}</Link>
-              <Link to={caminho(completo ? "/planos" : "/cadastro")} className={`${botaoPublico} min-h-11 bg-creme px-5 text-sm whitespace-nowrap text-fundo hover:bg-white max-sm:hidden`}>{t(completo ? "menu.assinar" : "nav.criarConta")}</Link>
+              <Link to={caminho(completo ? "/planos" : "/cadastro")} className={`${botaoPublico} bg-destaque text-sm whitespace-nowrap text-fundo hover:shadow-brilho max-sm:hidden`}>{t(completo ? "menu.assinar" : "nav.criarConta")}</Link>
             </>
           )}
         </nav>
@@ -60,35 +65,58 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
   )
 }
 
-export function RodapePublico({ completo = false }: { completo?: boolean }) {
+const linkRodape = "inline-flex min-h-11 items-center text-sm text-creme/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
+
+function Coluna({ id, titulo, children }: { id: string; titulo: string; children: React.ReactNode }) {
+  return (
+    <nav aria-labelledby={id}>
+      <h2 id={id} className="font-mono text-xs font-normal tracking-[0.08em] text-creme/60 uppercase">{titulo}</h2>
+      <ul className="mt-3">{children}</ul>
+    </nav>
+  )
+}
+
+// Rodapé em colunas (direção Manifesto, Decisão 58), o mesmo em todas as páginas públicas.
+export function RodapePublico() {
   const { sessao, carregando } = useAuth()
   const t = useT()
   const caminho = useCaminho()
+  const inicio = caminho("/")
   return (
-    <footer className="border-t border-creme/10 px-6 py-12 sm:px-16 lg:px-24">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+    <footer className="border-t border-superficie px-6 py-16 sm:px-16 lg:px-24">
+      <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="max-w-xs">
-          <Marca to={caminho("/")} />
+          <Marca to={inicio} />
           <p className="mt-4 text-sm text-creme/70">{t("auth.layout.apoio")}</p>
         </div>
-        <nav aria-label={t("nav.rodape")} className="flex flex-wrap gap-x-2 text-sm font-semibold">
-          {!carregando && !sessao && (
+        <Coluna id="rodape-frentes" titulo={t("home.rodape.frentes")}>
+          {([1, 2, 3, 4] as const).map((n) => (
+            <li key={n}><Link to={{ pathname: inicio, hash: `#frente-${n}` }} className={linkRodape}>{t(`home.pilar.${n}.nome`)}</Link></li>
+          ))}
+        </Coluna>
+        <Coluna id="rodape-conta" titulo={t("home.rodape.conta")}>
+          {carregando ? (
+            // Mesma altura do estado sem sessão: nada salta quando a sessão termina de carregar.
+            <li aria-hidden="true" className="invisible"><span className={linkRodape}>{t("nav.entrar")}</span><br /><span className={linkRodape}>{t("nav.criarConta")}</span></li>
+          ) : sessao ? (
+            <li><Link to={caminho("/inicio")} className={linkRodape}>{t("menu.painel")}</Link></li>
+          ) : (
             <>
-              <Link to={caminho("/entrar")} className={linkPublico}>{t("nav.entrar")}</Link>
-              <Link to={caminho("/cadastro")} className={linkPublico}>{t("nav.criarConta")}</Link>
+              <li><Link to={caminho("/entrar")} className={linkRodape}>{t("nav.entrar")}</Link></li>
+              <li><Link to={caminho("/cadastro")} className={linkRodape}>{t("nav.criarConta")}</Link></li>
             </>
           )}
-          {completo ? (
-            <>
-              <Link to={caminho("/suporte")} className={linkPublico}>{t("menu.suporte")}</Link>
-              <Link to={caminho("/termos")} className={linkPublico}>{t("publico.termos.titulo")}</Link>
-              <Link to={caminho("/privacidade")} className={linkPublico}>{t("publico.privacidade.titulo")}</Link>
-            </>
-          ) : null}
-          <Link to={caminho("/cookies")} className={linkPublico}>{t("cookies.politica")}</Link>
-        </nav>
+          <li><Link to={caminho("/planos")} className={linkRodape}>{t("menu.planos")}</Link></li>
+          <li><a href={caminho("/hall-of-fame")} className={linkRodape}>{t("menu.hallOfFame")}</a></li>
+        </Coluna>
+        <Coluna id="rodape-legal" titulo={t("home.rodape.legal")}>
+          <li><Link to={caminho("/suporte")} className={linkRodape}>{t("menu.suporte")}</Link></li>
+          <li><Link to={caminho("/termos")} className={linkRodape}>{t("publico.termos.titulo")}</Link></li>
+          <li><Link to={caminho("/privacidade")} className={linkRodape}>{t("publico.privacidade.titulo")}</Link></li>
+          <li><Link to={caminho("/cookies")} className={linkRodape}>{t("cookies.politica")}</Link></li>
+        </Coluna>
       </div>
-      <p className="mx-auto mt-10 max-w-6xl font-mono text-xs tracking-[0.15em] text-creme/60">© Grupo Árvora</p>
+      <p className="mx-auto mt-12 max-w-6xl border-t border-superficie pt-6 font-mono text-xs tracking-[0.08em] text-creme/60">{t("home.direitos")}</p>
     </footer>
   )
 }
@@ -112,7 +140,7 @@ export function LayoutPublico() {
       <main id="conteudo" tabIndex={-1}>
         <Outlet />
       </main>
-      <RodapePublico completo />
+      <RodapePublico />
     </div>
   )
 }

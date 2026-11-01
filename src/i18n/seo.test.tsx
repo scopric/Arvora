@@ -146,7 +146,8 @@ describe("404 e carregamento", () => {
     )
     expect(document.title).toContain(dic["titulo.naoEncontrada"])
     expect(screen.getByRole("heading").textContent).toBe(dic["sistema.naoEncontrada"])
-    expect(screen.getByRole("link").getAttribute("href")).toBe(`/${lang}`)
+    expect(screen.getByRole("link", { name: dic["sistema.voltar"] }).getAttribute("href")).toBe(`/${lang}`)
+    expect(screen.getByRole("link", { name: dic["sistema.falarConosco"] }).getAttribute("href")).toBe(`/${lang}/suporte`)
     expect(document.head.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex")
   })
 

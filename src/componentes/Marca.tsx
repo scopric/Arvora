@@ -7,7 +7,7 @@ export function Marca({ to, className = "" }: { to?: string; className?: string 
   const app = useApp()
   const classes = app
     ? `inline-flex min-h-9 items-center gap-2 rounded-md pointer-coarse:min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado ${className}`
-    : `inline-flex min-h-11 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado ${className}`
+    : `inline-flex min-h-11 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque ${className}`
   const conteudo = (
     <>
       <img src="/logo-simbolo.png" alt="" width="354" height="287" className={app ? "h-5 w-auto" : "h-8 w-auto"} />

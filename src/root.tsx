@@ -1,7 +1,7 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useParams } from "react-router"
 import "./index.css"
 import corpoUrl from "@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url"
-import tituloUrl from "@fontsource-variable/big-shoulders-display/files/big-shoulders-display-latin-wght-normal.woff2?url"
+import tituloUrl from "@fontsource-variable/newsreader/files/newsreader-latin-opsz-normal.woff2?url"
 import { BannerCookies } from "./componentes/BannerCookies"
 import { Carregando } from "./componentes/Carregando"
 import { ehIdioma, textosDe, useIdiomaUrl } from "./i18n"
