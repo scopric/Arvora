@@ -14,7 +14,7 @@ function abrir(busca: string) {
     <MemoryRouter initialEntries={[`/pt/confirmar${busca}`]}>
       <Routes>
         <Route path="/:lang/confirmar" element={<Confirmar />} />
-        <Route path="/:lang/perfil" element={<p>tela perfil</p>} />
+        <Route path="/:lang/inicio" element={<p>tela inicio</p>} />
         <Route path="/:lang/redefinir-senha" element={<p>tela redefinir</p>} />
       </Routes>
     </MemoryRouter>,
@@ -25,13 +25,13 @@ afterEach(cleanup)
 beforeEach(() => verifyOtp.mockReset())
 
 describe("tela Confirmar", () => {
-  it("signup: só consome o código no clique e leva ao perfil", async () => {
+  it("signup: só consome o código no clique e leva ao início", async () => {
     verifyOtp.mockResolvedValue({ data: { session: {} }, error: null })
     abrir("?token_hash=abc&type=signup")
     expect(verifyOtp).not.toHaveBeenCalled()
     await userEvent.click(screen.getByRole("button", { name: "Confirmar" }))
     expect(verifyOtp).toHaveBeenCalledWith({ token_hash: "abc", type: "signup" })
-    expect(await screen.findByText("tela perfil")).toBeTruthy()
+    expect(await screen.findByText("tela inicio")).toBeTruthy()
   })
 
   it("recovery: leva à tela de nova senha", async () => {
@@ -71,7 +71,7 @@ describe("tela Confirmar", () => {
     verifyOtp.mockResolvedValue({ data: { session: {} }, error: null })
     abrir("?token_hash=abc&type=email_change")
     await userEvent.click(screen.getByRole("button", { name: "Confirmar" }))
-    expect(await screen.findByText("tela perfil")).toBeTruthy()
+    expect(await screen.findByText("tela inicio")).toBeTruthy()
   })
 
   it("exceção no verifyOtp: erro visível e botão liberado, sem travar em 'Aguarde'", async () => {
@@ -98,6 +98,6 @@ describe("tela Confirmar", () => {
     await userEvent.click(botao)
     expect(verifyOtp).toHaveBeenCalledTimes(1)
     volta({ data: { session: {} }, error: null })
-    expect(await screen.findByText("tela perfil")).toBeTruthy()
+    expect(await screen.findByText("tela inicio")).toBeTruthy()
   })
 })

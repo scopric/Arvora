@@ -3,10 +3,12 @@ import { Link } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
 import { Campo, Selecao } from "../componentes/Campo"
-import { Marca } from "../componentes/Marca"
-import { useCaminho, useIdioma, useT, useTitulo, type Chave } from "../i18n"
+import { useEstiloCampo } from "../componentes/campoEstilo"
+import { linkTextoApp } from "../componentes/menuApp"
+import { PaginaApp } from "../componentes/PaginaApp"
+import { useCaminho, useIdioma, useT, type Chave } from "../i18n"
 import { abrirPortal } from "../lib/assinatura"
-import { sair, useAuth } from "../lib/sessao"
+import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, perfilSchema } from "../lib/validacao"
 
@@ -33,7 +35,7 @@ type Estado =
 export function Perfil() {
   const { sessao } = useAuth()
   const t = useT()
-  useTitulo("titulo.perfil", true)
+  const estilo = useEstiloCampo()
   const idioma = useIdioma()
   const uid = sessao?.user.id
   const [estado, setEstado] = useState<Estado>({ fase: "carregando" })
@@ -86,27 +88,15 @@ export function Perfil() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12 sm:py-16">
-      <header className="mb-10 flex items-start justify-between gap-6">
-        <div>
-          <Marca />
-          <h1 className="mt-4 font-titulo text-4xl font-medium">{t("perfil.titulo")}</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => void sair()}
-          className="rounded-lg border border-creme/30 px-4 py-2 text-sm font-semibold hover:border-creme/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
-        >
-          {t("perfil.sair")}
-        </button>
-      </header>
+    // Dentro do LayoutMembro (menu, marca e "Sair" vêm de lá).
+    <PaginaApp chave="titulo.perfil" titulo={t("perfil.titulo")} estreita>
 
-      {estado.fase === "carregando" ? <p role="status" className="text-creme/70">{t("comum.carregando")}</p> : null}
+      {estado.fase === "carregando" ? <p role="status" className="text-nevoa">{t("comum.carregando")}</p> : null}
       {estado.fase === "erro" ? <Aviso tipo="erro">{t(estado.mensagem)}</Aviso> : null}
       {estado.fase === "pronto" ? (
         <form key={JSON.stringify(estado.perfil)} onSubmit={salvar} noValidate className="space-y-5">
           {aviso ? <Aviso tipo={aviso.tipo}>{t(aviso.texto)}</Aviso> : null}
-          <p className="text-sm text-creme/70">{t("perfil.emailConta")} {sessao?.user.email}</p>
+          <p className="text-legenda text-nevoa">{t("perfil.emailConta")} {sessao?.user.email}</p>
           <Campo rotulo={t("perfil.nome")} name="nome" defaultValue={estado.perfil.nome} erro={erros.nome} autoComplete="name" />
           <Campo rotulo={t("perfil.empresa")} name="empresa_nome" defaultValue={estado.perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
           <Selecao rotulo={t("perfil.setor")} name="setor_id" defaultValue={estado.perfil.setor_id?.toString() ?? ""} erro={erros.setor_id}>
@@ -124,7 +114,7 @@ export function Perfil() {
           <Campo rotulo="LinkedIn" name="linkedin_url" type="url" defaultValue={estado.perfil.linkedin_url ?? ""} erro={erros.linkedin_url} placeholder={t("perfil.linkedin.exemplo")} />
           <Campo rotulo="Instagram" name="instagram" defaultValue={estado.perfil.instagram ?? ""} erro={erros.instagram} placeholder={t("perfil.instagram.exemplo")} />
           <div>
-            <label htmlFor="bio" className="mb-2 block text-sm font-semibold">{t("perfil.bio")}</label>
+            <label htmlFor="bio" className={estilo.rotulo}>{t("perfil.bio")}</label>
             <textarea
               id="bio"
               name="bio"
@@ -132,15 +122,15 @@ export function Perfil() {
               maxLength={600}
               defaultValue={estado.perfil.bio ?? ""}
               aria-invalid={erros.bio ? true : undefined}
-              className="w-full rounded-lg border border-creme/25 bg-transparent px-4 py-3 text-base outline-none focus-visible:border-dourado focus-visible:ring-2 focus-visible:ring-dourado/40"
+              className={`${estilo.campo} ${estilo.bordaOk}`}
             />
-            {erros.bio ? <p role="alert" className="mt-2 text-sm text-red-300">{erros.bio}</p> : null}
+            {erros.bio ? <p role="alert" className={estilo.erro}>{erros.bio}</p> : null}
           </div>
 
           {/* A visibilidade agora se muda em Configurações > Privacidade; o campo segue no envio só porque o schema o exige. */}
           <input type="hidden" name="visibilidade" value={estado.perfil.visibilidade} />
-          <p className="text-sm text-creme/70">
-            <Link to={caminho("/configuracoes/privacidade")} className="underline underline-offset-4">{t("conta.perfil.linkPrivacidade")}</Link>
+          <p className="text-legenda">
+            <Link to={caminho("/configuracoes/privacidade")} className={linkTextoApp}>{t("conta.perfil.linkPrivacidade")}</Link>
           </p>
 
           <Botao type="submit" ocupado={ocupado}>{t("perfil.salvar")}</Botao>
@@ -150,11 +140,11 @@ export function Perfil() {
 
       <section className="mt-12 border-t border-creme/15 pt-8">
         <h2 className="text-sm font-semibold">{t("perfil.dados.titulo")}</h2>
-        <p className="mt-2 text-sm text-creme/70">
-          <Link to={caminho("/configuracoes/dados")} className="underline underline-offset-4">{t("conta.perfil.linkDados")}</Link>
+        <p className="mt-2 text-legenda">
+          <Link to={caminho("/configuracoes/dados")} className={linkTextoApp}>{t("conta.perfil.linkDados")}</Link>
         </p>
       </section>
-    </main>
+    </PaginaApp>
   )
 }
 

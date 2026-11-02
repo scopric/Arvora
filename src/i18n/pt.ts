@@ -184,7 +184,6 @@ export const pt = {
   "erro.auth.email_exists": "Não foi possível criar a conta com esses dados. Se você já tem conta, entre ou recupere a senha.",
   "erro.auth.default": "Algo deu errado do nosso lado. Tente de novo; se persistir, escreva para o suporte.",
   "perfil.titulo": "Meu perfil",
-  "perfil.sair": "Sair",
   "perfil.erroCarregar": "Não conseguimos carregar seu perfil agora. Tente de novo em instantes.",
   "perfil.corrija": "Corrija os campos em vermelho.",
   "perfil.erroUrl": "Esse endereço de perfil já está em uso.",

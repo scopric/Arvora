@@ -19,7 +19,7 @@ export function Entrar() {
   const navegar = useNavigate()
   const de = (useLocation().state as { de?: string } | null)?.de
   // Só caminho interno: nada de redirecionar para fora do site.
-  const origem = de?.startsWith("/") && !de.startsWith("//") ? de : caminho("/perfil")
+  const origem = de?.startsWith("/") && !de.startsWith("//") ? de : caminho("/inicio")
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)

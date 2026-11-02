@@ -187,7 +187,6 @@ export const en: Record<keyof typeof pt, string> = {
   "erro.auth.email_exists": "We could not create the account with these details. If you already have an account, log in or reset your password.",
   "erro.auth.default": "Something went wrong on our side. Try again; if it persists, contact support.",
   "perfil.titulo": "My profile",
-  "perfil.sair": "Log out",
   "perfil.erroCarregar": "We could not load your profile right now. Try again in a moment.",
   "perfil.corrija": "Fix the fields marked in red.",
   "perfil.erroUrl": "That profile address is already in use.",
