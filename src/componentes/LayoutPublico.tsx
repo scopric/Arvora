@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation } from "react-router"
 import { useCaminho, useT } from "../i18n"
+import { linkSite } from "../lib/enderecos"
 import { useAuth } from "../lib/sessao"
 import { LayoutMembro } from "./LayoutMembro"
 import { Marca } from "./Marca"
@@ -33,7 +34,7 @@ export function TopoPublico({ completo = false }: { completo?: boolean }) {
   return (
     <header className="sticky top-0 z-20 border-b border-superficie bg-fundo/95 backdrop-blur-md">
       <div className="flex min-h-17 items-center justify-between gap-3 px-4 sm:px-12 lg:px-20">
-        <Marca to={caminho("/")} className="max-sm:[&>span]:sr-only" />
+        <Marca to={linkSite(caminho("/"))} className="max-sm:[&>span]:sr-only" />
         {completo ? (
           <nav aria-label={t("nav.principal")} className="hidden items-center gap-1 text-sm font-semibold md:flex">
             <ItensMenu />
@@ -81,7 +82,7 @@ export function RodapePublico() {
   const { sessao, carregando } = useAuth()
   const t = useT()
   const caminho = useCaminho()
-  const inicio = caminho("/")
+  const inicio = linkSite(caminho("/"))
   return (
     <footer className="border-t border-superficie px-6 py-16 sm:px-16 lg:px-24">
       <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
@@ -91,7 +92,7 @@ export function RodapePublico() {
         </div>
         <Coluna id="rodape-frentes" titulo={t("home.rodape.frentes")}>
           {([1, 2, 3, 4] as const).map((n) => (
-            <li key={n}><Link to={{ pathname: inicio, hash: `#frente-${n}` }} className={linkRodape}>{t(`home.pilar.${n}.nome`)}</Link></li>
+            <li key={n}><Link to={`${inicio}#frente-${n}`} className={linkRodape}>{t(`home.pilar.${n}.nome`)}</Link></li>
           ))}
         </Coluna>
         <Coluna id="rodape-conta" titulo={t("home.rodape.conta")}>

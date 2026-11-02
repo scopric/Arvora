@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { useCaminho, useT } from "../i18n"
 import { Cena } from "./Cena"
+import { linkSite } from "../lib/enderecos"
 import { Marca } from "./Marca"
 import { SeletorIdioma } from "./SeletorIdioma"
 
@@ -17,7 +18,7 @@ export function LayoutAuth({ titulo, subtitulo, children }: { titulo: string; su
           className="pointer-events-none absolute -top-1/4 -left-1/4 -z-10 size-[50rem] rounded-full bg-superficie/25 blur-3xl"
         />
         <Cena soLarga className="inset-x-0 top-10 bottom-[40%] -z-10" classeCanvas="cena-fade-base" />
-        <Marca to={caminho("/")} />
+        <Marca to={linkSite(caminho("/"))} />
         <div>
           <span aria-hidden="true" className="mb-8 block h-px w-16 bg-destaque" />
           <p className="zona-limpa max-w-md font-titulo text-h2 font-normal text-balance">
@@ -31,7 +32,7 @@ export function LayoutAuth({ titulo, subtitulo, children }: { titulo: string; su
 
       <main className="flex items-center justify-center bg-painel px-6 pt-20 pb-12 sm:px-12 lg:py-12">
         <div className="w-full max-w-md">
-          <Marca to={caminho("/")} className="mb-10 lg:hidden" />
+          <Marca to={linkSite(caminho("/"))} className="mb-10 lg:hidden" />
           <h1 className="font-titulo text-h3 leading-none font-normal sm:text-h2">{titulo}</h1>
           <p className="mt-3 text-creme/70">{subtitulo}</p>
           <div className="mt-8">{children}</div>
