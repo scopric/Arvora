@@ -133,7 +133,7 @@ describe("vercel.json: X-Robots-Tag", () => {
     const geral = cfg.headers.find((h) => h.source === "/(.*)")!
     expect(geral.headers.find((x) => x.key === "X-Robots-Tag")?.value).toBe("noindex, nofollow")
   })
-  it("home e páginas públicas não casam", () => {
+  it("a regra das telas privadas não casa com home e páginas públicas", () => {
     for (const p of ["/", "/pt", "/en", "/pt/hall-of-fame", "/en/hall-of-fame/2026/fulano", "/pt/perfilx"]) expect(re.test(p)).toBe(false)
   })
 })
