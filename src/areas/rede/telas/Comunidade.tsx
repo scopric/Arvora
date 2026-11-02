@@ -9,12 +9,12 @@ import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT, type Chave } from "../../../i18n"
-import { useEstiloCampo } from "../../../componentes/campoEstilo"
+import { campoApp, useEstiloCampo } from "../../../componentes/campoEstilo"
 import { PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
-import { campoTexto, DialogoDenuncia } from "../componentes"
+import { DialogoDenuncia } from "../componentes"
 import { nomeDe, ok, quando, useCarga, vitrinesPorId } from "../lib"
 
 const JANELA_EDICAO_MS = 15 * 60_000 // PROVISÓRIO: igual ao banco (editar até 15 min depois de criar)
@@ -85,7 +85,7 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
       {editando ? (
         <form onSubmit={salvar} className="mt-3 space-y-3">
           <label htmlFor={`ed-${tipo}-${item.id}`} className="sr-only">{t("rede.comunidade.editar")}</label>
-          <textarea id={`ed-${tipo}-${item.id}`} name="corpo" defaultValue={item.corpo} rows={3} maxLength={tipo === "posts" ? 5000 : 2000} required className={campoTexto} />
+          <textarea id={`ed-${tipo}-${item.id}`} name="corpo" defaultValue={item.corpo} rows={3} maxLength={tipo === "posts" ? 5000 : 2000} required className={campoApp} />
           <div className="flex gap-3">
             <Botao type="submit" variante="contorno" ocupado={ocupado} className="sm:w-auto">{t("rede.comunidade.salvar")}</Botao>
             <Botao type="button" variante="contorno" onClick={() => setEditando(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>
@@ -131,7 +131,7 @@ function Caixa({ rotulo, botao, maximo, aoEnviar, primario }: { rotulo: string; 
   return (
     <form onSubmit={enviar} className={`space-y-3 ${primario ? "rounded-xl p-4 shadow-borda" : ""}`}>
       <label htmlFor={id} className={campo.rotulo}>{rotulo}</label>
-      <textarea id={id} name="corpo" rows={3} maxLength={maximo} required className={campoTexto} />
+      <textarea id={id} name="corpo" rows={3} maxLength={maximo} required className={campoApp} />
       {erro ? <Aviso tipo="erro">{t("rede.comunidade.erroPublicar")}</Aviso> : null}
       <div className="flex justify-end"><Botao type="submit" variante={primario ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto">{botao}</Botao></div>
     </form>

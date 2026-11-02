@@ -11,12 +11,15 @@ vi.mock("../../../lib/supabase", () => ({
 }))
 vi.mock("../../../lib/sessao", () => ({ useAuth: () => ({ sessao: { user: { id: "u1", email: "a@b.com" } }, carregando: false }), sair: vi.fn() }))
 
+import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 import { AcessoContext, type Nivel } from "../../../lib/acesso"
 import { chamadas, criarFalso, type Resposta } from "../testeSupabase"
 import { Academy } from "./Academy"
 import { Aula } from "./Aula"
 import { Aulas, BemEstar } from "./Aulas"
 import { BemVindo } from "./BemVindo"
+import { Curso } from "./Curso"
+import { CursoAula } from "./CursoAula"
 import { Inicio } from "./Inicio"
 import { Tarefa } from "./Tarefa"
 import { Tarefas } from "./Tarefas"
@@ -373,5 +376,62 @@ describe("/academy", () => {
     falso.atual = criarFalso({ cursos: falha })
     montar("academy", <Academy />, "/pt/academy")
     expect((await screen.findByRole("alert")).textContent).toMatch(/algo deu errado/i)
+  })
+})
+
+describe("/academy/:curso e /academy/:curso/:aula", () => {
+  const curso = { id: 1, slug: "f", titulo: "Fundamentos", descricao: "A base da venda.", capa_path: null, nivel_minimo: "clube", vertical_id: 1, verticais: vertical }
+  const aulaCurso = (id: number, slug: string, titulo: string, nivel_minimo: string, duracao_min: number | null) =>
+    ({ ...aulaBase, id, slug, titulo, tipo: "gravada", nivel_minimo, duracao_min, modulo_id: 10, ordem: id })
+  // A 2ª aula é do Grupo: o Clube vê o cadeado nela e "Próxima aula" pula para a 3ª.
+  const aulas = [aulaCurso(1, "a", "Abertura", "clube", 12), aulaCurso(2, "b", "Proposta", "grupo", 25), aulaCurso(3, "c", "Fechamento", "clube", null)]
+  const respostas = (extra: Record<string, Resposta> = {}) => ({
+    "cursos.single": ok(curso), modulos: ok([{ id: 10, titulo: "Módulo 1", ordem: 1 }]), aulas: ok(aulas), progresso_aula: ok([]), ...extra,
+  })
+  it("Clube: lista numerada com duração, cadeado nas aulas do Grupo e 'Começar' em contorno", async () => {
+    falso.atual = criarFalso(respostas())
+    montar("academy/:curso", <Curso />, "/pt/academy/f", "clube")
+    const modulo = (await screen.findByRole("heading", { name: "Módulo 1" })).closest("section")!
+    const itens = within(modulo).getAllByRole("listitem")
+    expect(itens.map((li) => within(li).getByText(/^\d$/).textContent)).toEqual(["1", "2", "3"])
+    expect(within(itens[0]).getByText("12 min")).toBeTruthy()
+    expect(within(itens[2]).queryByText(/min$/)).toBeNull()
+    expect(within(itens[0]).queryByText(/bloqueado: parte do grupo/i)).toBeNull()
+    expect(within(itens[1]).getByText(/bloqueado: parte do grupo/i)).toBeTruthy()
+    const cta = screen.getByRole("link", { name: "Começar o curso" })
+    expect(cta.getAttribute("href")).toBe("/pt/academy/f/a")
+    expect(cta.className).toBe(botaoContornoApp)
+    expect(screen.getByRole("link", { name: "Academy" }).getAttribute("href")).toBe("/pt/academy")
+    expect(await violacoes()).toEqual([])
+  })
+  it("Grupo com progresso: 'Continuar' em dourado aponta para a primeira aula não concluída; sem cadeado", async () => {
+    falso.atual = criarFalso(respostas({ progresso_aula: ok([{ aula_id: 1, percentual: 100 }, { aula_id: 2, percentual: 40 }]) }))
+    montar("academy/:curso", <Curso />, "/pt/academy/f")
+    const cta = await screen.findByRole("link", { name: "Continuar de onde parou" })
+    expect(cta.getAttribute("href")).toBe("/pt/academy/f/b")
+    expect(cta.className).toBe(botaoPrimarioApp)
+    expect(screen.getByText("Assistida")).toBeTruthy()
+    expect(screen.getByText("40%")).toBeTruthy()
+    expect(screen.getByText("1 de 3 aulas concluídas")).toBeTruthy()
+    expect(screen.queryByText(/bloqueado: parte do grupo/i)).toBeNull()
+  })
+  it("aula do curso: a atual marcada na lista lateral (aria-current) e 'Próxima aula' pula a bloqueada", async () => {
+    falso.atual = criarFalso(respostas({ "rpc:video_da_aula": ok("https://video.invalid/a.mp4"), "progresso_aula.single": ok(null) }))
+    montar("academy/:curso/:aula", <CursoAula />, "/pt/academy/f/a", "clube")
+    const lista = await screen.findByRole("navigation", { name: "Aulas do curso" })
+    const atuais = within(lista).getAllByRole("link", { current: "page" })
+    expect(atuais.map((a) => a.textContent)).toEqual(["Abertura"])
+    expect(within(lista).getByRole("link", { name: /^Proposta/ }).textContent).toMatch(/bloqueado: parte do grupo/i)
+    expect(screen.getByRole("link", { name: /^Próxima aula: Fechamento/ }).getAttribute("href")).toBe("/pt/academy/f/c")
+    expect(screen.getByRole("link", { name: "Fundamentos" }).getAttribute("href")).toBe("/pt/academy/f")
+    expect(chamadas.some((c) => c.tabela === "rpc" && c.metodo === "video_da_aula")).toBe(true) // a liberada pede o vídeo
+    expect(await violacoes()).toEqual([])
+  })
+  it("aula bloqueada: prévia com cadeado e a RPC do vídeo nem é chamada", async () => {
+    falso.atual = criarFalso(respostas({ "rpc:video_da_aula": ok("https://video.invalid/a.mp4") }))
+    montar("academy/:curso/:aula", <CursoAula />, "/pt/academy/f/b", "clube")
+    // Dois cadeados: o da aula na lista lateral e o do cartão bloqueado no lugar do vídeo.
+    expect((await screen.findAllByText(/bloqueado: parte do grupo/i)).length).toBe(2)
+    expect(chamadas.some((c) => c.tabela === "rpc")).toBe(false)
   })
 })

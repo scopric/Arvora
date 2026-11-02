@@ -9,7 +9,8 @@ import { supabase } from "../../../lib/supabase"
 import { Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { EDITA, usePode } from "../lib/papel"
-import { classeAcaoPrimaria, classeLink } from "../lib/estilo"
+import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { classeLink } from "../lib/estilo"
 
 export function Premiados() {
   const t = useT()
@@ -24,7 +25,7 @@ export function Premiados() {
     return { premiados: exigir(premiados), edicoes: exigir(edicoes) }
   }, [pode])
   return (
-    <Pagina titulo="admin.premiados.titulo" intro="admin.premiados.intro" acoes={pode ? <Link className={classeAcaoPrimaria} to={caminho("/admin/premiados/novo")}>{t("admin.premiados.novo")}</Link> : null}>
+    <Pagina titulo="admin.premiados.titulo" intro="admin.premiados.intro" acoes={pode ? <Link className={botaoPrimarioApp} to={caminho("/admin/premiados/novo")}>{t("admin.premiados.novo")}</Link> : null}>
       <Mostrar carga={carga}>
         {({ premiados, edicoes }) => {
           const nome = new Map(edicoes.map((e) => [e.id, e.nome]))

@@ -3,16 +3,12 @@ import { Link } from "react-router"
 import { Aviso } from "../../componentes/Aviso"
 import { Botao } from "../../componentes/Botao"
 import { Selecao } from "../../componentes/Campo"
-import { useEstiloCampo } from "../../componentes/campoEstilo"
+import { campoApp, useEstiloCampo } from "../../componentes/campoEstilo"
 import { linkTextoApp } from "../../componentes/menuApp"
 import { Selo } from "../../componentes/Selo"
 import { useCaminho, useIdioma, useT, type Chave } from "../../i18n"
 import { supabase } from "../../lib/supabase"
 import { chaveSlug, dia, iniciais, mudarStatus, pedirConexao, podePedirDe, type Conexao, type Vitrine } from "./lib"
-
-// Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
-export const campoTexto =
-  "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"
 
 // Avatar de iniciais: a foto de perfil ainda não tem bucket (fora do lançamento), então ninguém mostra imagem aqui.
 export function Avatar({ nome }: { nome: string | null }) {
@@ -97,7 +93,7 @@ export function DialogoDenuncia({ alvo, aberto, aoFechar }: { alvo: AlvoDenuncia
           </Selecao>
           <div>
             <label htmlFor="den-texto" className={campo.rotulo}>{t("rede.denuncia.detalhe")}</label>
-            <textarea id="den-texto" name="texto" rows={3} maxLength={1000} className={campoTexto} />
+            <textarea id="den-texto" name="texto" rows={3} maxLength={1000} className={campoApp} />
           </div>
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Botao type="button" variante="contorno" onClick={fechar} className="sm:w-auto">{t("comum.cancelar")}</Botao>
@@ -240,7 +236,7 @@ export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar, dest
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
           <div>
             <label htmlFor="cx-msg" className={campo.rotulo}>{t("rede.conexao.mensagem")}</label>
-            <textarea id="cx-msg" name="mensagem" rows={3} maxLength={500} className={campoTexto} />
+            <textarea id="cx-msg" name="mensagem" rows={3} maxLength={500} className={campoApp} />
           </div>
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Botao type="button" variante="contorno" onClick={() => setAberto(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>

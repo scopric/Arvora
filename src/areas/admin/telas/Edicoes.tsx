@@ -8,7 +8,8 @@ import { Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { EDITA, usePode } from "../lib/papel"
 import { faseDe } from "../lib/regras"
-import { classeAcaoPrimaria, classeLink } from "../lib/estilo"
+import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { classeLink } from "../lib/estilo"
 
 export function Edicoes() {
   const t = useT()
@@ -16,7 +17,7 @@ export function Edicoes() {
   const pode = usePode(EDITA)
   const carga = useCarga(async () => exigir(await supabase.from("edicoes").select("id, nome, ano, pais, cidade, durante_inicio, durante_fim, publicada_em").order("ano", { ascending: false })), [])
   return (
-    <Pagina titulo="admin.edicoes.titulo" intro="admin.edicoes.intro" acoes={pode ? <Link className={classeAcaoPrimaria} to={caminho("/admin/edicoes/nova")}>{t("admin.edicoes.nova")}</Link> : null}>
+    <Pagina titulo="admin.edicoes.titulo" intro="admin.edicoes.intro" acoes={pode ? <Link className={botaoPrimarioApp} to={caminho("/admin/edicoes/nova")}>{t("admin.edicoes.nova")}</Link> : null}>
       <Mostrar carga={carga}>
         {(linhas) =>
           linhas.length === 0 ? (

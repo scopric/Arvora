@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
+import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 import { Erro } from "../../../componentes/Erro"
 import { useCaminho, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { botaoLink, caixaSutil, linkTexto } from "../util"
+import { caixaSutil, linkTexto } from "../util"
 
 type Sala = { fase: "espera" } | { fase: "rede" } | { fase: "aberta"; url: string } | { fase: "semAcesso" } | { fase: "indisponivel" } | { fase: "erro" }
 
@@ -66,7 +67,7 @@ export function SalaAoVivo({ aulaId, inicio, duracaoMin }: { aulaId: number; ini
   if (sala.fase === "aberta")
     return (
       <div className="space-y-2">
-        <a href={sala.url} target="_blank" rel="noopener noreferrer" className={`${botaoLink} w-full sm:w-auto`}>
+        <a href={sala.url} target="_blank" rel="noopener noreferrer" className={`${botaoPrimarioApp} w-full sm:w-auto`}>
           {t("aprender.sala.entrar")}
           <span className="sr-only"> ({t("aprender.abreFora")})</span>
         </a>
