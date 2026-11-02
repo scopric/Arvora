@@ -8,7 +8,7 @@ const raiz = process.env.RAIZ_BUILD ?? "build/client"
 const site = process.env.VITE_SITE_URL?.replace(/\/+$/, "")
 const idiomas = ["pt", "en"]
 
-// Sem Disallow de propósito: as telas privadas já mandam noindex (vercel.json); bloquear aqui impediria o robô de ler o noindex.
+// Sem Disallow de propósito: o noindex vem do vercel.json (telas privadas sempre; o site todo até o lançamento); bloquear aqui impediria o robô de lê-lo.
 let robots = "User-agent: *\nAllow: /\n"
 
 // Caminhos (sem o idioma) de cada pasta com index.html, ex.: "/hall-of-fame/2025/fulano".
