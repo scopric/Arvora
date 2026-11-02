@@ -1,7 +1,7 @@
 -- RLS da F1 (identidade): setores, perfis, equipe. Roda com `supabase test db`, tudo dentro de uma
 -- transacao desfeita. Sem dbdev/helpers: o papel e o aal do JWT sao simulados com set_config.
 begin;
-select plan(69);
+select plan(70);
 
 create schema tt;
 grant usage on schema tt to public;
@@ -115,6 +115,8 @@ reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d1', 'aal2');
 select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', '2000-01-01')$$,
                  'P0001', 'perfil_mudou', 'versao diferente da que o moderador leu nao aprova');
+select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', null)$$,
+                 'P0001', 'perfil_mudou', 'versao nula nao aprova');
 select lives_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000b'))$$,
                 'moderador com 2FA aprova');
 select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000a', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000a'))$$,

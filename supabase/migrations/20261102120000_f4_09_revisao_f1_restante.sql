@@ -26,13 +26,15 @@ begin
   if (select private.papel_atual()) is null or (select private.papel_atual()) not in ('super_admin', 'moderador') then
     raise exception 'sem_permissao' using errcode = '42501';
   end if;
-  if not exists (select 1 from public.perfis where id = perfil and atualizado_em = versao) then
-    raise exception 'perfil_mudou' using errcode = 'P0001';
-  end if;
+  -- A versao vai no proprio UPDATE: em READ COMMITTED ele espera a escrita do membro em andamento e reconfere o
+  -- WHERE na linha nova. Um EXISTS antes, sozinho, deixaria aprovar a bio gravada no meio do clique.
   update public.perfis
      set publico_aprovado_em = case when aprovar then now() else null end
-   where id = perfil and suspenso_em is null and (not aprovar or visibilidade = 'publico');
+   where id = perfil and atualizado_em = versao and suspenso_em is null and (not aprovar or visibilidade = 'publico');
   if not found then
+    if exists (select 1 from public.perfis where id = perfil and atualizado_em is distinct from versao) then
+      raise exception 'perfil_mudou' using errcode = 'P0001';
+    end if;
     raise exception 'perfil_nao_aprovavel' using errcode = 'P0002';
   end if;
 end;

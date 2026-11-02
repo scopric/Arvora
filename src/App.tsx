@@ -24,7 +24,7 @@ import { RecuperarSenha } from "./telas/RecuperarSenha"
 import { RedefinirSenha } from "./telas/RedefinirSenha"
 
 // Caminho sem prefixo de idioma: manda para /{idioma}{caminho}, conservando busca e hash
-// (o link de recuperação de senha do Supabase chega com #access_token=...).
+// (os links dos e-mails usam ?token_hash=...&type=..., ver Confirmar.tsx).
 function SemPrefixo() {
   const { pathname, search, hash } = useLocation()
   return <Navigate to={`/${idiomaPreferido()}${pathname === "/" ? "" : pathname}${search}${hash}`} replace />
