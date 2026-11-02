@@ -127,6 +127,12 @@ describe("vercel.json: X-Robots-Tag", () => {
         expect(re.test(`/${l}/${t}/`)).toBe(true)
       }
   })
+  // Até o lançamento o site inteiro fica fora do Google (Decisão 64): o domínio próprio não tem o noindex da Vercel
+  // e o Hall of Fame ainda mostra exemplos. No lançamento, apagar esta regra e este teste.
+  it("até o lançamento: noindex em todo o site", () => {
+    const geral = cfg.headers.find((h) => h.source === "/(.*)")!
+    expect(geral.headers.find((x) => x.key === "X-Robots-Tag")?.value).toBe("noindex, nofollow")
+  })
   it("home e páginas públicas não casam", () => {
     for (const p of ["/", "/pt", "/en", "/pt/hall-of-fame", "/en/hall-of-fame/2026/fulano", "/pt/perfilx"]) expect(re.test(p)).toBe(false)
   })
