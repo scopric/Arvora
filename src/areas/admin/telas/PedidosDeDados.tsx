@@ -16,7 +16,7 @@ import { diasAte } from "../lib/regras"
 
 const STATUS = ["recebido", "em_andamento", "concluido", "recusado"] as const
 type Status = (typeof STATUS)[number]
-type Pedido = { id: number; email: string; tipo: "exportacao" | "exclusao" | "retificacao"; status: Status; prazo_em: string; criado_em: string; perfil_id: string | null; observacao: string | null }
+type Pedido = { id: number; email: string; tipo: "exportacao" | "exclusao" | "retificacao"; status: Status; prazo_em: string; criado_em: string; observacao: string | null }
 
 function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
   const t = useT()
@@ -56,7 +56,7 @@ export function PedidosDeDados() {
   const pode = usePode(SUPER)
   const [abertos, setAbertos] = useState(true)
   const carga = useCarga(async () => {
-    let q = supabase.from("pedidos_gdpr").select("id, email, tipo, status, prazo_em, criado_em, perfil_id, observacao").order("prazo_em").limit(300)
+    let q = supabase.from("pedidos_gdpr").select("id, email, tipo, status, prazo_em, criado_em, observacao").order("prazo_em").limit(300)
     if (abertos) q = q.in("status", ["recebido", "em_andamento"])
     return exigir(await q) as Pedido[]
   }, [abertos, pode])
@@ -80,7 +80,6 @@ export function PedidosDeDados() {
               colunas={[
                 { chave: "email", titulo: t("admin.comum.email"), celula: (l) => l.email },
                 { chave: "recebido", titulo: t("admin.pedidos.recebidoEm"), celula: (l) => dataCurta(l.criado_em) },
-                { chave: "perfil", titulo: t("admin.pedidos.perfil"), celula: (l) => <span className="break-all text-xs">{l.perfil_id ?? "—"}</span> },
                 { chave: "tipo", titulo: t("admin.comum.tipo"), celula: (l) => t(`admin.pedidos.tipo.${l.tipo}`) },
                 {
                   chave: "prazo", titulo: t("admin.pedidos.prazo"),

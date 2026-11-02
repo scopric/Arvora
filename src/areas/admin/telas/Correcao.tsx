@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Botao } from "../../../componentes/Botao"
 import { Cartao } from "../../../componentes/Cartao"
-import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
@@ -33,8 +32,8 @@ function Item({ e, titulo, membro, enunciado, prazo, aoMudar }: { e: Entrega; ti
     <Cartao>
       <h2 className="text-lg font-semibold">{membro} · {titulo}</h2>
       <p className="mt-1 text-sm opacity-75">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}
-        {prazo !== null ? <> · {t("admin.correcao.prazo")}: {prazo} {t("admin.correcao.diasPrazo")}{dias > prazo ? <> <Selo tom="alerta">{t("admin.correcao.atrasada")}</Selo></> : null}</> : null}
-        {/* Aviso por e-mail ao corretor/membro: depende da conta do Resend (ainda não existe). */}
+        {prazo !== null ? <> · {t("admin.correcao.prazo")}: {prazo} {t("admin.correcao.diasPrazo")}</> : null}
+        {/* O prazo é o do membro para entregar (informativo), não o da correção. Aviso por e-mail ao corretor/membro: depende da conta do Resend (ainda não existe). */}
       </p>
       <p className="mt-3 text-sm opacity-75">{enunciado}</p>
       {e.texto ? <p className="mt-3 whitespace-pre-wrap">{e.texto}</p> : null}

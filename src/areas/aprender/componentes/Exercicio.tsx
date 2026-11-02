@@ -168,6 +168,7 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, ra
             </div>
           ) : null}
           {!entrega && !podeEnviar ? <p className="mt-4 text-sm opacity-75">{t("aprender.exercicio.semEnvio")}</p> : null}
+          {reenvio && !podeEnviar ? <p className="mt-4 text-sm opacity-75">{t("aprender.exercicio.soGrupo")}</p> : null}
         </>
       )}
       {ok ? (
