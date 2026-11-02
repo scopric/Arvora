@@ -63,7 +63,8 @@ insert into public.entregas (exercicio_id, perfil_id, texto) values (tt.ex(), tt
 update public.entregas set status = 'ajustar', corrigido_por = tt.u('ed'), corrigido_em = now(), devolutiva = 'x'
  where perfil_id in (tt.u('c1'), tt.u('b1'));
 select tt.como(tt.u('c1'));
-select is(tt.afeta($$update public.entregas set texto = 'novo' where perfil_id = tt.u('c1')$$), 0, 'clube nao reenvia entrega em ajustar');
+-- A linha passa no USING (e dela, em ajustar) mas o WITH CHECK (pode_entregar) falha: o banco recusa com erro, nao com 0 linhas.
+select throws_ok($$update public.entregas set texto = 'novo' where perfil_id = tt.u('c1')$$, '42501', null, 'clube nao reenvia entrega em ajustar');
 reset role;
 select tt.como(tt.u('b1'));
 select is(tt.afeta($$update public.entregas set texto = 'novo' where perfil_id = tt.u('b1')$$), 1, 'grupo reenvia entrega em ajustar');
