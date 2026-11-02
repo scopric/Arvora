@@ -103,7 +103,7 @@ export function Aula() {
             ) : null}
           </div>
           <div className={painel}>
-            <Materiais aulaId={aula.id} uid={uid} podeEnviar={!!aula.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} />
+            <Materiais aulaId={aula.id} uid={uid} podeEnviar={!!aula.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} doGrupo={temNivel(acesso.nivel, "grupo")} />
           </div>
         </div>
       ) : null}

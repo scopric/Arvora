@@ -40,7 +40,7 @@ export function Tarefa() {
           <Link to={caminho(`/aulas/${exercicio.aulas.slug}`)} className={linkTexto}>{t("aprender.tarefa.verAula")}</Link>
         </p>
       ) : null}
-      <Exercicio exercicio={exercicio} entrega={entrega} uid={uid} podeEnviar={!!exercicio.aulas?.verticais?.aceita_entregas} aoAtualizar={recarregar} />
+      <Exercicio exercicio={exercicio} entrega={entrega} uid={uid} podeEnviar={!!exercicio.aulas?.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} doGrupo={temNivel(acesso.nivel, "grupo")} aoAtualizar={recarregar} />
     </Pagina>
   )
 }

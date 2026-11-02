@@ -127,6 +127,13 @@ describe("Correção de tarefas", () => {
     await waitFor(() => expect(chamou("rpc:corrigir_entrega")).toHaveLength(1))
     expect(chamou("rpc:corrigir_entrega")[0].args[0]).toEqual({ entrega: 5, novo_status: "ajustar", devolutiva: "Detalhe mais a meta" })
   })
+  it("mostra o prazo de entrega do exercício, sem marcar atraso", async () => {
+    estado.respostas["exercicios"] = { data: [{ id: 2, aula_id: 3, enunciado_md: "Descreva sua meta", prazo_dias: 3 }], error: null }
+    montar(<Correcao />, "/correcao", "/pt/admin/correcao", "corretor")
+    await screen.findByText(/Ana Exemplo · Aula de vendas/)
+    expect(screen.getByText(/Prazo de entrega: 3 dia\(s\)/)).toBeTruthy()
+    expect(screen.queryByText("Atrasada")).toBeNull()
+  })
   it("fila vazia diz 'fila zerada'; editor não tem a tela", async () => {
     estado.respostas["entregas"] = { data: [], error: null }
     montar(<Correcao />, "/correcao", "/pt/admin/correcao")
@@ -204,6 +211,19 @@ describe("Pedidos de dados, Equipe, Membros, Visão geral, Temas, Moderação", 
     cleanup()
     montar(<PedidosDeDados />, "/pedidos-de-dados", "/pt/admin/pedidos-de-dados", "editor")
     expect(await screen.findByText("Sem acesso a esta tela")).toBeTruthy()
+  })
+  it("marcar como atendido pede confirmação antes de gravar", async () => {
+    estado.respostas["pedidos_gdpr"] = { data: [{ id: 1, email: "x@exemplo.invalid", tipo: "exclusao", status: "recebido", prazo_em: "2026-11-20", criado_em: "2026-10-20T10:00:00Z", observacao: null }], error: null }
+    montar(<PedidosDeDados />, "/pedidos-de-dados", "/pt/admin/pedidos-de-dados")
+    await screen.findByText("x@exemplo.invalid")
+    await userEvent.click(screen.getByRole("button", { name: "Marcar como atendido" }))
+    expect(chamou("pedidos_gdpr", "update")).toHaveLength(0)
+    await userEvent.click(await screen.findByRole("button", { name: "Cancelar" }))
+    expect(chamou("pedidos_gdpr", "update")).toHaveLength(0)
+    await userEvent.click(screen.getByRole("button", { name: "Marcar como atendido" }))
+    await userEvent.click(within(await screen.findByRole("dialog")).getByRole("button", { name: "Marcar como atendido" }))
+    await waitFor(() => expect(chamou("pedidos_gdpr", "update")).toHaveLength(1))
+    expect(chamou("pedidos_gdpr", "update")[0].args[0]).toMatchObject({ status: "concluido" })
   })
   it("Equipe: só o super_admin", async () => {
     montar(<Equipe />, "/equipe", "/pt/admin/equipe", "auditor")

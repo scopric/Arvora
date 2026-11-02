@@ -97,7 +97,8 @@ from public.aulas where slug = 'negociar-preco';
 -- Comunidade.
 insert into public.espacos (slug, titulo, titulo_en, descricao, nivel_minimo, ordem) values
   ('geral', 'Geral', 'General', 'Espaço aberto a Clube e Grupo (proposta).', 'clube', 1),
-  ('grupo', 'Grupo Árvora', 'Árvora Group', 'Espaço só do Grupo (proposta).', 'grupo', 2);
+  ('grupo', 'Grupo Árvora', 'Árvora Group', 'Espaço só do Grupo (proposta).', 'grupo', 2)
+on conflict (slug) do nothing;
 insert into public.posts (espaco_id, autor_id, corpo)
 select id, '00000000-0000-0000-0000-00000000de00', 'Post de exemplo: alguém aqui já vendeu para o setor público na Irlanda?'
 from public.espacos where slug = 'geral';

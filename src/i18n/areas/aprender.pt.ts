@@ -79,6 +79,7 @@ export const aprenderPt = {
   "aprender.exercicio.novaResposta": "Sua nova resposta",
   "aprender.exercicio.prazo": "Prazo",
   "aprender.exercicio.reenviar": "Reenviar",
+  "aprender.exercicio.soGrupo": "Enviar e reenviar tarefas é só para o Grupo.",
   "aprender.exercicio.semEnvio": "O envio de respostas não está aberto para este exercício.",
   "aprender.exercicio.semMudanca": "Altere a resposta ou anexe um arquivo novo antes de reenviar.",
   "aprender.exercicio.suaResposta": "Sua resposta",

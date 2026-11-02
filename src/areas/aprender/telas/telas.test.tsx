@@ -170,6 +170,16 @@ describe("/aulas/:slug gravada e exercícios", () => {
     expect((await screen.findAllByRole("alert"))[0].textContent).toMatch(/escreva uma resposta/i)
     expect(chamadas.filter((c) => c.metodo !== "video_da_aula")).toEqual([])
   })
+  it("sem poder enviar: Clube vê 'só para o Grupo'; vertical sem entregas vê a mensagem da vertical", async () => {
+    const entrega = { id: 3, exercicio_id: 9, texto: "v1", arquivo_path: null, status: "ajustar", devolutiva: "Falta o preço.", enviada_em: "2026-10-22T10:00:00Z", corrigido_em: "2026-10-23T10:00:00Z" }
+    montarGravada({ entregas: ok([entrega]), aulas: ok({ ...gravada, nivel_minimo: "clube" }) }, "clube")
+    expect(await screen.findByText("Enviar e reenviar tarefas é só para o Grupo.")).toBeTruthy()
+    expect(screen.queryByRole("button", { name: /reenviar/i })).toBeNull()
+    cleanup()
+    montarGravada({ aulas: ok({ ...gravada, verticais: { ...vertical, aceita_entregas: false } }) })
+    expect(await screen.findByText("O envio de respostas não está aberto para este exercício.")).toBeTruthy()
+    expect(screen.queryByText("Enviar e reenviar tarefas é só para o Grupo.")).toBeNull()
+  })
   it("status 'ajustar': devolutiva em destaque e reenvio por UPDATE", async () => {
     const entrega = { id: 3, exercicio_id: 9, texto: "v1", arquivo_path: null, status: "ajustar", devolutiva: "Falta o preço.", enviada_em: "2026-10-22T10:00:00Z", corrigido_em: "2026-10-23T10:00:00Z" }
     montarGravada({ entregas: ok([entrega]), "entregas.update": ok([{ id: 3 }]) })

@@ -80,6 +80,7 @@ export const aprenderEn: Record<keyof typeof aprenderPt, string> = {
   "aprender.exercicio.novaResposta": "Your new answer",
   "aprender.exercicio.prazo": "Deadline",
   "aprender.exercicio.reenviar": "Resend",
+  "aprender.exercicio.soGrupo": "Sending and resending tasks is for the Group only.",
   "aprender.exercicio.semEnvio": "Sending answers is not open for this exercise.",
   "aprender.exercicio.semMudanca": "Change the answer or attach a new file before resending.",
   "aprender.exercicio.suaResposta": "Your answer",
