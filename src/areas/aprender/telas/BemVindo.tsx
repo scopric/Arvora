@@ -16,7 +16,7 @@ import { Pagina } from "../componentes/Pagina"
 import { QuandoAula } from "../componentes/QuandoAula"
 import { COLUNAS_AULA, type AulaLinha } from "../tipos"
 import { useCarga } from "../useCarga"
-import { botaoContorno, dados, linhas, linkTexto } from "../util"
+import { botaoContorno, cartao, dados, linhas, linkTexto } from "../util"
 
 // No onboarding só os campos de perfil que importam já; o resto o membro completa em Meu perfil (mesmo schema).
 const passo1 = perfilSchema.pick({ nome: true, empresa_nome: true, setor_id: true, cidade: true, pais: true, visibilidade: true })
@@ -118,11 +118,11 @@ export function BemVindo() {
   const nomeDe = (c: Cat) => (lang === "en" ? (c.nome_en ?? c.nome) : c.nome)
   const grupoChips = (tipo: Item["tipo"], legenda: Chave) => (
     <fieldset>
-      <legend className="mb-2 text-sm font-semibold">{t(legenda)}</legend>
+      <legend className="mb-2 text-legenda font-medium text-bruma">{t(legenda)}</legend>
       <div className="flex flex-wrap gap-2">
         {categorias.map((c) => (
-          <label key={c.id} className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-creme/30 px-4 has-[:checked]:border-destaque has-[:checked]:text-destaque has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-dourado`}>
-            <input type="checkbox" checked={sel.has(`${tipo}:${c.id}`)} onChange={() => alternar(`${tipo}:${c.id}`)} className="size-4 accent-destaque" />
+          <label key={c.id} className="flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-grafite px-3 text-legenda font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:text-creme has-[:checked]:border-bruma has-[:checked]:bg-creme/5 has-[:checked]:text-creme has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-dourado">
+            <input type="checkbox" checked={sel.has(`${tipo}:${c.id}`)} onChange={() => alternar(`${tipo}:${c.id}`)} className="size-4 accent-dourado" />
             {nomeDe(c)}
           </label>
         ))}
@@ -132,20 +132,22 @@ export function BemVindo() {
 
   return (
     <Pagina chave={chave}>
-      <ol className="mb-6 flex flex-wrap gap-x-6 gap-y-1 text-sm" aria-label={t("aprender.bemVindo.passos")}>
+      {/* Molde Linear (welcome): coluna estreita, passos com ponto dourado no atual, formulário em cartão. */}
+      <div className="max-w-2xl">
+      <ol className="mb-6 flex flex-wrap gap-x-5 gap-y-1 text-legenda" aria-label={t("aprender.bemVindo.passos")}>
         {(["aprender.bemVindo.passo1", grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube", "aprender.bemVindo.passo3"] as Chave[]).map((k, i) => (
-          <li key={k} aria-current={etapa === i + 1 ? "step" : undefined} className={etapa === i + 1 ? "font-semibold text-destaque" : "opacity-70"}>{i + 1}. {t(k)}</li>
+          <li key={k} aria-current={etapa === i + 1 ? "step" : undefined} className={`flex items-center gap-2 ${etapa === i + 1 ? "font-medium text-creme" : "text-nevoa"}`}><span aria-hidden="true" className={`size-1.5 rounded-full ${etapa === i + 1 ? "bg-dourado" : "bg-fumaca"}`} />{i + 1}. {t(k)}</li>
         ))}
       </ol>
-      <h2 ref={titulo} tabIndex={-1} className="mb-4 text-2xl font-semibold outline-none">
+      <h2 ref={titulo} tabIndex={-1} className="mb-5 text-subtitulo font-semibold outline-none">
         {t(etapa === 1 ? "aprender.bemVindo.passo1" : etapa === 2 ? (grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube") : "aprender.bemVindo.passo3")}
-        <span className="ml-3 text-sm font-normal opacity-70">{t("aprender.bemVindo.passoDe").replace("{n}", String(etapa))}</span>
+        <span className="ml-3 text-legenda font-normal text-nevoa">{t("aprender.bemVindo.passoDe").replace("{n}", String(etapa))}</span>
       </h2>
       {aviso ? <div className="mb-4"><Aviso tipo="erro">{t(aviso)}</Aviso></div> : null}
 
       {etapa === 1 ? (
-        <form onSubmit={salvarPerfil} noValidate className="max-w-xl space-y-5">
-          <p className="opacity-80">{t("aprender.bemVindo.perfilTexto")}</p>
+        <form onSubmit={salvarPerfil} noValidate className={`${cartao} space-y-5`}>
+          <p className="text-base text-bruma">{t("aprender.bemVindo.perfilTexto")}</p>
           <Campo rotulo={t("perfil.nome")} name="nome" defaultValue={perfil.nome} erro={erros.nome} autoComplete="name" />
           <Campo rotulo={t("perfil.empresa")} name="empresa_nome" defaultValue={perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
           <Selecao rotulo={t("perfil.setor")} name="setor_id" defaultValue={perfil.setor_id?.toString() ?? ""} erro={erros.setor_id}>
@@ -170,16 +172,16 @@ export function BemVindo() {
       ) : null}
 
       {etapa === 2 ? (
-        <div className="max-w-2xl space-y-6">
+        <div className={`${cartao} space-y-6`}>
           {grupo ? (
             <>
-              <p className="opacity-80">{t("aprender.bemVindo.redeTexto")}</p>
+              <p className="text-base text-bruma">{t("aprender.bemVindo.redeTexto")}</p>
               {grupoChips("procura", "aprender.bemVindo.busco")}
               {grupoChips("oferece", "aprender.bemVindo.ofereco")}
             </>
           ) : (
             <>
-              <p className="opacity-80">{t("aprender.bemVindo.conhecaRede")}</p>
+              <p className="text-base text-bruma">{t("aprender.bemVindo.conhecaRede")}</p>
               <Link to={caminho("/network")} className={linkTexto}>{t("aprender.bemVindo.verRede")}</Link>
             </>
           )}
@@ -192,26 +194,28 @@ export function BemVindo() {
       ) : null}
 
       {etapa === 3 ? (
-        <div className="max-w-2xl space-y-6">
+        <div className="space-y-6">
           {grupo ? (
             aula && aula.inicio_em ? (
-              <div className="space-y-3 rounded-2xl border border-current/15 bg-superficie/25 p-5">
-                <h3 className="text-xl font-semibold">{aula.titulo}</h3>
-                <p className="opacity-80"><QuandoAula inicio={aula.inicio_em} /></p>
+              <div className={`${cartao} space-y-3`}>
+                <p className="text-legenda font-medium text-nevoa">{t("aprender.inicio.proximaAula")}</p>
+                <h3 className="text-corpo-g font-semibold">{aula.titulo}</h3>
+                <p className="text-base text-bruma"><QuandoAula inicio={aula.inicio_em} /></p>
                 <Agenda aula={{ ...aula, inicio_em: aula.inicio_em }} />
               </div>
             ) : (
-              <p className="opacity-80">{t("aprender.aulas.vazio")}</p>
+              <p className="text-base text-nevoa">{t("aprender.aulas.vazio")}</p>
             )
           ) : (
             <Bloqueado frase={t("aprender.aulas.bloqueado")} minimo="grupo" />
           )}
           <div className="flex flex-wrap items-center gap-4">
             <button type="button" onClick={() => setEtapa(2)} className={botaoContorno}>{t("aprender.bemVindo.voltar")}</button>
-            <Botao ocupado={ocupado} className="sm:w-auto" onClick={() => void concluir()}>{t("aprender.bemVindo.concluir")}</Botao>
+            <Botao variante={grupo ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto" onClick={() => void concluir()}>{t("aprender.bemVindo.concluir")}</Botao>
           </div>
         </div>
       ) : null}
+      </div>
     </Pagina>
   )
 }

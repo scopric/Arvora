@@ -21,6 +21,7 @@ type AulaComVertical = AulaLinha & { verticais: Vertical | null }
 
 // /aulas/:slug. Ao vivo (ainda sem materiais publicados): sala com o botão "Entrar". Gravada: player + abas Resumo,
 // E-book e Exercícios. Abaixo do nível da aula: prévia com cadeado (PRD §17.1 nº1).
+// Molde MasterClass (lição): player largo à esquerda, painel de materiais à direita (no celular, abaixo).
 export function Aula() {
   const { slug } = useParams()
   const t = useT()
@@ -62,41 +63,48 @@ export function Aula() {
   const permitido = temNivel(acesso.nivel, aula.nivel_minimo)
   const vertical = aula.verticais ? nomeVertical(aula.verticais, lang) : ""
   const rotulo = [vertical, aoVivo ? t("aprender.aoVivo") : null].filter(Boolean).join(" · ")
+  const meta = aula.inicio_em || aula.duracao_min ? (
+    <>
+      {aula.inicio_em ? <QuandoAula inicio={aula.inicio_em} /> : null}
+      {aula.duracao_min ? <> · {aula.duracao_min} {t("aprender.min")}</> : null}
+    </>
+  ) : undefined
+  const painel = "lg:sticky lg:top-16 lg:self-start"
 
   return (
-    <Pagina chave="aprender.aula.titulo" titulo={aula.titulo} rotulo={rotulo}>
-      <p className="-mt-4 mb-8 opacity-80">
-        {aula.inicio_em ? <QuandoAula inicio={aula.inicio_em} /> : null}
-        {aula.duracao_min ? <> · {aula.duracao_min} {t("aprender.min")}</> : null}
-      </p>
-      <Link to={caminho("/aulas")} className={`mb-6 inline-block ${linkTexto}`}>‹ {t("aprender.voltarAulas")}</Link>
-
+    <Pagina chave="aprender.aula.titulo" titulo={aula.titulo} conteudo rotulo={rotulo} meta={meta} voltar={{ para: caminho("/aulas"), rotulo: t("aprender.voltarAulas") }}>
       {!permitido ? (
-        <Bloqueado previa={<p className="text-lg">{aula.descricao ?? aula.titulo}</p>} frase={t("aprender.aulas.bloqueado")} minimo={aula.nivel_minimo === "clube" ? "clube" : "grupo"} />
+        <Bloqueado previa={<p className="text-base">{aula.descricao ?? aula.titulo}</p>} frase={t("aprender.aulas.bloqueado")} minimo={aula.nivel_minimo === "clube" ? "clube" : "grupo"} />
       ) : aoVivo ? (
         // Ao vivo nunca cai no player: sem inicio_em (o banco não deixa, mas a tela não presume) não há sala nem agenda.
-        <div className="space-y-8">
-          {aula.descricao ? <p className="max-w-prose text-lg">{aula.descricao}</p> : null}
-          {aula.inicio_em ? (
-            <>
-              <SalaAoVivo aulaId={aula.id} inicio={aula.inicio_em} duracaoMin={aula.duracao_min} />
-              <Agenda aula={{ ...aula, inicio_em: aula.inicio_em }} />
-            </>
-          ) : (
-            <Erro>{t("aprender.sala.indisponivel")}</Erro>
-          )}
-          <Vazio>{t("aprender.materiais.emBreve")}</Vazio>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="min-w-0 space-y-6">
+            {aula.inicio_em ? (
+              <>
+                <SalaAoVivo aulaId={aula.id} inicio={aula.inicio_em} duracaoMin={aula.duracao_min} />
+                <Agenda aula={{ ...aula, inicio_em: aula.inicio_em }} />
+              </>
+            ) : (
+              <Erro>{t("aprender.sala.indisponivel")}</Erro>
+            )}
+            {aula.descricao ? <p className="max-w-prose text-base text-bruma">{aula.descricao}</p> : null}
+          </div>
+          <div className={painel}><Vazio>{t("aprender.materiais.emBreve")}</Vazio></div>
         </div>
       ) : uid ? (
-        <div className="space-y-10">
-          {aula.descricao ? <p className="max-w-prose text-lg">{aula.descricao}</p> : null}
-          <Gravacao aulaId={aula.id} titulo={aula.titulo} uid={uid} />
-          <Materiais aulaId={aula.id} uid={uid} podeEnviar={!!aula.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} doGrupo={temNivel(acesso.nivel, "grupo")} />
-          {proxima.fase === "ok" && proxima.dados ? (
-            <p>
-              <Link to={caminho(`/aulas/${proxima.dados.slug}`)} className={linkTexto}>{t("aprender.proxima")}: {proxima.dados.titulo} →</Link>
-            </p>
-          ) : null}
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="min-w-0 space-y-6">
+            <Gravacao aulaId={aula.id} titulo={aula.titulo} uid={uid} />
+            {aula.descricao ? <p className="max-w-prose text-base text-bruma">{aula.descricao}</p> : null}
+            {proxima.fase === "ok" && proxima.dados ? (
+              <p>
+                <Link to={caminho(`/aulas/${proxima.dados.slug}`)} className={linkTexto}>{t("aprender.proxima")}: {proxima.dados.titulo} <span aria-hidden="true">→</span></Link>
+              </p>
+            ) : null}
+          </div>
+          <div className={painel}>
+            <Materiais aulaId={aula.id} uid={uid} podeEnviar={!!aula.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} doGrupo={temNivel(acesso.nivel, "grupo")} />
+          </div>
         </div>
       ) : null}
     </Pagina>

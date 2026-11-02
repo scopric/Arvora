@@ -1,7 +1,7 @@
 -- SO DESENVOLVIMENTO LOCAL (roda no `supabase db reset`). Nunca vai para producao (Erros 6.1).
 -- Os setores iniciais sao dado de referencia e vem da migration f1_17; nao recria-los aqui.
 -- Tudo abaixo e FICTICIO e marcado como exemplo: pessoas, empresas, premiados, textos legais, conta Stripe e plano.
--- Conta de demonstracao (so local): demo@exemplo.invalid / senha-demo-local, nivel Grupo.
+-- Contas de demonstracao (so local): demo@exemplo.invalid (Grupo) e admin@exemplo.invalid (super_admin), senha senha-demo-local.
 
 -- Conta Stripe e plano de exemplo (Price inexistente no Stripe; valor zero de proposito).
 insert into public.contas_stripe (stripe_account_id, titular, pais) values ('acct_exemplo_local', 'Conta de exemplo (local)', 'IE');
@@ -27,6 +27,21 @@ where id = '00000000-0000-0000-0000-00000000de00';
 insert into public.assinaturas (perfil_id, conta_stripe_id, stripe_subscription_id, plano_id, status, periodo_inicio, periodo_fim)
 select '00000000-0000-0000-0000-00000000de00', p.conta_stripe_id, 'sub_exemplo_local', p.id, 'active', now(), now() + interval '1 year'
 from public.planos p where p.stripe_price_id = 'price_exemplo_grupo';
+
+-- Admin de demonstracao (so local): admin@exemplo.invalid / senha-demo-local, super_admin. O 2FA (TOTP) e cadastrado
+-- na primeira entrada em /admin, pelo QR da propria tela.
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+                        raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+                        confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-00000000ad00', 'authenticated', 'authenticated',
+        'admin@exemplo.invalid', extensions.crypt('senha-demo-local', extensions.gen_salt('bf')), now(),
+        '{"provider":"email","providers":["email"]}', '{"nome":"Admin de exemplo","maior_18":"true"}', now(), now(),
+        '', '', '', '');
+insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values ('00000000-0000-0000-0000-00000000ad00', '00000000-0000-0000-0000-00000000ad00',
+        '{"sub":"00000000-0000-0000-0000-00000000ad00","email":"admin@exemplo.invalid","email_verified":true}',
+        'email', now(), now(), now());
+insert into public.equipe (perfil_id, papel) values ('00000000-0000-0000-0000-00000000ad00', 'super_admin');
 
 -- Textos legais de EXEMPLO (os reais sao das Contratantes e do solicitor).
 insert into public.documentos_legais (tipo, versao, idioma, titulo, conteudo_md)

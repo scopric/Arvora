@@ -2,12 +2,13 @@ import { useState } from "react"
 import { Link, useParams } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Botao } from "../../../componentes/Botao"
-import { Cartao } from "../../../componentes/Cartao"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone } from "../../../componentes/Icone"
 import { Vazio } from "../../../componentes/Vazio"
-import { useCaminho, useIdioma, useT, useTitulo } from "../../../i18n"
+import { useCaminho, useIdioma, useT } from "../../../i18n"
+import { linkTextoApp } from "../../../componentes/menuApp"
+import { PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -20,7 +21,6 @@ export function NetworkPerfil() {
   const t = useT()
   const idioma = useIdioma()
   const caminho = useCaminho()
-  useTitulo("rede.networkPerfil.titulo")
   const { perfil: param = "" } = useParams()
   const acesso = useAcesso()
   const { sessao } = useAuth()
@@ -49,6 +49,7 @@ export function NetworkPerfil() {
   }, `${liberado}-${param}`)
 
   let corpo
+  let nome: string | undefined
   if (acesso.carregando || (liberado && estado.fase === "carregando")) corpo = <Esqueleto linhas={5} />
   else if (acesso.erro) corpo = <Erro aoTentar={acesso.recarregar}>{t("acesso.erro")}</Erro>
   else if (!liberado) corpo = <Bloqueado minimo="clube" frase={t("rede.network.bloqueadoVisitante")} />
@@ -60,71 +61,69 @@ export function NetworkPerfil() {
     const local = [nomeSetor(setores, perfil.setor_id, idioma), perfil.cidade].filter(Boolean).join(" · ")
     const lista = (tipo: Item["tipo"]) => itens.filter((i) => i.tipo === tipo)
     const bloco = (tipo: Item["tipo"]) => (
-      <section aria-labelledby={`bl-${tipo}`}>
-        <h2 id={`bl-${tipo}`} className="font-mono text-xs font-semibold tracking-[0.2em] text-destaque uppercase">{t(tipo === "procura" ? "rede.networkPerfil.procura" : "rede.networkPerfil.oferece")}</h2>
+      <section aria-labelledby={`bl-${tipo}`} className="rounded-xl p-5 shadow-borda">
+        <h2 id={`bl-${tipo}`} className="text-legenda font-medium text-nevoa">{t(tipo === "procura" ? "rede.networkPerfil.procura" : "rede.networkPerfil.oferece")}</h2>
         {lista(tipo).length === 0 ? (
-          <p className="mt-2 text-sm opacity-70">{t("rede.networkPerfil.nada")}</p>
+          <p className="mt-3 text-base text-nevoa">{t("rede.networkPerfil.nada")}</p>
         ) : (
-          <ul className="mt-2 space-y-2">
+          <ul className="mt-3 divide-y divide-grafite">
             {lista(tipo).map((i) => (
-              <li key={i.categoria_id}>
-                <strong>{nomeCategoria(categorias, i.categoria_id, idioma)}</strong>
-                {i.texto ? <p className="text-sm opacity-80">{i.texto}</p> : null}
+              <li key={i.categoria_id} className="py-2.5 first:pt-0 last:pb-0">
+                <p className="text-base font-medium">{nomeCategoria(categorias, i.categoria_id, idioma)}</p>
+                {i.texto ? <p className="mt-1 text-base text-bruma">{i.texto}</p> : null}
               </li>
             ))}
           </ul>
         )}
       </section>
     )
+    const nomeOk = perfil.nome || null
+    nome = nomeOk ?? undefined
     corpo = (
-      <Cartao className="space-y-6">
-        <div className="flex items-start gap-4">
-          <Avatar nome={perfil.nome} />
+      <div className="space-y-6">
+        <div className="flex items-start gap-3">
+          <Avatar nome={nomeOk} />
           <div>
-            <h1 className="font-titulo text-4xl font-medium">{perfil.nome}</h1>
-            {perfil.empresa_nome ? <p className="opacity-80">{perfil.empresa_nome}</p> : null}
-            {local ? <p className="text-sm opacity-60">{local}</p> : null}
+            {perfil.empresa_nome ? <p className="text-base text-bruma">{perfil.empresa_nome}</p> : null}
+            {local ? <p className="text-legenda text-nevoa">{local}</p> : null}
           </div>
         </div>
-        {perfil.bio ? <p className="whitespace-pre-wrap">{perfil.bio}</p> : null}
+        {perfil.bio ? <p className="max-w-prose text-base whitespace-pre-wrap">{perfil.bio}</p> : null}
         {perfil.linkedin_url?.startsWith("https://") || perfil.instagram ? (
-          <p className="flex flex-wrap gap-4 text-sm">
-            {perfil.linkedin_url?.startsWith("https://") ? <a href={perfil.linkedin_url} rel="noopener noreferrer" className="underline">LinkedIn</a> : null}
-            {perfil.instagram ? <a href={`https://www.instagram.com/${perfil.instagram}`} rel="noopener noreferrer" className="underline">Instagram</a> : null}
+          <p className="flex flex-wrap gap-4 text-legenda">
+            {perfil.linkedin_url?.startsWith("https://") ? <a href={perfil.linkedin_url} rel="noopener noreferrer" className={linkTextoApp}>LinkedIn</a> : null}
+            {perfil.instagram ? <a href={`https://www.instagram.com/${perfil.instagram}`} rel="noopener noreferrer" className={linkTextoApp}>Instagram</a> : null}
           </p>
         ) : null}
-        <div className="grid gap-6 sm:grid-cols-2">{bloco("procura")}{bloco("oferece")}</div>
+        <div className="grid gap-4 sm:grid-cols-2">{bloco("procura")}{bloco("oferece")}</div>
         {meu ? (
-          <p className="text-sm opacity-75">{t("rede.networkPerfil.seuPerfil")} <Link to={caminho("/perfil")} className="underline">{t("menu.perfil")}</Link></p>
+          <p className="text-legenda text-nevoa">{t("rede.networkPerfil.seuPerfil")} <Link to={caminho("/perfil")} className={linkTextoApp}>{t("menu.perfil")}</Link></p>
         ) : (
-          <div className="space-y-4 border-t border-current/15 pt-6">
+          <div className="space-y-4 border-t border-grafite pt-6">
             <div className="flex flex-wrap items-center gap-3">
               {grupo && perfil.id ? (
-                <AcaoConexao uid={uid} outroId={perfil.id} nome={perfil.nome ?? ""} origem="busca" conexao={conexao ?? undefined} aoMudar={recarregar} />
+                <AcaoConexao uid={uid} outroId={perfil.id} nome={nomeOk ?? ""} origem="busca" conexao={conexao ?? undefined} aoMudar={recarregar} />
               ) : (
-                <span className="inline-flex min-h-12 items-center gap-2 text-sm opacity-75"><Icone nome="cadeado" className="size-4" />{t("rede.network.conectarBloqueado")}</span>
+                <span className="inline-flex items-center gap-2 text-legenda text-nevoa"><Icone nome="cadeado" className="size-4 text-cinza" />{t("rede.network.conectarBloqueado")}</span>
               )}
               <Botao variante="contorno" onClick={() => setDenunciando(true)} className="sm:w-auto">{t("rede.networkPerfil.denunciar")}</Botao>
             </div>
-            {!grupo ? <p className="text-sm opacity-75">{t("rede.network.bloqueadoClube")}</p> : null}
+            {!grupo ? <p className="text-legenda text-nevoa">{t("rede.network.bloqueadoClube")}</p> : null}
             {conexao?.status === "aceita" && perfil.id ? (
               <Contato outroId={perfil.id} />
             ) : (
-              <p className="text-sm opacity-60">{t("rede.networkPerfil.contatoDepois")}</p>
+              <p className="text-legenda text-nevoa">{t("rede.networkPerfil.contatoDepois")}</p>
             )}
           </div>
         )}
         {perfil.id ? <DialogoDenuncia alvo={{ perfil_denunciado_id: perfil.id }} aberto={denunciando} aoFechar={() => setDenunciando(false)} /> : null}
-      </Cartao>
+      </div>
     )
   }
 
-  const temPerfil = estado.fase === "pronto" && !!estado.dados?.perfil
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <Link to={caminho("/network")} className="underline">{t("rede.networkPerfil.voltar")}</Link>
-      {temPerfil ? null : <h1 className="mt-6 font-titulo text-4xl font-medium">{t("rede.networkPerfil.titulo")}</h1>}
-      <div className="mt-6">{corpo}</div>
-    </div>
+    <PaginaApp chave="rede.networkPerfil.titulo" titulo={nome} estreita voltar={{ para: caminho("/network"), rotulo: t("rede.networkPerfil.voltar") }}>
+      {corpo}
+    </PaginaApp>
   )
 }

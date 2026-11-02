@@ -131,7 +131,8 @@ export function LayoutPublico() {
   const t = useT()
   const { sessao } = useAuth()
   const segmento = useLocation().pathname.split("/")[2]
-  if (sessao && COM_CASCA_DO_MEMBRO.has(segmento)) return <LayoutMembro />
+  // O miolo mantém o visual público (Decisão 55): só a casca fica no escopo do app.
+  if (sessao && COM_CASCA_DO_MEMBRO.has(segmento)) return <LayoutMembro conteudoPublico />
   return (
     <div className="min-h-dvh">
       <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:m-2 focus:rounded-lg focus:bg-creme focus:px-4 focus:py-3 focus:text-fundo">{t("menu.pular")}</a>

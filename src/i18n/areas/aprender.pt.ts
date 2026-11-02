@@ -2,6 +2,7 @@
 // PROVISÓRIO: textos de aulas, tarefas e Bem-Estar seguem o microcopy do PRD §17.8; prazos e janelas citados são do cliente.
 export const aprenderPt = {
   "aprender.inicio.titulo": "Início",
+  "aprender.inicio.ola": "Olá",
   "aprender.bemVindo.titulo": "Bem-vindo",
   "aprender.aulas.titulo": "Aulas",
   "aprender.aula.titulo": "Aula",

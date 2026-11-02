@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase"
 import { Aviso } from "./Aviso"
 import { Botao } from "./Botao"
 import { Campo } from "./Campo"
+import { Cartao } from "./Cartao"
 import { Erro } from "./Erro"
 import { Esqueleto } from "./Esqueleto"
 
@@ -100,36 +101,39 @@ export function Mfa({ children }: { children: ReactNode }) {
     </form>
   )
 
+  // Molde: login do Linear — cartão centrado, texto curto, botões empilhados.
   return (
-    <div className="mx-auto max-w-md px-6 py-16">
+    <main className="flex min-h-dvh items-center justify-center px-4 py-16">
+      <Cartao className="w-full max-w-md">
       <Titulo />
-      <h1 className="font-titulo text-4xl leading-none font-normal text-balance sm:text-5xl">{t("mfa.titulo")}</h1>
+      <h1 className="text-subtitulo font-semibold">{t("mfa.titulo")}</h1>
       {estado.fase === "carregando" ? <Esqueleto className="mt-8" /> : null}
       {estado.fase === "erro" ? <div className="mt-8"><Erro aoTentar={carregar}>{t("mfa.erro")}</Erro></div> : null}
       {estado.fase === "cadastrar" ? (
         <>
-          <p className="mt-4 opacity-80">{t("mfa.cadastrar.texto")}</p>
+          <p className="mt-3 text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
           {aviso ? <div className="mt-6"><Aviso tipo="erro">{t(aviso)}</Aviso></div> : null}
           <Botao onClick={cadastrar} ocupado={ocupado} className="mt-6">{t("mfa.cadastrar.botao")}</Botao>
         </>
       ) : null}
       {estado.fase === "qr" ? (
         <>
-          <p className="mt-4 opacity-80">{t("mfa.cadastrar.texto")}</p>
+          <p className="mt-3 text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
           {/* data: URI de SVG gerado pelo Supabase; img-src do CSP já libera data: */}
-          <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="mt-6 size-48 rounded-lg bg-white p-2" />
-          <p className="mt-4 text-sm opacity-80">{t("mfa.qr.segredo")}</p>
-          <p className="mt-1 font-mono text-sm break-all select-all">{estado.segredo}</p>
-          <p className="mt-6 opacity-80">{t("mfa.verificar.texto")}</p>
+          <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="mt-6 size-48 rounded-md bg-white p-2" />
+          <p className="mt-4 text-legenda text-nevoa">{t("mfa.qr.segredo")}</p>
+          <p className="mt-1 font-mono text-legenda break-all select-all">{estado.segredo}</p>
+          <p className="mt-6 text-base text-bruma">{t("mfa.verificar.texto")}</p>
           {formulario(estado.fator)}
         </>
       ) : null}
       {estado.fase === "verificar" ? (
         <>
-          <p className="mt-4 opacity-80">{t("mfa.verificar.texto")}</p>
+          <p className="mt-3 text-base text-bruma">{t("mfa.verificar.texto")}</p>
           {formulario(estado.fator)}
         </>
       ) : null}
-    </div>
+      </Cartao>
+    </main>
   )
 }

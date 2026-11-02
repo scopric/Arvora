@@ -7,7 +7,8 @@ import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone } from "../../../componentes/Icone"
 import { Vazio } from "../../../componentes/Vazio"
-import { useIdioma, useT, useTitulo } from "../../../i18n"
+import { useIdioma, useT } from "../../../i18n"
+import { PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -21,7 +22,6 @@ const SEM_FILTROS: Filtros = { setor: "", cidade: "", categoria: "", tipo: "" }
 export function Network() {
   const t = useT()
   const idioma = useIdioma()
-  useTitulo("rede.network.titulo")
   const acesso = useAcesso()
   const { sessao } = useAuth()
   const uid = sessao?.user.id ?? ""
@@ -94,10 +94,10 @@ export function Network() {
     const categorias = dados?.categorias ?? []
     const cadeado = clube
     corpo = (
-      <>
-        {clube ? <div className="mb-6"><Bloqueado frase={t("rede.network.bloqueadoClube")} /></div> : null}
-        <form onSubmit={buscar} aria-label={t("rede.network.filtros")} className="grid gap-4 sm:grid-cols-2">
-          <fieldset disabled={cadeado} className="contents">
+      <div className="grid gap-8 lg:grid-cols-[16rem_1fr]">
+        {/* Molde Linear (integrations): filtros numa coluna à esquerda, fixa ao rolar; resultados em grade de 2 colunas. */}
+        <form onSubmit={buscar} aria-label={t("rede.network.filtros")} className="lg:sticky lg:top-16 lg:self-start">
+          <fieldset disabled={cadeado} className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-1">
             <Selecao rotulo={t("rede.network.setor")} name="setor" defaultValue={filtros.setor}>
               <option value="">{t("rede.network.todos")}</option>
               {setores.map((s) => <option key={s.id} value={s.id}>{nomeDe(s, idioma)}</option>)}
@@ -112,19 +112,21 @@ export function Network() {
               <option value="oferece">{t("rede.network.oferece")}</option>
               <option value="procura">{t("rede.network.procura")}</option>
             </Selecao>
-            <Botao type="submit" className="sm:col-span-2 sm:w-auto">
-              {cadeado ? <Icone nome="cadeado" className="mr-2 size-4" /> : null}
+            {/* Para o Clube o dourado da tela é o do Bloqueado: o botão fica em contorno. */}
+            <Botao type="submit" variante={cadeado ? "contorno" : "primario"} className="w-full sm:col-span-2 lg:col-span-1">
+              {cadeado ? <Icone nome="cadeado" className="size-4" /> : null}
               {t("rede.network.buscar")}
             </Botao>
           </fieldset>
         </form>
-        <div className="mt-8" aria-live="polite">
+        <div className="min-w-0 space-y-6" aria-live="polite">
+          {clube ? <Bloqueado frase={t("rede.network.bloqueadoClube")} /> : null}
           {estado.fase === "carregando" ? <Esqueleto linhas={4} /> : null}
           {estado.fase === "erro" ? <Erro aoTentar={recarregar}>{t("rede.network.erro")}</Erro> : null}
           {dados && dados.membros.length === 0 ? <Vazio>{t("rede.network.vazio")}</Vazio> : null}
           {dados && dados.membros.length > 0 ? (
             <>
-              <ul className="space-y-4">
+              <ul className="grid gap-4 md:grid-cols-2">
                 {dados.membros.map((m) => (
                   <CartaoPerfil
                     key={m.id}
@@ -135,8 +137,8 @@ export function Network() {
                       .map((i) => <Etiqueta key={`${i.tipo}-${i.categoria_id}`}>{t(i.tipo === "oferece" ? "rede.network.oferece" : "rede.network.procura")}: {nomeCategoria(categorias, i.categoria_id, idioma)}</Etiqueta>)}
                     acoes={
                       cadeado ? (
-                        <span className="inline-flex min-h-11 items-center gap-2 text-sm opacity-70">
-                          <Icone nome="cadeado" className="size-4" />
+                        <span className="inline-flex items-center gap-2 text-legenda text-nevoa">
+                          <Icone nome="cadeado" className="size-4 text-cinza" />
                           {t("rede.network.conectarBloqueado")}
                         </span>
                       ) : undefined
@@ -144,7 +146,7 @@ export function Network() {
                   />
                 ))}
               </ul>
-              {clube && dados.membros.length >= POR_PAGINA ? <p className="mt-6 text-sm opacity-75">{t("rede.network.soPrimeiros")}</p> : null}
+              {clube && dados.membros.length >= POR_PAGINA ? <p className="mt-6 text-legenda text-nevoa">{t("rede.network.soPrimeiros")}</p> : null}
               {temMais ? (
                 <div className="mt-6 flex flex-col items-center gap-3">
                   {erroMais ? <Aviso tipo="erro">{t("rede.network.erro")}</Aviso> : null}
@@ -154,14 +156,12 @@ export function Network() {
             </>
           ) : null}
         </div>
-      </>
+      </div>
     )
   }
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <h1 className="font-titulo text-4xl font-medium">{t("rede.network.titulo")}</h1>
-      <p className="mt-2 opacity-75">{t("rede.network.intro")}</p>
-      <div className="mt-8">{corpo}</div>
-    </div>
+    <PaginaApp chave="rede.network.titulo" intro={t("rede.network.intro")}>
+      {corpo}
+    </PaginaApp>
   )
 }

@@ -52,7 +52,7 @@ export function Videos() {
             <>
               <CrudTabela tabela="videos" colunas="id, tipo, titulo, slug, descricao, tema_id, edicao_id, trailer_video_id, duracao_min, nivel_minimo, publicado_em" campos={campos} aoEditar={async (l) => ({ ...l, video_id: exigirSemNulo(await supabase.rpc("video_do_video", { p_video: l.id as number })) })} ordem={[{ coluna: "criado_em", asc: false }]} podeEditar={pode} podeApagar legenda="admin.videos.titulo" vazio="admin.videos.vazio" />
               <Secao titulo="admin.videos.citados">
-                <CrudTabela tabela="videos_citados" colunas="id, video_id, premiado_id, empresa_id" campos={citados} ordem={[{ coluna: "id", asc: false }]} podeEditar={pode} podeApagar legenda="admin.videos.citados" vazio="admin.videos.citadosVazio" />
+                <CrudTabela variante="contorno" tabela="videos_citados" colunas="id, video_id, premiado_id, empresa_id" campos={citados} ordem={[{ coluna: "id", asc: false }]} podeEditar={pode} podeApagar legenda="admin.videos.citados" vazio="admin.videos.citadosVazio" />
               </Secao>
             </>
           )

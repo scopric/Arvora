@@ -39,7 +39,7 @@ describe("tela Assinatura", () => {
     expect(await screen.findByRole("heading", { name: "Grupo" })).toBeTruthy()
     expect(screen.getByText("Ativa")).toBeTruthy()
     expect(screen.getByText(/49,00/)).toBeTruthy()
-    expect(screen.getByText("Próxima cobrança:")).toBeTruthy()
+    expect(screen.getByText("Próxima cobrança")).toBeTruthy()
     expect(screen.getByText("15/12/2026")).toBeTruthy()
   })
 
@@ -49,8 +49,8 @@ describe("tela Assinatura", () => {
     expect(await screen.findAllByText("Pagamento pendente")).toHaveLength(1)
     expect(screen.getByRole("alert").textContent).toMatch(/período de novas tentativas de cobrança/)
     expect(screen.getByRole("alert").textContent).not.toMatch(/7 dias/)
-    expect(screen.getByText("Período atual até:")).toBeTruthy()
-    expect(screen.queryByText("Próxima cobrança:")).toBeNull()
+    expect(screen.getByText("Período atual até")).toBeTruthy()
+    expect(screen.queryByText("Próxima cobrança")).toBeNull()
   })
 
   it.each([
@@ -70,9 +70,9 @@ describe("tela Assinatura", () => {
   it("cancelada e ativa até a data do fim do período", async () => {
     resp.assinaturas = { data: [linha({ cancela_no_fim: true })], error: null }
     monta()
-    expect(await screen.findByText("Cancelada, ativa até:")).toBeTruthy()
+    expect(await screen.findByText("Cancelada, ativa até")).toBeTruthy()
     expect(screen.getByText("Cancelada")).toBeTruthy()
-    expect(screen.queryByText("Próxima cobrança:")).toBeNull()
+    expect(screen.queryByText("Próxima cobrança")).toBeNull()
   })
 
   it("vigente vence a encerrada mais nova; só encerrada mostra 'Encerrada em'", async () => {
@@ -82,7 +82,7 @@ describe("tela Assinatura", () => {
     cleanup()
     resp.assinaturas = { data: [linha({ status: "canceled" })], error: null }
     monta()
-    expect(await screen.findByText("Encerrada em:")).toBeTruthy()
+    expect(await screen.findByText("Encerrada em")).toBeTruthy()
   })
 
   it("sem assinatura: convite para ver planos, e o direito de cancelar continua explicado", async () => {
@@ -119,7 +119,7 @@ describe("tela Assinatura", () => {
     cleanup()
     resp.assinaturas = { data: [linha({ origem: "manual" })], error: null }
     monta()
-    await screen.findByText("Acesso concedido pela equipe até:")
+    await screen.findByText("Acesso concedido pela equipe até")
     expect(screen.queryByRole("button", { name: /Stripe/ })).toBeNull()
   })
 

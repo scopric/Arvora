@@ -3,6 +3,7 @@ import type { aprenderPt } from "./aprender.pt"
 // Texto em inglês pendente de revisão do cliente.
 export const aprenderEn: Record<keyof typeof aprenderPt, string> = {
   "aprender.inicio.titulo": "Home",
+  "aprender.inicio.ola": "Hi",
   "aprender.bemVindo.titulo": "Welcome",
   "aprender.aulas.titulo": "Classes",
   "aprender.aula.titulo": "Class",

@@ -30,7 +30,7 @@ function Ebook({ caminho }: { caminho: string }) {
     <div className="space-y-3">
       {erro ? <Aviso tipo="erro">{t("aprender.ebook.erro")}</Aviso> : null}
       <Botao onClick={baixar} className="sm:w-auto">{t("aprender.ebook.baixar")}</Botao>
-      <p className="text-sm opacity-70">{t("aprender.ebook.uso")}</p>
+      <p className="text-legenda text-nevoa">{t("aprender.ebook.uso")}</p>
     </div>
   )
 }
@@ -59,6 +59,9 @@ export function Materiais({ aulaId, uid, podeEnviar, doGrupo }: { aulaId: number
   const ebook = de("ebook")
   // Aba sem material: a aula já está publicada, então só falta este item. PROVISÓRIO: o "sai até [data]" do PRD §17.5.3 é prazo do cliente.
   const vazio = <Vazio>{t("aprender.materiais.vazio")}</Vazio>
+  // Um primário por tela: só o primeiro exercício com formulário aberto (sem entrega, ou a ajustar) fica dourado.
+  const entregaDe = (id: number) => entregas.find((e) => e.exercicio_id === id) ?? null
+  const primeiroAberto = podeEnviar ? exercicios.find((x) => !entregaDe(x.id) || entregaDe(x.id)?.status === "ajustar")?.id : undefined
 
   return (
     <Abas
@@ -69,7 +72,7 @@ export function Materiais({ aulaId, uid, podeEnviar, doGrupo }: { aulaId: number
           chave: "resumo",
           rotulo: t("aprender.aba.resumo"),
           conteudo: resumo?.conteudo_md ? (
-            <div className="max-w-prose space-y-4 text-lg leading-relaxed">
+            <div className="max-w-prose space-y-4 text-base leading-relaxed">
               {resumo.conteudo_md.split(/\n{2,}/).map((p, i) => (
                 <p key={i} className="whitespace-pre-line">{p}</p>
               ))}
@@ -85,7 +88,11 @@ export function Materiais({ aulaId, uid, podeEnviar, doGrupo }: { aulaId: number
           conteudo: exercicios.length ? (
             <div className="space-y-5">
               {exercicios.map((x) => (
+<<<<<<< HEAD
                 <Exercicio key={x.id} exercicio={x} entrega={entregas.find((e) => e.exercicio_id === x.id) ?? null} uid={uid} podeEnviar={podeEnviar} doGrupo={doGrupo} aoAtualizar={recarregar} rascunho={rascunhos[x.id]} aoDigitar={(v) => setRascunhos((r) => {
+=======
+                <Exercicio key={x.id} exercicio={x} entrega={entregaDe(x.id)} uid={uid} podeEnviar={podeEnviar} primario={x.id === primeiroAberto} aoAtualizar={recarregar} rascunho={rascunhos[x.id]} aoDigitar={(v) => setRascunhos((r) => {
+>>>>>>> origin/main
                     const n = { ...r }
                     if (v === undefined) delete n[x.id]
                     else n[x.id] = v

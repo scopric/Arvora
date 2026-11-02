@@ -4,6 +4,7 @@ import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone } from "../../../componentes/Icone"
+import { linkListaApp, rotuloGrupoApp } from "../../../componentes/menuApp"
 import { useCaminho, useT } from "../../../i18n"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
@@ -11,9 +12,10 @@ import { carregarCurso } from "../curso"
 import { Gravacao } from "../componentes/Gravacao"
 import { Pagina } from "../componentes/Pagina"
 import { useCarga } from "../useCarga"
-import { foco, linkTexto } from "../util"
+import { linkTexto } from "../util"
 
 // Player do curso (ACA-02, ACA-03): vídeo à esquerda, lista de aulas à direita, retoma de onde parou e grava o progresso.
+// Molde MasterClass (lição): player largo, título em Big Shoulders, painel direito com as aulas do curso (no celular, abaixo).
 export function CursoAula() {
   const { curso: slugCurso, aula: slugAula } = useParams()
   const t = useT()
@@ -43,46 +45,41 @@ export function CursoAula() {
   const permitido = temNivel(acesso.nivel, aula.nivel_minimo)
 
   return (
-    <Pagina chave={chave} titulo={aula.titulo} rotulo={curso.titulo}>
-      <Link to={caminho(`/academy/${curso.slug}`)} className={`mb-6 inline-block ${linkTexto}`}>‹ {curso.titulo}</Link>
-      <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
+    <Pagina chave={chave} titulo={aula.titulo} conteudo voltar={{ para: caminho(`/academy/${curso.slug}`), rotulo: curso.titulo }}>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-6">
           {permitido ? (
             <>
-              {aula.descricao ? <p className="max-w-prose text-lg">{aula.descricao}</p> : null}
               <Gravacao key={aula.id} aulaId={aula.id} titulo={aula.titulo} uid={uid} aoMudarPercentual={(p) => setLocal((l) => ({ ...l, [aula.id]: p }))} />
+              {aula.descricao ? <p className="max-w-prose text-base text-bruma">{aula.descricao}</p> : null}
               {seguinte ? (
                 <p>
-                  <Link to={caminho(`/academy/${curso.slug}/${seguinte.slug}`)} className={linkTexto}>{t("aprender.proxima")}: {seguinte.titulo} →</Link>
+                  <Link to={caminho(`/academy/${curso.slug}/${seguinte.slug}`)} className={linkTexto}>{t("aprender.proxima")}: {seguinte.titulo} <span aria-hidden="true">→</span></Link>
                 </p>
               ) : null}
             </>
           ) : (
-            <Bloqueado previa={<p className="text-lg">{aula.descricao ?? aula.titulo}</p>} frase={t("aprender.academy.continuaNoGrupo")} />
+            <Bloqueado previa={<p className="text-base">{aula.descricao ?? aula.titulo}</p>} frase={t("aprender.academy.continuaNoGrupo")} />
           )}
         </div>
-        <nav aria-label={t("aprender.curso.lista")} className="space-y-5">
+        <nav aria-label={t("aprender.curso.lista")} className="rounded-xl p-2 shadow-borda lg:sticky lg:top-16 lg:self-start">
           {modulos.map((m) => (
             <section key={m.id}>
-              <h2 className="text-sm font-semibold tracking-wide uppercase opacity-75">{m.titulo}</h2>
-              <ol className="mt-2 space-y-1">
+              <h2 className={rotuloGrupoApp}>{m.titulo}</h2>
+              <ol>
                 {aulas.filter((a) => a.modulo_id === m.id).map((a) => (
                   <li key={a.id}>
-                    <Link
-                      to={caminho(`/academy/${curso.slug}/${a.slug}`)}
-                      aria-current={a.id === aula.id ? "page" : undefined}
-                      className={`flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 hover:bg-creme/10 aria-[current=page]:bg-creme/15 ${foco}`}
-                    >
+                    <Link to={caminho(`/academy/${curso.slug}/${a.slug}`)} aria-current={a.id === aula.id ? "page" : undefined} className={linkListaApp}>
                       <span className="flex-1">{a.titulo}</span>
                       {!temNivel(acesso.nivel, a.nivel_minimo) ? (
                         <>
-                          <Icone nome="cadeado" className="size-4" />
+                          <Icone nome="cadeado" className="size-3.5 shrink-0 text-cinza" />
                           <span className="sr-only">{t("bloqueado.rotulo")}</span>
                         </>
                       ) : pct(a.id) === 100 ? (
-                        <span className="text-sm text-destaque">{t("aprender.assistida")}</span>
+                        <span className="text-legenda text-destaque">{t("aprender.assistida")}</span>
                       ) : pct(a.id) > 0 ? (
-                        <span className="text-sm opacity-75">{pct(a.id)}%</span>
+                        <span className="text-legenda tabular-nums">{pct(a.id)}%</span>
                       ) : null}
                     </Link>
                   </li>

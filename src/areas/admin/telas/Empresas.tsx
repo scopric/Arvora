@@ -5,13 +5,14 @@ import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { AreaTexto, classeAcao } from "../componentes/Campos"
+import { AreaTexto } from "../componentes/Campos"
 import { CrudTabela } from "../componentes/CrudTabela"
 import type { CampoDef } from "../componentes/FormularioRegistro"
 import { AvisoDe, Mostrar, Pagina, Secao } from "../componentes/Pagina"
 import { exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { opcoesDe } from "../lib/opcoes"
 import { APROVA_EMPRESA, EDITA, usePode } from "../lib/papel"
+import { classeAcao, classeLink } from "../lib/estilo"
 
 // Fila de aprovação (ADM-02, DIR-02) e cadastro. A recusa exige motivo (empresas.motivo_recusa), que o dono vê para corrigir.
 export function Empresas() {
@@ -63,12 +64,12 @@ export function Empresas() {
                       <li key={e.id}>
                         <Cartao>
                           <div className="flex items-start justify-between gap-3">
-                            <h3 className="text-lg font-semibold">{e.nome}</h3>
+                            <h3 className="text-base font-semibold">{e.nome}</h3>
                             <Selo tom="alerta">{t("admin.empresas.pendente")}</Selo>
                           </div>
-                          <p className="mt-1 text-sm opacity-75">{[e.cidade, e.pais].filter(Boolean).join(" · ") || "—"}</p>
-                          {e.site ? <p className="mt-1 text-sm"><a className="underline" href={e.site} target="_blank" rel="noopener noreferrer">{e.site}</a></p> : null}
-                          {e.descricao ? <p className="mt-3 text-sm">{e.descricao}</p> : null}
+                          <p className="mt-1 text-legenda text-nevoa">{[e.cidade, e.pais].filter(Boolean).join(" · ") || "—"}</p>
+                          {e.site ? <p className="mt-1 text-legenda"><a className={classeLink} href={e.site} target="_blank" rel="noopener noreferrer">{e.site}</a></p> : null}
+                          {e.descricao ? <p className="mt-3 text-base text-bruma">{e.descricao}</p> : null}
                           {aprova ? (
                             <div className="mt-4 flex gap-3">
                               <button type="button" className={classeAcao} disabled={acao.ocupado} onClick={() => void decidir(e.id, true)}>{t("admin.empresas.aprovar")}</button>

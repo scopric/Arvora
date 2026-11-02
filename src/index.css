@@ -15,6 +15,51 @@
   --font-titulo: "Newsreader Variable", Georgia, serif;
   --font-corpo: "Schibsted Grotesk Variable", system-ui, sans-serif;
 
+  /* App (membro e admin), estilo-base Linear com a paleta Árvora (Decisão 55; fontes em
+     Arvora/Documentos/Refero Styles/linear/). Cada cinza do Linear virou um tom da Árvora com a MESMA luminosidade
+     (L em OKLCH) e a mesma relação de camadas; só a matiz muda (do verde-floresta #112019 até a do creme).
+     Contraste sobre carvao: nevoa 5,9 · bruma 13,1 · osso 15,2 · creme 17,3 · dourado 7,9. `cinza` (3,35) nunca é texto. */
+  --color-breu: #050a08; /* Void: casca, sidebar, tab bar */
+  --color-carvao: #0c110f; /* Carbon: painel de conteúdo, cartão */
+  --color-obsidiana: #131816; /* Obsidian: diálogo, popover, folha */
+  --color-grafite: #1a2922; /* Graphite: hairline, inset, divisória */
+  --color-fumaca: #303f35; /* Smoke: avatar, trilho, esqueleto */
+  --color-cinza: #5e6a5d; /* Ash: ícone inativo, borda de input (nunca texto) */
+  --color-nevoa: #899283; /* Fog: texto terciário, rótulos, placeholder */
+  --color-bruma: #d5d8c6; /* Mist: texto secundário, botão contorno */
+  --color-osso: #e5e6e2; /* Bone: hover, corpo longo */
+  /* Nome de conteúdo (curso, aula, premiado): a serifa dos títulos do site, decisão do Ricardo em 01/11/2026 (Decisão 59);
+     a Big Shoulders saiu do projeto com a direção Floresta (Decisão 54). */
+  --font-conteudo: "Newsreader Variable", Georgia, serif;
+
+  /* Escala do Linear com entrelinha e espaço embutidos (nomes novos: o público não os usa).
+     legenda (13) e corpo-p (15) só em rótulo, menu, metadado, tabela e selo; texto corrido fica em 16px (PRD §17.7.3). */
+  --text-legenda: 13px;
+  --text-legenda--line-height: 1.5;
+  --text-legenda--letter-spacing: -0.01em;
+  --text-corpo-p: 15px;
+  --text-corpo-p--line-height: 1.6;
+  --text-corpo-p--letter-spacing: -0.01em;
+  --text-corpo-g: 20px;
+  --text-corpo-g--line-height: 1.4;
+  --text-corpo-g--letter-spacing: -0.012em;
+  --text-subtitulo: 24px;
+  --text-subtitulo--line-height: 1.25;
+  --text-subtitulo--letter-spacing: -0.012em;
+  --text-titulo-p: 32px;
+  --text-titulo-p--line-height: 1.13;
+  --text-titulo-p--letter-spacing: -0.012em;
+  --text-titulo: 48px;
+  --text-titulo--line-height: 1;
+  --text-titulo--letter-spacing: -0.022em;
+  --text-titulo-g: 64px;
+  --text-titulo-g--line-height: 1;
+  --text-titulo-g--letter-spacing: -0.022em;
+
+  /* Elevação só por hairline (Linear): sem sombra externa, salvo a sutil dos elementos flutuantes. */
+  --shadow-borda: inset 0 0 0 1px var(--color-grafite);
+  --shadow-flutuante: inset 0 0 0 1px var(--color-grafite), 0 2px 4px rgb(0 0 0 / 0.4);
+
   --shadow-brilho: 0 0 20px 5px rgb(157 181 138 / 0.35);
 
   --text-display: 5.625rem;
@@ -28,6 +73,23 @@
 @layer base {
   body {
     @apply bg-fundo text-creme font-corpo antialiased;
+  }
+
+  /* Escopo do app: só o que herda pela cascata. Pesos do Linear (400/510/590, nunca 700): os utilitários
+     font-medium/semibold/bold leem estas variáveis. */
+  .app {
+    color-scheme: dark;
+    letter-spacing: -0.01em;
+    --font-weight-medium: 510;
+    --font-weight-semibold: 590;
+    --font-weight-bold: 590;
+  }
+  /* O preflight põe `bolder` em b/strong (vira 700 sobre 400); dentro do app vale o teto do Linear. */
+  .app :is(b, strong) {
+    font-weight: var(--font-weight-semibold);
+  }
+  body:has(.app) {
+    background-color: var(--color-breu);
   }
 }
 
@@ -133,28 +195,4 @@
 .cena-mascara {
   -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
   mask-image: radial-gradient(closest-side, #000 55%, transparent);
-}
-
-/* Admin (PRD §17.7.2): tema claro. Troca os papéis das cores, então todo componente que usa creme/fundo/dourado se inverte sozinho.
-   dourado 4,57 e destaque 6,6 sobre creme (PRD §17.7.1); o anel de foco e o texto passam o contraste. */
-.tema-claro {
-  --color-fundo: #f4f4ef;
-  --color-creme: #112019;
-  --color-painel: #e8e8e0;
-  --color-dourado: #8a6a1f;
-  --color-destaque: #3f5e3f;
-  --color-white: #000;
-}
-
-/* Base do canvas some em degradê: sem corte reto na borda da seção (home). No login, junta com a máscara radial (interseção),
-   para os raios de sol não mostrarem a borda de cima do canvas. */
-.cena-fade-base {
-  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
-  mask-image: linear-gradient(to bottom, #000 72%, transparent);
-}
-.cena-mascara.cena-fade-base {
-  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent), linear-gradient(to bottom, #000 72%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image: radial-gradient(closest-side, #000 55%, transparent), linear-gradient(to bottom, #000 72%, transparent);
-  mask-composite: intersect;
 }

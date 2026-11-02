@@ -100,6 +100,7 @@ export const contaEn: Record<keyof typeof contaPt, string> = {
   "conta.assinatura.erro": "We could not load your subscription right now. Please try again.",
   "conta.assinatura.vazio": "You do not have a subscription yet.",
   "conta.assinatura.verPlanos": "See plans",
+  "conta.assinatura.situacao": "Status",
   "conta.assinatura.estado.ativa": "Active",
   "conta.assinatura.estado.pendente": "Payment pending",
   "conta.assinatura.estado.cancelada": "Cancelled",

@@ -29,13 +29,12 @@ export function Tarefa() {
   if (estado.fase === "carregando") return <Pagina chave={chave}><Esqueleto linhas={4} /></Pagina>
   if (estado.fase === "erro") return <Pagina chave={chave}><Erro aoTentar={recarregar} /></Pagina>
   const item = estado.dados[0]
-  const voltar = <Link to={caminho("/tarefas")} className={`mb-6 inline-block ${linkTexto}`}>‹ {t("aprender.tarefas.voltar")}</Link>
-  if (!item) return <Pagina chave={chave} titulo={t("aprender.naoEncontrada")}>{voltar}</Pagina>
+  const voltar = { para: caminho("/tarefas"), rotulo: t("aprender.tarefas.voltar") }
+  if (!item) return <Pagina chave={chave} titulo={t("aprender.naoEncontrada")} voltar={voltar}>{null}</Pagina>
 
   const { exercicio, entrega } = item
   return (
-    <Pagina chave={chave} titulo={exercicio.aulas?.titulo ?? t(chave)}>
-      {voltar}
+    <Pagina chave={chave} titulo={exercicio.aulas?.titulo ?? t(chave)} voltar={voltar}>
       {exercicio.aulas ? (
         <p className="mb-6">
           <Link to={caminho(`/aulas/${exercicio.aulas.slug}`)} className={linkTexto}>{t("aprender.tarefa.verAula")}</Link>

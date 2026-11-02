@@ -7,6 +7,7 @@ import { exigir, useCarga } from "../lib/consulta"
 import { useOpcoesNivel } from "../lib/opcoes"
 import { EDITA, usePode } from "../lib/papel"
 import { COLUNAS_CURSO, camposCurso } from "../lib/camposCurso"
+import { classeLink } from "../lib/estilo"
 
 export function Cursos() {
   const t = useT()
@@ -21,7 +22,7 @@ export function Cursos() {
           <CrudTabela
             tabela="cursos" colunas={COLUNAS_CURSO} campos={camposCurso(verticais, niveis)} ordem={[{ coluna: "ordem" }, { coluna: "titulo" }]}
             podeEditar={pode} podeApagar legenda="admin.cursos.titulo" vazio="admin.cursos.vazio"
-            extra={{ titulo: "admin.cursos.estrutura", celula: (l) => <Link className="underline" to={caminho(`/admin/cursos/${l.id}`)}>{t("admin.cursos.abrir")}</Link> }}
+            extra={{ titulo: "admin.cursos.estrutura", celula: (l) => <Link className={classeLink} to={caminho(`/admin/cursos/${l.id}`)}>{t("admin.cursos.abrir")}</Link> }}
           />
         )}
       </Mostrar>

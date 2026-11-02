@@ -4,7 +4,7 @@ import { Botao } from "../../../componentes/Botao"
 import { Selo } from "../../../componentes/Selo"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { campoBase, dataCurta, linkTexto } from "../util"
+import { campoBase, cartao, dataCurta, linkTexto } from "../util"
 import type { EntregaLinha, ExercicioLinha } from "../tipos"
 
 // Mesmos limites do bucket `entregas` (migration f2_03). PROVISÓRIO no banco; se mudarem lá, mudam aqui.
@@ -34,7 +34,12 @@ async function abrirArquivo(caminho: string): Promise<boolean> {
 // `podeEnviar` = vertical aceita entregas e o membro é do Grupo (o RLS confere de novo). `doGrupo` só separa o motivo do bloqueio.
 // `rascunho`/`aoDigitar` (opcionais): quem hospeda o exercício em abas guarda o texto fora daqui, porque a aba inativa é
 // desmontada. `aoDigitar(undefined)` = apagar o rascunho (depois de enviar).
+<<<<<<< HEAD
 export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true, aoAtualizar, rascunho, aoDigitar }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; doGrupo?: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void }) {
+=======
+// `primario` (padrão true): só o primeiro formulário aberto da tela ganha o botão dourado; os demais ficam em contorno.
+export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, rascunho, aoDigitar, primario = true }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void; primario?: boolean }) {
+>>>>>>> origin/main
   const t = useT()
   const lang = useIdioma()
   const id = useId()
@@ -93,26 +98,26 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true,
 
   const mostrarForm = podeEnviar && (!entrega || reenvio)
   return (
-    <article className="rounded-2xl border border-current/15 bg-superficie/25 p-6">
+    <article className={cartao}>
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="font-titulo text-2xl font-bold uppercase">
+        <h3 className="text-base font-semibold">
           {t("aprender.exercicio.n")} {exercicio.ordem}
         </h3>
         {entrega ? <SeloStatus status={entrega.status} /> : <Selo>{t("aprender.exercicio.naoEnviado")}</Selo>}
       </header>
-      <p className="mt-3 max-w-prose whitespace-pre-line">{exercicio.enunciado_md}</p>
+      <p className="mt-3 max-w-prose text-base whitespace-pre-line">{exercicio.enunciado_md}</p>
       {exercicio.prazo_dias ? (
-        <p className="mt-2 text-sm opacity-75">
+        <p className="mt-2 text-legenda text-nevoa">
           {t("aprender.exercicio.prazo")}: {exercicio.prazo_dias} {t("aprender.exercicio.dias")}
         </p>
       ) : null}
 
       {entrega ? (
-        <section aria-label={t("aprender.exercicio.suaResposta")} className="mt-5 border-t border-current/15 pt-4">
-          <h4 className="text-sm font-semibold">
+        <section aria-label={t("aprender.exercicio.suaResposta")} className="mt-5 border-t border-grafite pt-4">
+          <h4 className="text-legenda font-medium text-bruma">
             {t("aprender.exercicio.suaResposta")} · {dataCurta(entrega.enviada_em, lang)}
           </h4>
-          {entrega.texto ? <p className="mt-2 max-w-prose whitespace-pre-line opacity-90">{entrega.texto}</p> : null}
+          {entrega.texto ? <p className="mt-2 max-w-prose text-base whitespace-pre-line">{entrega.texto}</p> : null}
           {entrega.arquivo_path ? (
             <button
               type="button"
@@ -128,35 +133,35 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true,
       ) : null}
 
       {entrega && entrega.status !== "enviada" && entrega.devolutiva ? (
-        <section aria-label={t("aprender.exercicio.devolutiva")} className="mt-5 rounded-xl border-2 border-destaque p-4">
-          <h4 className="text-sm font-semibold text-destaque">
+        <section aria-label={t("aprender.exercicio.devolutiva")} className="mt-5 border-l-2 border-destaque pl-4">
+          <h4 className="text-legenda font-medium text-destaque">
             {t("aprender.exercicio.devolutiva")}
             {entrega.corrigido_em ? ` · ${dataCurta(entrega.corrigido_em, lang)}` : ""}
           </h4>
-          <p className="mt-2 max-w-prose whitespace-pre-line">{entrega.devolutiva}</p>
+          <p className="mt-2 max-w-prose text-base whitespace-pre-line">{entrega.devolutiva}</p>
         </section>
       ) : null}
-      {entrega?.status === "enviada" ? <p className="mt-4 text-sm opacity-75">{t("aprender.exercicio.aguardando")}</p> : null}
+      {entrega?.status === "enviada" ? <p className="mt-4 text-legenda text-nevoa">{t("aprender.exercicio.aguardando")}</p> : null}
 
       {mostrarForm ? (
         <form onSubmit={enviar} noValidate className="mt-5 space-y-4">
           <div>
-            <label htmlFor={`${id}-t`} className="mb-2 block text-sm font-semibold">
+            <label htmlFor={`${id}-t`} className="mb-1.5 block text-legenda font-medium text-bruma">
               {reenvio ? t("aprender.exercicio.novaResposta") : t("aprender.exercicio.suaResposta")}
             </label>
             <textarea id={`${id}-t`} rows={6} value={texto} onChange={(e) => setTexto(e.target.value)} className={campoBase} />
           </div>
           {exercicio.aceita_arquivo ? (
             <div>
-              <label htmlFor={`${id}-a`} className="mb-2 block text-sm font-semibold">
+              <label htmlFor={`${id}-a`} className="mb-1.5 block text-legenda font-medium text-bruma">
                 {t("aprender.exercicio.anexar")}
               </label>
-              <input id={`${id}-a`} type="file" accept={TIPOS.join(",")} onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} className="block w-full text-sm" />
-              <p className="mt-1 text-sm opacity-70">{t("aprender.exercicio.arquivoAjuda")}</p>
+              <input id={`${id}-a`} type="file" accept={TIPOS.join(",")} onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} className="block w-full text-legenda text-bruma" />
+              <p className="mt-1.5 text-legenda text-nevoa">{t("aprender.exercicio.arquivoAjuda")}</p>
             </div>
           ) : null}
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
-          <Botao type="submit" ocupado={ocupado} className="sm:w-auto">
+          <Botao type="submit" variante={primario ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto">
             {reenvio ? t("aprender.exercicio.reenviar") : t("aprender.exercicio.enviar")}
           </Botao>
         </form>
@@ -167,7 +172,11 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true,
               <Aviso tipo="erro">{t(erro)}</Aviso>
             </div>
           ) : null}
+<<<<<<< HEAD
           {(!entrega || reenvio) && !podeEnviar ? <p className="mt-4 text-sm opacity-75">{t(doGrupo ? "aprender.exercicio.semEnvio" : "aprender.exercicio.soGrupo")}</p> : null}
+=======
+          {!entrega && !podeEnviar ? <p className="mt-4 text-legenda text-nevoa">{t("aprender.exercicio.semEnvio")}</p> : null}
+>>>>>>> origin/main
         </>
       )}
       {ok ? (
