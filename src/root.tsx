@@ -46,14 +46,18 @@ export function meta({ params }: { params: { lang?: string } }) {
 export default function Root() {
   // Cada parte no seu endereço (Decisão 66). Vale também para a navegação dentro do SPA, que não passa pelo servidor.
   // Uma troca só: senão um redirecionamento interno (ex.: RotaProtegida → /entrar) antes de a página sair trocaria o destino.
-  const { pathname, search, hash } = useLocation()
+  // O state.de (página a voltar depois do login) não atravessa endereços: vai como ?de=.
+  const { pathname, search, hash, state } = useLocation()
   const saindo = useRef(false)
   useEffect(() => {
     const alvo = enderecoCerto(window.location.origin, pathname)
     if (!alvo || saindo.current) return
     saindo.current = true
-    window.location.replace(alvo + search + hash)
-  }, [pathname, search, hash])
+    const busca = new URLSearchParams(search)
+    const de = (state as { de?: unknown } | null)?.de
+    if (typeof de === "string") busca.set("de", de)
+    window.location.replace(alvo + (busca.size ? `?${busca}` : "") + hash)
+  }, [pathname, search, hash, state])
   return (
     <>
       {/* Antes do conteúdo no DOM (ordem de tab/leitor de tela); visualmente fica embaixo (fixed). */}
