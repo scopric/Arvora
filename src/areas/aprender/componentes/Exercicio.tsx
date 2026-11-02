@@ -34,12 +34,8 @@ async function abrirArquivo(caminho: string): Promise<boolean> {
 // `podeEnviar` = vertical aceita entregas e o membro é do Grupo (o RLS confere de novo). `doGrupo` só separa o motivo do bloqueio.
 // `rascunho`/`aoDigitar` (opcionais): quem hospeda o exercício em abas guarda o texto fora daqui, porque a aba inativa é
 // desmontada. `aoDigitar(undefined)` = apagar o rascunho (depois de enviar).
-<<<<<<< HEAD
-export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true, aoAtualizar, rascunho, aoDigitar }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; doGrupo?: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void }) {
-=======
 // `primario` (padrão true): só o primeiro formulário aberto da tela ganha o botão dourado; os demais ficam em contorno.
-export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, rascunho, aoDigitar, primario = true }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void; primario?: boolean }) {
->>>>>>> origin/main
+export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true, aoAtualizar, rascunho, aoDigitar, primario = true }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; doGrupo?: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void; primario?: boolean }) {
   const t = useT()
   const lang = useIdioma()
   const id = useId()
@@ -172,11 +168,7 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, ra
               <Aviso tipo="erro">{t(erro)}</Aviso>
             </div>
           ) : null}
-<<<<<<< HEAD
-          {(!entrega || reenvio) && !podeEnviar ? <p className="mt-4 text-sm opacity-75">{t(doGrupo ? "aprender.exercicio.semEnvio" : "aprender.exercicio.soGrupo")}</p> : null}
-=======
-          {!entrega && !podeEnviar ? <p className="mt-4 text-legenda text-nevoa">{t("aprender.exercicio.semEnvio")}</p> : null}
->>>>>>> origin/main
+          {(!entrega || reenvio) && !podeEnviar ? <p className="mt-4 text-legenda text-nevoa">{t(doGrupo ? "aprender.exercicio.semEnvio" : "aprender.exercicio.soGrupo")}</p> : null}
         </>
       )}
       {ok ? (

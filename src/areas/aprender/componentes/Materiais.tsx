@@ -88,11 +88,7 @@ export function Materiais({ aulaId, uid, podeEnviar, doGrupo }: { aulaId: number
           conteudo: exercicios.length ? (
             <div className="space-y-5">
               {exercicios.map((x) => (
-<<<<<<< HEAD
-                <Exercicio key={x.id} exercicio={x} entrega={entregas.find((e) => e.exercicio_id === x.id) ?? null} uid={uid} podeEnviar={podeEnviar} doGrupo={doGrupo} aoAtualizar={recarregar} rascunho={rascunhos[x.id]} aoDigitar={(v) => setRascunhos((r) => {
-=======
-                <Exercicio key={x.id} exercicio={x} entrega={entregaDe(x.id)} uid={uid} podeEnviar={podeEnviar} primario={x.id === primeiroAberto} aoAtualizar={recarregar} rascunho={rascunhos[x.id]} aoDigitar={(v) => setRascunhos((r) => {
->>>>>>> origin/main
+                <Exercicio key={x.id} exercicio={x} entrega={entregaDe(x.id)} uid={uid} podeEnviar={podeEnviar} doGrupo={doGrupo} primario={x.id === primeiroAberto} aoAtualizar={recarregar} rascunho={rascunhos[x.id]} aoDigitar={(v) => setRascunhos((r) => {
                     const n = { ...r }
                     if (v === undefined) delete n[x.id]
                     else n[x.id] = v

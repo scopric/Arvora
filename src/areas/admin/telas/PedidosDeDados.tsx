@@ -38,13 +38,8 @@ function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
       <AreaTexto rotulo={t("admin.pedidos.observacao")} rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-2">
-<<<<<<< HEAD
-        <Botao type="button" ocupado={acao.ocupado} onClick={() => void salvar(status)} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
-        {p.status !== "concluido" ? <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => setConfirmando(true)} className="sm:w-auto">{t("admin.pedidos.atendido")}</Botao> : null}
-=======
         <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={() => void salvar(status)} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
-        {p.status !== "concluido" ? <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => void salvar("concluido")} className="sm:w-auto">{t("admin.pedidos.atendido")}</Botao> : null}
->>>>>>> origin/main
+        {p.status !== "concluido" ? <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => setConfirmando(true)} className="sm:w-auto">{t("admin.pedidos.atendido")}</Botao> : null}
       </div>
       <DialogoConfirmar
         aberto={confirmando} titulo={t("admin.pedidos.atendidoTitulo")} texto={t("admin.pedidos.atendidoTexto")} confirmar={t("admin.pedidos.atendido")}
