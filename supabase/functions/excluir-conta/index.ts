@@ -9,9 +9,9 @@ Deno.serve((req) =>
   handle(req, {
     env: (n) => Deno.env.get(n),
     db: (a) => consultas(clienteDoUsuario(a)),
-    // Cliente anônimo separado: não toca na sessão do pedido.
-    senhaConfere: async (url, anon, email, password) => {
-      const anonimo = createClient(url, anon, opcoes);
+    // Cliente separado: não toca na sessão do pedido. Com a chave de serviço o CAPTCHA do Auth não se aplica.
+    senhaConfere: async (url, serviceRole, email, password) => {
+      const anonimo = createClient(url, serviceRole, opcoes);
       const { error } = await anonimo.auth.signInWithPassword({
         email,
         password,

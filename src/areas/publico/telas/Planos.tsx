@@ -103,7 +103,7 @@ export function Planos() {
           </Link>
           <p className="mt-3 text-sm text-creme/70">
             {t("publico.planos.jaTemConta")}{" "}
-            <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">
+            <Link to={caminho("/entrar")} state={{ de: caminho("/planos") }} className="underline decoration-dourado underline-offset-4">
               {t("nav.entrar")}
             </Link>
           </p>

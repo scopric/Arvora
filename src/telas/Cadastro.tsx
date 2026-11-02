@@ -23,7 +23,7 @@ export function Cadastro() {
   const [ocupado, setOcupado] = useState(false)
   const captcha = useCaptcha()
 
-  if (sessao) return <Navigate to={caminho("/perfil")} replace />
+  if (sessao) return <Navigate to={caminho("/inicio")} replace />
 
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()

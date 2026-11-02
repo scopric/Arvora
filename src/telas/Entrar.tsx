@@ -7,6 +7,7 @@ import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
 import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { useCaptcha } from "../lib/captcha"
+import { caminhoInterno, inicioDepoisDoLogin } from "../lib/enderecos"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
@@ -17,12 +18,17 @@ export function Entrar() {
   const t = useT()
   useTitulo("titulo.entrar", true)
   const navegar = useNavigate()
-  const de = (useLocation().state as { de?: string } | null)?.de
+  const local = useLocation()
+  // ?de= vem de outro endereço (Decisão 66, root.tsx); a validação abaixo vale para os dois.
+  const de = (local.state as { de?: string } | null)?.de ?? new URLSearchParams(local.search).get("de") ?? undefined
   // Só caminho interno: nada de redirecionar para fora do site.
-  const origem = de?.startsWith("/") && !de.startsWith("//") ? de : caminho("/perfil")
+  const origem = caminhoInterno(de) ?? caminho(inicioDepoisDoLogin(window.location.origin))
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
+  // E-mail da última tentativa recusada por falta de confirmação: habilita o reenvio do link.
+  const [semConfirmar, setSemConfirmar] = useState<string | null>(null)
+  const [reenvio, setReenvio] = useState<Chave | null>(null)
   const captcha = useCaptcha()
 
   if (sessao) return <Navigate to={origem} replace />
@@ -39,15 +45,35 @@ export function Entrar() {
     setOcupado(false)
     if (error) {
       captcha.renovar() // o token vale uma vez só
+      setSemConfirmar(error.code === "email_not_confirmed" ? dados.data.email : null)
+      setReenvio(null)
       return setAviso(mensagemDeErroAuth(error))
     }
     navegar(origem, { replace: true })
+  }
+
+  async function reenviar() {
+    if (!semConfirmar) return
+    if (captcha.falta) return setReenvio("captcha.falta")
+    setOcupado(true)
+    const { error } = await supabase.auth.resend({ type: "signup", email: semConfirmar, options: captcha.opcoes })
+    setOcupado(false)
+    captcha.renovar()
+    setReenvio(error ? mensagemDeErroAuth(error) : "entrar.reenviado")
   }
 
   return (
     <LayoutAuth titulo={t("entrar.titulo")} subtitulo={t("entrar.subtitulo")}>
       <form onSubmit={enviar} noValidate className="space-y-5">
         {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
+        {semConfirmar ? (
+          <div className="space-y-3">
+            {reenvio ? <Aviso tipo={reenvio === "entrar.reenviado" ? "ok" : "erro"}>{t(reenvio)}</Aviso> : null}
+            <Botao type="button" variante="contorno" ocupado={ocupado} onClick={reenviar}>
+              {t("entrar.reenviar")}
+            </Botao>
+          </div>
+        ) : null}
         <Campo rotulo={t("auth.email.rotulo")} name="email" type="email" autoComplete="email" placeholder={t("auth.email.exemplo")} erro={t(erros.email)} />
         <Campo rotulo={t("auth.senha.rotulo")} name="senha" type="password" autoComplete="current-password" erro={t(erros.senha)} />
         <Turnstile key={captcha.reinicio} onToken={captcha.setToken} />

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Link, NavLink, Outlet, useNavigate } from "react-router"
 import { useCaminho, useT } from "../i18n"
+import { linkSite } from "../lib/enderecos"
 import { temNivel, useAcesso, type Acesso } from "../lib/acesso"
 import { sair, useAuth } from "../lib/sessao"
 import { Erro } from "./Erro"
@@ -105,7 +106,10 @@ function MenuAvatar({ acesso }: { acesso: Acesso }) {
 
   async function sairDaConta() {
     await sair()
-    navegar(caminho("/"), { replace: true })
+    // No app, "/" levaria ao Início e, sem sessão, ao login: volta à home do site (Decisão 66).
+    const home = linkSite(caminho("/"))
+    if (home.startsWith("/")) navegar(home, { replace: true })
+    else window.location.assign(home)
   }
 
   return (

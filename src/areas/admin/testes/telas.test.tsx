@@ -273,6 +273,18 @@ describe("Pedidos de dados, Equipe, Membros, Visão geral, Temas, Moderação", 
     await waitFor(() => expect(chamou("rpc:resolver_denuncia")).toHaveLength(1))
     expect(chamou("rpc:resolver_denuncia")[0].args[0]).toEqual({ denuncia: 5, procedente: true })
   })
+  it("Moderação: aprovar perfil envia a versão lida; perfil alterado no meio mostra o aviso e recarrega", async () => {
+    estado.respostas["denuncias"] = { data: [], error: null }
+    estado.respostas["perfis"] = { data: [{ id: "p1", nome: "Bia", empresa_nome: null, cidade: null, bio: null, atualizado_em: "2026-10-30T10:00:00.123456+00:00" }], error: null }
+    estado.respostas["rpc:aprovar_perfil_publico"] = { data: null, error: { code: "P0001", message: "perfil_mudou" } }
+    montar(<Moderacao />, "/moderacao", "/pt/admin/moderacao", "moderador")
+    await userEvent.click(await screen.findByRole("tab", { name: "Perfis públicos" }))
+    await userEvent.click(await screen.findByRole("button", { name: "Aprovar perfil público" }))
+    await waitFor(() => expect(chamou("rpc:aprovar_perfil_publico")).toHaveLength(1))
+    expect(chamou("rpc:aprovar_perfil_publico")[0].args[0]).toEqual({ perfil: "p1", versao: "2026-10-30T10:00:00.123456+00:00", aprovar: true })
+    expect(await screen.findByText(/O membro alterou o perfil/)).toBeTruthy()
+    await waitFor(() => expect(chamou("perfis").length).toBeGreaterThan(1))
+  })
 })
 
 describe("Receitas fora do Stripe, estorno, acesso manual e câmbio", () => {

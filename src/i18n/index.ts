@@ -95,7 +95,7 @@ function definirMeta(nome: string, conteudo: string | null) {
   el.content = conteudo
 }
 
-// Título da aba ("<tela> — Grupo Árvora") e description no idioma da página; noindex reforça o X-Robots-Tag do vercel.json.
+// Título da aba ("<tela> — Grupo Árvora") e description no idioma da página; noindex reforça o X-Robots-Tag do vercel.json (que hoje cobre o site todo até o lançamento).
 export function useTitulo(chave: Chave, noindex = false) {
   const idioma = useIdioma()
   useEffect(() => {

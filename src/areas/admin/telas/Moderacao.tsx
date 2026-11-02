@@ -79,7 +79,7 @@ function Denuncias({ pergunta }: { pergunta: (p: Pergunta) => void }) {
 function PerfisPublicos() {
   const t = useT()
   const acao = useAcao()
-  const carga = useCarga(async () => exigir(await supabase.from("perfis").select("id, nome, empresa_nome, cidade, bio").eq("visibilidade", "publico").is("publico_aprovado_em", null).is("suspenso_em", null).order("criado_em").limit(100)), [])
+  const carga = useCarga(async () => exigir(await supabase.from("perfis").select("id, nome, empresa_nome, cidade, bio, atualizado_em").eq("visibilidade", "publico").is("publico_aprovado_em", null).is("suspenso_em", null).order("criado_em").limit(100)), [])
   return (
     <div className="space-y-4">
       <AvisoDe aviso={acao.aviso} />
@@ -95,7 +95,7 @@ function PerfisPublicos() {
                     <h3 className="text-base font-semibold">{p.nome}</h3>
                     <p className="text-legenda text-nevoa">{[p.empresa_nome, p.cidade].filter(Boolean).join(" · ")}</p>
                     {p.bio ? <p className="mt-2 text-base text-bruma">{p.bio}</p> : null}
-                    <button type="button" className={`${classeAcao} mt-3`} disabled={acao.ocupado} onClick={() => void acao.rodar(async () => { exigirSemDados(await supabase.rpc("aprovar_perfil_publico", { perfil: p.id, aprovar: true })); carga.recarregar() }, "admin.moderacao.perfilAprovado")}>{t("admin.moderacao.aprovarPerfil")}</button>
+                    <button type="button" className={`${classeAcao} mt-3`} disabled={acao.ocupado} onClick={() => void acao.rodar(async () => { try { exigirSemDados(await supabase.rpc("aprovar_perfil_publico", { perfil: p.id, versao: p.atualizado_em, aprovar: true })) } finally { carga.recarregar() } }, "admin.moderacao.perfilAprovado")}>{t("admin.moderacao.aprovarPerfil")}</button>
                   </Cartao>
                 </li>
               ))}

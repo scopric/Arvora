@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useParams } from "react-router"
+import { Link, useLocation, useParams } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Botao } from "../../../componentes/Botao"
@@ -22,6 +22,7 @@ type Props = { tipo: "talk" | "original"; base: string; titulo: Chave }
 export function PaginaVideo({ tipo, base, titulo }: Props) {
   const t = useT()
   const caminho = useCaminho()
+  const { pathname } = useLocation()
   const { slug = "" } = useParams()
   const { sessao } = useAuth()
   const acesso = useAcesso()
@@ -58,7 +59,7 @@ export function PaginaVideo({ tipo, base, titulo }: Props) {
           {v.nivel_minimo === "visitante" && !uid ? (
             <div>
               <p className="max-w-prose text-lg">{t("publico.video.entrar")}</p>
-              <Link to={caminho("/entrar")} className={`${linkPrimario} mt-4`}>{t("nav.entrar")}</Link>
+              <Link to={caminho("/entrar")} state={{ de: pathname }} className={`${linkPrimario} mt-4`}>{t("nav.entrar")}</Link>
             </div>
           ) : (
             <Bloqueado minimo={minimo} frase={t(minimo === "grupo" ? "publico.video.restoGrupo" : "publico.video.restoClube")} />

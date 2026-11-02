@@ -11,6 +11,7 @@ delete from public.contas_stripe where stripe_account_id = 'acct_exemplo_local';
 
 create schema tt;
 grant usage on schema tt to public;
+alter default privileges in schema tt grant execute on functions to public; -- a f4_09 tirou o EXECUTE padrao de PUBLIC
 create function tt.como(uid uuid, aal text default 'aal1') returns void language plpgsql as $$
 begin
   perform set_config('request.jwt.claims',

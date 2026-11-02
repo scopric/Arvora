@@ -1,5 +1,5 @@
 import { focoApp, linkTextoApp } from "../../componentes/menuApp"
-import { SITE_URL } from "../../site"
+import { APP_URL } from "../../site"
 import { supabase } from "../../lib/supabase"
 
 // Datas da plataforma: sempre Europe/Dublin (PRD AUL-01), com Brasília ao lado para quem assiste do Brasil.
@@ -54,7 +54,7 @@ function dobrar(linha: string) {
 }
 
 export function gerarIcs(a: AulaAgenda, lang: string): string {
-  const url = `${SITE_URL}/${lang}/aulas/${a.slug}`
+  const url = `${APP_URL}/${lang}/aulas/${a.slug}`
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -89,7 +89,7 @@ export function linkGoogleAgenda(a: AulaAgenda, lang: string): string {
     action: "TEMPLATE",
     text: a.titulo,
     dates: `${utc(new Date(a.inicio_em))}/${utc(fim(a))}`,
-    details: `${SITE_URL}/${lang}/aulas/${a.slug}`,
+    details: `${APP_URL}/${lang}/aulas/${a.slug}`,
   })
   return `https://calendar.google.com/calendar/render?${p}`
 }
