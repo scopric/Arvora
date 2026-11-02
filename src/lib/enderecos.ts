@@ -35,6 +35,11 @@ export function linkSite(caminho: string, { site, app }: Enderecos = OFICIAIS): 
   return site === app ? caminho : site + caminho
 }
 
+// Caminho de volta depois do login só se for deste endereço: "//x", "/\\x" e espaço/tab o navegador lê como outro domínio.
+export function caminhoInterno(de: string | null | undefined): string | null {
+  return de && /^\/(?!\/)[^\\\s]*$/.test(de) ? de : null
+}
+
 // Destino padrão depois do login: no painel, o próprio painel.
 export function inicioDepoisDoLogin(origem: string, { site, app, admin }: Enderecos = OFICIAIS): "/admin" | "/inicio" {
   return origem === admin && admin !== app && admin !== site ? "/admin" : "/inicio"

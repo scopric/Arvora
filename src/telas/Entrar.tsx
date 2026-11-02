@@ -7,7 +7,7 @@ import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
 import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { useCaptcha } from "../lib/captcha"
-import { inicioDepoisDoLogin } from "../lib/enderecos"
+import { caminhoInterno, inicioDepoisDoLogin } from "../lib/enderecos"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
@@ -22,7 +22,7 @@ export function Entrar() {
   // ?de= vem de outro endereço (Decisão 66, root.tsx); a validação abaixo vale para os dois.
   const de = (local.state as { de?: string } | null)?.de ?? new URLSearchParams(local.search).get("de") ?? undefined
   // Só caminho interno: nada de redirecionar para fora do site.
-  const origem = de?.startsWith("/") && !de.startsWith("//") ? de : caminho(inicioDepoisDoLogin(window.location.origin))
+  const origem = caminhoInterno(de) ?? caminho(inicioDepoisDoLogin(window.location.origin))
   const [erros, setErros] = useState<CamposDeErro>({})
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { enderecoCerto, inicioDepoisDoLogin, linkSite } from "./enderecos"
+import { caminhoInterno, enderecoCerto, inicioDepoisDoLogin, linkSite } from "./enderecos"
 
 const S = "https://www.x.com", A = "https://app.x.com", P = "https://alpha.x.com"
 const sites = { site: S, app: A, admin: P }
@@ -48,5 +48,10 @@ describe("enderecoCerto", () => {
     expect(enderecoCerto(S, "/pt/admin", { site: S, app: S, admin: S })).toBeNull()
     expect(enderecoCerto(S, "/pt", { site: S, app: S, admin: S })).toBeNull()
     expect(ir(S, "/entrar")).toBeNull()
+  })
+  it("volta do login só para caminho deste endereço", () => {
+    expect(caminhoInterno("/pt/planos")).toBe("/pt/planos")
+    for (const ruim of ["//evil.com", "/\\evil.com", "/\t/evil.com", "https://evil.com", "javascript:x", "", null, undefined])
+      expect(caminhoInterno(ruim)).toBeNull()
   })
 })
