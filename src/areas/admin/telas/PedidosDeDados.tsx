@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Botao } from "../../../componentes/Botao"
+import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Selecao } from "../../../componentes/Campo"
 import { Selo } from "../../../componentes/Selo"
 import { Tabela } from "../../../componentes/Tabela"
@@ -15,11 +16,12 @@ import { diasAte } from "../lib/regras"
 
 const STATUS = ["recebido", "em_andamento", "concluido", "recusado"] as const
 type Status = (typeof STATUS)[number]
-type Pedido = { id: number; email: string; tipo: "exportacao" | "exclusao" | "retificacao"; status: Status; prazo_em: string; observacao: string | null }
+type Pedido = { id: number; email: string; tipo: "exportacao" | "exclusao" | "retificacao"; status: Status; prazo_em: string; criado_em: string; perfil_id: string | null; observacao: string | null }
 
 function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
   const t = useT()
   const [status, setStatus] = useState<Status>(p.status)
+  const [confirmando, setConfirmando] = useState(false)
   const [obs, setObs] = useState(p.observacao ?? "")
   const acao = useAcao()
   const salvar = (novo: Status) =>
@@ -37,8 +39,13 @@ function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-2">
         <Botao type="button" ocupado={acao.ocupado} onClick={() => void salvar(status)} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
-        {p.status !== "concluido" ? <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => void salvar("concluido")} className="sm:w-auto">{t("admin.pedidos.atendido")}</Botao> : null}
+        {p.status !== "concluido" ? <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => setConfirmando(true)} className="sm:w-auto">{t("admin.pedidos.atendido")}</Botao> : null}
       </div>
+      <DialogoConfirmar
+        aberto={confirmando} titulo={t("admin.pedidos.atendidoTitulo")} texto={t("admin.pedidos.atendidoTexto")} confirmar={t("admin.pedidos.atendido")}
+        aoCancelar={() => setConfirmando(false)}
+        aoConfirmar={() => { setConfirmando(false); void salvar("concluido") }}
+      />
     </div>
   )
 }
@@ -49,7 +56,7 @@ export function PedidosDeDados() {
   const pode = usePode(SUPER)
   const [abertos, setAbertos] = useState(true)
   const carga = useCarga(async () => {
-    let q = supabase.from("pedidos_gdpr").select("id, email, tipo, status, prazo_em, observacao").order("prazo_em").limit(300)
+    let q = supabase.from("pedidos_gdpr").select("id, email, tipo, status, prazo_em, criado_em, perfil_id, observacao").order("prazo_em").limit(300)
     if (abertos) q = q.in("status", ["recebido", "em_andamento"])
     return exigir(await q) as Pedido[]
   }, [abertos, pode])
@@ -72,6 +79,8 @@ export function PedidosDeDados() {
               legenda={t("admin.pedidosDeDados.titulo")} linhas={linhas} id={(l) => l.id}
               colunas={[
                 { chave: "email", titulo: t("admin.comum.email"), celula: (l) => l.email },
+                { chave: "recebido", titulo: t("admin.pedidos.recebidoEm"), celula: (l) => dataCurta(l.criado_em) },
+                { chave: "perfil", titulo: t("admin.pedidos.perfil"), celula: (l) => <span className="break-all text-xs">{l.perfil_id ?? "—"}</span> },
                 { chave: "tipo", titulo: t("admin.comum.tipo"), celula: (l) => t(`admin.pedidos.tipo.${l.tipo}`) },
                 {
                   chave: "prazo", titulo: t("admin.pedidos.prazo"),

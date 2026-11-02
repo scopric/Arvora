@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Botao } from "../../../componentes/Botao"
 import { Cartao } from "../../../componentes/Cartao"
+import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
@@ -12,7 +13,7 @@ import { CORRIGE, usePode } from "../lib/papel"
 
 type Entrega = { id: number; exercicio_id: number; perfil_id: string; texto: string | null; arquivo_path: string | null; enviada_em: string }
 
-function Item({ e, titulo, membro, enunciado, aoMudar }: { e: Entrega; titulo: string; membro: string; enunciado: string; aoMudar: () => void }) {
+function Item({ e, titulo, membro, enunciado, prazo, aoMudar }: { e: Entrega; titulo: string; membro: string; enunciado: string; prazo: number | null; aoMudar: () => void }) {
   const t = useT()
   const lang = useIdioma()
   const [devolutiva, setDevolutiva] = useState("")
@@ -31,7 +32,10 @@ function Item({ e, titulo, membro, enunciado, aoMudar }: { e: Entrega; titulo: s
   return (
     <Cartao>
       <h2 className="text-lg font-semibold">{membro} · {titulo}</h2>
-      <p className="mt-1 text-sm opacity-75">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}</p>
+      <p className="mt-1 text-sm opacity-75">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}
+        {prazo !== null ? <> · {t("admin.correcao.prazo")}: {prazo} {t("admin.correcao.diasPrazo")}{dias > prazo ? <> <Selo tom="alerta">{t("admin.correcao.atrasada")}</Selo></> : null}</> : null}
+        {/* Aviso por e-mail ao corretor/membro: depende da conta do Resend (ainda não existe). */}
+      </p>
       <p className="mt-3 text-sm opacity-75">{enunciado}</p>
       {e.texto ? <p className="mt-3 whitespace-pre-wrap">{e.texto}</p> : null}
       {e.arquivo_path ? (
@@ -55,8 +59,8 @@ export function Correcao() {
   const pode = usePode(CORRIGE)
   const carga = useCarga(async () => {
     const entregas = exigir(await supabase.from("entregas").select("id, exercicio_id, perfil_id, texto, arquivo_path, enviada_em").eq("status", "enviada").order("enviada_em").limit(100)) as Entrega[]
-    if (entregas.length === 0) return { entregas, exercicios: new Map<number, { aula_id: number; enunciado_md: string }>(), aulas: new Map<number, string>(), perfis: new Map<string, string>() }
-    const exercicios = exigir(await supabase.from("exercicios").select("id, aula_id, enunciado_md").in("id", [...new Set(entregas.map((x) => x.exercicio_id))]))
+    if (entregas.length === 0) return { entregas, exercicios: new Map<number, { aula_id: number; enunciado_md: string; prazo_dias: number | null }>(), aulas: new Map<number, string>(), perfis: new Map<string, string>() }
+    const exercicios = exigir(await supabase.from("exercicios").select("id, aula_id, enunciado_md, prazo_dias").in("id", [...new Set(entregas.map((x) => x.exercicio_id))]))
     const [aulas, perfis] = await Promise.all([
       supabase.from("aulas").select("id, titulo").in("id", [...new Set(exercicios.map((x) => x.aula_id))]),
       supabase.from("perfis").select("id, nome").in("id", [...new Set(entregas.map((x) => x.perfil_id))]),
@@ -81,7 +85,7 @@ export function Correcao() {
                 const ex = d.exercicios.get(e.exercicio_id)
                 return (
                   <li key={e.id}>
-                    <Item e={e} titulo={ex ? (d.aulas.get(ex.aula_id) ?? "—") : "—"} membro={d.perfis.get(e.perfil_id) ?? "—"} enunciado={ex?.enunciado_md ?? ""} aoMudar={carga.recarregar} />
+                    <Item e={e} titulo={ex ? (d.aulas.get(ex.aula_id) ?? "—") : "—"} membro={d.perfis.get(e.perfil_id) ?? "—"} enunciado={ex?.enunciado_md ?? ""} prazo={ex?.prazo_dias ?? null} aoMudar={carga.recarregar} />
                   </li>
                 )
               })}
