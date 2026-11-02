@@ -119,6 +119,8 @@ export const pt = {
   "entrar.esqueci": "Esqueci a senha",
   "entrar.semConta": "Ainda não tem conta?",
   "entrar.criarConta": "Criar conta",
+  "entrar.reenviar": "Reenviar o link de confirmação",
+  "entrar.reenviado": "Se o e-mail estiver cadastrado e sem confirmar, enviamos um novo link.",
   "cadastro.titulo": "Criar conta",
   "cadastro.subtitulo": "Leva um minuto. Você confirma o e-mail em seguida.",
   "cadastro.nome": "Nome",

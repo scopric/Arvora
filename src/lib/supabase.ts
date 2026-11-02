@@ -11,4 +11,6 @@ if (!url || !chave) {
   )
 }
 
-export const supabase = createClient<Database>(url, chave)
+// PKCE: o cliente ignora tokens no #hash da URL, então um link com a sessão de outra pessoa não troca a sua.
+// Os e-mails usam token_hash + verifyOtp (Confirmar.tsx), que independe do fluxo.
+export const supabase = createClient<Database>(url, chave, { auth: { flowType: "pkce" } })

@@ -73,6 +73,7 @@ export type AvisoAcao = { tipo: "ok" | "erro"; texto: string } | null
 // Códigos que o banco levanta (raise exception) e que a equipe precisa entender sem abrir o log.
 const CODIGOS: Record<string, Chave> = {
   ciclo_em_andamento: "admin.cod.ciclo_em_andamento",
+  perfil_mudou: "admin.cod.perfil_mudou",
   ciclo_ja_fechado: "admin.cod.ciclo_ja_fechado",
   ciclo_nao_fechado: "admin.cod.ciclo_nao_fechado",
   ciclo_fechado: "admin.cod.ciclo_fechado",

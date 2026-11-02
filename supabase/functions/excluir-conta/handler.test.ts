@@ -35,6 +35,7 @@ function montar(o: {
   limite?: boolean | "erro";
 } = {}) {
   const ordem: string[] = [];
+  const chaves: string[] = [];
   const limites: string[] = [];
   const stripe: { url: string; init: RequestInit; corpo: URLSearchParams }[] =
     [];
@@ -58,8 +59,9 @@ function montar(o: {
     agora: () => AGORA,
     env: (n) => (o.env ?? ENV)[n],
     db: () => db,
-    senhaConfere: (_u, _a, email, senha) => {
+    senhaConfere: (_u, chave, email, senha) => {
       ordem.push(`senha:${email}`);
+      chaves.push(chave);
       return Promise.resolve((o.senhaOk ?? true) && senha === SENHA);
     },
     apagarUsuario: (_u, _s, uid) => {
@@ -77,7 +79,7 @@ function montar(o: {
         Response.json({ id: "sub", status: "canceled" }));
     },
   };
-  return { deps, ordem, stripe, limites };
+  return { deps, ordem, stripe, limites, chaves };
 }
 
 const jwt = (aal: string) =>
@@ -124,6 +126,12 @@ Deno.test("feliz sem assinatura: confere senha, apaga, nada no Stripe", async ()
   equal(r.headers.get("Access-Control-Allow-Origin"), SITE);
   equal(stripe.length, 0);
   deepEqual(ordem, [`senha:titular@exemplo.test`, `apagar:${UID}`]);
+});
+
+Deno.test("senha conferida com a chave de serviço (com CAPTCHA no Auth, a anon é recusada)", async () => {
+  const { deps, chaves } = montar();
+  await handle(post(corpoOk), deps);
+  deepEqual(chaves, ["service_falsa"]);
 });
 
 Deno.test("feliz com 2 assinaturas em 2 contas: DELETE por conta, depois apagar", async () => {

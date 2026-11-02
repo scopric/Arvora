@@ -68,6 +68,12 @@ export function Confirmar() {
         <Botao type="button" ocupado={ocupado} onClick={confirmar}>
           {t("confirmar.botao")}
         </Botao>
+        {/* Link vencido ou já usado: na entrada a pessoa pede outro (o token_hash não traz o e-mail). */}
+        {aviso ? (
+          <Link to={caminho(dados.data.type === "recovery" ? "/recuperar-senha" : "/entrar")} className="block underline decoration-dourado underline-offset-4">
+            {t(dados.data.type === "recovery" ? "entrar.esqueci" : "confirmar.irEntrar")}
+          </Link>
+        ) : null}
       </div>
     </LayoutAuth>
   )

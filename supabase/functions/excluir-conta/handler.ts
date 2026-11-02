@@ -39,9 +39,11 @@ export type Consultas = {
 export type Deps = {
   env: (nome: string) => string | undefined;
   db: (authorization: string) => Consultas;
+  // Chave de serviço, não a anon: com CAPTCHA ligado no Auth, o login sem token é recusado (captcha_failed)
+  // e a exclusão (art. 17) pararia. O limite desta conferência é o consumir_limite abaixo (5 por hora).
   senhaConfere: (
     url: string,
-    anon: string,
+    serviceRole: string,
     email: string,
     senha: string,
   ) => Promise<boolean>;
@@ -141,7 +143,7 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
         "Retry-After": String(LIMITE.janelaSeg),
       });
     }
-    if (!(await deps.senhaConfere(url, anon, usuario.email, senha))) {
+    if (!(await deps.senhaConfere(url, serviceRole, usuario.email, senha))) {
       return json({ erro: "senha_invalida" }, 401, site);
     }
     uid = usuario.id;

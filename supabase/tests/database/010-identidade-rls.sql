@@ -1,10 +1,11 @@
 -- RLS da F1 (identidade): setores, perfis, equipe. Roda com `supabase test db`, tudo dentro de uma
 -- transacao desfeita. Sem dbdev/helpers: o papel e o aal do JWT sao simulados com set_config.
 begin;
-select plan(65);
+select plan(69);
 
 create schema tt;
 grant usage on schema tt to public;
+alter default privileges in schema tt grant execute on functions to public; -- a f4_09 tirou o EXECUTE padrao de PUBLIC
 -- Troca para a pessoa/papel: aal 'aal1' ou 'aal2'. Volta ao superusuario com `reset role`.
 create function tt.como(uid uuid, aal text default 'aal1') returns void language plpgsql as $$
 begin
@@ -46,7 +47,7 @@ select is((select count(*)::int from pg_class c join pg_namespace n on n.oid = c
 select ok(not has_table_privilege('anon', 'public.equipe', 'select'), 'anon sem acesso a equipe');
 select ok(not has_table_privilege('anon', 'public.perfis', 'insert'), 'anon nao insere em perfis');
 select ok(not has_function_privilege('anon', 'private.papel_atual()', 'execute'), 'anon sem execute em papel_atual');
-select ok(not has_function_privilege('anon', 'public.aprovar_perfil_publico(uuid, boolean)', 'execute'),
+select ok(not has_function_privilege('anon', 'public.aprovar_perfil_publico(uuid, timestamptz, boolean)', 'execute'),
           'anon sem execute em aprovar_perfil_publico');
 select ok(not has_schema_privilege('anon', 'private', 'usage'), 'anon sem uso do schema private');
 select ok(not has_column_privilege('authenticated', 'public.perfis', 'maior_18_em', 'select'),
@@ -100,26 +101,36 @@ select tt.anonimo();
 select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 0, 'anon nao ve perfil publico ainda nao aprovado');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d1', 'aal1');
-select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b')$$,
+select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000b'))$$,
                  '42501', 'sem_permissao', 'moderador sem 2FA (aal1) nao aprova');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d2', 'aal2');
-select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b')$$,
+select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000b'))$$,
                  '42501', 'sem_permissao', 'editor nao aprova perfil');
 reset role;
 select tt.como('00000000-0000-0000-0000-00000000000a', 'aal2');
-select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b')$$,
+select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000b'))$$,
                  '42501', 'sem_permissao', 'membro comum nao aprova perfil, mesmo com aal2');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d1', 'aal2');
-select lives_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b')$$,
+select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', '2000-01-01')$$,
+                 'P0001', 'perfil_mudou', 'versao diferente da que o moderador leu nao aprova');
+select lives_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000b'))$$,
                 'moderador com 2FA aprova');
-select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000a')$$,
+select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000a', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000a'))$$,
                  'P0002', 'perfil_nao_aprovavel', 'perfil privado nao e aprovavel');
 reset role;
 select tt.anonimo();
 select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 1, 'anon ve o perfil publico aprovado');
 select is((select nome from public.perfis where slug = 'bia'), 'Bia', 'anon le as colunas publicas');
+reset role;
+select tt.como('00000000-0000-0000-0000-00000000000a', 'aal2');
+select is((select count(*)::int from public.perfis where id = '00000000-0000-0000-0000-00000000000b'), 1,
+          'A enxerga o perfil publico aprovado de B');
+select is((select tt.afeta($q$update public.perfis set nome = 'Hack' where id = '00000000-0000-0000-0000-00000000000b'$q$)), 0,
+          'A (membro, aal2) nao altera o perfil de B mesmo vendo a linha');
+reset role;
+select tt.anonimo();
 select throws_ok($$select maior_18_em from public.perfis$$, '42501', null, 'anon nao le maior_18_em');
 select throws_ok($$select suspenso_em from public.perfis$$, '42501', null, 'anon nao le suspenso_em');
 reset role;
@@ -134,14 +145,14 @@ select is((select count(*)::int from public.perfis where id in ('00000000-0000-0
 reset role;
 -- reaprova, depois suspende (suspender_perfil entra na F4; aqui a coluna e escrita pelo dono do banco)
 select tt.como('00000000-0000-0000-0000-0000000000d1', 'aal2');
-select lives_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b')$$, 'reaprovado');
+select lives_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000b'))$$, 'reaprovado');
 reset role;
 update public.perfis set suspenso_em = now() where id = '00000000-0000-0000-0000-00000000000b';
 select tt.anonimo();
 select is((select count(*)::int from public.perfis where id in ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-0000000000d1','00000000-0000-0000-0000-0000000000d2','00000000-0000-0000-0000-0000000000d3','00000000-0000-0000-0000-0000000000d4')), 0, 'perfil suspenso some para o publico');
 reset role;
 select tt.como('00000000-0000-0000-0000-0000000000d1', 'aal2');
-select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b')$$,
+select throws_ok($$select public.aprovar_perfil_publico('00000000-0000-0000-0000-00000000000b', (select atualizado_em from public.perfis where id = '00000000-0000-0000-0000-00000000000b'))$$,
                  'P0002', 'perfil_nao_aprovavel', 'perfil suspenso nao e aprovavel');
 reset role;
 
@@ -203,6 +214,8 @@ reset role;
 create policy tt_frouxa_i on public.equipe for insert to authenticated with check (true);
 create policy tt_frouxa_u on public.equipe for update to authenticated using (true) with check (true);
 create policy tt_frouxa_d on public.equipe for delete to authenticated using (true);
+-- SELECT frouxa: sem ela B nem enxerga as linhas e o "0 linhas" abaixo nao provaria nada.
+create policy tt_frouxa_s on public.equipe for select to authenticated using (true);
 select tt.como('00000000-0000-0000-0000-00000000000b', 'aal1');
 select throws_ok($$insert into public.equipe (perfil_id, papel) values ('00000000-0000-0000-0000-00000000000b', 'super_admin')$$,
                  '42501', null, 'com politica frouxa, escrita em equipe sem aal2 continua negada');
@@ -210,6 +223,8 @@ select is((select tt.afeta($q$update public.equipe set papel = 'super_admin' whe
           0, 'com politica frouxa, update em equipe sem aal2 afeta 0 linhas');
 select is((select tt.afeta($q$delete from public.equipe where perfil_id = '00000000-0000-0000-0000-0000000000d2'$q$)),
           0, 'com politica frouxa, delete em equipe sem aal2 afeta 0 linhas');
+select is((select count(*)::int from public.equipe where perfil_id = '00000000-0000-0000-0000-0000000000d2'), 1,
+          'controle: com a SELECT frouxa, B enxerga a linha que nao conseguiu alterar');
 reset role;
 select tt.como('00000000-0000-0000-0000-00000000000b', 'aal2');
 select lives_ok($$insert into public.equipe (perfil_id, papel) values ('00000000-0000-0000-0000-00000000000b', 'moderador')$$,

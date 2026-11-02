@@ -11,6 +11,7 @@ delete from public.contas_stripe where stripe_account_id = 'acct_exemplo_local';
 
 create schema tt;
 grant usage on schema tt to public;
+alter default privileges in schema tt grant execute on functions to public; -- a f4_09 tirou o EXECUTE padrao de PUBLIC
 create function tt.u(s text) returns uuid language sql as $$ select ('00000000-0000-0000-0000-0000000000' || s)::uuid $$;
 create function tt.conta(a text default 'acct_teste') returns bigint language sql as $$ select id from public.contas_stripe where stripe_account_id = a $$;
 create function tt.plano(price text) returns bigint language sql as $$ select id from public.planos where stripe_price_id = price $$;

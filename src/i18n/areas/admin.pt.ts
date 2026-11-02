@@ -74,6 +74,7 @@ export const adminPt = {
   "admin.semPermissao.texto": "O seu papel na equipe não inclui esta área. Peça ao super administrador, se precisar.",
   "admin.vazio.nada": "Nada pendente.",
   "admin.cod.cambio_ausente": "Falta a taxa do BCE para uma moeda do Ciclo. Cadastre o câmbio e tente de novo.",
+  "admin.cod.perfil_mudou": "O membro alterou o perfil depois que você abriu a lista. Recarregamos: leia de novo antes de aprovar.",
   "admin.cod.ciclo_em_andamento": "O Ciclo ainda não terminou: só se fecha depois do dia 9.",
   "admin.cod.ciclo_fechado": "Este Ciclo está fechado. Reabra o Ciclo (com motivo) antes de mudar lançamentos.",
   "admin.cod.ciclo_ja_fechado": "Este Ciclo já está fechado.",
