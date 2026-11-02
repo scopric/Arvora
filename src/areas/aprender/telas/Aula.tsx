@@ -91,7 +91,7 @@ export function Aula() {
         <div className="space-y-10">
           {aula.descricao ? <p className="max-w-prose text-lg">{aula.descricao}</p> : null}
           <Gravacao aulaId={aula.id} titulo={aula.titulo} uid={uid} />
-          <Materiais aulaId={aula.id} uid={uid} podeEnviar={!!aula.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} />
+          <Materiais aulaId={aula.id} uid={uid} podeEnviar={!!aula.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} doGrupo={temNivel(acesso.nivel, "grupo")} />
           {proxima.fase === "ok" && proxima.dados ? (
             <p>
               <Link to={caminho(`/aulas/${proxima.dados.slug}`)} className={linkTexto}>{t("aprender.proxima")}: {proxima.dados.titulo} →</Link>

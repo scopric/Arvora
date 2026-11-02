@@ -35,7 +35,7 @@ function Ebook({ caminho }: { caminho: string }) {
   )
 }
 
-export function Materiais({ aulaId, uid, podeEnviar }: { aulaId: number; uid: string; podeEnviar: boolean }) {
+export function Materiais({ aulaId, uid, podeEnviar, doGrupo }: { aulaId: number; uid: string; podeEnviar: boolean; doGrupo: boolean }) {
   const t = useT()
   const { hash } = useLocation()
   // Rascunhos dos exercícios ficam aqui: a aba inativa é desmontada (Abas) e o texto digitado se perderia.
@@ -85,7 +85,7 @@ export function Materiais({ aulaId, uid, podeEnviar }: { aulaId: number; uid: st
           conteudo: exercicios.length ? (
             <div className="space-y-5">
               {exercicios.map((x) => (
-                <Exercicio key={x.id} exercicio={x} entrega={entregas.find((e) => e.exercicio_id === x.id) ?? null} uid={uid} podeEnviar={podeEnviar} aoAtualizar={recarregar} rascunho={rascunhos[x.id]} aoDigitar={(v) => setRascunhos((r) => {
+                <Exercicio key={x.id} exercicio={x} entrega={entregas.find((e) => e.exercicio_id === x.id) ?? null} uid={uid} podeEnviar={podeEnviar} doGrupo={doGrupo} aoAtualizar={recarregar} rascunho={rascunhos[x.id]} aoDigitar={(v) => setRascunhos((r) => {
                     const n = { ...r }
                     if (v === undefined) delete n[x.id]
                     else n[x.id] = v

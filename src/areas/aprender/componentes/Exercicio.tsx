@@ -31,10 +31,10 @@ async function abrirArquivo(caminho: string): Promise<boolean> {
 }
 
 // Um exercício: enunciado, a resposta enviada, o status, a devolutiva e (se pode) o formulário de envio/reenvio.
-// `podeEnviar` = vertical aceita entregas e o membro é do Grupo (o RLS confere de novo).
+// `podeEnviar` = vertical aceita entregas e o membro é do Grupo (o RLS confere de novo). `doGrupo` só separa o motivo do bloqueio.
 // `rascunho`/`aoDigitar` (opcionais): quem hospeda o exercício em abas guarda o texto fora daqui, porque a aba inativa é
 // desmontada. `aoDigitar(undefined)` = apagar o rascunho (depois de enviar).
-export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, rascunho, aoDigitar }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void }) {
+export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true, aoAtualizar, rascunho, aoDigitar }: { exercicio: ExercicioLinha; entrega: EntregaLinha | null; uid: string; podeEnviar: boolean; doGrupo?: boolean; aoAtualizar: () => void; rascunho?: string; aoDigitar?: (texto: string | undefined) => void }) {
   const t = useT()
   const lang = useIdioma()
   const id = useId()
@@ -167,8 +167,7 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, aoAtualizar, ra
               <Aviso tipo="erro">{t(erro)}</Aviso>
             </div>
           ) : null}
-          {!entrega && !podeEnviar ? <p className="mt-4 text-sm opacity-75">{t("aprender.exercicio.semEnvio")}</p> : null}
-          {reenvio && !podeEnviar ? <p className="mt-4 text-sm opacity-75">{t("aprender.exercicio.soGrupo")}</p> : null}
+          {(!entrega || reenvio) && !podeEnviar ? <p className="mt-4 text-sm opacity-75">{t(doGrupo ? "aprender.exercicio.semEnvio" : "aprender.exercicio.soGrupo")}</p> : null}
         </>
       )}
       {ok ? (

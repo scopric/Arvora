@@ -1,6 +1,6 @@
 -- Correcoes criticas (f4_08): tarefa so do Grupo, live so do Grupo, check de aula ao vivo e espacos de referencia. Transacao desfeita.
 begin;
-select plan(14);
+select plan(15);
 
 -- Espacos criados pela migration: conferidos antes de qualquer limpeza do seed.
 select is((select count(*)::int from public.espacos where slug in ('geral', 'grupo')), 2, 'espacos de referencia existem');
@@ -39,8 +39,8 @@ from (values ('c1', 'price_t_clube'), ('b1', 'price_t_grupo')) v(s, p);
 
 insert into public.verticais (slug, nome, aceita_entregas) values ('v', 'V', true);
 -- aula gravada de nivel clube com tarefa
-insert into public.aulas (vertical_id, tipo, titulo, slug, nivel_minimo, materiais_publicados_em)
-select id, 'gravada', 'Clube', 'aula-clube', 'clube', now() from public.verticais;
+insert into public.aulas (vertical_id, tipo, titulo, slug, nivel_minimo, duracao_min, materiais_publicados_em)
+select id, 'gravada', 'Clube', 'aula-clube', 'clube', 30, now() from public.verticais;
 insert into public.exercicios (aula_id, ordem, enunciado_md, prazo_dias) select id, 1, 'Faca.', 7 from public.aulas where slug = 'aula-clube';
 create function tt.ex() returns bigint language sql as $$ select e.id from public.exercicios e join public.aulas a on a.id = e.aula_id where a.slug = 'aula-clube' $$;
 -- live do grupo, ja aberta
@@ -57,10 +57,16 @@ select tt.como(tt.u('b1'));
 select lives_ok($$insert into public.entregas (exercicio_id, perfil_id, texto) values (tt.ex(), tt.u('b1'), 'x')$$,
                 'grupo entrega tarefa de aula nivel clube');
 reset role;
--- reenvio tambem exige Grupo: entrega em 'ajustar' de membro Clube nao pode ser atualizada (pode_entregar no UPDATE)
-insert into public.entregas (exercicio_id, perfil_id, texto, status) values (tt.ex(), tt.u('c1'), 'velho', 'ajustar');
+-- reenvio tambem exige Grupo (pode_entregar no UPDATE). O gatilho forca 'enviada' no INSERT; 'ajustar' entra por UPDATE
+-- do superusuario. Troca de texto em 'ajustar' (o gatilho volta para 'enviada').
+insert into public.entregas (exercicio_id, perfil_id, texto) values (tt.ex(), tt.u('c1'), 'velho');  -- a do b1 ja existe (insercao acima)
+update public.entregas set status = 'ajustar', corrigido_por = tt.u('ed'), corrigido_em = now(), devolutiva = 'x'
+ where perfil_id in (tt.u('c1'), tt.u('b1'));
 select tt.como(tt.u('c1'));
-select is(tt.afeta($$update public.entregas set texto = 'novo' where perfil_id = tt.u('c1')$$), 0, 'clube nao reenvia entrega mesmo em ajustar');
+select is(tt.afeta($$update public.entregas set texto = 'novo' where perfil_id = tt.u('c1')$$), 0, 'clube nao reenvia entrega em ajustar');
+reset role;
+select tt.como(tt.u('b1'));
+select is(tt.afeta($$update public.entregas set texto = 'novo' where perfil_id = tt.u('b1')$$), 1, 'grupo reenvia entrega em ajustar');
 reset role;
 
 -- 2) link da live: clube barrado, grupo recebe

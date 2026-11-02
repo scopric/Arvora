@@ -75,7 +75,7 @@ begin
   return v_aula.inicio_em - make_interval(mins => v_t.abre_min_antes);
 end $$;
 
--- 3) Espacos da comunidade (mesmos do seed local). Idempotente.
+-- 3) Espacos da comunidade (mesmos do seed local). Pode rodar de novo sem erro, mas NAO atualiza espaco que ja exista (edicao feita por super_admin prevalece).
 insert into public.espacos (slug, titulo, titulo_en, descricao, nivel_minimo, ordem) values
   ('geral', 'Geral', 'General', 'Espaço aberto a Clube e Grupo.', 'clube', 1),
   ('grupo', 'Grupo Árvora', 'Árvora Group', 'Espaço só do Grupo.', 'grupo', 2)
