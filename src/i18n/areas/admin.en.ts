@@ -76,6 +76,7 @@ export const adminEn: Record<keyof typeof adminPt, string> = {
   "admin.semPermissao.texto": "Your team role does not include this area. Ask the super admin if you need it.",
   "admin.vazio.nada": "Nothing pending.",
   "admin.cod.cambio_ausente": "An ECB rate is missing for a currency in the Cycle. Add the rate and try again.",
+  "admin.cod.perfil_mudou": "The member changed the profile after you opened the list. We reloaded it: read it again before approving.",
   "admin.cod.ciclo_em_andamento": "The Cycle has not ended yet: it can only be closed after day 9.",
   "admin.cod.ciclo_fechado": "This Cycle is closed. Reopen it (with a reason) before changing entries.",
   "admin.cod.ciclo_ja_fechado": "This Cycle is already closed.",

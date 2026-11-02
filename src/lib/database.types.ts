@@ -1396,7 +1396,7 @@ isOneToOne: false
 { Args: { "material": number }; Returns: undefined
                            },
 "aprovar_perfil_publico":
-{ Args: { "aprovar"?: boolean,"perfil": string }; Returns: undefined
+{ Args: { "aprovar"?: boolean,"perfil": string,"versao": string }; Returns: undefined
                            },
 "arquivos_do_titular":
 { Args: { "p_uid": string }; Returns: {

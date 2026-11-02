@@ -122,6 +122,8 @@ export const en: Record<keyof typeof pt, string> = {
   "entrar.esqueci": "Forgot password",
   "entrar.semConta": "Don't have an account yet?",
   "entrar.criarConta": "Create account",
+  "entrar.reenviar": "Resend the confirmation link",
+  "entrar.reenviado": "If the email is registered and not yet confirmed, we sent a new link.",
   "cadastro.titulo": "Create account",
   "cadastro.subtitulo": "It takes a minute. You will confirm your email right after.",
   "cadastro.nome": "Name",

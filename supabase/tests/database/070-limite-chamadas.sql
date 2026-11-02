@@ -4,6 +4,7 @@ select plan(23);
 
 create schema tt;
 grant usage on schema tt to public;
+alter default privileges in schema tt grant execute on functions to public; -- a f4_09 tirou o EXECUTE padrao de PUBLIC
 create function tt.como(uid uuid) returns void language plpgsql as $$
 begin
   perform set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'aal', 'aal1')::text, true);
