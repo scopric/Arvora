@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation, useParams } from "react-router"
 import "./index.css"
 import corpoUrl from "@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url"
@@ -45,10 +45,14 @@ export function meta({ params }: { params: { lang?: string } }) {
 
 export default function Root() {
   // Cada parte no seu endereço (Decisão 66). Vale também para a navegação dentro do SPA, que não passa pelo servidor.
+  // Uma troca só: senão um redirecionamento interno (ex.: RotaProtegida → /entrar) antes de a página sair trocaria o destino.
   const { pathname, search, hash } = useLocation()
+  const saindo = useRef(false)
   useEffect(() => {
     const alvo = enderecoCerto(window.location.origin, pathname)
-    if (alvo) window.location.replace(alvo + search + hash)
+    if (!alvo || saindo.current) return
+    saindo.current = true
+    window.location.replace(alvo + search + hash)
   }, [pathname, search, hash])
   return (
     <>
