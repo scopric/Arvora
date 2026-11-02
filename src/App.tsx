@@ -62,9 +62,9 @@ export function Rotas() {
         <Route path="recuperar-senha" element={<RecuperarSenha />} />
         <Route path="redefinir-senha" element={<RedefinirSenha />} />
         <Route element={<RotaProtegida />}>
-          <Route path="perfil" element={<Perfil />} />
           {/* Área do membro: login + LayoutMembro (sidebar/abas). Cada área registra as suas rotas em src/areas/<area>/rotas.tsx. */}
           <Route element={<LayoutMembro />}>
+            <Route path="perfil" element={<Perfil />} />
             {rotasAprender()}
             {rotasRede()}
             {rotasConta()}

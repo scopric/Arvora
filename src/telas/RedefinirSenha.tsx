@@ -30,7 +30,7 @@ export function RedefinirSenha() {
     const { error } = await supabase.auth.updateUser({ password: dados.data.senha })
     setOcupado(false)
     if (error) return setAviso(mensagemDeErroAuth(error))
-    navegar(caminho("/perfil"), { replace: true })
+    navegar(caminho("/inicio"), { replace: true })
   }
 
   if (carregando) return <LayoutAuth titulo={t("redefinir.titulo")} subtitulo={t("redefinir.verificando")}>{null}</LayoutAuth>
