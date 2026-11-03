@@ -64,8 +64,8 @@ describe("LayoutMembro", () => {
   it("barra superior tem as 4 áreas e acende a área pelo prefixo da rota", () => {
     montar({ nivel: "clube" }, "/pt/academy", <LayoutMembro />, "academy")
     const topo = screen.getByRole("navigation", { name: "Menu do membro" })
-    expect(within(topo).getAllByRole("link").map((l) => l.textContent)).toEqual(["Grupo Árvora", "Início", "Aprender", "Rede", "Awards"])
-    expect(within(topo).getByRole("link", { name: "Aprender" }).getAttribute("aria-current")).toBe("page")
+    expect(within(topo).getAllByRole("link").map((l) => l.textContent)).toEqual(["Grupo Árvora", "Início", "Treinamentos", "Rede", "Awards"])
+    expect(within(topo).getByRole("link", { name: "Treinamentos" }).getAttribute("aria-current")).toBe("page")
     expect(within(topo).getByRole("link", { name: "Início" }).getAttribute("aria-current")).toBeNull()
     expect(screen.getByRole("heading", { name: "Tela de dentro" })).toBeTruthy()
   })
@@ -78,13 +78,13 @@ describe("LayoutMembro", () => {
 
   it("Clube: seções do Grupo ficam com cadeado e motivo para leitor de tela; Meu Award some sem premiado", () => {
     montar({ nivel: "clube" }, "/pt/academy", <LayoutMembro />, "academy")
-    const secoes = screen.getByRole("navigation", { name: "Seções de Aprender" })
-    const aulas = within(secoes).getByRole("link", { name: /Aulas/ })
+    const secoes = screen.getByRole("navigation", { name: "Seções de Treinamentos" })
+    const aulas = within(secoes).getByRole("link", { name: /Agenda/ })
     expect(aulas.textContent).toContain("Bloqueado: parte do Grupo Árvora")
     expect(aulas.getAttribute("title")).toBe("Incluído no Grupo Árvora")
     expect(aulas.getAttribute("href")).toBe("/pt/aulas") // continua clicável: abre a prévia
-    expect(within(secoes).getByRole("link", { name: "Academy" }).textContent).not.toContain("Bloqueado")
-    expect(within(secoes).getByRole("link", { name: "Academy" }).getAttribute("aria-current")).toBe("page")
+    expect(within(secoes).getByRole("link", { name: "Cursos" }).textContent).not.toContain("Bloqueado")
+    expect(within(secoes).getByRole("link", { name: "Cursos" }).getAttribute("aria-current")).toBe("page")
     cleanup()
     montar({ nivel: "clube" }, "/pt/hall-of-fame", <LayoutMembro />, "hall-of-fame")
     expect(within(screen.getByRole("navigation", { name: "Seções do Awards" })).queryByRole("link", { name: /Meu Award/ })).toBeNull()
@@ -93,15 +93,15 @@ describe("LayoutMembro", () => {
   it("Rede: Clube vê Network aberto e Match com cadeado; a tab bar acende a área pelo prefixo da rota", () => {
     montar({ nivel: "clube" }, "/pt/network", <LayoutMembro />, "network")
     const secoes = screen.getByRole("navigation", { name: "Seções da Rede" })
-    expect(within(secoes).getByRole("link", { name: /Business Network/ }).textContent).not.toContain("Bloqueado")
-    expect(within(secoes).getByRole("link", { name: /Match/ }).textContent).toContain("Bloqueado: parte do Grupo Árvora")
+    expect(within(secoes).getByRole("link", { name: /Membros/ }).textContent).not.toContain("Bloqueado")
+    expect(within(secoes).getByRole("link", { name: /Sugestões/ }).textContent).toContain("Bloqueado: parte do Grupo Árvora")
     expect(within(secoes).getByRole("link", { name: /Conexões/ }).textContent).toContain("Bloqueado: parte do Grupo Árvora")
     const abas = screen.getByRole("navigation", { name: "Navegação rápida" })
     expect(within(abas).getByRole("link", { name: "Rede" }).getAttribute("aria-current")).toBe("page")
-    expect(within(abas).getByRole("link", { name: "Aprender" }).getAttribute("aria-current")).toBeNull()
+    expect(within(abas).getByRole("link", { name: "Treinamentos" }).getAttribute("aria-current")).toBeNull()
     cleanup()
     montar({ nivel: "grupo" }, "/pt/tarefas", <LayoutMembro />, "tarefas")
-    expect(within(screen.getByRole("navigation", { name: "Navegação rápida" })).getByRole("link", { name: "Aprender" }).getAttribute("aria-current")).toBe("page")
+    expect(within(screen.getByRole("navigation", { name: "Navegação rápida" })).getByRole("link", { name: "Treinamentos" }).getAttribute("aria-current")).toBe("page")
   })
 
   it("trilho e tab bar: o Clube entra em Aprender pelo Academy; o Grupo pelas Aulas; Awards fica em /awards", () => {
@@ -109,13 +109,13 @@ describe("LayoutMembro", () => {
     const trilho = screen.getByRole("navigation", { name: "Menu do membro" })
     const abas = screen.getByRole("navigation", { name: "Navegação rápida" })
     for (const nav of [trilho, abas]) {
-      expect(within(nav).getByRole("link", { name: "Aprender" }).getAttribute("href")).toBe("/pt/academy")
+      expect(within(nav).getByRole("link", { name: "Treinamentos" }).getAttribute("href")).toBe("/pt/academy")
       expect(within(nav).getByRole("link", { name: "Awards" }).getAttribute("href")).toBe("/pt/awards")
       expect(within(nav).getByRole("link", { name: "Rede" }).getAttribute("href")).toBe("/pt/network")
     }
     cleanup()
     montar({ nivel: "grupo" }, "/pt/inicio", <LayoutMembro />)
-    expect(within(screen.getByRole("navigation", { name: "Menu do membro" })).getByRole("link", { name: "Aprender" }).getAttribute("href")).toBe("/pt/aulas")
+    expect(within(screen.getByRole("navigation", { name: "Menu do membro" })).getByRole("link", { name: "Treinamentos" }).getAttribute("href")).toBe("/pt/aulas")
   })
 
   it("Grupo premiado: nada bloqueado e Meu Award aparece; Início não tem seções", () => {
@@ -170,7 +170,7 @@ describe("LayoutMembro", () => {
   it("com o acesso carregando ou com erro, o link da área é a rota da própria área", () => {
     for (const estado of [{ carregando: true, nivel: "clube" as const }, { erro: true, nivel: "clube" as const }]) {
       montar(estado, "/pt/inicio", <LayoutMembro />)
-      expect(within(screen.getByRole("navigation", { name: "Menu do membro" })).getByRole("link", { name: "Aprender" }).getAttribute("href")).toBe("/pt/aulas")
+      expect(within(screen.getByRole("navigation", { name: "Menu do membro" })).getByRole("link", { name: "Treinamentos" }).getAttribute("href")).toBe("/pt/aulas")
       cleanup()
     }
   })
