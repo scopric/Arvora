@@ -68,6 +68,7 @@ describe("enderecoCerto", () => {
     expect(barraContaDoPainel(A, "/pt/checkout/sucesso", true, sites)).toBe(true)
     expect(barraContaDoPainel(A, "/pt/redefinir-senha", true, sites)).toBe(false)
     expect(barraContaDoPainel(A, "/pt/confirmar", true, sites)).toBe(false)
+    expect(barraContaDoPainel(A, "/confirmar", true, sites)).toBe(false)
     expect(barraContaDoPainel(A, "/pt/planos", false, sites)).toBe(false)
     expect(barraContaDoPainel(P, "/pt/admin", true, sites)).toBe(false)
     expect(barraContaDoPainel(S, "/pt/planos", true, { site: S, app: S, admin: S })).toBe(false)

@@ -121,6 +121,7 @@ export const en: Record<keyof typeof pt, string> = {
   "entrar.botao": "Log in",
   "entrar.esqueci": "Forgot password",
   "entrar.semConta": "Don't have an account yet?",
+  "entrar.contaDeMembro": "This is a member account and cannot use the admin panel. Use the member area.",
   "entrar.criarConta": "Create account",
   "entrar.reenviar": "Resend the confirmation link",
   "entrar.reenviado": "If the email is registered and not yet confirmed, we sent a new link.",

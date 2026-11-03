@@ -52,7 +52,9 @@ export function ehAppSeparado(origem: string, { app, admin }: Enderecos = OFICIA
 // (o e-mail de recuperação cai no app, Site URL do Supabase).
 export function barraContaDoPainel(origem: string, caminho: string, equipe: boolean, sites: Enderecos = OFICIAIS): boolean {
   if (!equipe || !ehAppSeparado(origem, sites)) return false
-  const area = caminho.split("/")[2]
+  const [, lang, area] = caminho.split("/")
+  // Sem idioma, o SemPrefixo completa o caminho e a regra volta a valer no próximo render.
+  if (lang !== "pt" && lang !== "en") return false
   return area !== "confirmar" && area !== "redefinir-senha"
 }
 

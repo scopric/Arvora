@@ -118,6 +118,7 @@ export const pt = {
   "entrar.botao": "Entrar",
   "entrar.esqueci": "Esqueci a senha",
   "entrar.semConta": "Ainda não tem conta?",
+  "entrar.contaDeMembro": "Esta conta é de membro e não entra no painel. Use a área do membro.",
   "entrar.criarConta": "Criar conta",
   "entrar.reenviar": "Reenviar o link de confirmação",
   "entrar.reenviado": "Se o e-mail estiver cadastrado e sem confirmar, enviamos um novo link.",

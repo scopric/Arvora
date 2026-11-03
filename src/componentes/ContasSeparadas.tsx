@@ -8,6 +8,7 @@ import { ADMIN_URL } from "../site"
 import { Aviso } from "./Aviso"
 import { Botao } from "./Botao"
 import { Carregando } from "./Carregando"
+import { Erro } from "./Erro"
 
 // Sai e só então troca de página: se o signOut falhar, a sessão continua e a pessoa precisa saber.
 export function BotaoSair({ destino, className = "" }: { destino: string; className?: string }) {
@@ -32,12 +33,15 @@ export function BotaoSair({ destino, className = "" }: { destino: string; classN
 // Decisão 67: conta da equipe não usa o app. Fica em volta de todas as rotas do app (inclui planos, checkout e
 // as páginas com casca do membro). Barreira de interface; quem barra os dados é o RLS.
 export function SoMembroNoApp({ children }: { children: ReactNode }) {
+  const t = useT()
   const { sessao } = useAuth()
   const acesso = useAcesso()
   const { pathname } = useLocation()
   const origem = window.location.origin
   if (!sessao || !barraContaDoPainel(origem, pathname, true)) return children
   if (acesso.carregando) return <Carregando />
+  // Erro de leitura não vira "não é equipe": mostra o erro com "tentar de novo".
+  if (acesso.erro) return <main className="mx-auto max-w-xl px-6 py-24"><Erro aoTentar={acesso.recarregar}>{t("acesso.erro")}</Erro></main>
   return barraContaDoPainel(origem, pathname, acesso.equipe) ? <ContaDoPainel /> : children
 }
 

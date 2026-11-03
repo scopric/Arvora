@@ -24,7 +24,10 @@ export function Entrar() {
   // Só caminho interno: nada de redirecionar para fora do site.
   const origem = caminhoInterno(de) ?? caminho(inicioDepoisDoLogin(window.location.origin))
   const [erros, setErros] = useState<CamposDeErro>({})
-  const [aviso, setAviso] = useState<Chave | null>(null)
+  // Conta de membro que tentou o painel volta aqui com ?motivo=membro (Decisão 67).
+  const [aviso, setAviso] = useState<Chave | null>(() =>
+    ehPainel(window.location.origin) && new URLSearchParams(local.search).get("motivo") === "membro" ? "entrar.contaDeMembro" : null,
+  )
   const [ocupado, setOcupado] = useState(false)
   // E-mail da última tentativa recusada por falta de confirmação: habilita o reenvio do link.
   const [semConfirmar, setSemConfirmar] = useState<string | null>(null)
