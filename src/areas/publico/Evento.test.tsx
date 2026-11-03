@@ -80,6 +80,7 @@ function Destino() {
   return <p>destino: /{lang}/evento/{edicao}</p>
 }
 describe("Evento atual (/evento)", () => {
+  afterEach(() => vi.useRealTimers())
   const abrir = () =>
     render(
       <MemoryRouter initialEntries={["/pt/evento"]}>
@@ -96,20 +97,23 @@ describe("Evento atual (/evento)", () => {
     abrir()
     expect(await screen.findByText("destino: /pt/evento/dublin-2026")).toBeTruthy()
     expect(falso.chamadas.some((c) => c.tabela === "edicoes_publicas" && c.op === "not" && c.args[0] === "publicada_em")).toBe(true)
-    vi.useRealTimers()
+    // O falso não ordena: o find/at(-1) só acerta no banco real se a lista vier em ordem crescente de início.
+    const ordem = falso.chamadas.filter((c) => c.tabela === "edicoes_publicas" && c.op === "order")
+    expect(ordem).toHaveLength(1)
+    expect(ordem[0].args[0]).toBe("durante_inicio")
+    expect((ordem[0].args[1] as { ascending?: boolean } | undefined)?.ascending).not.toBe(false)
   })
   it("sem edição futura, a mais recente que já passou", async () => {
     vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-03T12:00:00Z") })
     falso.tabelas.edicoes_publicas = { data: [ed("edicao-qa", "2024-05-01T20:00:00Z"), ed("exemplo-dublin-2025", "2025-11-12T20:00:00Z")], error: null }
     abrir()
     expect(await screen.findByText("destino: /pt/evento/exemplo-dublin-2025")).toBeTruthy()
-    vi.useRealTimers()
   })
   it("sem edição publicada, em breve", async () => {
     falso.tabelas.edicoes_publicas = { data: [], error: null }
     abrir()
     expect(await screen.findByText("Em breve.")).toBeTruthy()
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBeTruthy()
+    expect(screen.getByRole("heading", { level: 1, name: "Evento" })).toBeTruthy()
   })
 })
 
