@@ -46,37 +46,44 @@ function LinkItem({ item, acesso, classe }: { item: Item; acesso: Acesso; classe
   )
 }
 
-// Trilho de ícones (desktop): sidebar compacta de vidro com a marca e as quatro áreas; o rótulo vai no title e para o
-// leitor de tela. O ativo é por prefixo da área, não por rota exata: /academy/vendas acende "Aprender".
+// Trilho (desktop) que expande: recolhido mostra só os ícones; ao passar o mouse ou ao chegar pelo teclado (foco
+// dentro dele) abre por cima do conteúdo com o nome de cada área. O nome fica sempre no DOM (só esmaecido quando
+// recolhido), então o leitor de tela ouve a área. O ativo é por prefixo da área: /academy/vendas acende "Treinamentos".
 function Trilho({ caminhoAtual, acesso }: { caminhoAtual: string; acesso: Acesso }) {
   const nivel = nivelConhecido(acesso)
   const t = useT()
   const caminho = useCaminho()
   const ativa = areaDe(caminhoAtual)
   return (
-    <nav aria-label={t("menu.membro")} className="app fixed inset-y-3 left-3 z-20 hidden w-16 flex-col items-center gap-1 rounded-xl py-3 vidro-fundo lg:flex">
-      <Marca to={caminho("/inicio")} className="mb-2 justify-center [&>span]:sr-only" />
+    <nav
+      aria-label={t("menu.membro")}
+      className="group/trilho app fixed inset-y-3 left-3 z-30 hidden w-16 flex-col gap-1 overflow-hidden rounded-xl px-2 py-3 vidro-barra transition-[width] duration-200 ease-out focus-within:w-56 hover:w-56 motion-reduce:transition-none lg:flex"
+    >
+      <Marca to={caminho("/inicio")} className="mb-2 px-1.5 [&>span]:whitespace-nowrap [&>span]:opacity-0 [&>span]:transition-opacity group-focus-within/trilho:[&>span]:opacity-100 group-hover/trilho:[&>span]:opacity-100" />
       {AREAS.map((a) => (
-        <Link key={a.rota} to={caminho(destinoArea(a.rota, nivel))} title={t(a.rotulo)} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={itemTrilhoApp}>
-          <Icone nome={a.icone} className="size-5" />
-          <span className="sr-only">{t(a.rotulo)}</span>
+        <Link key={a.rota} to={caminho(destinoArea(a.rota, nivel))} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={itemTrilhoApp}>
+          <Icone nome={a.icone} className="size-5 shrink-0" />
+          <span className="whitespace-nowrap opacity-0 transition-opacity group-focus-within/trilho:opacity-100 group-hover/trilho:opacity-100 motion-reduce:transition-none">{t(a.rotulo)}</span>
         </Link>
       ))}
     </nav>
   )
 }
 
-// Seções da área ativa em pílulas segmentadas, com os cadeados do PRD §17.3.5. No celular vai para a 2ª linha da barra.
+// Seções da área ativa em pílulas, no topo do conteúdo (a barra de cima ficou só com idioma, sino e avatar). Quebram
+// em linhas quando não cabem: todas ficam visíveis, sem rolagem lateral. Cadeados do PRD §17.3.5.
 function Secoes({ caminhoAtual, acesso }: { caminhoAtual: string; acesso: Acesso }) {
   const t = useT()
   const area = areaDe(caminhoAtual)
   if (!area?.secoes || !area.itens.length) return null
   return (
-    <nav aria-label={t(area.secoes)} className="flex gap-1 overflow-x-auto rounded-full bg-breu/40 p-1 max-lg:order-last max-lg:basis-full">
-      {area.itens.map((item) => (
-        <LinkItem key={item.rota} item={item} acesso={acesso} classe={pilulaNavApp} />
-      ))}
-    </nav>
+    <div className="app mx-auto w-full max-w-[1280px] px-4 pt-6 sm:px-6">
+      <nav aria-label={t(area.secoes)} className="flex flex-wrap gap-2">
+        {area.itens.map((item) => (
+          <LinkItem key={item.rota} item={item} acesso={acesso} classe={pilulaNavApp} />
+        ))}
+      </nav>
+    </div>
   )
 }
 
@@ -235,12 +242,12 @@ export function LayoutMembro({ conteudoPublico = false }: { conteudoPublico?: bo
         <header className="app sticky top-0 z-20 px-4 pt-3 lg:px-6">
           {/* O vidro da barra mora num ::before: com backdrop-filter na própria barra, ela viraria "backdrop root" e o
               popover do avatar (vidro-flutuante, dentro dela) só desfocaria a barra, não a página que rola por baixo. */}
-          <div className="relative isolate flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-3 py-2 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-xl before:vidro-barra sm:px-4 lg:min-h-16">
+          {/* No celular a barra inteira é de vidro (marca + ações); no desktop só o grupo de ações, à direita. */}
+          <div className="relative isolate flex items-center gap-x-4 rounded-xl px-3 py-2 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-xl before:vidro-barra sm:px-4 lg:px-0 lg:py-0 lg:before:hidden">
             <Marca to={caminho("/inicio")} className="[&>span]:sr-only lg:hidden" />
-            <Secoes caminhoAtual={caminhoAtual} acesso={acesso} />
             {/* Centro reservado para a busca global (LEG-04, P1). */}
             <div className="flex-1" />
-            <div className="flex items-center gap-2">
+            <div className="relative isolate flex items-center gap-2 lg:rounded-full lg:p-1.5 lg:before:pointer-events-none lg:before:absolute lg:before:inset-0 lg:before:-z-10 lg:before:rounded-full lg:before:vidro-barra">
               <SeletorIdioma />
               <Link to={caminho("/notificacoes")} aria-label={t("menu.notificacoes")} title={t("menu.notificacoes")} className={`inline-flex size-10 items-center justify-center rounded-full text-cinza transition-colors pointer-coarse:size-11 hover:bg-fumaca/40 hover:text-creme ${foco}`}>
                 <Icone nome="sino" className="size-5" />
@@ -249,6 +256,7 @@ export function LayoutMembro({ conteudoPublico = false }: { conteudoPublico?: bo
             </div>
           </div>
         </header>
+        <Secoes caminhoAtual={caminhoAtual} acesso={acesso} />
         <main id="conteudo" tabIndex={-1} className="flex-1 pb-20 outline-none lg:pb-0">
           <EscopoApp value={!conteudoPublico}>
             {acesso.carregando ? <Esqueleto linhas={4} className="mx-auto max-w-3xl px-6 py-16" /> : acesso.erro ? (
