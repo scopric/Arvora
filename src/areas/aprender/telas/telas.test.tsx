@@ -424,7 +424,7 @@ describe("/academy/:curso e /academy/:curso/:aula", () => {
     expect(within(lista).getByRole("link", { name: /^Proposta/ }).textContent).toMatch(/bloqueado: parte do grupo/i)
     expect(screen.getByRole("link", { name: /^Próxima aula: Fechamento/ }).getAttribute("href")).toBe("/pt/academy/f/c")
     expect(screen.getByRole("link", { name: "Fundamentos" }).getAttribute("href")).toBe("/pt/academy/f")
-    expect(chamadas.some((c) => c.tabela === "rpc" && c.metodo === "video_da_aula")).toBe(true) // a liberada pede o vídeo
+    await waitFor(() => expect(chamadas.some((c) => c.tabela === "rpc" && c.metodo === "video_da_aula")).toBe(true)) // a liberada pede o vídeo
     expect(await violacoes()).toEqual([])
   })
   it("aula bloqueada: prévia com cadeado e a RPC do vídeo nem é chamada", async () => {
