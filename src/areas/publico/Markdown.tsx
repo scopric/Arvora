@@ -62,7 +62,7 @@ export function Markdown({ texto }: { texto: string }) {
       const nivel = Math.min(titulo[1].length + 1, 6)
       const Tag = `h${nivel}` as "h2"
       blocos.push(
-        <Tag key={blocos.length} className={`mt-8 font-titulo font-bold uppercase ${ESTILO_TITULO[nivel - 1]}`}>
+        <Tag key={blocos.length} className={`mt-8 font-titulo font-normal ${ESTILO_TITULO[nivel - 1]}`}>
           {inline(titulo[2])}
         </Tag>,
       )

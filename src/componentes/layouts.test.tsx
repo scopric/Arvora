@@ -134,7 +134,7 @@ describe("LayoutPublico", () => {
     )
     expect(screen.getByRole("navigation", { name: "Menu do membro" })).toBeTruthy()
     const botao = screen.getByRole("button", { name: "Assinar" })
-    expect(botao.className).toContain("min-h-12 w-full") // variante pública do Botao
+    expect(botao.className).toContain("rounded-full") // variante pública do Botao
     expect(screen.getByRole("main").classList.contains("app")).toBe(false)
   })
 

@@ -103,7 +103,7 @@ function Citados({ videoId }: { videoId: number }) {
   if (r.carregando) return null
   return (
     <section aria-labelledby="citados" className="mt-12">
-      <h2 id="citados" className="mb-4 font-titulo text-3xl font-bold uppercase">{t("publico.video.quem")}</h2>
+      <h2 id="citados" className="mb-4 font-titulo text-3xl font-normal">{t("publico.video.quem")}</h2>
       {r.erro ? (
         <Erro aoTentar={r.recarregar} />
       ) : lista.length === 0 ? (

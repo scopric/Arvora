@@ -56,7 +56,7 @@ export function Suporte({ email = EMAIL }: { email?: string }) {
       <div className="space-y-10">
         {TEMAS.map(({ tema, perguntas }) => (
           <section key={tema} aria-labelledby={tema}>
-            <h2 id={tema} className="mb-3 font-titulo text-3xl font-bold uppercase">
+            <h2 id={tema} className="mb-3 font-titulo text-3xl font-normal">
               {t(tema)}
             </h2>
             <div className="divide-y divide-creme/15 border-y border-creme/15">

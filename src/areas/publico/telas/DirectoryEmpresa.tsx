@@ -87,7 +87,7 @@ function Conteudo({ e, logado }: { e: Empresa; logado: boolean }) {
         <div className="mt-14"><Erro aoTentar={parecidas.recarregar} /></div>
       ) : parecidas.dados?.length ? (
         <section aria-labelledby="parecidas" className="mt-14">
-          <h2 id="parecidas" className="mb-4 font-titulo text-3xl font-bold uppercase">{t("publico.directoryEmpresa.parecidas")}</h2>
+          <h2 id="parecidas" className="mb-4 font-titulo text-3xl font-normal">{t("publico.directoryEmpresa.parecidas")}</h2>
           <ul className="grid gap-5 sm:grid-cols-3">
             {parecidas.dados.map((o) => (
               <li key={o.id}>
