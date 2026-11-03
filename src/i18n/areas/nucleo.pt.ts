@@ -43,6 +43,8 @@ export const nucleoPt = {
   "menu.meuPlano": "Meu plano",
   "menu.sair": "Sair",
   "menu.aprender": "Treinamentos",
+  // Nome curto da área na tab bar do celular (o nome inteiro não cabe nas 5 colunas em 320–390 px).
+  "menu.aprenderAba": "Treinos",
   "menu.awardsAba": "Awards",
   "menu.rede": "Rede",
   "menu.mais": "Mais",
