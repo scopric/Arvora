@@ -13,6 +13,7 @@ import { AcessoProvider } from "./lib/AcessoProvider"
 import { AuthProvider } from "./lib/auth"
 import { RotaProtegida } from "./RotaProtegida"
 import { NaoEncontrada } from "./componentes/NaoEncontrada"
+import { SoMembroNoApp } from "./componentes/ContasSeparadas"
 import { LANG_HTML } from "./site"
 import { Cadastro } from "./telas/Cadastro"
 import { Cookies } from "./telas/Cookies"
@@ -86,7 +87,9 @@ export default function App() {
   return (
     <AuthProvider>
       <AcessoProvider>
-        <Rotas />
+        <SoMembroNoApp>
+          <Rotas />
+        </SoMembroNoApp>
       </AcessoProvider>
     </AuthProvider>
   )
