@@ -162,7 +162,7 @@ function Premiados({ edicaoId, edicaoSlug }: { edicaoId: number; edicaoSlug: str
       <h2 id="premiados" className={titulo2}>{t("publico.evento.premiados")}</h2>
       <ul className="grid gap-2 sm:grid-cols-2">
         {r.dados.map((p) => (
-          <li key={p.id}><a href={caminho(`/hall-of-fame/${edicaoSlug}/${p.slug}`)} className="inline-flex min-h-11 items-center underline decoration-dourado underline-offset-4">{p.nome}</a></li>
+          <li key={p.id}><Link to={caminho(`/hall-of-fame/${edicaoSlug}/${p.slug}`)} className="inline-flex min-h-11 items-center underline decoration-dourado underline-offset-4">{p.nome}</Link></li>
         ))}
       </ul>
     </section>

@@ -23,7 +23,7 @@ describe("Hall of Fame", () => {
     lista()
     expect((await screen.findByRole("link", { name: "Premiado Um" })).getAttribute("href")).toBe("/pt/hall-of-fame/ed-teste/p1")
     expect(screen.getByText("Inovação · Edição Teste")).toBeTruthy()
-    expect(falso.chamadas.some((c) => c.op === "not" || c.args.includes("publicado_em"))).toBe(true)
+    expect(falso.chamadas.some((c) => c.op === "not" && c.args[0] === "publicado_em")).toBe(true)
     await waitFor(() => expect(document.title).toBe("Hall of Fame — Grupo Árvora"))
   })
   it("lista vazia: estado vazio, sem erro", async () => {

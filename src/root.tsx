@@ -77,7 +77,7 @@ export function chaveErro(error: unknown) {
   return isRouteErrorResponse(error) && error.status === 404 ? "sistema.naoEncontrada" : "sistema.erro"
 }
 
-// Sem stack na tela. Em páginas pré-renderizadas o status HTTP continua 200 (limite do ssr:false).
+// Sem stack na tela. Como é SPA (ssr:false), o status HTTP continua 200.
 export function ErrorBoundary({ error }: { error: unknown }) {
   const idioma = useIdiomaUrl()
   const dic = textosDe(idioma)

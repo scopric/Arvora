@@ -1,4 +1,4 @@
-// Gera robots.txt e sitemap.xml em build/client a partir das páginas que o pré-render realmente criou
+// Gera robots.txt e, se houver páginas pré-renderizadas (hoje nenhuma: Hall of Fame virou SPA), sitemap.xml em build/client
 // (build/client/{pt,en}/**/index.html), sem repetir a lista de react-router.config.ts.
 // Precisa do domínio (VITE_SITE_URL, o mesmo do canonical); sem ele não há sitemap válido, então só sai o robots.
 import { existsSync, readdirSync, statSync, writeFileSync } from "node:fs"

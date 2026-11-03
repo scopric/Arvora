@@ -13,7 +13,7 @@ const ghost = `${botao} border border-superficie text-creme hover:border-destaqu
 const primario = `${botao} bg-destaque text-fundo hover:shadow-brilho`
 const eyebrow = "font-mono text-xs tracking-[0.08em] uppercase"
 
-// Para onde cada frente leva. Hall of Fame é pré-renderizado fora do app: <a> comum.
+// Para onde cada frente leva.
 const DESTINO: Record<number, string> = { 1: "/awards", 2: "/biblioteca", 3: "/biblioteca", 4: "/planos" }
 // Sobre creme o anel de foco em sálvia não passa de 3:1 (WCAG 1.4.11): anel escuro.
 const escuro = `${botao.replace("focus-visible:outline-destaque", "focus-visible:outline-fundo")} bg-fundo text-creme hover:shadow-brilho`
@@ -141,7 +141,7 @@ export function EmBreve() {
                 <h3 className="mt-8 text-2xl font-medium">{t(`home.portas.${n}.nome`)}</h3>
                 <p className="mt-3 grow text-fundo/70">{t(`home.portas.${n}.texto`)}</p>
                 {n === 1 ? (
-                  <a href={caminho("/hall-of-fame")} className={`${escuro} mt-8 self-start`}>{t("home.portas.1.acao")}</a>
+                  <Link to={caminho("/hall-of-fame")} className={`${escuro} mt-8 self-start`}>{t("home.portas.1.acao")}</Link>
                 ) : (
                   <Link to={caminho("/planos")} className={`${escuro} mt-8 self-start`}>{t(`home.portas.${n}.acao`)}</Link>
                 )}
@@ -163,7 +163,7 @@ export function EmBreve() {
           </div>
           <div className="mt-8 lg:col-span-5 lg:mt-0">
             <p className="max-w-md text-xl leading-normal text-creme/70">{t("home.hof.texto")}</p>
-            <a href={caminho("/hall-of-fame")} className={`${ghost} mt-8 border-dourado/60 hover:border-dourado`}>{t("home.hof.ver")}</a>
+            <Link to={caminho("/hall-of-fame")} className={`${ghost} mt-8 border-dourado/60 hover:border-dourado`}>{t("home.hof.ver")}</Link>
           </div>
         </div>
       </section>

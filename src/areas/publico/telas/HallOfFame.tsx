@@ -17,7 +17,7 @@ export function HallOfFame() {
   const caminho = useCaminho()
   useTitulo("menu.hallOfFame")
   const r = useConsulta(
-    () => supabase.from("premiados").select("id,nome,slug,edicoes!inner(slug,nome,ano),categorias_premio(nome)").not("publicado_em", "is", null).order("nome"),
+    () => supabase.from("premiados").select("id,nome,slug,edicoes!inner(slug,nome),categorias_premio(nome)").not("publicado_em", "is", null).order("nome"),
     "hof",
   )
   return (
