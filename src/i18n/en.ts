@@ -129,6 +129,8 @@ export const en: Record<keyof typeof pt, string> = {
   "cadastro.nome": "Name",
   "cadastro.maior18": "I am 18 years old or older.",
   "cadastro.botao": "Create account",
+  "cadastro.legal.antes": "By creating an account, you agree to the",
+  "cadastro.legal.meio": "and confirm you have read the",
   "cadastro.jaTemConta": "Already have an account?",
   "cadastro.entrar": "Log in",
   "cadastro.enviado.titulo": "Check your email",
