@@ -39,9 +39,10 @@ function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
   return (
     <div className="space-y-3">
       <Selecao rotulo={t("admin.comum.status")} value={status} onChange={(e) => setStatus(e.target.value as Status)}>
-        {STATUS.map((s) => <option key={s} value={s}>{t(`admin.pedidos.status.${s}`)}</option>)}
+        {/* Recusado não vira Concluído (achado B10): a recusa é a resposta final ao titular. */}
+        {STATUS.filter((s) => !(p.status === "recusado" && s === "concluido")).map((s) => <option key={s} value={s}>{t(`admin.pedidos.status.${s}`)}</option>)}
       </Selecao>
-      <AreaTexto rotulo={t("admin.pedidos.observacao")} erro={erroObs ? t("admin.pedidos.recusaSemMotivo") : undefined} rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
+      <AreaTexto rotulo={t("admin.pedidos.observacao")} erro={erroObs ? t("admin.pedidos.recusaSemMotivo") : undefined} rows={2} value={obs} onChange={(e) => { setObs(e.target.value); if (erroObs && e.target.value.trim() !== "") setErroObs(false) }} />
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-2">
         <Botao type="button" pequeno ocupado={acao.ocupado} onClick={() => void salvar(status)}>{t("admin.comum.salvar")}</Botao>

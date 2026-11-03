@@ -516,6 +516,7 @@ describe("Checkup (g): URL, confirmações e recusa GDPR", () => {
     expect(screen.getByLabelText("Observação").getAttribute("aria-invalid")).toBe("true")
     expect(chamou("pedidos_gdpr", "update")).toHaveLength(0)
     await userEvent.type(screen.getByLabelText("Observação"), "Titular não confirmou a identidade")
+    expect(screen.queryByText(/Escreva o motivo da recusa/)).toBeNull() // o erro some ao digitar o motivo
     await userEvent.click(screen.getByRole("button", { name: "Salvar" }))
     await waitFor(() => expect(chamou("pedidos_gdpr", "update")).toHaveLength(1))
     expect(chamou("pedidos_gdpr", "update")[0].args[0]).toEqual({ status: "recusado", observacao: "Titular não confirmou a identidade" })
@@ -524,5 +525,7 @@ describe("Checkup (g): URL, confirmações e recusa GDPR", () => {
     montar(<PedidosDeDados />, "/pedidos-de-dados", "/pt/admin/pedidos-de-dados")
     await screen.findByText("y@exemplo.invalid")
     expect(screen.queryByRole("button", { name: "Marcar como atendido" })).toBeNull()
+    // nem pelo seletor: recusado não vira concluído
+    expect(screen.queryByRole("option", { name: "Concluído" })).toBeNull()
   })
 })
