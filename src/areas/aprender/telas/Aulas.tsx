@@ -84,10 +84,10 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
 
   const bloco = (titulo: string, lista: AulaLinha[]) => (
     <section className="space-y-6">
-      <h2 className="text-corpo-g font-semibold">{titulo}</h2>
+      <h2 className="text-subtitulo font-semibold">{titulo}</h2>
       {semanas(lista).map(([segunda, itens]) => (
         <div key={segunda}>
-          <h3 className="mb-2 text-legenda font-medium text-nevoa">
+          <h3 className="mb-2 text-corpo-p font-medium text-nevoa">
             {t("aprender.aulas.semanaDe")} {formatar(`${segunda}T12:00:00Z`, lang, { day: "numeric", month: "long" }, "UTC")}
           </h3>
           <ul className="divide-y divide-grafite rounded-xl shadow-borda">
@@ -98,12 +98,12 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
                   <div className="flex flex-wrap items-center gap-2">
                     <Selo tom={live ? "destaque" : "neutro"}>{live ? t("aprender.aoVivo") : t("aprender.gravada")}</Selo>
                     {progresso.get(a.id) === 100 ? <Selo>{t("aprender.assistida")}</Selo> : null}
-                    <span className="text-legenda text-nevoa">{nomeDe(a.vertical_id)}{a.duracao_min ? ` · ${a.duracao_min} ${t("aprender.min")}` : ""}</span>
+                    <span className="text-corpo-p text-nevoa">{nomeDe(a.vertical_id)}{a.duracao_min ? ` · ${a.duracao_min} ${t("aprender.min")}` : ""}</span>
                   </div>
                   <h4 className="mt-2 text-base font-medium">
                     <Link to={caminho(`/aulas/${a.slug}`)} className={`rounded-sm underline-offset-4 hover:underline ${foco}`}>{a.titulo}</Link>
                   </h4>
-                  <p className="mt-1 text-legenda text-nevoa"><QuandoAula inicio={a.inicio_em!} /></p>
+                  <p className="mt-1 text-corpo-p text-nevoa"><QuandoAula inicio={a.inicio_em!} /></p>
                   {live && new Date(a.inicio_em!).getTime() > agora ? (
                     <div className="mt-3"><Agenda aula={{ ...a, inicio_em: a.inicio_em! }} /></div>
                   ) : null}

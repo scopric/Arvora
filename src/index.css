@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "@fontsource-variable/newsreader/opsz.css";
 @import "@fontsource-variable/schibsted-grotesk";
+@import "@fontsource-variable/big-shoulders-display";
 
 /* Hex aproximados do deck (22/10/2026); confirmar com o contratante. */
 @theme {
@@ -15,50 +16,67 @@
   --font-titulo: "Newsreader Variable", Georgia, serif;
   --font-corpo: "Schibsted Grotesk Variable", system-ui, sans-serif;
 
-  /* App (membro e admin), estilo-base Linear com a paleta Árvora (Decisão 55; fontes em
-     Arvora/Documentos/Refero Styles/linear/). Cada cinza do Linear virou um tom da Árvora com a MESMA luminosidade
-     (L em OKLCH) e a mesma relação de camadas; só a matiz muda (do verde-floresta #112019 até a do creme).
-     Contraste sobre carvao: nevoa 5,9 · bruma 13,1 · osso 15,2 · creme 17,3 · dourado 7,9. `cinza` (3,35) nunca é texto. */
-  --color-breu: #050a08; /* Void: casca, sidebar, tab bar */
-  --color-carvao: #0c110f; /* Carbon: painel de conteúdo, cartão */
-  --color-obsidiana: #131816; /* Obsidian: diálogo, popover, folha */
-  --color-grafite: #1a2922; /* Graphite: hairline, inset, divisória */
-  --color-fumaca: #303f35; /* Smoke: avatar, trilho, esqueleto */
-  --color-cinza: #5e6a5d; /* Ash: ícone inativo, borda de input (nunca texto) */
-  --color-nevoa: #899283; /* Fog: texto terciário, rótulos, placeholder */
-  --color-bruma: #d5d8c6; /* Mist: texto secundário, botão contorno */
-  --color-osso: #e5e6e2; /* Bone: hover, corpo longo */
-  /* Nome de conteúdo (curso, aula, premiado): a serifa dos títulos do site, decisão do Ricardo em 01/11/2026 (Decisão 59);
-     a Big Shoulders saiu do projeto com a direção Floresta (Decisão 54). */
-  --font-conteudo: "Newsreader Variable", Georgia, serif;
+  /* App (membro e admin), estilo-base MasterClass com a paleta Árvora (Decisão 70; fontes em
+     Arvora/Documentos/Refero Styles/redesenho-2026-11-02/masterclass/). Cada superfície do MasterClass virou um tom da
+     Árvora com a MESMA luminosidade (L em OKLCH); só a matiz muda (do verde-floresta #112019 até a do creme).
+     Contraste WCAG: cinza 7,7 sobre breu · 5,4 sobre placa; creme 18,1 · 12,7; dourado 8,3 sobre breu e breu sobre
+     dourado 8,3 (texto sobre dourado é sempre breu: creme dá 2,2). */
+  --color-breu: #050a08; /* palco: fundo de tudo (o app do MasterClass usa #000; desvio consciente) */
+  --color-carvao: #0a0e0c; /* carbon: tiles, painel de filtros, tab bar, barra fixa */
+  --color-ardosia: #122018; /* slate: barra superior, blocos aninhados, campos, folha "Mais" */
+  --color-placa: #222f26; /* charcoal plate: painel lateral, cartão, popover, diálogo; hairline sobre breu/carvão */
+  --color-fumaca: #3d493d; /* smoke: botão secundário cheio, trilho, esqueleto; hairline sobre placa */
+  --color-cinza: #9ea392; /* ash mute: texto secundário e meta, placeholder, ícone inativo, thead, borda de campo */
+  /* Nome de conteúdo (curso, aula, premiado, nome no perfil): condensada no papel do Sohne Schmal do MasterClass,
+     caixa-alta, peso 500, nunca abaixo de 48px nem em UI (Decisão 70). */
+  --font-conteudo: "Big Shoulders Display Variable", "Arial Narrow", sans-serif;
 
-  /* Escala do Linear com entrelinha e espaço embutidos (nomes novos: o público não os usa).
-     legenda (13) e corpo-p (15) só em rótulo, menu, metadado, tabela e selo; texto corrido fica em 16px (PRD §17.7.3). */
-  --text-legenda: 13px;
+  /* PROVISÓRIO: apelidos dos tokens do redesenho Linear (Decisão 55), para o marco 1 não quebrar as telas antes de
+     cada uma ser refeita no seu marco. Saem no fechamento; tokens-antigos.test.ts barra o uso. */
+  --color-obsidiana: var(--color-placa);
+  --color-grafite: var(--color-placa);
+  --color-nevoa: var(--color-cinza);
+  --color-bruma: var(--color-creme);
+  --color-osso: var(--color-creme);
+
+  /* Escala do MasterClass com entrelinha e espaço embutidos (nomes só do app; o público não os usa).
+     Mínimo de corpo 14 ("Don't" do DESIGN.md); legenda (12) só em selo e contagem; texto corrido em 16 (PRD §17.7.3).
+     Tracking positivo em `em`, como o DESIGN.md (o css-variables.css do Refero dá px; divergência registrada). */
+  --text-legenda: 12px;
   --text-legenda--line-height: 1.5;
-  --text-legenda--letter-spacing: -0.01em;
-  --text-corpo-p: 15px;
-  --text-corpo-p--line-height: 1.6;
-  --text-corpo-p--letter-spacing: -0.01em;
-  --text-corpo-g: 20px;
-  --text-corpo-g--line-height: 1.4;
-  --text-corpo-g--letter-spacing: -0.012em;
-  --text-subtitulo: 24px;
-  --text-subtitulo--line-height: 1.25;
-  --text-subtitulo--letter-spacing: -0.012em;
-  --text-titulo-p: 32px;
-  --text-titulo-p--line-height: 1.13;
-  --text-titulo-p--letter-spacing: -0.012em;
-  --text-titulo: 48px;
-  --text-titulo--line-height: 1;
-  --text-titulo--letter-spacing: -0.022em;
-  --text-titulo-g: 64px;
-  --text-titulo-g--line-height: 1;
-  --text-titulo-g--letter-spacing: -0.022em;
+  --text-legenda--letter-spacing: 0.01em;
+  --text-corpo-p: 14px;
+  --text-corpo-p--line-height: 1.45;
+  --text-corpo-p--letter-spacing: 0.01em;
+  --text-corpo: 16px;
+  --text-corpo--line-height: 1.5;
+  --text-corpo--letter-spacing: 0.01em;
+  --text-subtitulo: 20px;
+  --text-subtitulo--line-height: 1.33;
+  --text-subtitulo--letter-spacing: 0.02em;
+  --text-titulo-p: 24px;
+  --text-titulo-p--line-height: 1.25;
+  --text-titulo-p--letter-spacing: 0.02em;
+  --text-titulo: 32px;
+  --text-titulo--line-height: 1.25;
+  --text-titulo--letter-spacing: 0.02em;
+  --text-titulo-g: 48px;
+  --text-titulo-g--line-height: 1.1;
+  --text-titulo-g--letter-spacing: 0.02em;
+  --text-conteudo: 64px;
+  --text-conteudo--line-height: 0.9;
+  --text-conteudo--letter-spacing: 0;
+  --text-conteudo-g: 80px;
+  --text-conteudo-g--line-height: 0.9;
+  --text-conteudo-g--letter-spacing: -0.01em;
 
-  /* Elevação só por hairline (Linear): sem sombra externa, salvo a sutil dos elementos flutuantes. */
-  --shadow-borda: inset 0 0 0 1px var(--color-grafite);
-  --shadow-flutuante: inset 0 0 0 1px var(--color-grafite), 0 2px 4px rgb(0 0 0 / 0.4);
+  /* Elevação só por inset (MasterClass): sem sombra externa. Hairline placa sobre breu/carvão, fumaca sobre placa. */
+  --shadow-borda: inset 0 0 0 1px var(--color-placa);
+  --shadow-borda-placa: inset 0 0 0 1px var(--color-fumaca);
+  --shadow-campo: inset 0 0 0 1px var(--color-cinza);
+  --shadow-campo-foco: inset 0 0 0 2px var(--color-cinza);
+  --shadow-ativo: inset 0 0 0 2px var(--color-fumaca);
+  --shadow-flutuante: var(--shadow-borda-placa); /* PROVISÓRIO: apelido, sai no fechamento */
 
   --shadow-brilho: 0 0 20px 5px rgb(157 181 138 / 0.35);
 
@@ -75,16 +93,16 @@
     @apply bg-fundo text-creme font-corpo antialiased;
   }
 
-  /* Escopo do app: só o que herda pela cascata. Pesos do Linear (400/510/590, nunca 700): os utilitários
+  /* Escopo do app: só o que herda pela cascata. Pesos do MasterClass (400 e 600, nunca 700): os utilitários
      font-medium/semibold/bold leem estas variáveis. */
   .app {
     color-scheme: dark;
-    letter-spacing: -0.01em;
-    --font-weight-medium: 510;
-    --font-weight-semibold: 590;
-    --font-weight-bold: 590;
+    letter-spacing: 0.01em;
+    --font-weight-medium: 600;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 600;
   }
-  /* O preflight põe `bolder` em b/strong (vira 700 sobre 400); dentro do app vale o teto do Linear. */
+  /* O preflight põe `bolder` em b/strong (vira 700 sobre 400); dentro do app vale o teto do MasterClass. */
   .app :is(b, strong) {
     font-weight: var(--font-weight-semibold);
   }

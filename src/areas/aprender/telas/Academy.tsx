@@ -60,7 +60,7 @@ export function Academy() {
                       <Icone nome="aprender" className="size-8" />
                     </div>
                   )}
-                  <p className="mt-3 flex items-center gap-2 text-legenda text-nevoa">
+                  <p className="mt-3 flex items-center gap-2 text-corpo-p text-nevoa">
                     {c.verticais ? <span>{nomeVertical(c.verticais, lang)}</span> : null}
                     {bloqueado ? (
                       <span className="flex items-center gap-1">
@@ -70,10 +70,10 @@ export function Academy() {
                       </span>
                     ) : null}
                   </p>
-                  <h2 className="mt-1 font-conteudo text-subtitulo leading-none font-normal tracking-normal">
+                  <h2 className="mt-1 font-conteudo text-titulo-p leading-none font-normal tracking-normal">
                     <Link to={caminho(`/academy/${c.slug}`)} className={`rounded-sm underline-offset-4 group-hover:underline after:absolute after:inset-0 ${foco}`}>{c.titulo}</Link>
                   </h2>
-                  {c.descricao ? <p className="mt-1.5 line-clamp-2 text-legenda text-nevoa">{c.descricao}</p> : null}
+                  {c.descricao ? <p className="mt-1.5 line-clamp-2 text-corpo-p text-nevoa">{c.descricao}</p> : null}
                 </li>
               )
             })}

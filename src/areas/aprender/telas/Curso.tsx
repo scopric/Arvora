@@ -61,7 +61,7 @@ export function Curso() {
                     {progresso.has(continuar.id) ? t("aprender.curso.continuar") : t("aprender.curso.comecar")}
                   </Link>
                 ) : null}
-                <label className="flex items-center gap-3 text-legenda text-nevoa">
+                <label className="flex items-center gap-3 text-corpo-p text-nevoa">
                   <progress value={feitas} max={aulas.length} className={barraProgresso} />
                   <span className="tabular-nums">{feitas} {t("aprender.curso.de")} {aulas.length} {t("aprender.curso.aulasConcluidas")}</span>
                 </label>
@@ -74,7 +74,7 @@ export function Curso() {
         ) : (
           ordenadas.map(({ modulo, itens }) => (
             <section key={modulo.id}>
-              <h2 className="text-corpo-g font-semibold">{modulo.titulo}</h2>
+              <h2 className="text-subtitulo font-semibold">{modulo.titulo}</h2>
               <ol className="mt-3 divide-y divide-grafite overflow-hidden rounded-xl shadow-borda">
                 {itens.map((a) => {
                   const livre = temNivel(acesso.nivel, a.nivel_minimo)
@@ -83,7 +83,7 @@ export function Curso() {
                   return (
                     <li key={a.id}>
                       <Link to={caminho(`/academy/${curso.slug}/${a.slug}`)} className={`flex min-h-12 items-center gap-3 px-4 py-2.5 transition-colors hover:bg-creme/2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dourado`}>
-                        <span className="w-6 shrink-0 text-legenda text-nevoa tabular-nums">{numero}</span>
+                        <span className="w-6 shrink-0 text-corpo-p text-nevoa tabular-nums">{numero}</span>
                         <span className="flex-1 text-base">{a.titulo}</span>
                         {!livre ? (
                           <>
@@ -91,11 +91,11 @@ export function Curso() {
                             <span className="sr-only">{t("bloqueado.rotulo")}</span>
                           </>
                         ) : pct === 100 ? (
-                          <span className="text-legenda text-destaque">{t("aprender.assistida")}</span>
+                          <span className="text-corpo-p text-destaque">{t("aprender.assistida")}</span>
                         ) : pct > 0 ? (
-                          <span className="text-legenda text-nevoa tabular-nums">{pct}%</span>
+                          <span className="text-corpo-p text-nevoa tabular-nums">{pct}%</span>
                         ) : null}
-                        {a.duracao_min ? <span className="text-legenda text-nevoa tabular-nums">{a.duracao_min} {t("aprender.min")}</span> : null}
+                        {a.duracao_min ? <span className="text-corpo-p text-nevoa tabular-nums">{a.duracao_min} {t("aprender.min")}</span> : null}
                       </Link>
                     </li>
                   )

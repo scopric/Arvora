@@ -55,7 +55,7 @@ export function Tarefas() {
                   <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex min-h-12 items-center gap-4 px-4 py-3 transition-colors hover:bg-creme/2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dourado`}>
                     <span className="min-w-0 flex-1">
                       <span className="block text-base font-medium">{exercicio.aulas?.titulo}</span>
-                      <span className="mt-0.5 block text-legenda text-nevoa">
+                      <span className="mt-0.5 block text-corpo-p text-nevoa">
                         {t("aprender.exercicio.n")} {exercicio.ordem}
                         {entrega ? ` · ${dataCurta(entrega.enviada_em, lang)}` : ""}
                       </span>

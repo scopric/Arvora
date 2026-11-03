@@ -47,9 +47,9 @@ export function VisaoGeral() {
                 // Células por hairline (border-b/r de cada li); a moldura é um ::after por cima, para o hover não a cobrir. Colunas pela quantidade.
                 // A célula inteira é clicável (link esticado por ::after); o foco contorna a célula, não só o texto.
                 <li key={c.chave} className="relative border-r border-b border-grafite p-5 transition-colors has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-dourado hover:bg-obsidiana">
-                  <p className="text-legenda font-medium text-nevoa">{t(c.titulo)}</p>
-                  <p className="mt-2 text-titulo-p font-medium tabular-nums">{c.n}</p>
-                  <Link className={`mt-3 inline-flex min-h-9 items-center gap-1 text-legenda font-medium text-bruma after:absolute after:inset-0 focus-visible:outline-none`} to={caminho(c.rota)}>
+                  <p className="text-corpo-p font-medium text-nevoa">{t(c.titulo)}</p>
+                  <p className="mt-2 text-titulo font-medium tabular-nums">{c.n}</p>
+                  <Link className={`mt-3 inline-flex min-h-9 items-center gap-1 text-corpo-p font-medium text-bruma after:absolute after:inset-0 focus-visible:outline-none`} to={caminho(c.rota)}>
                     {t("admin.visao.abrir")} <span aria-hidden="true">→</span>
                   </Link>
                 </li>

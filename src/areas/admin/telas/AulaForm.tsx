@@ -134,15 +134,15 @@ export function AulaForm() {
               {aula ? (
                 <div className="space-y-4">
                   <Cartao>
-                    <h2 className="text-corpo-g font-semibold">{t("admin.aula.previa")}</h2>
+                    <h2 className="text-subtitulo font-semibold">{t("admin.aula.previa")}</h2>
                     <p className="mt-3 text-base font-semibold">{aula.titulo}</p>
-                    <p className="mt-1 text-legenda text-nevoa">
+                    <p className="mt-1 text-corpo-p text-nevoa">
                       {t(`admin.aulas.tipo.${aula.tipo}`)} · {t(`nivel.${aula.nivel_minimo}`)}
                       {aula.duracao_min ? ` · ${aula.duracao_min} min` : ""}
                     </p>
-                    <p className="mt-1 text-legenda text-nevoa">{dataHora(aula.inicio_em, lang)} ({FUSO}) · {dataHora(aula.inicio_em, lang, "America/Sao_Paulo")} (Brasília)</p>
+                    <p className="mt-1 text-corpo-p text-nevoa">{dataHora(aula.inicio_em, lang)} ({FUSO}) · {dataHora(aula.inicio_em, lang, "America/Sao_Paulo")} (Brasília)</p>
                     <div className="mt-3"><Selo tom={estado === "publicados" ? "destaque" : "neutro"}>{t(`admin.aulas.estado.${estado}`)}</Selo></div>
-                    <ul className="mt-3 text-legenda">
+                    <ul className="mt-3 text-corpo-p">
                       {(["resumo", "ebook", "exercicios"] as const).map((m) => {
                         const x = d.materiais.find((y) => y.tipo === m)
                         return <li key={m}>{t(`admin.aula.material.${m}`)}: {x ? t(`admin.aula.materialStatus.${x.status}`) : t("admin.aula.materialStatus.vazio")}</li>
@@ -159,7 +159,7 @@ export function AulaForm() {
                         {t("admin.aula.agendar")}
                       </Botao>
                       <Botao type="button" ocupado={acao.ocupado} disabled={estado === "publicados" || falta !== null} onClick={() => setConfirmar(true)}>{t("admin.aula.publicarMateriais")}</Botao>
-                      {falta ? <p className="text-legenda text-nevoa">{t(falta)}</p> : null}
+                      {falta ? <p className="text-corpo-p text-nevoa">{t(falta)}</p> : null}
                     </div>
                   ) : null}
                 </div>

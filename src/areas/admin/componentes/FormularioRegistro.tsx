@@ -74,12 +74,12 @@ function CampoImagem({ rotulo, pasta, valor, aoMudar }: { rotulo: string; pasta:
   const acao = useAcao()
   return (
     <div>
-      <label className="mb-1.5 block text-legenda font-medium text-bruma">
+      <label className="mb-1.5 block text-corpo-p font-medium text-bruma">
         {rotulo}
         <input
           type="file"
           accept="image/png,image/jpeg,image/webp"
-          className="mt-2 block w-full text-legenda text-bruma"
+          className="mt-2 block w-full text-corpo-p text-bruma"
           onChange={(e) => {
             const arq = e.target.files?.[0]
             if (arq) void acao.rodar(async () => aoMudar(await enviarArquivo("imagens", pasta, arq)), "admin.comum.enviado")
@@ -87,7 +87,7 @@ function CampoImagem({ rotulo, pasta, valor, aoMudar }: { rotulo: string; pasta:
         />
       </label>
       {valor ? (
-        <p className="mt-2 flex items-center gap-3 text-legenda text-nevoa">
+        <p className="mt-2 flex items-center gap-3 text-corpo-p text-nevoa">
           <img src={supabase.storage.from("imagens").getPublicUrl(valor).data.publicUrl} alt="" className="size-12 rounded object-cover" />
           <span className="break-all">{valor}</span>
           <button type="button" className={classeLink} onClick={() => aoMudar("")}>{t("admin.comum.remover")}</button>

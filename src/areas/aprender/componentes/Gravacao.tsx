@@ -71,11 +71,11 @@ export function Gravacao({ aulaId, titulo, uid, aoMudarPercentual }: { aulaId: n
       )}
       {falhou ? <Aviso tipo="erro">{t("aprender.erroProgresso")}</Aviso> : null}
       <div className="flex flex-wrap items-center gap-4">
-        <label className="flex items-center gap-3 text-legenda text-nevoa">
+        <label className="flex items-center gap-3 text-corpo-p text-nevoa">
           <progress value={atual} max={100} className={barraProgresso} />
           <span className="tabular-nums">{t("aprender.progresso")}: {atual}%</span>
         </label>
-        {posicaoSalva > 5 && atual < 100 ? <span className="text-legenda text-nevoa">{t("aprender.parouEm")} {minutosParaTexto(posicaoSalva)}</span> : null}
+        {posicaoSalva > 5 && atual < 100 ? <span className="text-corpo-p text-nevoa">{t("aprender.parouEm")} {minutosParaTexto(posicaoSalva)}</span> : null}
         {atual < 100 ? (
           <Botao variante="contorno" className="sm:w-auto" onClick={() => void salvar(100, posicaoSalva)}>
             {t("aprender.marcarConcluida")}

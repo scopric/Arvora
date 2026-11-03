@@ -53,7 +53,7 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
           <h2 className="text-base font-medium">
             {p ? <Link to={caminho(`/network/${chaveSlug(p)}`)} className={linkTextoApp}>{p.nome}</Link> : t("rede.conexoes.membroIndisponivel")}
           </h2>
-          <p className="text-legenda text-nevoa">
+          <p className="text-corpo-p text-nevoa">
             {p?.empresa_nome ? `${p.empresa_nome} · ` : ""}{dia(c.pedida_em, idioma)}
             {c.origem === "match" ? ` · ${t("rede.conexoes.viaMatch")}` : ""}
           </p>

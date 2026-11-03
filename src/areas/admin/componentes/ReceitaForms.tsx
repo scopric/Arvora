@@ -106,9 +106,9 @@ export function LancarReceita({ ciclo, planos, aoFeito }: { ciclo: { inicio: str
         <Campo rotulo={t("admin.comum.descricao")} value={v.descricao} onChange={muda("descricao")} />
       </div>
       <SeletorMembro rotulo="admin.rel.membroOpcional" valor={v.membro} aoMudar={(id) => setV((a) => ({ ...a, membro: id }))} />
-      <label className="block text-legenda font-medium text-bruma">
+      <label className="block text-corpo-p font-medium text-bruma">
         {t("admin.rel.comprovante")} *
-        <input ref={ref} type="file" accept="application/pdf,image/png,image/jpeg" className="mt-2 block w-full text-legenda text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
+        <input ref={ref} type="file" accept="application/pdf,image/png,image/jpeg" className="mt-2 block w-full text-corpo-p text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
       </label>
       <AvisoDe aviso={acao.aviso} />
       <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.lancar")}</Botao>
@@ -269,7 +269,7 @@ export function Anular({ id, cliente, aoFeito }: { id: number; cliente: string |
   const acao = useAcao()
   return (
     <details className="max-md:hidden">
-      <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11" aria-label={`${t("admin.rel.anularDe")} ${cliente ?? `#${id}`}`}>{t("admin.rel.anular")}</summary>
+      <summary className="min-h-9 cursor-pointer py-2 text-corpo-p font-medium text-bruma pointer-coarse:min-h-11" aria-label={`${t("admin.rel.anularDe")} ${cliente ?? `#${id}`}`}>{t("admin.rel.anular")}</summary>
       <div className="mt-2 w-64 space-y-2">
         <AreaTexto rotulo={t("admin.rel.motivoAnulacao")} rows={2} value={motivo} onChange={(e) => setMotivo(e.target.value)} />
         <AvisoDe aviso={acao.aviso} />

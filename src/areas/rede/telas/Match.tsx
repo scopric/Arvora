@@ -29,7 +29,7 @@ function PreviaClube() {
       {[1, 2].map((n) => (
         <div key={n} className="rounded-xl p-5 shadow-borda">
           <p className="text-base font-semibold">{t("rede.match.previaNome")}</p>
-          <p className="text-legenda text-nevoa">{t("rede.match.previaMotivo")}</p>
+          <p className="text-corpo-p text-nevoa">{t("rede.match.previaMotivo")}</p>
         </div>
       ))}
     </div>
@@ -120,12 +120,12 @@ export function Match() {
       // Primeira vez: pede o opt-in. Desligado: explica e deixa religar. Sem documento vigente não liga (aviso).
       corpo = (
         <section className="max-w-2xl rounded-xl p-6 shadow-borda">
-          <h2 className="text-corpo-g font-semibold">{t(d.ja ? "rede.match.desligadoTitulo" : "rede.match.primeiraTitulo")}</h2>
+          <h2 className="text-subtitulo font-semibold">{t(d.ja ? "rede.match.desligadoTitulo" : "rede.match.primeiraTitulo")}</h2>
           <p className="mt-3 max-w-prose text-base text-bruma">{t(d.ja ? "rede.match.desligadoTexto" : "rede.match.primeiraTexto")}</p>
           {d.documento ? (
             <>
               <details open className="mt-5 rounded-md bg-creme/2 px-4 py-1 shadow-borda">
-                <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11">{d.documento.titulo} · v{d.documento.versao}</summary>
+                <summary className="min-h-9 cursor-pointer py-2 text-corpo-p font-medium text-bruma pointer-coarse:min-h-11">{d.documento.titulo} · v{d.documento.versao}</summary>
                 <p className="mt-1 mb-3 max-h-64 overflow-y-auto text-base whitespace-pre-wrap">{d.documento.conteudo_md}</p>
               </details>
               <label className="mt-5 flex items-start gap-3 text-base">
@@ -161,7 +161,7 @@ export function Match() {
         <>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="flex items-center gap-3"><Selo tom="destaque">{t("rede.match.ligado")}</Selo>
-              {d.semana ? <span className="text-legenda text-nevoa">{t("rede.match.semana")} {dia(`${d.semana}T12:00:00`, idioma)}</span> : null}
+              {d.semana ? <span className="text-corpo-p text-nevoa">{t("rede.match.semana")} {dia(`${d.semana}T12:00:00`, idioma)}</span> : null}
             </p>
             <Botao variante="contorno" onClick={() => setDesligando(true)} className="sm:w-auto">{t("rede.match.desligar")}</Botao>
           </div>
@@ -182,11 +182,11 @@ export function Match() {
                       acoes={
                         <>
                           <AcaoConexao uid={uid} outroId={s.sugerido_id} nome={p.nome ?? ""} origem="match" conexao={porOutro.get(s.sugerido_id)} aoMudar={recarregar} destaque={false} />
-                          <Link to={caminho(`/network/${p.slug ?? s.sugerido_id}`)} className={`inline-flex min-h-9 items-center text-legenda pointer-coarse:min-h-11 ${linkTextoApp}`}>{t("rede.match.verPerfil")}</Link>
+                          <Link to={caminho(`/network/${p.slug ?? s.sugerido_id}`)} className={`inline-flex min-h-9 items-center text-corpo-p pointer-coarse:min-h-11 ${linkTextoApp}`}>{t("rede.match.verPerfil")}</Link>
                         </>
                       }
                     >
-                      <p className="mt-4 border-l-2 border-grafite pl-3 text-legenda text-bruma">
+                      <p className="mt-4 border-l-2 border-grafite pl-3 text-corpo-p text-bruma">
                         <span className="block font-medium text-nevoa">{t("rede.match.porque")}</span>
                         {frase(s)}
                       </p>
@@ -196,7 +196,7 @@ export function Match() {
               </ul>
             )}
           </div>
-          <p className="mt-8 text-legenda text-nevoa">{t("rede.match.rodape")}</p>
+          <p className="mt-8 text-corpo-p text-nevoa">{t("rede.match.rodape")}</p>
           <DialogoConfirmar aberto={desligando} titulo={t("rede.match.desligarTitulo")} texto={t("rede.match.desligarTexto")} confirmar={t("rede.match.desligar")} aoConfirmar={() => void desligar(d.vigentes)} aoCancelar={() => setDesligando(false)} />
         </>
       )

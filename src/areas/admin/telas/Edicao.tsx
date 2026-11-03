@@ -74,7 +74,7 @@ function Indicados({ edicaoId, pode }: { edicaoId: number; pode: boolean }) {
         return (
           <div className="space-y-6">
             <ConsentimentoHof id={ultimo} aoRegistrar={async (id) => setUltimo(id)} aoMudar={() => setVersao((v) => v + 1)} />
-            {ultimo ? <p className="text-legenda">{t("admin.edicao.useId")} <strong>{ultimo}</strong></p> : null}
+            {ultimo ? <p className="text-corpo-p">{t("admin.edicao.useId")} <strong>{ultimo}</strong></p> : null}
             <CrudTabela
               variante="contorno"
               key={versao} tabela="indicados" colunas="id, edicao_id, categoria_id, nome, empresa_id, foto_path, resumo, consentimento_id, publicado_em" campos={campos} ordem={[{ coluna: "nome" }]}
@@ -105,7 +105,7 @@ export function Edicao() {
         {(ed) => (
           <>
             <Secao titulo="admin.edicao.dados">
-              {ed ? <p className="mb-4 text-legenda text-nevoa">{t("admin.edicoes.fase")}: {t(`admin.edicoes.fase.${faseDe(ed)}`)}</p> : null}
+              {ed ? <p className="mb-4 text-corpo-p text-nevoa">{t("admin.edicoes.fase")}: {t(`admin.edicoes.fase.${faseDe(ed)}`)}</p> : null}
               {pode ? (
                 <FormularioRegistro
                   campos={EDICAO} linha={ed}

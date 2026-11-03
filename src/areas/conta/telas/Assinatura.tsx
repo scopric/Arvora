@@ -96,15 +96,15 @@ function Plano({ a }: { a: Linha }) {
       {/* Molde Mercury (Plan & Billing): situação, preço e data em células lado a lado; "Gerenciar" abaixo. */}
       <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-3">
         <div>
-          <dt className="text-legenda text-nevoa">{t("conta.assinatura.situacao")}</dt>
+          <dt className="text-corpo-p text-nevoa">{t("conta.assinatura.situacao")}</dt>
           <dd className="mt-1"><Selo tom={sit.tom}>{t(sit.selo)}</Selo></dd>
         </div>
         {a.planos && !manual ? (
-          <div><dt className="text-legenda text-nevoa">{t("conta.assinatura.valor")}</dt><dd className="mt-0.5 text-corpo-g font-medium">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} <span className="text-legenda text-nevoa">/ {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</span></dd></div>
+          <div><dt className="text-corpo-p text-nevoa">{t("conta.assinatura.valor")}</dt><dd className="mt-0.5 text-subtitulo font-medium">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} <span className="text-corpo-p text-nevoa">/ {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</span></dd></div>
         ) : null}
         <div>
-          <dt className="text-legenda text-nevoa">{t(sit.data)}</dt>
-          <dd className="mt-0.5 text-corpo-g font-medium tabular-nums"><time dateTime={a.periodo_fim}>{dataCurta(a.periodo_fim, idioma)}</time></dd>
+          <dt className="text-corpo-p text-nevoa">{t(sit.data)}</dt>
+          <dd className="mt-0.5 text-subtitulo font-medium tabular-nums"><time dateTime={a.periodo_fim}>{dataCurta(a.periodo_fim, idioma)}</time></dd>
         </div>
       </dl>
       {sit.aviso ? <div className="mt-5"><Aviso tipo="erro">{t(sit.aviso)}</Aviso></div> : null}
@@ -126,7 +126,7 @@ function Plano({ a }: { a: Linha }) {
           >
             {t("conta.assinatura.gerenciar")}
           </Botao>
-          <p className="mt-2 text-legenda text-nevoa">{t("conta.assinatura.gerenciarAjuda")}</p>
+          <p className="mt-2 text-corpo-p text-nevoa">{t("conta.assinatura.gerenciarAjuda")}</p>
         </div>
       ) : null}
     </Secao>

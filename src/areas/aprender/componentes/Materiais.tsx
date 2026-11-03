@@ -30,7 +30,7 @@ function Ebook({ caminho }: { caminho: string }) {
     <div className="space-y-3">
       {erro ? <Aviso tipo="erro">{t("aprender.ebook.erro")}</Aviso> : null}
       <Botao onClick={baixar} className="sm:w-auto">{t("aprender.ebook.baixar")}</Botao>
-      <p className="text-legenda text-nevoa">{t("aprender.ebook.uso")}</p>
+      <p className="text-corpo-p text-nevoa">{t("aprender.ebook.uso")}</p>
     </div>
   )
 }

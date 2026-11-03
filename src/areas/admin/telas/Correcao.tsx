@@ -32,14 +32,14 @@ function Item({ e, titulo, membro, enunciado, prazo, aoMudar }: { e: Entrega; ti
   return (
     <Cartao>
       <h2 className="text-base font-semibold">{membro} · {titulo}</h2>
-      <p className="mt-1 text-legenda text-nevoa">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}
+      <p className="mt-1 text-corpo-p text-nevoa">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}
         {prazo !== null ? <> · {t("admin.correcao.prazo")}: {prazo} {t("admin.correcao.diasPrazo")}</> : null}
         {/* O prazo é o do membro para entregar (informativo), não o da correção. Aviso por e-mail ao corretor/membro: depende da conta do Resend (ainda não existe). */}
       </p>
       <p className="mt-3 text-base text-bruma">{enunciado}</p>
       {e.texto ? <p className="mt-3 whitespace-pre-wrap">{e.texto}</p> : null}
       {e.arquivo_path ? (
-        <button type="button" className={`mt-3 inline-flex min-h-9 items-center text-legenda pointer-coarse:min-h-11 ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("entregas", e.arquivo_path!))}>{t("admin.correcao.abrirArquivo")}</button>
+        <button type="button" className={`mt-3 inline-flex min-h-9 items-center text-corpo-p pointer-coarse:min-h-11 ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("entregas", e.arquivo_path!))}>{t("admin.correcao.abrirArquivo")}</button>
       ) : null}
       <div className="mt-4">
         <AreaTexto rotulo={t("admin.correcao.devolutiva")} rows={3} value={devolutiva} erro={erro} onChange={(x) => setDevolutiva(x.target.value)} />

@@ -17,7 +17,7 @@ const publico = {
 // App (molde Attio/Linear): hairline grafite, cabeçalho 12px/510 névoa sem fundo, linhas compactas com hover sutil, números tabulares.
 const app = {
   regiao: "overflow-x-auto rounded-xl border border-grafite focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado",
-  tabela: "w-full min-w-max text-left text-legenda",
+  tabela: "w-full min-w-max text-left text-corpo-p",
   cabecalho: "border-b border-grafite",
   th: "px-4 py-2.5 text-xs font-medium text-nevoa",
   corpo: "divide-y divide-grafite",

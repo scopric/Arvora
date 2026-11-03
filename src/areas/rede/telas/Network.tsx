@@ -137,7 +137,7 @@ export function Network() {
                       .map((i) => <Etiqueta key={`${i.tipo}-${i.categoria_id}`}>{t(i.tipo === "oferece" ? "rede.network.oferece" : "rede.network.procura")}: {nomeCategoria(categorias, i.categoria_id, idioma)}</Etiqueta>)}
                     acoes={
                       cadeado ? (
-                        <span className="inline-flex items-center gap-2 text-legenda text-nevoa">
+                        <span className="inline-flex items-center gap-2 text-corpo-p text-nevoa">
                           <Icone nome="cadeado" className="size-4 text-cinza" />
                           {t("rede.network.conectarBloqueado")}
                         </span>
@@ -146,7 +146,7 @@ export function Network() {
                   />
                 ))}
               </ul>
-              {clube && dados.membros.length >= POR_PAGINA ? <p className="mt-6 text-legenda text-nevoa">{t("rede.network.soPrimeiros")}</p> : null}
+              {clube && dados.membros.length >= POR_PAGINA ? <p className="mt-6 text-corpo-p text-nevoa">{t("rede.network.soPrimeiros")}</p> : null}
               {temMais ? (
                 <div className="mt-6 flex flex-col items-center gap-3">
                   {erroMais ? <Aviso tipo="erro">{t("rede.network.erro")}</Aviso> : null}

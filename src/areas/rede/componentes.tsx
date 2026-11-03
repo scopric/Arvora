@@ -13,7 +13,7 @@ import { chaveSlug, dia, iniciais, mudarStatus, pedirConexao, podePedirDe, type 
 // Avatar de iniciais: a foto de perfil ainda não tem bucket (fora do lançamento), então ninguém mostra imagem aqui.
 export function Avatar({ nome }: { nome: string | null }) {
   return (
-    <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-fumaca text-legenda font-medium">
+    <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-fumaca text-corpo-p font-medium">
       {iniciais(nome)}
     </span>
   )
@@ -39,7 +39,7 @@ export function Dialogo({ aberto, titulo, aoFechar, children }: { aberto: boolea
       }}
       className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl bg-obsidiana p-6 text-creme shadow-flutuante backdrop:bg-breu/70"
     >
-      <h2 id={id} className="text-corpo-g font-semibold">{titulo}</h2>
+      <h2 id={id} className="text-subtitulo font-semibold">{titulo}</h2>
       {aberto ? children : null}
     </dialog>
   )
@@ -117,8 +117,8 @@ export function CartaoPerfil({ perfil, setor, tags, children, acoes }: { perfil:
           <h2 className="text-base font-semibold">
             <Link to={caminho(`/network/${chaveSlug(perfil)}`)} className="rounded-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">{perfil.nome}</Link>
           </h2>
-          {perfil.empresa_nome ? <p className="text-legenda text-bruma">{perfil.empresa_nome}</p> : null}
-          {local ? <p className="text-legenda text-nevoa">{local}</p> : null}
+          {perfil.empresa_nome ? <p className="text-corpo-p text-bruma">{perfil.empresa_nome}</p> : null}
+          {local ? <p className="text-corpo-p text-nevoa">{local}</p> : null}
           {Children.count(tags) > 0 ? <ul className="mt-3 flex flex-wrap gap-2">{tags}</ul> : null}
         </div>
       </div>
@@ -150,10 +150,10 @@ export function Contato({ outroId }: { outroId: string }) {
         </Botao>
       </div>
     )
-  if (estado === "indisponivel") return <p className="text-legenda text-nevoa">{t("rede.contato.indisponivel")}</p>
-  if (estado === "vazio") return <p className="text-legenda text-nevoa">{t("rede.contato.vazio")}</p>
+  if (estado === "indisponivel") return <p className="text-corpo-p text-nevoa">{t("rede.contato.indisponivel")}</p>
+  if (estado === "vazio") return <p className="text-corpo-p text-nevoa">{t("rede.contato.vazio")}</p>
   return (
-    <dl className="space-y-1 text-legenda">
+    <dl className="space-y-1 text-corpo-p">
       {estado.email ? (
         <div className="flex gap-2"><dt className="text-nevoa">{t("rede.contato.email")}</dt><dd><a href={`mailto:${estado.email}`} className={linkTextoApp}>{estado.email}</a></dd></div>
       ) : null}
@@ -220,7 +220,7 @@ export function AcaoConexao({ uid, outroId, nome, origem, conexao, aoMudar, dest
     corpo = <Selo tom="destaque">{t("rede.conexao.conectados")}</Selo>
   } else {
     corpo = (
-      <p className="text-legenda text-nevoa">
+      <p className="text-corpo-p text-nevoa">
         {t(conexao.status === "recusada" && conexao.solicitante_id === uid ? "rede.conexao.naoAceito" : "rede.conexao.encerrada")}{" "}
         {liberaEm ? `${t("rede.conexao.novoPedidoEm")} ${dia(liberaEm.toISOString(), idioma)}.` : null}
       </p>

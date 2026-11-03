@@ -11,11 +11,11 @@ const publico = {
 // App (Linear): rótulo 13px/510 bruma; campo raio 6, fundo creme/2, borda cinza (3,35:1, o mínimo da WCAG 1.4.11),
 // foco só pela borda em bruma, sem anel. O texto digitado fica em 16px (PRD §17.7.3; também evita o zoom do iOS).
 const app = {
-  rotulo: "mb-1.5 block text-legenda font-medium text-bruma",
+  rotulo: "mb-1.5 block text-corpo-p font-medium text-bruma",
   campo: "w-full rounded-md border bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma",
   bordaOk: "border-cinza",
-  erro: "mt-1.5 text-legenda text-red-300",
-  ajuda: "mt-1.5 text-legenda text-nevoa",
+  erro: "mt-1.5 text-corpo-p text-red-300",
+  ajuda: "mt-1.5 text-corpo-p text-nevoa",
 }
 
 // Um só lugar decide o visual de campo: Campo/Selecao e AreaTexto/Caixa do admin.

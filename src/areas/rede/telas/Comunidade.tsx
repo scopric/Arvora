@@ -76,7 +76,7 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
 
   return (
     <article className={`${tipo === "posts" ? "rounded-xl p-4 shadow-borda" : "border-t border-grafite pt-3 first:border-t-0 first:pt-0"} ${item.oculto_em ? "opacity-60" : ""}`}>
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 text-legenda">
+      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 text-corpo-p">
         <strong className="text-creme">{autor ?? t(item.autor_id ? "rede.comunidade.membro" : "rede.comunidade.exMembro")}</strong>
         <time dateTime={item.criado_em} className="text-nevoa">{quando(item.criado_em, idioma)}</time>
         {item.editado_em ? <span className="text-nevoa">{t("rede.comunidade.editado")}</span> : null}
@@ -248,7 +248,7 @@ export function Comunidade() {
   return (
     <PaginaApp chave="rede.comunidade.titulo" estreita>
       <details className="rounded-md bg-creme/2 px-4 py-1 shadow-borda">
-        <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11">{t("rede.comunidade.regrasTitulo")}</summary>
+        <summary className="min-h-9 cursor-pointer py-2 text-corpo-p font-medium text-bruma pointer-coarse:min-h-11">{t("rede.comunidade.regrasTitulo")}</summary>
         {/* PROVISÓRIO: regras de convivência a validar pelo cliente (PRD COM-02) */}
         <ul className="mt-1 mb-3 list-disc space-y-1 pl-5 text-base text-bruma">
           <li>{t("rede.comunidade.regra1")}</li>

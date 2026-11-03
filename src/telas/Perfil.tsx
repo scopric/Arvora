@@ -96,7 +96,7 @@ export function Perfil() {
       {estado.fase === "pronto" ? (
         <form key={JSON.stringify(estado.perfil)} onSubmit={salvar} noValidate className="space-y-5">
           {aviso ? <Aviso tipo={aviso.tipo}>{t(aviso.texto)}</Aviso> : null}
-          <p className="text-legenda text-nevoa">{t("perfil.emailConta")} {sessao?.user.email}</p>
+          <p className="text-corpo-p text-nevoa">{t("perfil.emailConta")} {sessao?.user.email}</p>
           <Campo rotulo={t("perfil.nome")} name="nome" defaultValue={estado.perfil.nome} erro={erros.nome} autoComplete="name" />
           <Campo rotulo={t("perfil.empresa")} name="empresa_nome" defaultValue={estado.perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
           <Selecao rotulo={t("perfil.setor")} name="setor_id" defaultValue={estado.perfil.setor_id?.toString() ?? ""} erro={erros.setor_id}>
@@ -129,7 +129,7 @@ export function Perfil() {
 
           {/* A visibilidade agora se muda em Configurações > Privacidade; o campo segue no envio só porque o schema o exige. */}
           <input type="hidden" name="visibilidade" value={estado.perfil.visibilidade} />
-          <p className="text-legenda">
+          <p className="text-corpo-p">
             <Link to={caminho("/configuracoes/privacidade")} className={linkTextoApp}>{t("conta.perfil.linkPrivacidade")}</Link>
           </p>
 
@@ -140,7 +140,7 @@ export function Perfil() {
 
       <section className="mt-12 border-t border-creme/15 pt-8">
         <h2 className="text-sm font-semibold">{t("perfil.dados.titulo")}</h2>
-        <p className="mt-2 text-legenda">
+        <p className="mt-2 text-corpo-p">
           <Link to={caminho("/configuracoes/dados")} className={linkTextoApp}>{t("conta.perfil.linkDados")}</Link>
         </p>
       </section>

@@ -11,7 +11,7 @@ export function Marca({ to, className = "" }: { to?: string; className?: string 
   const conteudo = (
     <>
       <img src="/logo-simbolo.png" alt="" width="354" height="287" className={app ? "h-5 w-auto" : "h-8 w-auto"} />
-      <span className={app ? "text-legenda font-semibold text-creme" : "text-xs font-semibold tracking-[0.3em] text-destaque uppercase"}>Grupo Árvora</span>
+      <span className={app ? "text-corpo-p font-semibold text-creme" : "text-xs font-semibold tracking-[0.3em] text-destaque uppercase"}>Grupo Árvora</span>
     </>
   )
   return to ? (

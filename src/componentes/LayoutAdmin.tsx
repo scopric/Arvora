@@ -77,7 +77,7 @@ export function LayoutAdmin() {
               </div>
               <BotaoSair destino={caminho("/entrar")} className="mt-2 px-2" />
               <details className="mt-2 lg:hidden">
-                <summary className={`flex min-h-9 cursor-pointer list-none items-center justify-between rounded-md border border-grafite px-3 text-legenda font-medium text-bruma pointer-coarse:min-h-11 hover:text-creme ${foco}`}>
+                <summary className={`flex min-h-9 cursor-pointer list-none items-center justify-between rounded-md border border-grafite px-3 text-corpo-p font-medium text-bruma pointer-coarse:min-h-11 hover:text-creme ${foco}`}>
                   {t("menu.mais")}
                   <Icone nome="menu" className="size-4" />
                 </summary>

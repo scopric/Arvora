@@ -100,7 +100,7 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
             </label>
           </fieldset>
           {estado.visibilidade === "publico" ? (
-            <p className="text-legenda text-nevoa">{t(estado.aprovado ? "conta.privacidade.visib.aprovado" : "conta.privacidade.visib.aguarda")}</p>
+            <p className="text-corpo-p text-nevoa">{t(estado.aprovado ? "conta.privacidade.visib.aprovado" : "conta.privacidade.visib.aguarda")}</p>
           ) : null}
           <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("conta.privacidade.visib.salvar")}</Botao>
         </form>
@@ -134,7 +134,7 @@ function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar:
   return (
     <section>
       <h2 ref={titulo} tabIndex={-1} className="text-base font-semibold outline-none">{t("conta.consent.lista.titulo")}</h2>
-      <p className="mt-1 text-legenda text-nevoa">{t("conta.consent.lista.texto")}</p>
+      <p className="mt-1 text-corpo-p text-nevoa">{t("conta.consent.lista.texto")}</p>
       <div className="mt-4 space-y-4">
         {falhou ? <Aviso tipo="erro">{t("conta.consent.erro")}</Aviso> : null}
         {aceites.length === 0 ? (

@@ -122,7 +122,7 @@ export function CrudTabela(p: CrudProps) {
       <AvisoDe aviso={acao.aviso} />
       {p.podeEditar ? (
         <Cartao>
-          <p className="mb-5 text-corpo-g font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
+          <p className="mb-5 text-subtitulo font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
           <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} variante={p.variante} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
         </Cartao>
       ) : null}

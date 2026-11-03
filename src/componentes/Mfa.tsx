@@ -108,7 +108,7 @@ export function Mfa({ children }: { children: ReactNode }) {
     <main className="flex min-h-dvh items-center justify-center px-4 py-16">
       <Cartao className="w-full max-w-md">
       <Titulo />
-      <h1 className="text-subtitulo font-semibold">{t("mfa.titulo")}</h1>
+      <h1 className="text-titulo-p font-semibold">{t("mfa.titulo")}</h1>
       {estado.fase === "carregando" ? <Esqueleto className="mt-8" /> : null}
       {estado.fase === "erro" ? <div className="mt-8"><Erro aoTentar={carregar}>{t("mfa.erro")}</Erro></div> : null}
       {estado.fase === "cadastrar" ? (
@@ -123,8 +123,8 @@ export function Mfa({ children }: { children: ReactNode }) {
           <p className="mt-3 text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
           {/* data: URI de SVG gerado pelo Supabase; img-src do CSP já libera data: */}
           <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="mt-6 size-48 rounded-md bg-white p-2" />
-          <p className="mt-4 text-legenda text-nevoa">{t("mfa.qr.segredo")}</p>
-          <p className="mt-1 font-mono text-legenda break-all select-all">{estado.segredo}</p>
+          <p className="mt-4 text-corpo-p text-nevoa">{t("mfa.qr.segredo")}</p>
+          <p className="mt-1 font-mono text-corpo-p break-all select-all">{estado.segredo}</p>
           <p className="mt-6 text-base text-bruma">{t("mfa.verificar.texto")}</p>
           {formulario(estado.fator)}
         </>

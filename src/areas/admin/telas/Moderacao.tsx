@@ -48,7 +48,7 @@ function Denuncias({ pergunta }: { pergunta: (p: Pergunta) => void }) {
                     <Cartao>
                       <div className="flex flex-wrap items-center gap-3">
                         <Selo tom="alerta">{x.post_id ? t("admin.moderacao.alvo.post") : x.comentario_id ? t("admin.moderacao.alvo.comentario") : x.empresa_id ? t("admin.moderacao.alvo.empresa") : x.conexao_id ? t("admin.moderacao.alvo.conexao") : t("admin.moderacao.alvo.perfil")}</Selo>
-                        <span className="text-legenda text-nevoa">{dataHora(x.criado_em, lang)}</span>
+                        <span className="text-corpo-p text-nevoa">{dataHora(x.criado_em, lang)}</span>
                       </div>
                       <p className="mt-3 font-semibold">{x.motivo}</p>
                       {x.texto ? <p className="mt-1 text-base">{x.texto}</p> : null}
@@ -93,7 +93,7 @@ function PerfisPublicos() {
                 <li key={p.id}>
                   <Cartao>
                     <h3 className="text-base font-semibold">{p.nome}</h3>
-                    <p className="text-legenda text-nevoa">{[p.empresa_nome, p.cidade].filter(Boolean).join(" · ")}</p>
+                    <p className="text-corpo-p text-nevoa">{[p.empresa_nome, p.cidade].filter(Boolean).join(" · ")}</p>
                     {p.bio ? <p className="mt-2 text-base text-bruma">{p.bio}</p> : null}
                     <button type="button" className={`${classeAcao} mt-3`} disabled={acao.ocupado} onClick={() => void acao.rodar(async () => { try { exigirSemDados(await supabase.rpc("aprovar_perfil_publico", { perfil: p.id, versao: p.atualizado_em, aprovar: true })) } finally { carga.recarregar() } }, "admin.moderacao.perfilAprovado")}>{t("admin.moderacao.aprovarPerfil")}</button>
                   </Cartao>

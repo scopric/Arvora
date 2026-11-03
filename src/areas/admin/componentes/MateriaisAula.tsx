@@ -43,12 +43,12 @@ function Um({ aulaId, tipo, atual, aoMudar }: { aulaId: number; tipo: Material["
         <Selo tom={atual?.status === "aprovado" ? "destaque" : "neutro"}>{atual ? t(`admin.aula.materialStatus.${atual.status}`) : t("admin.aula.materialStatus.vazio")}</Selo>
       </div>
       <AreaTexto rotulo={t("admin.aula.materialTexto")} value={texto} onChange={(e) => setTexto(e.target.value)} />
-      <label className="block text-legenda font-medium text-bruma">
+      <label className="block text-corpo-p font-medium text-bruma">
         {t("admin.aula.materialArquivo")}
-        <input type="file" accept="application/pdf,application/epub+zip" className="mt-2 block w-full text-legenda text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
+        <input type="file" accept="application/pdf,application/epub+zip" className="mt-2 block w-full text-corpo-p text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
       </label>
       {atual?.arquivo_path ? (
-        <button type="button" className={`inline-flex min-h-9 items-center text-legenda pointer-coarse:min-h-11 ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("materiais", atual.arquivo_path!))}>{t("admin.aula.materialAbrir")}</button>
+        <button type="button" className={`inline-flex min-h-9 items-center text-corpo-p pointer-coarse:min-h-11 ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("materiais", atual.arquivo_path!))}>{t("admin.aula.materialAbrir")}</button>
       ) : null}
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-3">

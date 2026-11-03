@@ -73,7 +73,7 @@ export function Premiado() {
                     <dl className="space-y-3">
                       {Object.entries(pend).map(([k, v]) => (
                         <div key={k}>
-                          <dt className="text-legenda font-medium text-bruma">{k}</dt>
+                          <dt className="text-corpo-p font-medium text-bruma">{k}</dt>
                           <dd className="text-base whitespace-pre-wrap"><span className="text-nevoa">{t("admin.premiado.atual")}: </span>{String((d.p as unknown as Json)[k] === undefined ? "" : typeof (d.p as unknown as Json)[k] === "object" ? JSON.stringify((d.p as unknown as Json)[k]) : (d.p as unknown as Json)[k])}</dd>
                           <dd className="text-base whitespace-pre-wrap"><span className="text-nevoa">{t("admin.premiado.proposto")}: </span>{typeof v === "object" ? JSON.stringify(v) : String(v)}</dd>
                         </div>
@@ -90,7 +90,7 @@ export function Premiado() {
                 </Secao>
               ) : null}
               <Secao titulo="admin.premiado.dados">
-                {d.vinculo ? <p className="mb-4 text-legenda">{t("admin.premiado.vinculado")}: {d.vinculo}</p> : d.p ? <p className="mb-4 text-legenda text-nevoa">{t("admin.premiado.semVinculo")}</p> : null}
+                {d.vinculo ? <p className="mb-4 text-corpo-p">{t("admin.premiado.vinculado")}: {d.vinculo}</p> : d.p ? <p className="mb-4 text-corpo-p text-nevoa">{t("admin.premiado.semVinculo")}</p> : null}
                 {pode ? (
                   <FormularioRegistro
                     campos={campos} linha={linha}

@@ -17,7 +17,7 @@ export function Pagina({ titulo, intro, acoes, voltar, children }: { titulo: Cha
       {voltar ? <LinkVoltar {...voltar} /> : null}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t(titulo)}</h1>
+          <h1 className="text-titulo-p font-semibold sm:text-titulo">{t(titulo)}</h1>
           {intro ? <p className="mt-3 max-w-prose text-base text-nevoa">{t(intro)}</p> : null}
         </div>
         {acoes}
@@ -41,7 +41,7 @@ export function Secao({ titulo, children }: { titulo: Chave; children: ReactNode
   const t = useT()
   return (
     <section>
-      <h2 className="mb-4 text-corpo-g font-semibold">{t(titulo)}</h2>
+      <h2 className="mb-4 text-subtitulo font-semibold">{t(titulo)}</h2>
       {children}
     </section>
   )

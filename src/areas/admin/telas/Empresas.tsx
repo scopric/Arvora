@@ -67,8 +67,8 @@ export function Empresas() {
                             <h3 className="text-base font-semibold">{e.nome}</h3>
                             <Selo tom="alerta">{t("admin.empresas.pendente")}</Selo>
                           </div>
-                          <p className="mt-1 text-legenda text-nevoa">{[e.cidade, e.pais].filter(Boolean).join(" · ") || "—"}</p>
-                          {e.site ? <p className="mt-1 text-legenda"><a className={classeLink} href={e.site} target="_blank" rel="noopener noreferrer">{e.site}</a></p> : null}
+                          <p className="mt-1 text-corpo-p text-nevoa">{[e.cidade, e.pais].filter(Boolean).join(" · ") || "—"}</p>
+                          {e.site ? <p className="mt-1 text-corpo-p"><a className={classeLink} href={e.site} target="_blank" rel="noopener noreferrer">{e.site}</a></p> : null}
                           {e.descricao ? <p className="mt-3 text-base text-bruma">{e.descricao}</p> : null}
                           {aprova ? (
                             <div className="mt-4 flex gap-3">

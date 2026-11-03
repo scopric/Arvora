@@ -51,15 +51,15 @@ export function Membro() {
           <>
             <Cartao>
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-subtitulo font-semibold">{perfil.nome}</h2>
+                <h2 className="text-titulo-p font-semibold">{perfil.nome}</h2>
                 {perfil.suspenso_em ? <Selo tom="alerta">{t("admin.membros.suspenso")}</Selo> : null}
               </div>
               <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                {super_ ? <div><dt className="text-legenda text-nevoa">{t("admin.membro.email")}</dt><dd>{emailErro ? <span role="alert" className="text-red-300">{t("admin.membro.emailErro")}</span> : (email ?? "—")}</dd></div> : null}
-                <div><dt className="text-legenda text-nevoa">{t("admin.membros.empresa")}</dt><dd>{perfil.empresa_nome ?? "—"}</dd></div>
-                <div><dt className="text-legenda text-nevoa">{t("admin.comum.cidade")}</dt><dd>{[perfil.cidade, perfil.pais].filter(Boolean).join(", ") || "—"}</dd></div>
-                <div><dt className="text-legenda text-nevoa">{t("admin.membros.visibilidade")}</dt><dd>{t(`admin.membros.vis.${perfil.visibilidade}`)}</dd></div>
-                <div><dt className="text-legenda text-nevoa">{t("admin.membros.desde")}</dt><dd>{dataCurta(perfil.criado_em)}</dd></div>
+                {super_ ? <div><dt className="text-corpo-p text-nevoa">{t("admin.membro.email")}</dt><dd>{emailErro ? <span role="alert" className="text-red-300">{t("admin.membro.emailErro")}</span> : (email ?? "—")}</dd></div> : null}
+                <div><dt className="text-corpo-p text-nevoa">{t("admin.membros.empresa")}</dt><dd>{perfil.empresa_nome ?? "—"}</dd></div>
+                <div><dt className="text-corpo-p text-nevoa">{t("admin.comum.cidade")}</dt><dd>{[perfil.cidade, perfil.pais].filter(Boolean).join(", ") || "—"}</dd></div>
+                <div><dt className="text-corpo-p text-nevoa">{t("admin.membros.visibilidade")}</dt><dd>{t(`admin.membros.vis.${perfil.visibilidade}`)}</dd></div>
+                <div><dt className="text-corpo-p text-nevoa">{t("admin.membros.desde")}</dt><dd>{dataCurta(perfil.criado_em)}</dd></div>
               </dl>
               {perfil.bio ? <p className="mt-4 max-w-prose text-base text-bruma">{perfil.bio}</p> : null}
               <div className="mt-4 space-y-3">
@@ -83,7 +83,7 @@ export function Membro() {
                     ]}
                   />
                 )}
-                <p className="mt-4 text-legenda text-nevoa">{t("admin.membro.stripeNota")}</p>
+                <p className="mt-4 text-corpo-p text-nevoa">{t("admin.membro.stripeNota")}</p>
                 <ul className="mt-2 space-y-1">
                   {clientes.map((c) => (
                     <li key={c.stripe_customer_id}>

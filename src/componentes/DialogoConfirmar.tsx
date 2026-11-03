@@ -43,7 +43,7 @@ export function DialogoConfirmar({ aberto, titulo, texto, confirmar, perigo, des
           : "m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-creme/20 bg-painel p-6 text-creme backdrop:bg-black/60"
       }
     >
-      <h2 id={idTitulo} className={app ? "text-corpo-g font-semibold" : "font-titulo text-3xl font-normal"}>{titulo}</h2>
+      <h2 id={idTitulo} className={app ? "text-subtitulo font-semibold" : "font-titulo text-3xl font-normal"}>{titulo}</h2>
       {texto ? <p className={app ? "mt-2 text-base text-bruma" : "mt-3 opacity-80"}>{texto}</p> : null}
       {children ? <div className="mt-4">{children}</div> : null}
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

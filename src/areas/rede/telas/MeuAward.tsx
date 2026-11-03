@@ -63,7 +63,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
   return (
     <div className="space-y-6">
       <section aria-labelledby={`pv-${p.id}`}>
-        <h2 id={`pv-${p.id}`} className="text-legenda font-medium text-nevoa">{t("rede.meuAward.previa")}</h2>
+        <h2 id={`pv-${p.id}`} className="text-corpo-p font-medium text-nevoa">{t("rede.meuAward.previa")}</h2>
         {/* Molde MasterClass (herói da classe): capa larga, nome em Big Shoulders, categoria · edição em dourado, selos. */}
         <div className="relative mt-3 overflow-hidden rounded-xl after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:shadow-borda">
           {foto ? <img src={foto} alt={`${t("rede.meuAward.fotoDe")} ${p.nome}`} className="aspect-video w-full object-cover" /> : null}
@@ -73,16 +73,16 @@ function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
               <Selo tom={p.publicado_em ? "destaque" : "neutro"}>{t(p.publicado_em ? "rede.meuAward.publicado" : "rede.meuAward.naoPublicado")}</Selo>
             </div>
             <div>
-              <h3 className="font-conteudo text-titulo-p leading-none font-normal tracking-normal text-balance sm:text-titulo">{p.nome}</h3>
-              <p className="mt-2 text-legenda font-medium text-dourado">{categoria} · {edicao}</p>
+              <h3 className="font-conteudo text-titulo leading-none font-normal tracking-normal text-balance sm:text-titulo-g">{p.nome}</h3>
+              <p className="mt-2 text-corpo-p font-medium text-dourado">{categoria} · {edicao}</p>
             </div>
-            {!foto ? <p className="text-legenda text-nevoa">{t("rede.meuAward.semFoto")}</p> : null}
+            {!foto ? <p className="text-corpo-p text-nevoa">{t("rede.meuAward.semFoto")}</p> : null}
             {p.historia ? <p className="max-w-prose text-base whitespace-pre-wrap">{p.historia}</p> : <p className="text-base text-nevoa">{t("rede.meuAward.semHistoria")}</p>}
             <dl className="grid gap-4 border-t border-grafite pt-5 sm:grid-cols-3">
-              <div><dt className="text-legenda text-nevoa">{t("rede.meuAward.videoEntrevista")}</dt><dd className="mt-0.5 text-base">{t(p.video_entrevista_id ? "rede.meuAward.cadastrado" : "rede.meuAward.naoCadastrado")}</dd></div>
-              <div><dt className="text-legenda text-nevoa">{t("rede.meuAward.videoPremiacao")}</dt><dd className="mt-0.5 text-base">{t(p.video_premiacao_id ? "rede.meuAward.cadastrado" : "rede.meuAward.naoCadastrado")}</dd></div>
+              <div><dt className="text-corpo-p text-nevoa">{t("rede.meuAward.videoEntrevista")}</dt><dd className="mt-0.5 text-base">{t(p.video_entrevista_id ? "rede.meuAward.cadastrado" : "rede.meuAward.naoCadastrado")}</dd></div>
+              <div><dt className="text-corpo-p text-nevoa">{t("rede.meuAward.videoPremiacao")}</dt><dd className="mt-0.5 text-base">{t(p.video_premiacao_id ? "rede.meuAward.cadastrado" : "rede.meuAward.naoCadastrado")}</dd></div>
               <div>
-                <dt className="text-legenda text-nevoa">{t("rede.meuAward.materia")}</dt>
+                <dt className="text-corpo-p text-nevoa">{t("rede.meuAward.materia")}</dt>
                 <dd className="mt-0.5 text-base">{p.materia_url?.startsWith("https://") ? <a href={p.materia_url} rel="noopener noreferrer" className={linkTextoApp}>{t("rede.meuAward.abrirMateria")}</a> : <span>{t("rede.meuAward.naoCadastrada")}</span>}</dd>
               </div>
             </dl>
@@ -92,7 +92,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
 
       {pend ? (
         <section aria-labelledby={`an-${p.id}`} className="rounded-xl p-5 shadow-borda">
-          <h2 id={`an-${p.id}`} className="flex items-center gap-3 text-base font-semibold"><Selo tom="destaque">{t("rede.meuAward.emAnalise")}</Selo>{pendente.alteracao_em ? <span className="text-legenda font-normal text-nevoa">{quando(pendente.alteracao_em, idioma)}</span> : null}</h2>
+          <h2 id={`an-${p.id}`} className="flex items-center gap-3 text-base font-semibold"><Selo tom="destaque">{t("rede.meuAward.emAnalise")}</Selo>{pendente.alteracao_em ? <span className="text-corpo-p font-normal text-nevoa">{quando(pendente.alteracao_em, idioma)}</span> : null}</h2>
           <p className="mt-2 text-base text-bruma">{t("rede.meuAward.emAnaliseTexto")}</p>
           {pend.historia ? <p className="mt-3 text-base whitespace-pre-wrap"><strong>{t("rede.meuAward.historia")}: </strong>{pend.historia}</p> : null}
           {pend.materia_url ? <p className="mt-2 text-base break-all"><strong>{t("rede.meuAward.materia")}: </strong>{pend.materia_url}</p> : null}
@@ -102,7 +102,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
 
       {editando ? (
         <form onSubmit={pedir} className="space-y-5 rounded-xl p-5 shadow-borda">
-          <h2 className="text-corpo-g font-semibold">{t("rede.meuAward.pedirAlteracao")}</h2>
+          <h2 className="text-subtitulo font-semibold">{t("rede.meuAward.pedirAlteracao")}</h2>
           <p className="text-base text-bruma">{t(pend ? "rede.meuAward.substitui" : "rede.meuAward.passaPorAprovacao")}</p>
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
           <div>

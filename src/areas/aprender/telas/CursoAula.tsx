@@ -77,9 +77,9 @@ export function CursoAula() {
                           <span className="sr-only">{t("bloqueado.rotulo")}</span>
                         </>
                       ) : pct(a.id) === 100 ? (
-                        <span className="text-legenda text-destaque">{t("aprender.assistida")}</span>
+                        <span className="text-corpo-p text-destaque">{t("aprender.assistida")}</span>
                       ) : pct(a.id) > 0 ? (
-                        <span className="text-legenda tabular-nums">{pct(a.id)}%</span>
+                        <span className="text-corpo-p tabular-nums">{pct(a.id)}%</span>
                       ) : null}
                     </Link>
                   </li>

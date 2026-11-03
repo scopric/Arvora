@@ -30,7 +30,7 @@ function baixar(nome: string, csv: string) {
 function Linhas({ linhas, extra, liquido }: { linhas: LinhaRel[]; extra?: (l: LinhaRel) => ReactNode; liquido?: boolean }) {
   const t = useT()
   const lang = useIdioma()
-  if (linhas.length === 0) return <p className="text-legenda text-nevoa">{t("admin.rel.semLinhas")}</p>
+  if (linhas.length === 0) return <p className="text-corpo-p text-nevoa">{t("admin.rel.semLinhas")}</p>
   return (
     <Tabela
       legenda={t("admin.rel.linhas")} linhas={linhas} id={(l) => `${l.fonte}-${l.ref_id}`}
@@ -55,7 +55,7 @@ function Linhas({ linhas, extra, liquido }: { linhas: LinhaRel[]; extra?: (l: Li
 function Numero({ rotulo, valor, forte }: { rotulo: Chave; valor: ReactNode; forte?: boolean }) {
   const t = useT()
   return (
-    <div className={`flex items-baseline justify-between gap-4 border-b border-grafite py-2 ${forte ? "text-base font-semibold" : "text-legenda"}`}>
+    <div className={`flex items-baseline justify-between gap-4 border-b border-grafite py-2 ${forte ? "text-base font-semibold" : "text-corpo-p"}`}>
       <dt>{t(rotulo)}</dt>
       <dd className="tabular-nums">{valor}</dd>
     </div>
@@ -65,7 +65,7 @@ function Como({ children }: { children: ReactNode }) {
   const t = useT()
   return (
     <details className="mt-3">
-      <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11">{t("admin.rel.como")}</summary>
+      <summary className="min-h-9 cursor-pointer py-2 text-corpo-p font-medium text-bruma pointer-coarse:min-h-11">{t("admin.rel.como")}</summary>
       <div className="mt-2">{children}</div>
     </details>
   )
@@ -107,10 +107,10 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
     <div className="space-y-8">
       <div className="flex flex-wrap items-center gap-3">
         <Selo tom={fechado ? "destaque" : "neutro"}>{t(fechado ? "admin.rel.fechado" : "admin.rel.rascunho")}</Selo>
-        {fechado && versao ? <span className="text-legenda text-nevoa">v{versao.versao} · SHA-256 <code className="break-all">{versao.csv_sha256}</code></span> : null}
+        {fechado && versao ? <span className="text-corpo-p text-nevoa">v{versao.versao} · SHA-256 <code className="break-all">{versao.csv_sha256}</code></span> : null}
         {fechado && versao?.enviado_em ? <Selo tom="destaque">{t("admin.rel.enviado")} {dataCurta(versao.enviado_em)}</Selo> : null}
       </div>
-      {!fechado ? <p className="text-legenda text-nevoa">{t("admin.rel.previa")}</p> : null}
+      {!fechado ? <p className="text-corpo-p text-nevoa">{t("admin.rel.previa")}</p> : null}
       {rel.pendencias.some(bloqueante) ? (
         <Aviso tipo="erro">
           {t("admin.rel.pendencias")}: {rel.pendencias.filter(bloqueante).map(pendTexto).join(" · ")}
@@ -132,7 +132,7 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
         <Como><Linhas linhas={rel.linhas.filter((l) => l.fonte === "stripe" || l.fonte === "externa")} extra={editar ? (l) => (l.fonte === "externa" ? <Anular id={l.ref_id} cliente={l.cliente} aoFeito={aoMudar} /> : "—") : undefined} /></Como>
         {ext.length > 0 && financeiro ? (
           <Como>
-            <ul className="space-y-1 text-legenda">
+            <ul className="space-y-1 text-corpo-p">
               {ext.map((l) => (
                 <li key={l.ref_id}>
                   {l.cliente} — {l.referencia ? <button type="button" className={classeLink} onClick={() => void acao.rodar(() => abrirAssinado("comprovantes", l.referencia!))}>{t("admin.rel.verComprovante")}</button> : "—"}
@@ -158,7 +158,7 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
       <Secao titulo="admin.rel.s3">
         <p>{t("admin.rel.taxaEm")} {dataCurta(rel.cambio.data_referencia)}</p>
         {rel.cambio.taxas.length === 0 ? (
-          <p className="mt-2 text-legenda text-nevoa">{t("admin.rel.soEur")}</p>
+          <p className="mt-2 text-corpo-p text-nevoa">{t("admin.rel.soEur")}</p>
         ) : (
           <ul className="mt-2 space-y-1">
             {rel.cambio.taxas.map((x) => (
@@ -179,8 +179,8 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
       <Secao titulo="admin.rel.s5">
         <dl><Numero rotulo="admin.rel.clientesAtivos" valor={rel.clientes_ativos.quantidade} forte /></dl>
         <Como>
-          {rel.clientes_ativos.lista.length === 0 ? <p className="text-legenda text-nevoa">{t("admin.rel.semLinhas")}</p> : (
-            <ul className="text-legenda">{rel.clientes_ativos.lista.map((c) => <li key={c.chave}>{c.chave} · {c.origem}</li>)}</ul>
+          {rel.clientes_ativos.lista.length === 0 ? <p className="text-corpo-p text-nevoa">{t("admin.rel.semLinhas")}</p> : (
+            <ul className="text-corpo-p">{rel.clientes_ativos.lista.map((c) => <li key={c.chave}>{c.chave} · {c.origem}</li>)}</ul>
           )}
         </Como>
       </Secao>
@@ -192,7 +192,7 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
           <Numero rotulo="admin.rel.iaTotal" valor={m(rel.ia.total)} forte />
         </dl>
         <Como>
-          <ul className="text-legenda">
+          <ul className="text-corpo-p">
             {rel.ia.por_nivel.map((n) => (
               <li key={n.nivel}>{t(`nivel.${n.nivel as "clube"}`)}: {n.horas_ia} h / {n.horas_total} h · {m(n.receita_liquida)} → {m(n.rateio)}</li>
             ))}
@@ -217,7 +217,7 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
               { chave: "quando", titulo: t("admin.log.quando"), celula: (x) => dataHora(x.criado_em, lang) },
               { chave: "sit", titulo: t("admin.rel.versaoSituacao"), celula: (x) => (x.reaberto_em ? `${t("admin.rel.versaoReaberta")} ${dataHora(x.reaberto_em, lang)}` : x === versoes[0] ? t("admin.rel.versaoAtual") : "—") },
               { chave: "env", titulo: t("admin.rel.enviado"), celula: (x) => (x.enviado_em ? dataHora(x.enviado_em, lang) : "—") },
-              { chave: "sha", titulo: "SHA-256", celula: (x) => <code className="text-legenda break-all">{x.csv_sha256}</code> },
+              { chave: "sha", titulo: "SHA-256", celula: (x) => <code className="text-corpo-p break-all">{x.csv_sha256}</code> },
               { chave: "csv", titulo: "CSV", celula: (x) => <button type="button" className={classeAcao} onClick={() => baixar(`relatorio-ciclo-${rel.ciclo.inicio}-v${x.versao}.csv`, x.dados.csv)}>{t("admin.rel.baixarVersao")}</button> },
             ]}
           />
@@ -232,8 +232,8 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
           <Botao type="button" variante="contorno" ocupado={acao.ocupado} className="max-md:hidden sm:w-auto" onClick={() => void acao.rodar(async () => { exigirSemDados(await supabase.rpc("marcar_relatorio_enviado", { ciclo_inicio: rel.ciclo.inicio, versao: versao.versao })); aoMudar() }, "admin.rel.marcadoEnviado")}>{t("admin.rel.marcarEnviado")}</Botao>
         ) : null}
       </div>
-      {super_ && !fechado && (!terminou || bloqueia(rel)) ? <p className="text-legenda text-nevoa">{!terminou ? t("admin.rel.cicloEmAndamento") : t("admin.rel.fecharBloqueado")}</p> : null}
-      <p className="text-legenda text-nevoa md:hidden">{t("admin.rel.soLeituraCelular")}</p>
+      {super_ && !fechado && (!terminou || bloqueia(rel)) ? <p className="text-corpo-p text-nevoa">{!terminou ? t("admin.rel.cicloEmAndamento") : t("admin.rel.fecharBloqueado")}</p> : null}
+      <p className="text-corpo-p text-nevoa md:hidden">{t("admin.rel.soLeituraCelular")}</p>
       {super_ && fechado ? (
         <div className="max-w-xl space-y-3 max-md:hidden">
           <h3 className="text-base font-semibold">{t("admin.rel.reabrirTitulo")}</h3>

@@ -96,7 +96,7 @@ export function Notificacoes() {
               <li key={i.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <p className={i.lida_em ? "text-base text-bruma" : "text-base font-medium"}>{titulo(i)}</p>
-                  <p className="mt-1 flex flex-wrap items-center gap-2 text-legenda text-nevoa">
+                  <p className="mt-1 flex flex-wrap items-center gap-2 text-corpo-p text-nevoa">
                     <time dateTime={i.criado_em}>{dataCurta(i.criado_em, idioma)}</time>
                     {i.lida_em ? null : <Selo tom="dourado">{t("conta.notificacoes.nova")}</Selo>}
                   </p>

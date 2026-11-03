@@ -20,7 +20,7 @@ export function Pagina({ titulo, menu = true, children }: { titulo: Chave; menu?
   useTitulo(titulo, true)
   return (
     <div className={`mx-auto px-4 py-8 sm:px-6 ${menu ? "max-w-5xl" : "max-w-3xl"}`}>
-      <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t(titulo)}</h1>
+      <h1 className="text-titulo-p font-semibold sm:text-titulo">{t(titulo)}</h1>
       <div className={menu ? "mt-6 grid gap-8 lg:grid-cols-[13rem_1fr]" : "mt-8"}>
         {menu ? (
           <nav aria-label={t("conta.menu")} className="flex flex-wrap gap-1 lg:sticky lg:top-16 lg:flex-col lg:gap-0.5 lg:self-start">
@@ -42,7 +42,7 @@ export function Secao({ titulo, texto, children }: { titulo: string; texto?: Rea
   return (
     <section>
       <h2 className="text-base font-semibold">{titulo}</h2>
-      {texto ? <p className="mt-1 text-legenda text-nevoa">{texto}</p> : null}
+      {texto ? <p className="mt-1 text-corpo-p text-nevoa">{texto}</p> : null}
       <div className="mt-4 rounded-xl p-5 shadow-borda">{children}</div>
     </section>
   )
@@ -59,7 +59,7 @@ export function Interruptor({ rotulo, ajuda, idAjuda, className = "", ...resto }
     <div className={`group flex min-h-9 items-start justify-between gap-4 pointer-coarse:min-h-11 ${className}`}>
       <div className="min-w-0">
         <label htmlFor={id} className="block cursor-pointer text-base font-medium group-has-disabled:cursor-not-allowed">{rotulo}</label>
-        {ajuda ? <p id={idDesc} className="mt-0.5 text-legenda text-nevoa">{ajuda}</p> : null}
+        {ajuda ? <p id={idDesc} className="mt-0.5 text-corpo-p text-nevoa">{ajuda}</p> : null}
       </div>
       <label className="relative -my-1.5 flex min-h-9 shrink-0 cursor-pointer items-center pointer-coarse:-my-2.5 pointer-coarse:min-h-11 has-disabled:cursor-not-allowed">
         <input id={id} type="checkbox" role="switch" aria-describedby={ajuda ? idDesc : undefined} className="peer sr-only" {...resto} />

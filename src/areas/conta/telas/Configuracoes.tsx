@@ -258,8 +258,8 @@ function DoisFatores() {
             <p className="text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
             {/* data: URI de SVG gerado pelo Supabase; img-src do CSP já libera data: */}
             <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="size-48 rounded-md bg-white p-2" />
-            <p className="text-legenda text-nevoa">{t("mfa.qr.segredo")}</p>
-            <p className="font-mono text-legenda break-all select-all">{estado.segredo}</p>
+            <p className="text-corpo-p text-nevoa">{t("mfa.qr.segredo")}</p>
+            <p className="font-mono text-corpo-p break-all select-all">{estado.segredo}</p>
             <p className="text-base text-bruma">{t("mfa.verificar.texto")}</p>
             {formCodigo(estado.fator, null)}
           </>

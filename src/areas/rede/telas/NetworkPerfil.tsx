@@ -62,7 +62,7 @@ export function NetworkPerfil() {
     const lista = (tipo: Item["tipo"]) => itens.filter((i) => i.tipo === tipo)
     const bloco = (tipo: Item["tipo"]) => (
       <section aria-labelledby={`bl-${tipo}`} className="rounded-xl p-5 shadow-borda">
-        <h2 id={`bl-${tipo}`} className="text-legenda font-medium text-nevoa">{t(tipo === "procura" ? "rede.networkPerfil.procura" : "rede.networkPerfil.oferece")}</h2>
+        <h2 id={`bl-${tipo}`} className="text-corpo-p font-medium text-nevoa">{t(tipo === "procura" ? "rede.networkPerfil.procura" : "rede.networkPerfil.oferece")}</h2>
         {lista(tipo).length === 0 ? (
           <p className="mt-3 text-base text-nevoa">{t("rede.networkPerfil.nada")}</p>
         ) : (
@@ -85,34 +85,34 @@ export function NetworkPerfil() {
           <Avatar nome={nomeOk} />
           <div>
             {perfil.empresa_nome ? <p className="text-base text-bruma">{perfil.empresa_nome}</p> : null}
-            {local ? <p className="text-legenda text-nevoa">{local}</p> : null}
+            {local ? <p className="text-corpo-p text-nevoa">{local}</p> : null}
           </div>
         </div>
         {perfil.bio ? <p className="max-w-prose text-base whitespace-pre-wrap">{perfil.bio}</p> : null}
         {perfil.linkedin_url?.startsWith("https://") || perfil.instagram ? (
-          <p className="flex flex-wrap gap-4 text-legenda">
+          <p className="flex flex-wrap gap-4 text-corpo-p">
             {perfil.linkedin_url?.startsWith("https://") ? <a href={perfil.linkedin_url} rel="noopener noreferrer" className={linkTextoApp}>LinkedIn</a> : null}
             {perfil.instagram ? <a href={`https://www.instagram.com/${perfil.instagram}`} rel="noopener noreferrer" className={linkTextoApp}>Instagram</a> : null}
           </p>
         ) : null}
         <div className="grid gap-4 sm:grid-cols-2">{bloco("procura")}{bloco("oferece")}</div>
         {meu ? (
-          <p className="text-legenda text-nevoa">{t("rede.networkPerfil.seuPerfil")} <Link to={caminho("/perfil")} className={linkTextoApp}>{t("menu.perfil")}</Link></p>
+          <p className="text-corpo-p text-nevoa">{t("rede.networkPerfil.seuPerfil")} <Link to={caminho("/perfil")} className={linkTextoApp}>{t("menu.perfil")}</Link></p>
         ) : (
           <div className="space-y-4 border-t border-grafite pt-6">
             <div className="flex flex-wrap items-center gap-3">
               {grupo && perfil.id ? (
                 <AcaoConexao uid={uid} outroId={perfil.id} nome={nomeOk ?? ""} origem="busca" conexao={conexao ?? undefined} aoMudar={recarregar} />
               ) : (
-                <span className="inline-flex items-center gap-2 text-legenda text-nevoa"><Icone nome="cadeado" className="size-4 text-cinza" />{t("rede.network.conectarBloqueado")}</span>
+                <span className="inline-flex items-center gap-2 text-corpo-p text-nevoa"><Icone nome="cadeado" className="size-4 text-cinza" />{t("rede.network.conectarBloqueado")}</span>
               )}
               <Botao variante="contorno" onClick={() => setDenunciando(true)} className="sm:w-auto">{t("rede.networkPerfil.denunciar")}</Botao>
             </div>
-            {!grupo ? <p className="text-legenda text-nevoa">{t("rede.network.bloqueadoClube")}</p> : null}
+            {!grupo ? <p className="text-corpo-p text-nevoa">{t("rede.network.bloqueadoClube")}</p> : null}
             {conexao?.status === "aceita" && perfil.id ? (
               <Contato outroId={perfil.id} />
             ) : (
-              <p className="text-legenda text-nevoa">{t("rede.networkPerfil.contatoDepois")}</p>
+              <p className="text-corpo-p text-nevoa">{t("rede.networkPerfil.contatoDepois")}</p>
             )}
           </div>
         )}

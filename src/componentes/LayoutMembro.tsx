@@ -49,7 +49,7 @@ function CartaoPlano({ nivel }: { nivel: Acesso["nivel"] }) {
   const caminho = useCaminho()
   const grupo = nivel === "grupo"
   return (
-    <Link to={caminho(grupo ? "/configuracoes/assinatura" : "/planos")} className={`block rounded-md bg-creme/2 px-3 py-2.5 text-legenda text-bruma shadow-borda transition-colors hover:text-creme ${foco}`}>
+    <Link to={caminho(grupo ? "/configuracoes/assinatura" : "/planos")} className={`block rounded-md bg-creme/2 px-3 py-2.5 text-corpo-p text-bruma shadow-borda transition-colors hover:text-creme ${foco}`}>
       {t(grupo ? "menu.cartao.grupo" : nivel === "clube" ? "menu.cartao.clube" : "menu.cartao.sem")}
     </Link>
   )
@@ -125,7 +125,7 @@ function MenuAvatar({ acesso }: { acesso: Acesso }) {
       </button>
       {aberto ? (
         <div className="absolute right-0 z-30 mt-2 w-72 rounded-xl bg-obsidiana p-1 shadow-flutuante">
-          <p className="truncate px-2 pt-1.5 text-legenda text-creme">{email}</p>
+          <p className="truncate px-2 pt-1.5 text-corpo-p text-creme">{email}</p>
           <p className="flex flex-wrap items-center gap-2 px-2 pt-1 pb-2 text-xs text-nevoa">
             {t("nivel.rotulo")}: {t(`nivel.${acesso.nivel}`)}
             {acesso.premiado ? <Selo tom="dourado">{t("selo.premiado")}</Selo> : null}

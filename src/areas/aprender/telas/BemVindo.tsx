@@ -119,10 +119,10 @@ export function BemVindo() {
   const nomeDe = (c: Cat) => (lang === "en" ? (c.nome_en ?? c.nome) : c.nome)
   const grupoChips = (tipo: Item["tipo"], legenda: Chave) => (
     <fieldset>
-      <legend className="mb-2 text-legenda font-medium text-bruma">{t(legenda)}</legend>
+      <legend className="mb-2 text-corpo-p font-medium text-bruma">{t(legenda)}</legend>
       <div className="flex flex-wrap gap-2">
         {categorias.map((c) => (
-          <label key={c.id} className="flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-grafite px-3 text-legenda font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:text-creme has-[:checked]:border-bruma has-[:checked]:bg-creme/5 has-[:checked]:text-creme has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-dourado">
+          <label key={c.id} className="flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-grafite px-3 text-corpo-p font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:text-creme has-[:checked]:border-bruma has-[:checked]:bg-creme/5 has-[:checked]:text-creme has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-dourado">
             <input type="checkbox" checked={sel.has(`${tipo}:${c.id}`)} onChange={() => alternar(`${tipo}:${c.id}`)} className="size-4 accent-dourado" />
             {nomeDe(c)}
           </label>
@@ -135,14 +135,14 @@ export function BemVindo() {
     <Pagina chave={chave}>
       {/* Molde Linear (welcome): coluna estreita, passos com ponto dourado no atual, formulário em cartão. */}
       <div className="max-w-2xl">
-      <ol className="mb-6 flex flex-wrap gap-x-5 gap-y-1 text-legenda" aria-label={t("aprender.bemVindo.passos")}>
+      <ol className="mb-6 flex flex-wrap gap-x-5 gap-y-1 text-corpo-p" aria-label={t("aprender.bemVindo.passos")}>
         {(["aprender.bemVindo.passo1", grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube", "aprender.bemVindo.passo3"] as Chave[]).map((k, i) => (
           <li key={k} aria-current={etapa === i + 1 ? "step" : undefined} className={`flex items-center gap-2 ${etapa === i + 1 ? "font-medium text-creme" : "text-nevoa"}`}><span aria-hidden="true" className={`size-1.5 rounded-full ${etapa === i + 1 ? "bg-dourado" : "bg-fumaca"}`} />{i + 1}. {t(k)}</li>
         ))}
       </ol>
-      <h2 ref={titulo} tabIndex={-1} className="mb-5 text-subtitulo font-semibold outline-none">
+      <h2 ref={titulo} tabIndex={-1} className="mb-5 text-titulo-p font-semibold outline-none">
         {t(etapa === 1 ? "aprender.bemVindo.passo1" : etapa === 2 ? (grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube") : "aprender.bemVindo.passo3")}
-        <span className="ml-3 text-legenda font-normal text-nevoa">{t("aprender.bemVindo.passoDe").replace("{n}", String(etapa))}</span>
+        <span className="ml-3 text-corpo-p font-normal text-nevoa">{t("aprender.bemVindo.passoDe").replace("{n}", String(etapa))}</span>
       </h2>
       {aviso ? <div className="mb-4"><Aviso tipo="erro">{t(aviso)}</Aviso></div> : null}
 
@@ -199,8 +199,8 @@ export function BemVindo() {
           {grupo ? (
             aula && aula.inicio_em ? (
               <div className={`${cartao} space-y-3`}>
-                <p className="text-legenda font-medium text-nevoa">{t("aprender.inicio.proximaAula")}</p>
-                <h3 className="text-corpo-g font-semibold">{aula.titulo}</h3>
+                <p className="text-corpo-p font-medium text-nevoa">{t("aprender.inicio.proximaAula")}</p>
+                <h3 className="text-subtitulo font-semibold">{aula.titulo}</h3>
                 <p className="text-base text-bruma"><QuandoAula inicio={aula.inicio_em} /></p>
                 <Agenda aula={{ ...aula, inicio_em: aula.inicio_em }} />
               </div>

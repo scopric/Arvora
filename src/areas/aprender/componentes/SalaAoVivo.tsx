@@ -54,7 +54,7 @@ export function SalaAoVivo({ aulaId, inicio, duracaoMin }: { aulaId: number; ini
     }
   }, [aulaId, inicio, duracaoMin, tentativa])
 
-  if (!sala) return <p role="status" className="text-legenda text-nevoa">{t("comum.carregandoConteudo")}</p>
+  if (!sala) return <p role="status" className="text-corpo-p text-nevoa">{t("comum.carregandoConteudo")}</p>
   if (sala.fase === "semAcesso") return <Bloqueado frase={t("aprender.aulas.bloqueado")} />
   if (sala.fase === "rede") return <Erro aoTentar={() => setTentativa((n) => n + 1)}>{t("aprender.sala.rede")}</Erro>
   if (sala.fase === "indisponivel" || sala.fase === "erro")
@@ -71,7 +71,7 @@ export function SalaAoVivo({ aulaId, inicio, duracaoMin }: { aulaId: number; ini
           {t("aprender.sala.entrar")}
           <span className="sr-only"> ({t("aprender.abreFora")})</span>
         </a>
-        <p className="text-legenda text-nevoa">{t("aprender.sala.abreFora")}</p>
+        <p className="text-corpo-p text-nevoa">{t("aprender.sala.abreFora")}</p>
       </div>
     )
   return <p className={caixaSutil}>{t("aprender.sala.espera")}</p>

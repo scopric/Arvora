@@ -22,10 +22,10 @@ type Sugestao = { id: number; sugerido_id: string; motivo: string; nome: string 
 
 // Molde Mercury (dashboard): saudação, linha de atalhos em pílula, grade de cartões em 2 colunas.
 const cartao = "rounded-xl p-5 shadow-borda"
-const atalho = `inline-flex min-h-9 items-center gap-2 rounded-full border border-grafite px-3 text-legenda font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme ${foco}`
+const atalho = `inline-flex min-h-9 items-center gap-2 rounded-full border border-grafite px-3 text-corpo-p font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme ${foco}`
 const lista = "divide-y divide-grafite"
 const item = "flex flex-col items-start gap-1 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-const meta = "shrink-0 text-legenda text-nevoa tabular-nums"
+const meta = "shrink-0 text-corpo-p text-nevoa tabular-nums"
 
 export function Inicio() {
   const t = useT()
@@ -110,7 +110,7 @@ export function Inicio() {
             {(a) =>
               a && a.inicio_em ? (
                 <div>
-                  <h3 className="text-subtitulo font-semibold">
+                  <h3 className="text-titulo-p font-semibold">
                     <Link to={caminho(`/aulas/${a.slug}`)} className={`rounded-sm underline-offset-4 hover:underline ${foco}`}>{a.titulo}</Link>
                   </h3>
                   <p className="mt-2 text-base text-bruma"><QuandoAula inicio={a.inicio_em} /></p>
@@ -166,11 +166,11 @@ export function Inicio() {
                   {l.map((s) => (
                     <li key={s.id} className="py-3 first:pt-0">
                       <p className="font-medium">{s.nome}</p>
-                      <p className="mt-1 text-legenda text-nevoa">{s.motivo}</p>
+                      <p className="mt-1 text-corpo-p text-nevoa">{s.motivo}</p>
                     </li>
                   ))}
                 </ul>
-                <Link to={caminho("/match")} className={`${linkTexto} mt-2 inline-block text-legenda`}>{t("aprender.inicio.verTodas")} <span aria-hidden="true">→</span></Link>
+                <Link to={caminho("/match")} className={`${linkTexto} mt-2 inline-block text-corpo-p`}>{t("aprender.inicio.verTodas")} <span aria-hidden="true">→</span></Link>
               </div>
             )}
           </Bloco>
@@ -181,7 +181,7 @@ export function Inicio() {
             {(n) =>
               n > 0 ? (
                 <div>
-                  <p className="text-titulo-p font-medium tabular-nums">{n}</p>
+                  <p className="text-titulo font-medium tabular-nums">{n}</p>
                   <p className="mt-1 text-base text-bruma">
                     {t(n === 1 ? "aprender.inicio.pedidoPendente" : "aprender.inicio.pedidosPendentes")} <Link to={caminho("/conexoes")} className={linkTexto}>{t("aprender.inicio.ver")}</Link>
                   </p>
