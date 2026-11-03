@@ -6,6 +6,7 @@ vi.mock("../../../lib/supabase", async () => ({ supabase: (await import("./mockS
 vi.mock("../../../lib/sessao", () => ({ useAuth: () => ({ sessao: { user: { id: "eu" } }, carregando: false }), sair: vi.fn() }))
 
 import { simularDialog } from "../../../testeUtil"
+import { ConsentimentoHof } from "../componentes/ConsentimentoHof"
 import { AulaForm } from "../telas/AulaForm"
 import { Correcao } from "../telas/Correcao"
 import { Empresas } from "../telas/Empresas"
@@ -13,6 +14,7 @@ import { Equipe } from "../telas/Equipe"
 import { Membros } from "../telas/Membros"
 import { Moderacao } from "../telas/Moderacao"
 import { PedidosDeDados } from "../telas/PedidosDeDados"
+import { Premiado } from "../telas/Premiado"
 import { RelatorioCiclo } from "../telas/RelatorioCiclo"
 import { Temas } from "../telas/Temas"
 import { VisaoGeral } from "../telas/VisaoGeral"
@@ -442,5 +444,85 @@ describe("Equipe", () => {
     await userEvent.click(within(document.querySelector("dialog[open]") as HTMLElement).getByRole("button", { name: "Trocar papel", hidden: true }))
     await waitFor(() => expect(chamou("equipe", "update")).toHaveLength(1))
     expect(chamou("equipe", "update")[0].args[0]).toEqual({ papel: "auditor" })
+  })
+})
+
+describe("Checkup (g): URL, confirmações e recusa GDPR", () => {
+  it("URL que não é https absoluta é barrada no campo sem chamar o banco; https grava em redes", async () => {
+    estado.respostas["edicoes"] = { data: [{ id: 1, nome: "Edição 2026" }], error: null }
+    estado.respostas["categorias_premio"] = { data: [{ id: 2, nome: "Inovação", edicao_id: 1 }], error: null }
+    estado.respostas["premiados:insert"] = { data: [{ id: 10 }], error: null }
+    montar(<Premiado />, "/premiados/:id", "/pt/admin/premiados/novo")
+    await userEvent.selectOptions(await screen.findByLabelText(/^Edição/), "1")
+    await userEvent.selectOptions(screen.getByLabelText(/^Categoria/), "2")
+    await userEvent.type(screen.getByLabelText(/^Nome/), "Ana Exemplo")
+    await userEvent.type(screen.getByLabelText("Link da matéria"), "javascript:alert(1)")
+    await userEvent.type(screen.getByLabelText("LinkedIn (link)"), "nao-e-url")
+    await userEvent.type(screen.getByLabelText("Site"), "http://exemplo.invalid")
+    await userEvent.click(screen.getByRole("button", { name: "Salvar" }))
+    expect(await screen.findAllByText("Digite um endereço completo começando com https://.")).toHaveLength(3)
+    expect(chamou("premiados", "insert")).toHaveLength(0)
+    for (const r of ["Link da matéria", "LinkedIn (link)", "Site"]) await userEvent.clear(screen.getByLabelText(r))
+    await userEvent.type(screen.getByLabelText("LinkedIn (link)"), "https://exemplo.invalid/in/ana")
+    await userEvent.click(screen.getByRole("button", { name: "Salvar" }))
+    await waitFor(() => expect(chamou("premiados", "insert")).toHaveLength(1))
+    expect(chamou("premiados", "insert")[0].args[0]).toMatchObject({ materia_url: null, redes: { linkedin: "https://exemplo.invalid/in/ana" } })
+  })
+
+  it("Equipe: adicionar pede confirmação com nome e papel; cancelar não grava", async () => {
+    estado.respostas["equipe:select"] = { data: [], error: null }
+    estado.respostas["equipe:insert"] = { data: [{ perfil_id: "p3" }], error: null }
+    estado.respostas["perfis"] = { data: [{ id: "p3", nome: "Caio Novo" }], error: null }
+    montar(<Equipe />, "/equipe", "/pt/admin/equipe")
+    await userEvent.type(await screen.findByLabelText("Nome do perfil"), "Caio")
+    await userEvent.selectOptions(screen.getByLabelText("Papel"), "super_admin")
+    await userEvent.click(screen.getByRole("button", { name: "Procurar" }))
+    await userEvent.click(await screen.findByRole("button", { name: "Adicionar: Caio Novo" }))
+    const dialogo = document.querySelector("dialog[open]") as HTMLElement
+    expect(dialogo.textContent).toContain("Caio Novo: Super administrador")
+    expect(chamou("equipe", "insert")).toHaveLength(0)
+    await userEvent.click(within(dialogo).getByRole("button", { name: "Cancelar", hidden: true }))
+    expect(chamou("equipe", "insert")).toHaveLength(0)
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar: Caio Novo" }))
+    await userEvent.click(within(document.querySelector("dialog[open]") as HTMLElement).getByRole("button", { name: "Adicionar", hidden: true }))
+    await waitFor(() => expect(chamou("equipe", "insert")).toHaveLength(1))
+    expect(chamou("equipe", "insert")[0].args[0]).toEqual({ perfil_id: "p3", papel: "super_admin" })
+  })
+
+  it("Consentimento: revogar pede confirmação (perigo) avisando da despublicação; cancelar não grava", async () => {
+    estado.respostas["documentos_legais"] = { data: [{ id: 1, versao: "1", idioma: "pt", vigente_desde: "2026-01-01" }], error: null }
+    estado.respostas["consentimentos:select"] = { data: [{ id: 7, documento_id: 1, titular_email: "t@exemplo.invalid", titular_nome: null, aceito_em: "2026-10-01T10:00:00Z", revogado_em: null }], error: null }
+    estado.respostas["consentimentos:update"] = { data: [{ id: 7 }], error: null }
+    const aoMudar = vi.fn()
+    montar(<ConsentimentoHof id={7} aoRegistrar={async () => {}} aoMudar={aoMudar} />, "/premiados/:id", "/pt/admin/premiados/5")
+    await userEvent.click(await screen.findByRole("button", { name: "Revogar" }))
+    const dialogo = document.querySelector("dialog[open]") as HTMLElement
+    expect(dialogo.textContent).toMatch(/publicação do premiado no Hall of Fame será desfeita/)
+    await userEvent.click(within(dialogo).getByRole("button", { name: "Cancelar", hidden: true }))
+    expect(chamou("consentimentos", "update")).toHaveLength(0)
+    await userEvent.click(screen.getByRole("button", { name: "Revogar" }))
+    await userEvent.click(within(document.querySelector("dialog[open]") as HTMLElement).getByRole("button", { name: "Revogar", hidden: true }))
+    await waitFor(() => expect(chamou("consentimentos", "update")).toHaveLength(1))
+    expect(aoMudar).toHaveBeenCalled()
+  })
+
+  it("Pedidos: recusar sem observação é barrado no campo; recusado não oferece 'Marcar como atendido'", async () => {
+    estado.respostas["pedidos_gdpr:select"] = { data: [{ id: 1, email: "x@exemplo.invalid", tipo: "exclusao", status: "recebido", prazo_em: "2026-11-20", criado_em: "2026-10-20T10:00:00Z", observacao: null }], error: null }
+    estado.respostas["pedidos_gdpr:update"] = { data: [{ id: 1 }], error: null }
+    montar(<PedidosDeDados />, "/pedidos-de-dados", "/pt/admin/pedidos-de-dados")
+    await userEvent.selectOptions(await screen.findByLabelText("Situação"), "recusado")
+    await userEvent.click(screen.getByRole("button", { name: "Salvar" }))
+    expect(screen.getByText(/Escreva o motivo da recusa/)).toBeTruthy()
+    expect(screen.getByLabelText("Observação").getAttribute("aria-invalid")).toBe("true")
+    expect(chamou("pedidos_gdpr", "update")).toHaveLength(0)
+    await userEvent.type(screen.getByLabelText("Observação"), "Titular não confirmou a identidade")
+    await userEvent.click(screen.getByRole("button", { name: "Salvar" }))
+    await waitFor(() => expect(chamou("pedidos_gdpr", "update")).toHaveLength(1))
+    expect(chamou("pedidos_gdpr", "update")[0].args[0]).toEqual({ status: "recusado", observacao: "Titular não confirmou a identidade" })
+    cleanup()
+    estado.respostas["pedidos_gdpr:select"] = { data: [{ id: 2, email: "y@exemplo.invalid", tipo: "exportacao", status: "recusado", prazo_em: "2026-11-20", criado_em: "2026-10-20T10:00:00Z", observacao: "Sem identidade" }], error: null }
+    montar(<PedidosDeDados />, "/pedidos-de-dados", "/pt/admin/pedidos-de-dados")
+    await screen.findByText("y@exemplo.invalid")
+    expect(screen.queryByRole("button", { name: "Marcar como atendido" })).toBeNull()
   })
 })
