@@ -2,13 +2,15 @@ import { useState } from "react"
 import { Link, useParams } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Botao } from "../../../componentes/Botao"
+import { Cartao } from "../../../componentes/Cartao"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone } from "../../../componentes/Icone"
+import { LinkVoltar } from "../../../componentes/LinkVoltar"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT } from "../../../i18n"
 import { linkTextoApp } from "../../../componentes/menuApp"
-import { PaginaApp } from "../../../componentes/PaginaApp"
+import { MolduraApp, PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -49,7 +51,6 @@ export function NetworkPerfil() {
   }, `${liberado}-${param}`)
 
   let corpo
-  let nome: string | undefined
   if (acesso.carregando || (liberado && estado.fase === "carregando")) corpo = <Esqueleto linhas={5} />
   else if (acesso.erro) corpo = <Erro aoTentar={acesso.recarregar}>{t("acesso.erro")}</Erro>
   else if (!liberado) corpo = <Bloqueado minimo="clube" frase={t("rede.network.bloqueadoVisitante")} />
@@ -61,68 +62,89 @@ export function NetworkPerfil() {
     const local = [nomeSetor(setores, perfil.setor_id, idioma), perfil.cidade].filter(Boolean).join(" · ")
     const lista = (tipo: Item["tipo"]) => itens.filter((i) => i.tipo === tipo)
     const bloco = (tipo: Item["tipo"]) => (
-      <section aria-labelledby={`bl-${tipo}`} className="rounded-xl p-5 shadow-borda">
-        <h2 id={`bl-${tipo}`} className="text-corpo-p font-medium text-nevoa">{t(tipo === "procura" ? "rede.networkPerfil.procura" : "rede.networkPerfil.oferece")}</h2>
-        {lista(tipo).length === 0 ? (
-          <p className="mt-3 text-base text-nevoa">{t("rede.networkPerfil.nada")}</p>
-        ) : (
-          <ul className="mt-3 divide-y divide-grafite">
-            {lista(tipo).map((i) => (
-              <li key={i.categoria_id} className="py-2.5 first:pt-0 last:pb-0">
-                <p className="text-base font-medium">{nomeCategoria(categorias, i.categoria_id, idioma)}</p>
-                {i.texto ? <p className="mt-1 text-base text-bruma">{i.texto}</p> : null}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <Cartao>
+        <section aria-labelledby={`bl-${tipo}`}>
+          <h2 id={`bl-${tipo}`} className="text-corpo-p font-semibold text-cinza">{t(tipo === "procura" ? "rede.networkPerfil.procura" : "rede.networkPerfil.oferece")}</h2>
+          {lista(tipo).length === 0 ? (
+            <p className="mt-3 text-corpo text-cinza">{t("rede.networkPerfil.nada")}</p>
+          ) : (
+            <ul className="mt-3 divide-y divide-fumaca">
+              {lista(tipo).map((i) => (
+                <li key={i.categoria_id} className="py-3 first:pt-0 last:pb-0">
+                  <p className="text-corpo font-semibold">{nomeCategoria(categorias, i.categoria_id, idioma)}</p>
+                  {i.texto ? <p className="mt-1 text-corpo text-cinza">{i.texto}</p> : null}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </Cartao>
     )
     const nomeOk = perfil.nome || null
-    nome = nomeOk ?? undefined
+    const redes = perfil.linkedin_url?.startsWith("https://") || perfil.instagram
+    // Molde B150: cabeçalho com avatar 96, nome em Big Shoulders, empresa e setor · cidade, links; ações (Pedir conexão
+    // dourado, Denunciar em Ghost) na lateral direita a partir de 640px. Depois os blocos Sobre, Procura, Oferece e Contato.
     corpo = (
       <div className="space-y-6">
-        <div className="flex items-start gap-3">
-          <Avatar nome={nomeOk} />
-          <div>
-            {perfil.empresa_nome ? <p className="text-base text-bruma">{perfil.empresa_nome}</p> : null}
-            {local ? <p className="text-corpo-p text-nevoa">{local}</p> : null}
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+          <Avatar nome={nomeOk} grande />
+          <div className="min-w-0 flex-1">
+            <h1 className="font-conteudo text-titulo-g font-[500] tracking-normal break-words text-balance uppercase lg:text-conteudo">{nomeOk ?? t("rede.networkPerfil.titulo")}</h1>
+            {perfil.empresa_nome ? <p className="mt-3 text-corpo text-creme">{perfil.empresa_nome}</p> : null}
+            {local ? <p className="text-corpo-p text-cinza">{local}</p> : null}
+            {redes ? (
+              <p className="mt-3 flex flex-wrap gap-4 text-corpo-p">
+                {perfil.linkedin_url?.startsWith("https://") ? <a href={perfil.linkedin_url} rel="noopener noreferrer" className={linkTextoApp}>LinkedIn</a> : null}
+                {perfil.instagram ? <a href={`https://www.instagram.com/${perfil.instagram}`} rel="noopener noreferrer" className={linkTextoApp}>Instagram</a> : null}
+              </p>
+            ) : null}
           </div>
-        </div>
-        {perfil.bio ? <p className="max-w-prose text-base whitespace-pre-wrap">{perfil.bio}</p> : null}
-        {perfil.linkedin_url?.startsWith("https://") || perfil.instagram ? (
-          <p className="flex flex-wrap gap-4 text-corpo-p">
-            {perfil.linkedin_url?.startsWith("https://") ? <a href={perfil.linkedin_url} rel="noopener noreferrer" className={linkTextoApp}>LinkedIn</a> : null}
-            {perfil.instagram ? <a href={`https://www.instagram.com/${perfil.instagram}`} rel="noopener noreferrer" className={linkTextoApp}>Instagram</a> : null}
-          </p>
-        ) : null}
-        <div className="grid gap-4 sm:grid-cols-2">{bloco("procura")}{bloco("oferece")}</div>
-        {meu ? (
-          <p className="text-corpo-p text-nevoa">{t("rede.networkPerfil.seuPerfil")} <Link to={caminho("/perfil")} className={linkTextoApp}>{t("menu.perfil")}</Link></p>
-        ) : (
-          <div className="space-y-4 border-t border-grafite pt-6">
-            <div className="flex flex-wrap items-center gap-3">
+          {meu ? null : (
+            <div className="flex flex-wrap items-center gap-3 sm:w-56 sm:shrink-0 sm:flex-col sm:items-stretch">
               {grupo && perfil.id ? (
                 <AcaoConexao uid={uid} outroId={perfil.id} nome={nomeOk ?? ""} origem="busca" conexao={conexao ?? undefined} aoMudar={recarregar} />
               ) : (
-                <span className="inline-flex items-center gap-2 text-corpo-p text-nevoa"><Icone nome="cadeado" className="size-4 text-cinza" />{t("rede.network.conectarBloqueado")}</span>
+                <span className="inline-flex items-center gap-2 text-corpo-p text-cinza"><Icone nome="cadeado" className="size-4" />{t("rede.network.conectarBloqueado")}</span>
               )}
-              <Botao variante="contorno" onClick={() => setDenunciando(true)} className="sm:w-auto">{t("rede.networkPerfil.denunciar")}</Botao>
+              <Botao pequeno onClick={() => setDenunciando(true)}>{t("rede.networkPerfil.denunciar")}</Botao>
             </div>
-            {!grupo ? <p className="text-corpo-p text-nevoa">{t("rede.network.bloqueadoClube")}</p> : null}
-            {conexao?.status === "aceita" && perfil.id ? (
-              <Contato outroId={perfil.id} />
-            ) : (
-              <p className="text-corpo-p text-nevoa">{t("rede.networkPerfil.contatoDepois")}</p>
-            )}
-          </div>
+          )}
+        </div>
+        {perfil.bio ? (
+          <Cartao>
+            <h2 className="text-corpo-p font-semibold text-cinza">{t("rede.networkPerfil.sobre")}</h2>
+            <p className="mt-3 max-w-prose text-corpo whitespace-pre-wrap">{perfil.bio}</p>
+          </Cartao>
+        ) : null}
+        <div className="grid gap-4 sm:grid-cols-2">{bloco("procura")}{bloco("oferece")}</div>
+        {meu ? (
+          <p className="text-corpo-p text-cinza">{t("rede.networkPerfil.seuPerfil")} <Link to={caminho("/perfil")} className={linkTextoApp}>{t("menu.perfil")}</Link></p>
+        ) : (
+          <Cartao>
+            <h2 className="text-corpo-p font-semibold text-cinza">{t("rede.networkPerfil.contato")}</h2>
+            <div className="mt-3 space-y-3">
+              {!grupo ? <p className="text-corpo text-cinza">{t("rede.network.bloqueadoClube")}</p> : null}
+              {conexao?.status === "aceita" && perfil.id ? <Contato outroId={perfil.id} /> : <p className="text-corpo text-cinza">{t("rede.networkPerfil.contatoDepois")}</p>}
+            </div>
+          </Cartao>
         )}
         {perfil.id ? <DialogoDenuncia alvo={{ perfil_denunciado_id: perfil.id }} aberto={denunciando} aoFechar={() => setDenunciando(false)} /> : null}
       </div>
     )
   }
 
+  // Com perfil carregado o <h1> é o nome, dentro do cabeçalho; nos outros estados a moldura dá o título da rota.
+  if (liberado && estado.fase === "pronto" && estado.dados?.perfil)
+    return (
+      <MolduraApp chave="rede.networkPerfil.titulo">
+        <div className="mx-auto max-w-[720px]">
+          <LinkVoltar para={caminho("/network")} rotulo={t("rede.networkPerfil.voltar")} />
+          {corpo}
+        </div>
+      </MolduraApp>
+    )
   return (
-    <PaginaApp chave="rede.networkPerfil.titulo" titulo={nome} estreita voltar={{ para: caminho("/network"), rotulo: t("rede.networkPerfil.voltar") }}>
+    <PaginaApp chave="rede.networkPerfil.titulo" estreita voltar={{ para: caminho("/network"), rotulo: t("rede.networkPerfil.voltar") }}>
       {corpo}
     </PaginaApp>
   )

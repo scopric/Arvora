@@ -187,4 +187,8 @@ export const redeEn: Record<keyof typeof redePt, string> = {
   "rede.meuAward.vazio": "We could not find an Award linked to your account.",
   "rede.contato.indisponivel": "Contact unavailable: the connection or the access of one of you has changed.",
   "rede.comunidade.postDe": "by",
+  "rede.network.limpar": "Clear",
+  "rede.networkPerfil.sobre": "About",
+  "rede.networkPerfil.contato": "Contact",
+  "rede.match.oculto": "Contact hidden until the connection is accepted",
 }

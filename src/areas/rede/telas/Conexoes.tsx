@@ -20,7 +20,8 @@ import { chaveSlug, COLUNAS_CONEXAO, dia, mudarStatus, ok, useCarga, vitrinesPor
 
 type Dados = { conexoes: Conexao[]; perfis: Map<string, Vitrine> }
 
-// Ações em contorno em toda a lista (molde Linear members): a mesma ação não muda de peso de uma linha para outra.
+// Molde The Org + Attio: linha com avatar, nome, empresa · data e as ações em Ghost à direita (a partir de 640px).
+// A mesma ação não muda de peso de uma linha para outra; nenhum dourado na tela.
 function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: Map<string, Vitrine>; aoMudar: () => void | Promise<void> }) {
   const t = useT()
   const idioma = useIdioma()
@@ -44,44 +45,45 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
     setOcupado(false)
   }
   const recebido = c.destinatario_id === uid
-  const botao = "sm:w-auto"
   return (
-    <li className="p-4">
-      <div className="flex items-start gap-3">
-        <Avatar nome={p?.nome ?? null} />
-        <div className="min-w-0 flex-1">
-          <h2 className="text-base font-medium">
-            {p ? <Link to={caminho(`/network/${chaveSlug(p)}`)} className={linkTextoApp}>{p.nome}</Link> : t("rede.conexoes.membroIndisponivel")}
-          </h2>
-          <p className="text-corpo-p text-nevoa">
-            {p?.empresa_nome ? `${p.empresa_nome} · ` : ""}{dia(c.pedida_em, idioma)}
-            {c.origem === "match" ? ` · ${t("rede.conexoes.viaMatch")}` : ""}
-          </p>
-          {c.mensagem ? <p className="mt-2 rounded-md bg-creme/2 px-3 py-2 text-base whitespace-pre-wrap shadow-borda">{c.mensagem}</p> : null}
+    <li className="p-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <Avatar nome={p?.nome ?? null} />
+          <div className="min-w-0 flex-1">
+            <h2 className="text-corpo font-semibold">
+              {p ? <Link to={caminho(`/network/${chaveSlug(p)}`)} className={`inline-flex items-center pointer-coarse:min-h-11 ${linkTextoApp}`}>{p.nome}</Link> : t("rede.conexoes.membroIndisponivel")}
+            </h2>
+            <p className="text-corpo-p text-cinza">
+              {p?.empresa_nome ? `${p.empresa_nome} · ` : ""}{dia(c.pedida_em, idioma)}
+              {c.origem === "match" ? ` · ${t("rede.conexoes.viaMatch")}` : ""}
+            </p>
+            {c.mensagem ? <p className="mt-3 rounded-lg bg-ardosia px-4 py-3 text-corpo whitespace-pre-wrap shadow-borda">{c.mensagem}</p> : null}
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 pl-13 sm:shrink-0 sm:pl-0">
+          {c.status === "pendente" && recebido ? (
+            <>
+              <Botao pequeno onClick={() => void agir("aceita")} ocupado={ocupado} disabled={!p}>{t("rede.conexoes.aceitar")}</Botao>
+              <Botao pequeno onClick={() => void agir("recusada")} ocupado={ocupado}>{t("rede.conexoes.recusar")}</Botao>
+            </>
+          ) : null}
+          {c.status === "pendente" && !recebido ? (
+            <>
+              <Selo>{t("rede.conexoes.aguardando")}</Selo>
+              <Botao pequeno onClick={() => void agir("cancelada")} ocupado={ocupado}>{t("rede.conexao.cancelarPedido")}</Botao>
+            </>
+          ) : null}
+          {c.status === "recusada" && !recebido ? <Selo tom="alerta">{t("rede.conexao.naoAceito")}</Selo> : null}
+          {c.status === "aceita" ? (
+            <>
+              <Contato outroId={outroId} pequeno />
+              <Botao pequeno onClick={() => setDesfazendo(true)} ocupado={ocupado}>{t("rede.conexoes.desfazer")}</Botao>
+            </>
+          ) : null}
         </div>
       </div>
-      {erro ? <div className="mt-3"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
-      <div className="mt-3 flex flex-wrap items-center gap-3 sm:pl-13">
-        {c.status === "pendente" && recebido ? (
-          <>
-            <Botao variante="contorno" onClick={() => void agir("aceita")} ocupado={ocupado} disabled={!p} className={botao}>{t("rede.conexoes.aceitar")}</Botao>
-            <Botao variante="contorno" onClick={() => void agir("recusada")} ocupado={ocupado} className={botao}>{t("rede.conexoes.recusar")}</Botao>
-          </>
-        ) : null}
-        {c.status === "pendente" && !recebido ? (
-          <>
-            <Selo>{t("rede.conexoes.aguardando")}</Selo>
-            <Botao variante="contorno" onClick={() => void agir("cancelada")} ocupado={ocupado} className={botao}>{t("rede.conexao.cancelarPedido")}</Botao>
-          </>
-        ) : null}
-        {c.status === "recusada" && !recebido ? <Selo tom="alerta">{t("rede.conexao.naoAceito")}</Selo> : null}
-        {c.status === "aceita" ? (
-          <>
-            <Contato outroId={outroId} />
-            <Botao variante="contorno" onClick={() => setDesfazendo(true)} ocupado={ocupado} className={botao}>{t("rede.conexoes.desfazer")}</Botao>
-          </>
-        ) : null}
-      </div>
+      {erro ? <div className="mt-3 pl-13"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
       <DialogoConfirmar aberto={desfazendo} titulo={t("rede.conexoes.desfazerTitulo")} texto={t("rede.conexoes.desfazerTexto")} confirmar={t("rede.conexoes.desfazer")} perigo aoConfirmar={() => void agir("cancelada")} aoCancelar={() => setDesfazendo(false)} />
     </li>
   )
@@ -118,7 +120,7 @@ export function Conexoes() {
       itens.length === 0 ? (
         <Vazio>{t(vazio)}</Vazio>
       ) : (
-        <ul className="divide-y divide-grafite rounded-xl shadow-borda">{itens.map((c) => <Linha key={c.id} c={c} uid={uid} perfis={perfis} aoMudar={recarregar} />)}</ul>
+        <ul className="divide-y divide-placa rounded-lg vidro-fundo">{itens.map((c) => <Linha key={c.id} c={c} uid={uid} perfis={perfis} aoMudar={recarregar} />)}</ul>
       )
     corpo = (
       <Abas

@@ -186,4 +186,8 @@ export const redePt = {
   "rede.meuAward.vazio": "Não encontramos um Award ligado à sua conta.",
   "rede.contato.indisponivel": "Contato indisponível: a conexão ou o acesso de um dos dois mudou.",
   "rede.comunidade.postDe": "de",
+  "rede.network.limpar": "Limpar",
+  "rede.networkPerfil.sobre": "Sobre",
+  "rede.networkPerfil.contato": "Contato",
+  "rede.match.oculto": "Contato oculto até a conexão ser aceita",
 }
