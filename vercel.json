@@ -2,7 +2,7 @@
   "outputDirectory": "build/client",
   "rewrites": [
     {
-      "source": "/((?!assets/|.*\\.).*)",
+      "source": "/((?:(?:pt|en)(?:/(?:cookies|entrar|cadastro|confirmar|recuperar-senha|redefinir-senha|perfil|admin|inicio|bem-vindo|aulas|academy|tarefas|bem-estar|comunidade|network|match|conexoes|meu-award|notificacoes|configuracoes|planos|checkout|suporte|termos|privacidade|awards|biblioteca|originals|directory|cadastrar-empresa|hall-of-fame|evento)(?:/.*)?)?|entrar|cadastro|confirmar|recuperar-senha|redefinir-senha|perfil)?/?)",
       "destination": "/index.html"
     }
   ],
