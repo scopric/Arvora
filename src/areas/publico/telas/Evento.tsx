@@ -9,12 +9,13 @@ import { useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { dataLonga, diaCurto, horaDublinBrasilia, urlImagem } from "../formatos"
-import { Pagina, SemRegistro, linkPrimario } from "../Pagina"
+import { Pagina, SemRegistro } from "../Pagina"
+import { linkPrimario } from "../../../componentes/botaoEstilo"
 import { useTituloNome } from "../tituloAba"
 import { useConsulta } from "../usarConsulta"
 
 const https = (url: string | null | undefined) => (url && /^https:\/\//i.test(url) && URL.canParse(url) ? url : null)
-const titulo2 = "mb-4 font-titulo text-3xl font-bold uppercase"
+const titulo2 = "mb-4 font-titulo text-3xl font-normal"
 
 // Página da edição (EVE-01/02/03). A fase vem do banco (`fase`, calculada pelas datas da edição): antes, durante ou depois.
 export function Evento() {

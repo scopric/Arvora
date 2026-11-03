@@ -1,6 +1,7 @@
 import { Aviso } from "../../../componentes/Aviso"
 import { useT, useTitulo, type Chave } from "../../../i18n"
-import { Pagina, linkPrimario } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkPrimario } from "../../../componentes/botaoEstilo"
 
 // E-mail de suporte vem de VITE_EMAIL_SUPORTE (o domínio ainda não existe; nunca no código). Sem a variável ou com valor
 // que não parece e-mail, a tela diz que o canal está em definição em vez de esconder o problema.
@@ -56,7 +57,7 @@ export function Suporte({ email = EMAIL }: { email?: string }) {
       <div className="space-y-10">
         {TEMAS.map(({ tema, perguntas }) => (
           <section key={tema} aria-labelledby={tema}>
-            <h2 id={tema} className="mb-3 font-titulo text-3xl font-bold uppercase">
+            <h2 id={tema} className="mb-3 font-titulo text-3xl font-normal">
               {t(tema)}
             </h2>
             <div className="divide-y divide-creme/15 border-y border-creme/15">

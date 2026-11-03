@@ -10,7 +10,8 @@ import { useCaminho, useT, useTitulo, type Chave } from "../../../i18n"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
-import { Pagina, SemRegistro, linkPrimario } from "../Pagina"
+import { Pagina, SemRegistro } from "../Pagina"
+import { linkPrimario } from "../../../componentes/botaoEstilo"
 import { useTituloNome } from "../tituloAba"
 import { useConsulta } from "../usarConsulta"
 
@@ -103,7 +104,7 @@ function Citados({ videoId }: { videoId: number }) {
   if (r.carregando) return null
   return (
     <section aria-labelledby="citados" className="mt-12">
-      <h2 id="citados" className="mb-4 font-titulo text-3xl font-bold uppercase">{t("publico.video.quem")}</h2>
+      <h2 id="citados" className="mb-4 font-titulo text-3xl font-normal">{t("publico.video.quem")}</h2>
       {r.erro ? (
         <Erro aoTentar={r.recarregar} />
       ) : lista.length === 0 ? (

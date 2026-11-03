@@ -15,7 +15,8 @@ import { supabase } from "../../../lib/supabase"
 import { errosPorCampo, type CamposDeErro } from "../../../lib/validacao"
 import { nomeLocalizado } from "../formatos"
 import { criarSlug } from "../slug"
-import { Pagina, linkPrimario } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkPrimario } from "../../../componentes/botaoEstilo"
 import { useConsulta } from "../usarConsulta"
 
 const vazioParaNulo = (v: string) => (v === "" ? null : v)
@@ -99,7 +100,7 @@ export function CadastrarEmpresa() {
       ) : null}
       {lista.length ? (
         <section aria-labelledby="minhas" className="mb-12">
-          <h2 id="minhas" className="mb-3 font-titulo text-3xl font-bold uppercase">{t("publico.cadastrarEmpresa.minhas")}</h2>
+          <h2 id="minhas" className="mb-3 font-titulo text-3xl font-normal">{t("publico.cadastrarEmpresa.minhas")}</h2>
           <ul className="divide-y divide-creme/15 border-y border-creme/15">
             {lista.map((m) => (
               <li key={m.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
