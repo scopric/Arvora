@@ -211,7 +211,7 @@ function BarraAbas({ acesso, caminhoAtual }: { acesso: Acesso; caminhoAtual: str
         {ABAS.map((a) => (
           <Link key={a.rota} to={caminho(destinoArea(a.rota, nivel))} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={item}>
             <Icone nome={a.icone} className="size-5" />
-            {t(a.rotulo)}
+            <span className="max-w-full truncate px-0.5">{t(a.rotulo)}</span>
           </Link>
         ))}
         <button type="button" aria-haspopup="dialog" aria-expanded={mais} onClick={() => setMais(true)} className={item}>
