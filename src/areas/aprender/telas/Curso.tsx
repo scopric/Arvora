@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
-import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone } from "../../../componentes/Icone"
@@ -57,7 +57,7 @@ export function Curso() {
             {aulas.length ? (
               <div className="flex flex-wrap items-center gap-5">
                 {continuar ? (
-                  <Link to={caminho(`/academy/${curso.slug}/${continuar.slug}`)} className={algumBloqueio ? botaoContornoApp : botaoPrimarioApp}>
+                  <Link to={caminho(`/academy/${curso.slug}/${continuar.slug}`)} className={botaoPrimarioApp}>
                     {progresso.has(continuar.id) ? t("aprender.curso.continuar") : t("aprender.curso.comecar")}
                   </Link>
                 ) : null}

@@ -1,6 +1,6 @@
 import { Link } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
-import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone, type NomeIcone } from "../../../componentes/Icone"
@@ -100,8 +100,8 @@ export function Inicio() {
               <li>{t(grupo ? "aprender.inicio.passo2" : "aprender.inicio.passo2Clube")}</li>
               <li>{t("aprender.inicio.passo3")}</li>
             </ol>
-            {/* Um primário por tela: para o Clube o dourado é o do Bloqueado logo abaixo. */}
-            <Link to={caminho("/bem-vindo")} className={`${grupo ? botaoPrimarioApp : botaoContornoApp} mt-5`}>{t("aprender.inicio.comecar")}</Link>
+            {/* Um primário por tela: o CTA do Bloqueado é secundário, então "Começar" é o dourado para todos (Decisão 70). */}
+            <Link to={caminho("/bem-vindo")} className={`${botaoPrimarioApp} mt-5`}>{t("aprender.inicio.comecar")}</Link>
           </section>
         ) : null}
 

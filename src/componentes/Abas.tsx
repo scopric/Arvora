@@ -9,8 +9,8 @@ const publico = {
   aba: "min-h-11 shrink-0 border-b-2 border-transparent px-4 font-semibold opacity-70 transition-colors hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-selected:border-destaque aria-selected:opacity-100",
 }
 
-// App (Linear): abas como pílulas de 32px; a ativa ganha fundo creme/5, texto creme e a barra dourada (menuApp).
-const app = { lista: "flex gap-1 overflow-x-auto p-1 -m-1", aba: abaApp }
+// App (MasterClass "All Lessons / My Notes"): abas em texto com sublinhado dourado de 2px na ativa (menuApp).
+const app = { lista: "flex gap-6 overflow-x-auto border-b border-placa", aba: abaApp }
 
 // Abas no padrão WAI-ARIA: setas esquerda/direita, Home e End movem e ativam; só a aba ativa entra na ordem de tab.
 export function Abas({ abas, rotulo, inicial }: { abas: Aba[]; rotulo: string; inicial?: string }) {

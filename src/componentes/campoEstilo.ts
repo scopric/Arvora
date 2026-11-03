@@ -8,14 +8,15 @@ const publico = {
   ajuda: "mt-2 text-sm text-creme/60",
 }
 
-// App (Linear): rótulo 13px/510 bruma; campo raio 6, fundo creme/2, borda cinza (3,35:1, o mínimo da WCAG 1.4.11),
-// foco só pela borda em bruma, sem anel. O texto digitado fica em 16px (PRD §17.7.3; também evita o zoom do iOS).
+// App (MasterClass, "Search Input"): rótulo 14px/600 creme; campo raio 4, fundo ardósia, borda cinza de 1px
+// (5,4:1), foco = borda creme + anel interno de 1px (o "2px inner ring" do DESIGN.md). Texto digitado em 16px
+// (PRD §17.7.3; também evita o zoom do iOS).
 const app = {
-  rotulo: "mb-1.5 block text-corpo-p font-medium text-bruma",
-  campo: "w-full rounded-md border bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma",
+  rotulo: "mb-2 block text-corpo-p font-semibold text-creme",
+  campo: "w-full rounded-sm border bg-ardosia px-4 py-2.5 text-corpo text-creme placeholder:text-cinza outline-none transition-colors focus-visible:border-creme focus-visible:ring-1 focus-visible:ring-creme focus-visible:ring-inset",
   bordaOk: "border-cinza",
-  erro: "mt-1.5 text-corpo-p text-red-300",
-  ajuda: "mt-1.5 text-corpo-p text-nevoa",
+  erro: "mt-2 text-corpo-p text-red-300",
+  ajuda: "mt-2 text-corpo-p text-cinza",
 }
 
 // Um só lugar decide o visual de campo: Campo/Selecao e AreaTexto/Caixa do admin.

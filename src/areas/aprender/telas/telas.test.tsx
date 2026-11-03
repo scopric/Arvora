@@ -11,7 +11,7 @@ vi.mock("../../../lib/supabase", () => ({
 }))
 vi.mock("../../../lib/sessao", () => ({ useAuth: () => ({ sessao: { user: { id: "u1", email: "a@b.com" } }, carregando: false }), sair: vi.fn() }))
 
-import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 import { AcessoContext, type Nivel } from "../../../lib/acesso"
 import { chamadas, criarFalso, type Resposta } from "../testeSupabase"
 import { Academy } from "./Academy"
@@ -388,7 +388,7 @@ describe("/academy/:curso e /academy/:curso/:aula", () => {
   const respostas = (extra: Record<string, Resposta> = {}) => ({
     "cursos.single": ok(curso), modulos: ok([{ id: 10, titulo: "Módulo 1", ordem: 1 }]), aulas: ok(aulas), progresso_aula: ok([]), ...extra,
   })
-  it("Clube: lista numerada com duração, cadeado nas aulas do Grupo e 'Começar' em contorno", async () => {
+  it("Clube: lista numerada com duração, cadeado nas aulas do Grupo e 'Começar' em dourado", async () => {
     falso.atual = criarFalso(respostas())
     montar("academy/:curso", <Curso />, "/pt/academy/f", "clube")
     const modulo = (await screen.findByRole("heading", { name: "Módulo 1" })).closest("section")!
@@ -400,7 +400,7 @@ describe("/academy/:curso e /academy/:curso/:aula", () => {
     expect(within(itens[1]).getByText(/bloqueado: parte do grupo/i)).toBeTruthy()
     const cta = screen.getByRole("link", { name: "Começar o curso" })
     expect(cta.getAttribute("href")).toBe("/pt/academy/f/a")
-    expect(cta.className).toBe(botaoContornoApp)
+    expect(cta.className).toBe(botaoPrimarioApp)
     expect(screen.getByRole("link", { name: "Academy" }).getAttribute("href")).toBe("/pt/academy")
     expect(await violacoes()).toEqual([])
   })

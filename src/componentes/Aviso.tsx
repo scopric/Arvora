@@ -12,9 +12,9 @@ export function Aviso({ tipo, children }: { tipo: "erro" | "ok"; children: React
       </p>
     )
   }
-  // App (Linear "card subtle"): fundo creme/2 com hairline; a cor fica num ponto, o texto segue em creme.
+  // App (MasterClass): bloco aninhado em ardósia com hairline; a cor fica num ponto, o texto segue em creme.
   return (
-    <p role={role} className="flex items-start gap-3 rounded-md bg-creme/2 px-4 py-3 text-base text-creme shadow-borda">
+    <p role={role} className="flex items-start gap-3 rounded-lg bg-ardosia px-4 py-3 text-corpo text-creme shadow-borda">
       <span aria-hidden="true" className={`mt-2 size-1.5 shrink-0 rounded-full ${tipo === "erro" ? "bg-red-300" : "bg-destaque"}`} />
       <span>{children}</span>
     </p>

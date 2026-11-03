@@ -16,7 +16,7 @@ type Props = {
 }
 
 // Diálogo de confirmação com <dialog> nativo: prende o foco, fecha com Esc e devolve o foco a quem abriu (comportamento do navegador).
-// App (Linear): superfície obsidiana, raio 12, hairline + sombra sutil; o "perigo" é a variante do Botao.
+// App (MasterClass): superfície placa, raio 12, hairline fumaça (sem sombra externa); o "perigo" é a variante do Botao.
 export function DialogoConfirmar({ aberto, titulo, texto, confirmar, perigo, desabilitado, children, aoConfirmar, aoCancelar }: Props) {
   const t = useT()
   const app = useApp()
@@ -39,12 +39,12 @@ export function DialogoConfirmar({ aberto, titulo, texto, confirmar, perigo, des
       }}
       className={
         app
-          ? "m-auto w-[calc(100%-2rem)] max-w-md rounded-xl bg-obsidiana p-6 text-creme shadow-flutuante backdrop:bg-breu/70"
+          ? "m-auto w-[calc(100%-2rem)] max-w-md rounded-xl bg-placa p-6 text-creme shadow-borda-placa backdrop:bg-breu/80"
           : "m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-creme/20 bg-painel p-6 text-creme backdrop:bg-black/60"
       }
     >
       <h2 id={idTitulo} className={app ? "text-subtitulo font-semibold" : "font-titulo text-3xl font-normal"}>{titulo}</h2>
-      {texto ? <p className={app ? "mt-2 text-base text-bruma" : "mt-3 opacity-80"}>{texto}</p> : null}
+      {texto ? <p className={app ? "mt-2 text-corpo text-cinza" : "mt-3 opacity-80"}>{texto}</p> : null}
       {children ? <div className="mt-4">{children}</div> : null}
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Botao variante="contorno" onClick={aoCancelar} className="sm:w-auto">{t("comum.cancelar")}</Botao>
