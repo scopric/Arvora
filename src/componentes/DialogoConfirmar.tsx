@@ -51,7 +51,7 @@ export function DialogoConfirmar({ aberto, titulo, texto, confirmar, perigo, des
         {app ? (
           <Botao variante={perigo ? "perigo" : "primario"} onClick={aoConfirmar} disabled={desabilitado}>{confirmar ?? t("comum.confirmar")}</Botao>
         ) : (
-          <Botao onClick={aoConfirmar} disabled={desabilitado} className={`sm:w-auto ${perigo ? "bg-red-200 text-red-950 hover:bg-red-100" : ""}`}>{confirmar ?? t("comum.confirmar")}</Botao>
+          <Botao variante={perigo ? "perigo" : "primario"} onClick={aoConfirmar} disabled={desabilitado} className="sm:w-auto">{confirmar ?? t("comum.confirmar")}</Botao>
         )}
       </div>
     </dialog>
