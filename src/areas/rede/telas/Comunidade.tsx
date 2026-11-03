@@ -1,5 +1,5 @@
-import { useId, useState, type SubmitEvent } from "react"
-import { Abas } from "../../../componentes/Abas"
+import { useId, useState, type ReactNode, type SubmitEvent } from "react"
+import { Link, useSearchParams } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Botao } from "../../../componentes/Botao"
@@ -9,7 +9,8 @@ import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT, type Chave } from "../../../i18n"
-import { campoApp, useEstiloCampo } from "../../../componentes/campoEstilo"
+import { campoApp } from "../../../componentes/campoEstilo"
+import { Icone } from "../../../componentes/Icone"
 import { focoApp } from "../../../componentes/menuApp"
 import { PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
@@ -22,7 +23,7 @@ const JANELA_EDICAO_MS = 15 * 60_000 // PROVISÓRIO: igual ao banco (editar até
 
 type Tipo = "posts" | "comentarios"
 type Alvo = { tipo: Tipo; id: number }
-type Item = { id: number; autor_id: string | null; corpo: string; oculto_em: string | null; editado_em: string | null; criado_em: string }
+type Item = { id: number; autor_id: string | null; corpo: string; oculto_em: string | null; editado_em: string | null; criado_em: string; comentarios?: { count: number }[] }
 
 async function salvarTexto({ tipo, id }: Alvo, corpo: string) {
   return tipo === "posts"
@@ -36,7 +37,7 @@ async function apagarTexto({ tipo, id }: Alvo) {
 }
 
 // Um post ou comentário: autor, data, "em análise" (oculto pela moderação), editar (15 min), apagar ou denunciar.
-function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item; autor: string | null; uid: string; aoMudar: () => void | Promise<void> }) {
+function Mensagem({ tipo, item, autor, uid, aoMudar, children, conversa }: { tipo: Tipo; item: Item; autor: string | null; uid: string; aoMudar: () => void | Promise<void>; children?: ReactNode; conversa?: ReactNode }) {
   const t = useT()
   const idioma = useIdioma()
   const [editando, setEditando] = useState(false)
@@ -107,12 +108,14 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
         )}
         {erro ? <div className="mt-3"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
         {!editando ? (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {children ? <div className="mr-auto">{children}</div> : null}
             {podeEditar ? <Botao pequeno onClick={() => setEditando(true)} aria-label={`${t("rede.comunidade.editar")} ${quem}`}>{t("rede.comunidade.editar")}</Botao> : null}
             {meu && !item.oculto_em ? <Botao pequeno variante="perigo" onClick={() => setApagando(true)} aria-label={`${t("rede.comunidade.apagar")} ${quem}`}>{t("rede.comunidade.apagar")}</Botao> : null}
             {!meu && item.autor_id ? <Botao pequeno onClick={() => setDenunciando(true)} aria-label={`${t("rede.comunidade.denunciar")} ${quem}`}>{t("rede.comunidade.denunciar")}</Botao> : null}
           </div>
         ) : null}
+        {conversa}
       </div>
       <DialogoConfirmar aberto={apagando} titulo={t("rede.comunidade.apagarTitulo")} texto={t("rede.comunidade.apagarTexto")} confirmar={t("rede.comunidade.apagar")} perigo aoConfirmar={() => void apagar()} aoCancelar={() => setApagando(false)} />
       <DialogoDenuncia alvo={tipo === "posts" ? { post_id: item.id } : { comentario_id: item.id }} aberto={denunciando} aoFechar={() => setDenunciando(false)} />
@@ -120,14 +123,13 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
   )
 }
 
-// Caixa de texto + Publicar (post novo ou comentário).
-// `primario`: a caixa de post novo é o único botão dourado da tela; a de comentário fica em contorno, dentro do post.
-function Caixa({ rotulo, botao, maximo, aoEnviar, primario }: { rotulo: string; botao: string; maximo: number; aoEnviar: (corpo: string) => Promise<boolean>; primario?: boolean }) {
+// Caixa de texto + Publicar (post novo ou comentário). O rótulo fica para o leitor de tela; o placeholder convida a escrever.
+// `primario`: a caixa de post novo é o único botão dourado da tela; a de comentário fica em cinza, dentro do post.
+function Caixa({ rotulo, convite, botao, maximo, aoEnviar, primario, autor }: { rotulo: string; convite: string; botao: string; maximo: number; aoEnviar: (corpo: string) => Promise<boolean>; primario?: boolean; autor?: string | null }) {
   const t = useT()
   const [erro, setErro] = useState(false)
   const [ocupado, setOcupado] = useState(false)
   const id = useId()
-  const campo = useEstiloCampo()
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = e.currentTarget
@@ -140,13 +142,18 @@ function Caixa({ rotulo, botao, maximo, aoEnviar, primario }: { rotulo: string; 
     setErro(!feito)
     if (feito) form.reset()
   }
-  // Molde Threads (composer): a caixa de post novo é um cartão de vidro; a de comentário fica nua, no fim da lista de comentários.
+  // Molde Nextdoor/X: avatar à esquerda e o campo ao lado; Publicar à direita, embaixo.
   return (
-    <form onSubmit={enviar} className={`space-y-3 ${primario ? "rounded-lg p-5 vidro sm:p-6" : ""}`}>
-      <label htmlFor={id} className={campo.rotulo}>{rotulo}</label>
-      <textarea id={id} name="corpo" rows={3} maxLength={maximo} required className={campoApp} />
-      {erro ? <Aviso tipo="erro">{t("rede.comunidade.erroPublicar")}</Aviso> : null}
-      <div className="flex justify-end"><Botao type="submit" variante={primario ? "primario" : "secundario"} ocupado={ocupado} className="sm:w-auto">{botao}</Botao></div>
+    <form onSubmit={enviar} className={primario ? "rounded-lg p-4 vidro sm:p-5" : ""}>
+      <div className="flex items-start gap-3">
+        {primario ? <Avatar nome={autor ?? null} /> : null}
+        <div className="min-w-0 flex-1 space-y-3">
+          <label htmlFor={id} className="sr-only">{rotulo}</label>
+          <textarea id={id} name="corpo" rows={2} maxLength={maximo} required placeholder={convite} className={campoApp} />
+          {erro ? <Aviso tipo="erro">{t("rede.comunidade.erroPublicar")}</Aviso> : null}
+          <div className="flex justify-end"><Botao type="submit" variante={primario ? "primario" : "secundario"} ocupado={ocupado} className="sm:w-auto">{botao}</Botao></div>
+        </div>
+      </div>
     </form>
   )
 }
@@ -168,6 +175,7 @@ function Comentarios({ postId, uid }: { postId: number; uid: string }) {
       ))}
       <Caixa
         rotulo={t("rede.comunidade.comentar")}
+        convite={t("rede.comunidade.comentarConvite")}
         botao={t("rede.comunidade.comentarBotao")}
         maximo={2000}
         aoEnviar={async (corpo) => {
@@ -180,40 +188,48 @@ function Comentarios({ postId, uid }: { postId: number; uid: string }) {
   )
 }
 
+// Post do feed: a conversa abre dentro do cartão, sob o texto (Peerlist), com a contagem no botão (Nextdoor).
 function Post({ item, autor, uid, aoMudar }: { item: Item; autor: string | null; uid: string; aoMudar: () => void }) {
   const t = useT()
   const [aberto, setAberto] = useState(false)
+  const n = item.comentarios?.[0]?.count ?? 0
+  const rotulo = n === 0 ? t("rede.comunidade.comentarBotao") : `${n} ${t(n === 1 ? "rede.comunidade.comentario1" : "rede.comunidade.comentariosN")}`
   return (
-    <li className="space-y-3">
-      <Mensagem tipo="posts" item={item} autor={autor} uid={uid} aoMudar={aoMudar} />
-      {!item.oculto_em ? (
-        <div className="pl-5 sm:pl-6">
-          <Botao pequeno aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
-            {t(aberto ? "rede.comunidade.fecharComentarios" : "rede.comunidade.verComentarios")}
-          </Botao>
-          {aberto ? <div className="mt-4"><Comentarios postId={item.id} uid={uid} /></div> : null}
-        </div>
-      ) : null}
+    <li>
+      <Mensagem tipo="posts" item={item} autor={autor} uid={uid} aoMudar={aoMudar} conversa={aberto ? <div className="mt-4"><Comentarios postId={item.id} uid={uid} /></div> : null}>
+        {!item.oculto_em ? (
+          <button type="button" aria-expanded={aberto} onClick={() => setAberto(!aberto)} className={`inline-flex min-h-10 items-center gap-2 rounded-lg px-2 text-corpo-p font-semibold text-cinza transition-colors pointer-coarse:min-h-11 hover:text-creme aria-expanded:text-creme ${focoApp}`}>
+            <Icone nome="balao" className="size-5" />
+            {rotulo}
+          </button>
+        ) : null}
+      </Mensagem>
     </li>
   )
 }
 
-function Espaco({ espacoId, uid }: { espacoId: number; uid: string }) {
+type EspacoLinha = { id: number; titulo: string; titulo_en: string | null; descricao: string | null; nivel_minimo: string }
+
+function Feed({ espaco, uid }: { espaco: EspacoLinha; uid: string }) {
   const t = useT()
   // ponytail: 50 posts mais recentes, sem "ver mais"; paginar quando o volume pedir.
+  // comentarios(count) respeita o RLS: conta só o que a pessoa pode ler.
   const { estado, recarregar } = useCarga(async () => {
-    const lista = ok(await supabase.from("posts").select("id, autor_id, corpo, oculto_em, editado_em, criado_em").eq("espaco_id", espacoId).order("criado_em", { ascending: false }).limit(50))
-    return { lista, autores: await vitrinesPorId(lista.map((p) => p.autor_id)) }
-  }, espacoId)
+    const lista: Item[] = ok(await supabase.from("posts").select("id, autor_id, corpo, oculto_em, editado_em, criado_em, comentarios(count)").eq("espaco_id", espaco.id).order("criado_em", { ascending: false }).limit(50))
+    return { lista, autores: await vitrinesPorId([uid, ...lista.map((p) => p.autor_id)]) }
+  }, espaco.id)
+  const eu = estado.fase === "pronto" ? (estado.dados.autores.get(uid)?.nome ?? null) : null
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Caixa
         rotulo={t("rede.comunidade.novoPost")}
+        convite={t("rede.comunidade.convite")}
         botao={t("rede.comunidade.publicar")}
         maximo={5000}
         primario
+        autor={eu}
         aoEnviar={async (corpo) => {
-          const { error } = await supabase.from("posts").insert({ espaco_id: espacoId, corpo }).select("id")
+          const { error } = await supabase.from("posts").insert({ espaco_id: espaco.id, corpo }).select("id")
           if (!error) recarregar()
           return !error
         }}
@@ -222,7 +238,7 @@ function Espaco({ espacoId, uid }: { espacoId: number; uid: string }) {
       {estado.fase === "erro" ? <Erro aoTentar={recarregar}>{t("rede.comunidade.erroPosts")}</Erro> : null}
       {estado.fase === "pronto" && estado.dados.lista.length === 0 ? <Vazio>{t("rede.comunidade.vazio")}</Vazio> : null}
       {estado.fase === "pronto" && estado.dados.lista.length > 0 ? (
-        <ul className="space-y-6">
+        <ul className="space-y-4">
           {estado.dados.lista.map((p) => (
             <Post key={p.id} item={p} autor={estado.dados.autores.get(p.autor_id ?? "")?.nome ?? null} uid={uid} aoMudar={recarregar} />
           ))}
@@ -232,15 +248,33 @@ function Espaco({ espacoId, uid }: { espacoId: number; uid: string }) {
   )
 }
 
+function Regras() {
+  const t = useT()
+  // PROVISÓRIO: regras de convivência a validar pelo cliente (PRD COM-02)
+  return (
+    <ul className="list-disc space-y-1 pl-5 text-corpo-p text-cinza">
+      <li>{t("rede.comunidade.regra1")}</li>
+      <li>{t("rede.comunidade.regra2")}</li>
+      <li>{t("rede.comunidade.regra3")}</li>
+      <li>{t("rede.comunidade.regra4")}</li>
+    </ul>
+  )
+}
+
+const GRUPO_BLOQUEADO = "grupo"
+// Um link por espaço: pílula no celular (chips do Nextdoor), item de menu com barra dourada no desktop (menu do Nextdoor).
+const itemEspaco = `relative inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 text-corpo-p font-semibold whitespace-nowrap text-cinza transition-colors pointer-coarse:min-h-11 hover:text-creme aria-[current=page]:bg-fumaca/70 aria-[current=page]:text-creme lg:flex lg:w-full lg:rounded-lg lg:px-3 lg:hover:bg-fumaca/30 lg:aria-[current=page]:bg-fumaca/50 lg:aria-[current=page]:before:absolute lg:aria-[current=page]:before:inset-y-2 lg:aria-[current=page]:before:left-0 lg:aria-[current=page]:before:w-0.5 lg:aria-[current=page]:before:rounded-full lg:aria-[current=page]:before:bg-dourado ${focoApp}`
+
 export function Comunidade() {
   const t = useT()
   const idioma = useIdioma()
   const acesso = useAcesso()
   const { sessao } = useAuth()
+  const [busca] = useSearchParams()
   const uid = sessao?.user.id ?? ""
   const liberado = !acesso.carregando && !acesso.erro && temNivel(acesso.nivel, "clube")
   const { estado, recarregar } = useCarga(
-    async () => (liberado ? ok(await supabase.from("espacos").select("id, titulo, titulo_en, descricao, nivel_minimo").order("ordem")) : []),
+    async () => (liberado ? (ok(await supabase.from("espacos").select("id, titulo, titulo_en, descricao, nivel_minimo").order("ordem")) as EspacoLinha[]) : []),
     `${liberado}-${acesso.nivel}`,
   )
 
@@ -250,27 +284,59 @@ export function Comunidade() {
   else if (!liberado) corpo = <Bloqueado minimo="clube" frase={t("rede.comunidade.bloqueado")} />
   else if (estado.fase === "carregando") corpo = <Esqueleto linhas={4} />
   else if (estado.fase === "erro") corpo = <Erro aoTentar={recarregar}>{t("rede.comunidade.erroEspacos")}</Erro>
+  else if (estado.dados.length === 0) corpo = <Vazio>{t("rede.comunidade.semEspacos")}</Vazio>
   else {
-    const abas = estado.dados.map((e) => ({ chave: String(e.id), rotulo: nomeDe({ nome: e.titulo, nome_en: e.titulo_en }, idioma), conteudo: <Espaco espacoId={e.id} uid={uid} /> }))
-    // O Clube não lê o espaço do Grupo (RLS): a aba bloqueada é fixa, só para mostrar o que o upgrade traz.
-    if (acesso.nivel === "clube" && !estado.dados.some((e) => e.nivel_minimo === "grupo"))
-      abas.push({ chave: "grupo-bloqueado", rotulo: t("rede.comunidade.espacoGrupo"), conteudo: <Bloqueado frase={t("rede.comunidade.bloqueadoGrupo")} /> })
-    corpo = abas.length === 0 ? <Vazio>{t("rede.comunidade.semEspacos")}</Vazio> : <Abas abas={abas} rotulo={t("rede.comunidade.espacos")} />
+    const espacos = estado.dados
+    // O Clube não lê o espaço do Grupo (RLS): o item bloqueado é fixo, só para mostrar o que o upgrade traz.
+    const comCadeado = acesso.nivel === "clube" && !espacos.some((e) => e.nivel_minimo === "grupo")
+    const pedido = busca.get("espaco")
+    const bloqueado = comCadeado && pedido === GRUPO_BLOQUEADO
+    const atual = espacos.find((e) => String(e.id) === pedido) ?? espacos[0]
+    const itens = [
+      ...espacos.map((e) => ({ chave: String(e.id), rotulo: nomeDe({ nome: e.titulo, nome_en: e.titulo_en }, idioma), ativo: !bloqueado && e.id === atual.id, cadeado: false })),
+      ...(comCadeado ? [{ chave: GRUPO_BLOQUEADO, rotulo: t("rede.comunidade.espacoGrupo"), ativo: bloqueado, cadeado: true }] : []),
+    ]
+    const titulo = bloqueado ? t("rede.comunidade.espacoGrupo") : nomeDe({ nome: atual.titulo, nome_en: atual.titulo_en }, idioma)
+    // Molde Nextdoor escuro: espaços à esquerda (chips no celular), feed ao centro, sobre o espaço e regras à direita.
+    corpo = (
+      <div className="grid gap-6 lg:grid-cols-[13rem_minmax(0,1fr)_17rem] lg:items-start lg:gap-8">
+        <nav aria-label={t("rede.comunidade.espacos")} className="lg:sticky lg:top-24">
+          <h2 className="mb-2 hidden px-3 text-corpo-p font-semibold text-cinza lg:block">{t("rede.comunidade.espacos")}</h2>
+          <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 lg:flex-col lg:gap-1 lg:overflow-visible">
+            {itens.map((i) => (
+              <li key={i.chave}>
+                <Link to={`?espaco=${i.chave}`} replace preventScrollReset aria-current={i.ativo ? "page" : undefined} className={itemEspaco}>
+                  <Icone nome={i.cadeado ? "cadeado" : "balao"} className="size-4 shrink-0" />
+                  {i.rotulo}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        {/* No celular, sobre e regras vêm antes do feed (no fim, ficariam atrás de todos os posts). */}
+        <section aria-labelledby="espaco-atual" className="order-last min-w-0 lg:order-none">
+          <h2 id="espaco-atual" className="mb-4 text-subtitulo font-semibold">{titulo}</h2>
+          {bloqueado ? <Bloqueado frase={t("rede.comunidade.bloqueadoGrupo")} /> : <Feed key={atual.id} espaco={atual} uid={uid} />}
+        </section>
+        <aside aria-label={t("rede.comunidade.sobre")} className="space-y-4 lg:sticky lg:top-24">
+          {!bloqueado && atual.descricao ? (
+            <div className="rounded-lg p-5 vidro">
+              <h2 className="text-corpo font-semibold">{t("rede.comunidade.sobreEspaco")}</h2>
+              <p className="mt-2 text-corpo-p text-cinza">{atual.descricao}</p>
+            </div>
+          ) : null}
+          <details className="rounded-lg px-5 py-1 vidro lg:hidden">
+            <summary className={`min-h-11 cursor-pointer rounded-sm py-2.5 text-corpo-p font-semibold text-cinza hover:text-creme ${focoApp}`}>{t("rede.comunidade.regrasTitulo")}</summary>
+            <div className="mb-4"><Regras /></div>
+          </details>
+          <div className="hidden rounded-lg p-5 vidro lg:block">
+            <h2 className="mb-3 text-corpo font-semibold">{t("rede.comunidade.regrasTitulo")}</h2>
+            <Regras />
+          </div>
+        </aside>
+      </div>
+    )
   }
 
-  return (
-    <PaginaApp chave="rede.comunidade.titulo" estreita>
-      <details className="rounded-lg px-4 py-1 vidro-fundo">
-        <summary className={`min-h-10 cursor-pointer rounded-sm py-2 text-corpo-p font-semibold text-cinza pointer-coarse:min-h-11 hover:text-creme ${focoApp}`}>{t("rede.comunidade.regrasTitulo")}</summary>
-        {/* PROVISÓRIO: regras de convivência a validar pelo cliente (PRD COM-02) */}
-        <ul className="mt-1 mb-3 list-disc space-y-1 pl-5 text-corpo text-cinza">
-          <li>{t("rede.comunidade.regra1")}</li>
-          <li>{t("rede.comunidade.regra2")}</li>
-          <li>{t("rede.comunidade.regra3")}</li>
-          <li>{t("rede.comunidade.regra4")}</li>
-        </ul>
-      </details>
-      <div className="mt-8">{corpo}</div>
-    </PaginaApp>
-  )
+  return <PaginaApp chave="rede.comunidade.titulo">{corpo}</PaginaApp>
 }

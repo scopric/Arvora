@@ -55,7 +55,7 @@ describe("Comunidade", () => {
     expect(await screen.findByText("Olá, pessoal")).toBeTruthy()
     expect(screen.getByText("Ana Exemplo")).toBeTruthy()
     expect(screen.queryByText(/curtir|curtida/i)).toBeNull()
-    await userEvent.click(screen.getByRole("tab", { name: "Grupo Árvora" }))
+    await userEvent.click(screen.getByRole("link", { name: "Grupo Árvora" }))
     expect(screen.getByText(/faz parte do Grupo Árvora/)).toBeTruthy()
     await semViolacoes()
   })
@@ -63,7 +63,8 @@ describe("Comunidade", () => {
   it("visitante vê o cadeado e nenhuma leitura de posts", async () => {
     mostra(<Comunidade />, "/pt", { nivel: "visitante" })
     expect(await screen.findByText(/benefício do Clube e do Grupo/)).toBeTruthy()
-    expect(screen.queryByRole("tablist")).toBeNull()
+    expect(screen.queryByRole("navigation", { name: "Espaços da comunidade" })).toBeNull()
+    expect(chamou("posts")).toEqual([])
   })
 
   it("apagar barrado pelo RLS (denúncia aberta) mostra a mensagem, não 'apagado'", async () => {
