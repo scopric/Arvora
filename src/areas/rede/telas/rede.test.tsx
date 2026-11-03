@@ -42,9 +42,9 @@ const chamou = (onde: string) => resp.chamadas.filter((c) => c.onde === onde)
 beforeEach(zerar)
 afterEach(cleanup)
 
-// Abre o menu "⋯" do post (popover nativo) e escolhe a ação.
+// Abre o último menu "⋯" da tela (popover nativo; o do comentário vem depois do post) e escolhe a ação.
 async function escolher(nome: RegExp) {
-  await userEvent.click(await screen.findByRole("button", { name: /^Mais opções/ }))
+  await userEvent.click((await screen.findAllByRole("button", { name: /^Mais opções/ })).at(-1)!)
   await userEvent.click(screen.getByRole("button", { name: nome }))
 }
 
@@ -117,6 +117,17 @@ describe("Comunidade", () => {
     expect(await screen.findByRole("button", { name: "Comentários: 3" })).toBeTruthy()
     expect(screen.getByRole("link", { name: "Geral" }).getAttribute("aria-current")).toBe("page")
     await semViolacoes()
+  })
+
+  it("abrir a conversa atualiza a contagem pela lista carregada; o menu fecha depois da ação", async () => {
+    resp.tabelas.posts = ok([{ ...post, comentarios: [{ count: 0 }] }])
+    resp.tabelas.comentarios = ok([{ id: 5, autor_id: "ana", corpo: "Bem-vinda", oculto_em: null, editado_em: null, criado_em: "2020-01-01T11:00:00Z" }])
+    mostra(<Comunidade />)
+    await userEvent.click(await screen.findByRole("button", { name: "Comentários: 0" }))
+    expect(await screen.findByRole("button", { name: "Comentários: 1" })).toBeTruthy()
+    await escolher(/^Denunciar/)
+    expect(screen.queryByRole("button", { name: /^Denunciar/ })).toBeNull()
+    expect(document.querySelector("dialog[open]")).toBeTruthy()
   })
 
   it("?espaco=grupo leva quem é Grupo ao espaço do Grupo, não ao cadeado", async () => {

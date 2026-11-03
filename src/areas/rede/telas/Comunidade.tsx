@@ -1,4 +1,4 @@
-import { useId, useState, type CSSProperties, type MouseEvent, type ReactNode, type SubmitEvent } from "react"
+import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode, type Ref, type SubmitEvent } from "react"
 import { Link, useSearchParams } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Bloqueado } from "../../../componentes/Bloqueado"
@@ -41,6 +41,19 @@ function Mensagem({ tipo, item, autor, uid, aoMudar, children, conversa }: { tip
   const t = useT()
   const idioma = useIdioma()
   const [editando, setEditando] = useState(false)
+  const menu = useRef<HTMLButtonElement>(null)
+  const saiuDaEdicao = useRef(false)
+  // Ao sair da edição (salvar ou cancelar), o foco volta ao "⋯" em vez de cair no <body>.
+  useEffect(() => {
+    if (!editando && saiuDaEdicao.current) {
+      saiuDaEdicao.current = false
+      menu.current?.focus()
+    }
+  }, [editando])
+  const sairDaEdicao = () => {
+    saiuDaEdicao.current = true
+    setEditando(false)
+  }
   const [apagando, setApagando] = useState(false)
   const [denunciando, setDenunciando] = useState(false)
   const [erro, setErro] = useState<Chave | null>(null)
@@ -62,7 +75,7 @@ function Mensagem({ tipo, item, autor, uid, aoMudar, children, conversa }: { tip
       setOcupado(false)
       return setErro(error ? "rede.comunidade.erroSalvar" : "rede.comunidade.prazoEdicao")
     }
-    setEditando(false)
+    sairDaEdicao()
     await aoMudar()
     setOcupado(false)
   }
@@ -98,16 +111,16 @@ function Mensagem({ tipo, item, autor, uid, aoMudar, children, conversa }: { tip
             {item.editado_em ? <span> · {t("rede.comunidade.editado")}</span> : null}
           </p>
         </div>
-        {!editando && acoes.length > 0 ? <MenuAcoes rotulo={`${t("rede.comunidade.acoes")} ${quem}`} acoes={acoes} /> : null}
+        {acoes.length > 0 ? <div hidden={editando} className="contents"><MenuAcoes ref={menu} rotulo={`${t("rede.comunidade.acoes")} ${quem}`} acoes={acoes} /></div> : null}
       </header>
       <div className="sm:pl-13">
         {editando ? (
           <form onSubmit={salvar} className="mt-3 space-y-3">
             <label htmlFor={`ed-${tipo}-${item.id}`} className="sr-only">{t("rede.comunidade.editar")}</label>
-            <textarea id={`ed-${tipo}-${item.id}`} name="corpo" defaultValue={item.corpo} rows={3} maxLength={tipo === "posts" ? 5000 : 2000} required className={campoApp} />
+            <textarea id={`ed-${tipo}-${item.id}`} name="corpo" defaultValue={item.corpo} rows={3} autoFocus maxLength={tipo === "posts" ? 5000 : 2000} required className={campoApp} />
             <div className="flex gap-3">
               <Botao type="submit" variante="secundario" ocupado={ocupado} className="sm:w-auto">{t("rede.comunidade.salvar")}</Botao>
-              <Botao type="button" variante="contorno" onClick={() => setEditando(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>
+              <Botao type="button" variante="contorno" onClick={sairDaEdicao} className="sm:w-auto">{t("comum.cancelar")}</Botao>
             </div>
           </form>
         ) : (
@@ -124,8 +137,8 @@ function Mensagem({ tipo, item, autor, uid, aoMudar, children, conversa }: { tip
 }
 
 // Menu "⋯" do post (Nextdoor): popover nativo (Esc e clique fora fecham), ancorado no botão por CSS anchor positioning.
-// Sem suporte a âncora, o popover abre no centro da tela (comportamento padrão do navegador), ainda usável.
-function MenuAcoes({ rotulo, acoes }: { rotulo: string; acoes: { rotulo: string; nome: string; perigo: boolean; fazer: () => void }[] }) {
+// Sem `position-area`, o popover abre no centro da tela (comportamento padrão do navegador), ainda usável.
+function MenuAcoes({ ref, rotulo, acoes }: { ref: Ref<HTMLButtonElement>; rotulo: string; acoes: { rotulo: string; nome: string; perigo: boolean; fazer: () => void }[] }) {
   const id = useId()
   const ancora = `--acoes-${id.replace(/[^a-zA-Z0-9]/g, "")}`
   const escolher = (e: MouseEvent<HTMLButtonElement>, fazer: () => void) => {
@@ -134,12 +147,16 @@ function MenuAcoes({ rotulo, acoes }: { rotulo: string; acoes: { rotulo: string;
   }
   return (
     <>
-      <button type="button" popoverTarget={id} aria-label={rotulo} style={{ anchorName: ancora } as CSSProperties} className={`-mt-1 -mr-2 inline-flex size-10 shrink-0 items-center justify-center rounded-full text-cinza transition-colors pointer-coarse:size-11 hover:bg-fumaca/40 hover:text-creme ${focoApp}`}>
+      <button ref={ref} type="button" popoverTarget={id} aria-label={rotulo} style={{ anchorName: ancora } as CSSProperties} className={`-mt-1 -mr-2 inline-flex size-10 shrink-0 items-center justify-center rounded-full text-cinza transition-colors pointer-coarse:size-11 hover:bg-fumaca/40 hover:text-creme ${focoApp}`}>
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-current"><circle cx="5" cy="12" r="1.75" /><circle cx="12" cy="12" r="1.75" /><circle cx="19" cy="12" r="1.75" /></svg>
       </button>
-      <div id={id} popover="auto" style={{ positionAnchor: ancora } as CSSProperties} className="m-0 min-w-44 rounded-lg p-1 text-creme vidro-flutuante [inset:auto] [position-area:bottom_span-left] [position-try-fallbacks:flip-block] supports-[not(anchor-name:--a)]:m-auto supports-[not(anchor-name:--a)]:[inset:0]">
+      <div
+        id={id}
+        popover="auto"
+        // Tab para fora do menu fecha (o popover nativo só fecha com Esc e clique fora).
+        onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && e.currentTarget.hidePopover?.()} style={{ positionAnchor: ancora } as CSSProperties} className="m-0 min-w-44 rounded-lg p-1 text-creme vidro-flutuante [inset:auto] [position-area:bottom_span-left] [position-try-fallbacks:flip-block] supports-[not(position-area:bottom)]:m-auto supports-[not(position-area:bottom)]:[inset:0]">
         {acoes.map((a) => (
-          <button key={a.rotulo} type="button" aria-label={a.nome} onClick={(e) => escolher(e, a.fazer)} className={`${linkMenuApp} w-full ${a.perigo ? "text-red-300 hover:text-red-200" : ""}`}>
+          <button key={a.rotulo} type="button" aria-label={a.nome} onClick={(e) => escolher(e, a.fazer)} className={`${linkMenuApp} w-full ${a.perigo ? "text-red-300! hover:text-red-200!" : ""}`}>
             {a.rotulo}
           </button>
         ))}
@@ -167,22 +184,23 @@ function Caixa({ rotulo, convite, botao, maximo, aoEnviar, primario, autor }: { 
     setErro(!feito)
     if (feito) form.reset()
   }
-  // Molde Nextdoor: avatar, campo em pílula de uma linha que cresce com o texto e o botão ao lado.
+  // Molde Nextdoor: avatar, campo em pílula de uma linha que cresce com o texto e o botão ao lado (embaixo, quando não cabe).
+  // Sem `field-sizing`, o campo começa com duas linhas de altura.
   return (
     <form onSubmit={enviar} className={primario ? "rounded-lg p-3 vidro sm:p-4" : ""}>
-      <div className="flex items-start gap-3">
+      <div className="flex flex-wrap items-start gap-3">
         {primario ? <Avatar nome={autor ?? null} /> : null}
         <label htmlFor={id} className="sr-only">{rotulo}</label>
-        <textarea id={id} name="corpo" rows={1} maxLength={maximo} required placeholder={convite} className={`${campoApp} min-h-12 max-h-60 min-w-0 flex-1 resize-none rounded-3xl! py-3! [field-sizing:content]`} />
-        <Botao type="submit" variante={primario ? "primario" : "secundario"} ocupado={ocupado} className="shrink-0 rounded-full! px-5!">{botao}</Botao>
+        <textarea id={id} name="corpo" rows={1} maxLength={maximo} required placeholder={convite} className={`${campoApp} min-h-12 max-h-60 min-w-0 flex-1 basis-48 resize-none rounded-3xl! py-3! [field-sizing:content] supports-[not(field-sizing:content)]:min-h-24`} />
+        <Botao type="submit" variante={primario ? "primario" : "secundario"} ocupado={ocupado} className="ml-auto shrink-0 rounded-full! px-5!">{botao}</Botao>
       </div>
       {erro ? <div className="mt-3"><Aviso tipo="erro">{t("rede.comunidade.erroPublicar")}</Aviso></div> : null}
     </form>
   )
 }
 
-// `aoMudarPost`: recarrega o feed depois de comentar, editar ou apagar, para a contagem do post acompanhar a conversa.
-function Comentarios({ postId, uid, aoMudarPost }: { postId: number; uid: string; aoMudarPost: () => void }) {
+// `aoContar`: informa ao post quantos comentários a conversa aberta tem (a contagem acompanha comentar e apagar sem reler o feed).
+function Comentarios({ postId, uid, aoContar }: { postId: number; uid: string; aoContar: (n: number) => void }) {
   const t = useT()
   const { estado, recarregar } = useCarga(async () => {
     // ponytail: os 100 mais recentes (desc + limite) e inverte para ler do mais antigo; paginar comentários antigos se algum post passar disso.
@@ -190,12 +208,17 @@ function Comentarios({ postId, uid, aoMudarPost }: { postId: number; uid: string
     const lista = [...recentes].reverse()
     return { lista, autores: await vitrinesPorId(lista.map((c) => c.autor_id)) }
   }, postId)
+  const total = estado.fase === "pronto" ? estado.dados.lista.length : null
+  // ponytail: no limite de 100 a lista não sabe o total; fica a contagem do feed.
+  useEffect(() => {
+    if (total !== null && total < 100) aoContar(total)
+  }, [total, aoContar])
   if (estado.fase === "carregando") return <Esqueleto linhas={2} />
   if (estado.fase === "erro") return <Erro aoTentar={recarregar}>{t("rede.comunidade.erroComentarios")}</Erro>
   return (
     <div className="space-y-4 border-l-2 border-placa pl-4">
       {estado.dados.lista.map((c) => (
-        <Mensagem key={c.id} tipo="comentarios" item={c} autor={estado.dados.autores.get(c.autor_id ?? "")?.nome ?? null} uid={uid} aoMudar={() => (recarregar(), aoMudarPost())} />
+        <Mensagem key={c.id} tipo="comentarios" item={c} autor={estado.dados.autores.get(c.autor_id ?? "")?.nome ?? null} uid={uid} aoMudar={recarregar} />
       ))}
       <Caixa
         rotulo={t("rede.comunidade.comentar")}
@@ -204,10 +227,7 @@ function Comentarios({ postId, uid, aoMudarPost }: { postId: number; uid: string
         maximo={2000}
         aoEnviar={async (corpo) => {
           const { error } = await supabase.from("comentarios").insert({ post_id: postId, corpo }).select("id")
-          if (!error) {
-            recarregar()
-            aoMudarPost()
-          }
+          if (!error) recarregar()
           return !error
         }}
       />
@@ -219,11 +239,12 @@ function Comentarios({ postId, uid, aoMudarPost }: { postId: number; uid: string
 function Post({ item, autor, uid, aoMudar }: { item: Item; autor: string | null; uid: string; aoMudar: () => void }) {
   const t = useT()
   const [aberto, setAberto] = useState(false)
-  const n = item.comentarios?.[0]?.count ?? 0
+  const [contados, setContados] = useState<number | null>(null)
+  const n = contados ?? item.comentarios?.[0]?.count ?? 0
 
   return (
     <li>
-      <Mensagem tipo="posts" item={item} autor={autor} uid={uid} aoMudar={aoMudar} conversa={aberto ? <div className="mt-4"><Comentarios postId={item.id} uid={uid} aoMudarPost={aoMudar} /></div> : null}>
+      <Mensagem tipo="posts" item={item} autor={autor} uid={uid} aoMudar={aoMudar} conversa={aberto ? <div className="mt-4"><Comentarios postId={item.id} uid={uid} aoContar={setContados} /></div> : null}>
         {!item.oculto_em ? (
           // Pílula do Nextdoor: balão + contagem; o nome acessível diz o que é (o número sozinho não diz).
           <button type="button" aria-expanded={aberto} aria-label={`${t("rede.comunidade.comentarios")}: ${n}`} onClick={() => setAberto(!aberto)} className={`inline-flex min-h-10 items-center gap-2 rounded-full bg-fumaca/40 px-3.5 text-corpo-p font-semibold text-cinza tabular-nums transition-colors pointer-coarse:min-h-11 hover:bg-fumaca/70 hover:text-creme aria-expanded:bg-fumaca/70 aria-expanded:text-creme ${focoApp}`}>
