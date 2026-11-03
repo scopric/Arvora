@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router"
+import { Link, Navigate, useParams } from "react-router"
 import { Cartao } from "../../../componentes/Cartao"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
@@ -16,6 +16,30 @@ import { useConsulta } from "../usarConsulta"
 
 const https = (url: string | null | undefined) => (url && /^https:\/\//i.test(url) && URL.canParse(url) ? url : null)
 const titulo2 = "mb-4 font-titulo text-3xl font-normal"
+
+// `/evento` sem slug (item "Evento" do menu do membro): redireciona para a edição atual, lida do banco.
+// Atual = a próxima edição publicada cujo evento ainda não terminou (durante_fim a partir de agora, o que inclui a que
+// está acontecendo); se não houver, a mais recente que já passou. Sem edição publicada, "em breve".
+// ponytail: traz todas as publicadas e escolhe aqui (uma por ano); filtrar no banco se a lista crescer.
+export function EventoAtual() {
+  const t = useT()
+  const caminho = useCaminho()
+  useTitulo("publico.evento.titulo")
+  const r = useConsulta(
+    () =>
+      supabase.from("edicoes_publicas").select("slug,durante_fim").not("publicada_em", "is", null).order("durante_inicio")
+        .then(({ data, error }) => {
+          const lista = (data ?? []).filter((e) => e.slug)
+          const agora = Date.now()
+          return { data: (lista.find((e) => e.durante_fim && Date.parse(e.durante_fim) >= agora) ?? lista.at(-1))?.slug ?? null, error }
+        }),
+    "edicao-atual-evento",
+  )
+  if (r.carregando) return <Pagina titulo={t("publico.evento.titulo")}><Esqueleto linhas={6} /></Pagina>
+  if (r.erro) return <Pagina titulo={t("publico.evento.titulo")}><Erro aoTentar={r.recarregar} /></Pagina>
+  if (!r.dados) return <Pagina titulo={t("publico.evento.titulo")}><p className="text-creme/80">{t("publico.awards.eventoEmBreve")}</p></Pagina>
+  return <Navigate replace to={caminho(`/evento/${r.dados}`)} />
+}
 
 // Página da edição (EVE-01/02/03). A fase vem do banco (`fase`, calculada pelas datas da edição): antes, durante ou depois.
 export function Evento() {

@@ -7,7 +7,7 @@ import { CheckoutCancelado } from "./telas/CheckoutCancelado"
 import { CheckoutSucesso } from "./telas/CheckoutSucesso"
 import { Directory } from "./telas/Directory"
 import { DirectoryEmpresa } from "./telas/DirectoryEmpresa"
-import { Evento } from "./telas/Evento"
+import { Evento, EventoAtual } from "./telas/Evento"
 import { HallOfFame, Premiado } from "./telas/HallOfFame"
 import { Legal } from "./telas/Legal"
 import { Originals } from "./telas/Originals"
@@ -35,6 +35,7 @@ export function rotasPublico() {
       <Route path="cadastrar-empresa" element={<CadastrarEmpresa />} />
       <Route path="hall-of-fame" element={<HallOfFame />} />
       <Route path="hall-of-fame/:edicao/:slug" element={<Premiado />} />
+      <Route path="evento" element={<EventoAtual />} />
       <Route path="evento/:edicao" element={<Evento />} />
     </>
   )
