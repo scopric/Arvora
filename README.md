@@ -7,7 +7,7 @@ Plataforma do Grupo Árvora: cursos, acompanhamento e uma comunidade para empree
 
 ## O que há aqui
 
-- **Site e área de membros** (`src/`): React 19, React Router 8, TypeScript estrito, Tailwind 4, Vite 8. Páginas públicas pré-renderizadas; validação de formulários com Zod.
+- **Site e área de membros** (`src/`): React 19, React Router 8, TypeScript estrito, Tailwind 4, Vite 8. Aplicação de página única (SPA) servida pela Vercel; validação de formulários com Zod.
 - **Banco e autenticação** (`supabase/`): Postgres com Row Level Security, Supabase Auth, migrations incrementais e testes de banco (pgTAP).
 - **Funções de borda** (`supabase/functions/`, Deno): checkout e portal do cliente (Stripe), webhook do Stripe, exclusão de conta.
 - **E-mails de autenticação** (`supabase/templates/`): bilíngues, com a marca.

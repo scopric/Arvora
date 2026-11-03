@@ -14,8 +14,6 @@ export type Item = {
   minimo?: Exclude<Nivel, "visitante">
   // Só para premiado (Meu Award): some para os demais.
   soPremiado?: boolean
-  // Link para página pré-renderizada fora do app (carga nova em vez de <Link>).
-  externo?: boolean
 }
 export type Grupo = { rotulo?: Chave; itens: Item[] }
 
@@ -32,7 +30,7 @@ export const SIDEBAR: Grupo[] = [
   {
     rotulo: "menu.awards",
     itens: [
-      { rotulo: "menu.hallOfFame", rota: "/hall-of-fame", icone: "award", externo: true },
+      { rotulo: "menu.hallOfFame", rota: "/hall-of-fame", icone: "award" },
       { rotulo: "menu.biblioteca", rota: "/biblioteca", icone: "livro" },
       { rotulo: "menu.originals", rota: "/originals", icone: "filme" },
       { rotulo: "menu.directory", rota: "/directory", icone: "predio" },
