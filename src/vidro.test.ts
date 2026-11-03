@@ -69,7 +69,8 @@ describe("contrato do vidro (index.css)", () => {
     const usos = (re: RegExp) => Object.entries(fontes).filter(([, t]) => re.test(t)).map(([a]) => a).sort()
     // Sem prefixo de variante: a utility direto no elemento.
     expect(usos(/(?<![:\w-])vidro-barra\b/)).toEqual(["./componentes/LayoutMembro.tsx"])
-    expect(usos(/(?<![:\w-])vidro-flutuante\b/)).toEqual(["./areas/rede/componentes.tsx", "./componentes/DialogoConfirmar.tsx", "./componentes/LayoutMembro.tsx"])
+    // Comunidade: o menu "⋯" do post (popover na camada de cima; o cartão em volta é `vidro`, sem desfoque próprio).
+    expect(usos(/(?<![:\w-])vidro-flutuante\b/)).toEqual(["./areas/rede/componentes.tsx", "./areas/rede/telas/Comunidade.tsx", "./componentes/DialogoConfirmar.tsx", "./componentes/LayoutMembro.tsx"])
     const layout = fontes["./componentes/LayoutMembro.tsx"]
     expect(layout).toMatch(/before:vidro-barra/)
     // A barra superior (pai do popover) não pode ter backdrop-filter próprio: vira "backdrop root" e o popover não desfoca a página.
