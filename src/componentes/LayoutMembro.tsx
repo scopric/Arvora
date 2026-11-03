@@ -54,25 +54,61 @@ function Trilho({ caminhoAtual, acesso }: { caminhoAtual: string; acesso: Acesso
   const caminho = useCaminho()
   const ativa = areaDe(caminhoAtual)
   return (
-    <nav aria-label={t("menu.membro")} className="app fixed inset-y-3 left-3 z-20 hidden w-16 flex-col items-center gap-1 rounded-xl py-3 vidro-fundo lg:flex">
+    <nav aria-label={t("menu.membro")} className="app fixed inset-y-3 left-3 z-20 hidden w-24 flex-col items-center gap-1 rounded-xl px-2 py-3 vidro-fundo lg:flex">
       <Marca to={caminho("/inicio")} className="mb-2 justify-center [&>span]:sr-only" />
       {AREAS.map((a) => (
-        <Link key={a.rota} to={caminho(destinoArea(a.rota, nivel))} title={t(a.rotulo)} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={itemTrilhoApp}>
+        <Link key={a.rota} to={caminho(destinoArea(a.rota, nivel))} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={itemTrilhoApp}>
           <Icone nome={a.icone} className="size-5" />
-          <span className="sr-only">{t(a.rotulo)}</span>
+          <span className="max-w-full truncate">{t(a.rotulo)}</span>
         </Link>
       ))}
     </nav>
   )
 }
 
-// Seções da área ativa em pílulas segmentadas, com os cadeados do PRD §17.3.5. No celular vai para a 2ª linha da barra.
+// Nome da área no começo da barra: diz onde a pessoa está (em Início a barra não ficava mais vazia). Só no desktop;
+// no celular a tab bar já marca a área.
+function TituloArea({ caminhoAtual }: { caminhoAtual: string }) {
+  const t = useT()
+  const area = areaDe(caminhoAtual)
+  if (!area) return null
+  return <p className="hidden shrink-0 pl-1 text-corpo font-semibold text-creme lg:block">{t(area.rotulo)}</p>
+}
+
+// Seções da área ativa em pílulas segmentadas, com os cadeados do PRD §17.3.5. No celular vai para a 2ª linha da barra
+// e rola de lado: quando não cabe, a borda do lado que tem mais esmaece e a seção ativa rola para a vista.
+const MASCARA: Record<string, string> = {
+  "false-false": "",
+  "false-true": "[mask-image:linear-gradient(to_right,black_80%,transparent)]",
+  "true-false": "[mask-image:linear-gradient(to_left,black_80%,transparent)]",
+  "true-true": "[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]",
+}
 function Secoes({ caminhoAtual, acesso }: { caminhoAtual: string; acesso: Acesso }) {
   const t = useT()
   const area = areaDe(caminhoAtual)
+  const lista = useRef<HTMLElement>(null)
+  const [corte, setCorte] = useState({ esq: false, dir: false })
+  useEffect(() => {
+    const el = lista.current
+    if (!el) return
+    const medir = () => setCorte({ esq: el.scrollLeft > 4, dir: el.scrollWidth - el.clientWidth - el.scrollLeft > 4 })
+    medir()
+    el.querySelector<HTMLElement>("[aria-current=page]")?.scrollIntoView?.({ block: "nearest", inline: "center" })
+    el.addEventListener("scroll", medir, { passive: true })
+    const obs = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(medir)
+    obs?.observe(el)
+    return () => {
+      el.removeEventListener("scroll", medir)
+      obs?.disconnect()
+    }
+  }, [caminhoAtual])
   if (!area?.secoes || !area.itens.length) return null
   return (
-    <nav aria-label={t(area.secoes)} className="flex gap-1 overflow-x-auto rounded-full bg-breu/40 p-1 max-lg:order-last max-lg:basis-full">
+    <nav
+      ref={lista}
+      aria-label={t(area.secoes)}
+      className={`flex gap-1 overflow-x-auto rounded-full bg-breu/40 p-1 [scrollbar-width:none] max-lg:order-last max-lg:basis-full ${MASCARA[`${corte.esq}-${corte.dir}`]}`}
+    >
       {area.itens.map((item) => (
         <LinkItem key={item.rota} item={item} acesso={acesso} classe={pilulaNavApp} />
       ))}
@@ -229,7 +265,7 @@ export function LayoutMembro({ conteudoPublico = false }: { conteudoPublico?: bo
   const caminhoAtual = useLocation().pathname.replace(/^\/[^/]*/, "") || "/"
   return (
     <EscopoApp value>
-      <div className={`flex min-h-dvh flex-col text-creme lg:pl-22 ${conteudoPublico ? "bg-fundo" : "app"}`}>
+      <div className={`flex min-h-dvh flex-col text-creme lg:pl-30 ${conteudoPublico ? "bg-fundo" : "app"}`}>
         <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-40 focus:m-2 focus:rounded-lg focus:bg-creme focus:px-4 focus:py-3 focus:text-breu">{t("menu.pular")}</a>
         <Trilho caminhoAtual={caminhoAtual} acesso={acesso} />
         <header className="app sticky top-0 z-20 px-4 pt-3 lg:px-6">
@@ -237,6 +273,7 @@ export function LayoutMembro({ conteudoPublico = false }: { conteudoPublico?: bo
               popover do avatar (vidro-flutuante, dentro dela) só desfocaria a barra, não a página que rola por baixo. */}
           <div className="relative isolate flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-3 py-2 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-xl before:vidro-barra sm:px-4 lg:min-h-16">
             <Marca to={caminho("/inicio")} className="[&>span]:sr-only lg:hidden" />
+            <TituloArea caminhoAtual={caminhoAtual} />
             <Secoes caminhoAtual={caminhoAtual} acesso={acesso} />
             {/* Centro reservado para a busca global (LEG-04, P1). */}
             <div className="flex-1" />
