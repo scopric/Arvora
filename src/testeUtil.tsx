@@ -13,6 +13,21 @@ export const renderiza = (ui: ReactElement, url = "/pt") =>
   )
 
 // jsdom não implementa showModal/close do <dialog>: simula só o atributo `open` (foco preso e Esc não são testáveis aqui).
+// jsdom esconde [popover] mas não tem showPopover nem popovertarget: abre e fecha pelo estilo, e o clique no botão alterna.
+export function simularPopover() {
+  HTMLElement.prototype.showPopover = function () {
+    this.style.display = "block"
+  }
+  HTMLElement.prototype.hidePopover = function () {
+    this.style.display = ""
+  }
+  document.addEventListener("click", (e) => {
+    const alvo = (e.target as Element).closest?.("[popovertarget]")
+    const p = alvo && document.getElementById(alvo.getAttribute("popovertarget") ?? "")
+    if (p) p.style.display = p.style.display === "block" ? "" : "block"
+  })
+}
+
 export function simularDialog() {
   HTMLDialogElement.prototype.showModal = function () {
     this.setAttribute("open", "")

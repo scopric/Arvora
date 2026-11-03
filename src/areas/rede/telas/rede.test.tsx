@@ -9,7 +9,7 @@ vi.mock("../../../lib/sessao", () => ({ useAuth: () => ({ sessao: { user: { id: 
 
 import { AcessoContext, type Acesso } from "../../../lib/acesso"
 import { EscopoApp } from "../../../componentes/escopo"
-import { renderiza, simularDialog } from "../../../testeUtil"
+import { renderiza, simularDialog, simularPopover } from "../../../testeUtil"
 import { resp, zerar } from "../mockSupabase"
 import { Comunidade } from "./Comunidade"
 import { Conexoes } from "./Conexoes"
@@ -21,6 +21,7 @@ import { MemoryRouter, Route, Routes } from "react-router"
 import { render } from "@testing-library/react"
 
 simularDialog()
+simularPopover()
 
 const base: Acesso = { carregando: false, erro: false, nivel: "grupo", premiado: false, equipe: false, papel: null, recarregar: () => {} }
 const com = (a: Partial<Acesso>, ui: ReactNode) => <AcessoContext value={{ ...base, ...a }}><main>{ui}</main></AcessoContext>
@@ -40,6 +41,12 @@ const chamou = (onde: string) => resp.chamadas.filter((c) => c.onde === onde)
 
 beforeEach(zerar)
 afterEach(cleanup)
+
+// Abre o menu "⋯" do post (popover nativo) e escolhe a ação.
+async function escolher(nome: RegExp) {
+  await userEvent.click(await screen.findByRole("button", { name: /^Mais opções/ }))
+  await userEvent.click(screen.getByRole("button", { name: nome }))
+}
 
 describe("Comunidade", () => {
   const espaco = { id: 1, titulo: "Geral", titulo_en: "General", descricao: null, nivel_minimo: "clube" }
@@ -71,7 +78,7 @@ describe("Comunidade", () => {
     resp.tabelas.posts = ok([{ ...post, autor_id: "eu" }])
     resp.escritas["posts.delete"] = ok([])
     mostra(<Comunidade />)
-    await userEvent.click(await screen.findByRole("button", { name: /^Apagar/ }))
+    await escolher(/^Apagar/)
     const dialogo = document.querySelector<HTMLElement>("dialog[open]")!
     await userEvent.click(within(dialogo).getByRole("button", { name: /^Apagar$/, hidden: true }))
     expect((await screen.findByRole("alert")).textContent).toMatch(/em análise por causa de uma denúncia/)
@@ -81,14 +88,14 @@ describe("Comunidade", () => {
     resp.tabelas.posts = ok([{ ...post, autor_id: "eu", criado_em: new Date().toISOString() }])
     resp.escritas["posts.update"] = ok([])
     mostra(<Comunidade />)
-    await userEvent.click(await screen.findByRole("button", { name: /^Editar/ }))
+    await escolher(/^Editar/)
     await userEvent.click(screen.getByRole("button", { name: "Salvar" }))
     expect((await screen.findByRole("alert")).textContent).toMatch(/prazo de edição/)
   })
 
   it("denunciar envia o post como alvo", async () => {
     mostra(<Comunidade />)
-    await userEvent.click(await screen.findByRole("button", { name: /^Denunciar/ }))
+    await escolher(/^Denunciar/)
     await userEvent.selectOptions(screen.getByLabelText("Motivo", { selector: "select" }), "spam")
     await userEvent.click(screen.getByRole("button", { name: "Enviar denúncia" }))
     await waitFor(() => expect(chamou("denuncias.insert")[0]?.args).toMatchObject({ post_id: 10, motivo: "spam" }))
@@ -97,11 +104,26 @@ describe("Comunidade", () => {
   it("denúncia repetida (23505) diz 'você já denunciou'", async () => {
     resp.escritas["denuncias.insert"] = erro("duplicate", "23505")
     mostra(<Comunidade />)
-    await userEvent.click(await screen.findByRole("button", { name: /^Denunciar/ }))
+    await escolher(/^Denunciar/)
     await userEvent.selectOptions(screen.getByLabelText("Motivo", { selector: "select" }), "spam")
     await userEvent.click(screen.getByRole("button", { name: "Enviar denúncia" }))
     expect(await screen.findByText(/Você já denunciou/)).toBeTruthy()
     expect(screen.queryByRole("button", { name: "Enviar denúncia" })).toBeNull()
+  })
+
+  it("contagem de comentários no botão do post, feed sem violações de acessibilidade", async () => {
+    resp.tabelas.posts = ok([{ ...post, comentarios: [{ count: 3 }] }])
+    mostra(<Comunidade />)
+    expect(await screen.findByRole("button", { name: "Comentários: 3" })).toBeTruthy()
+    expect(screen.getByRole("link", { name: "Geral" }).getAttribute("aria-current")).toBe("page")
+    await semViolacoes()
+  })
+
+  it("?espaco=grupo leva quem é Grupo ao espaço do Grupo, não ao cadeado", async () => {
+    resp.tabelas.espacos = ok([espaco, { id: 2, titulo: "Grupo Árvora", titulo_en: null, descricao: null, nivel_minimo: "grupo" }])
+    mostra(<Comunidade />, "/pt?espaco=grupo", { nivel: "grupo" })
+    expect((await screen.findByRole("link", { name: "Grupo Árvora" })).getAttribute("aria-current")).toBe("page")
+    expect(screen.queryByText(/faz parte do Grupo Árvora/)).toBeNull()
   })
 
   it("falha ao ler posts mostra erro, não lista vazia", async () => {
