@@ -75,7 +75,7 @@ describe("PaginaVideo", () => {
     falso.tabelas.videos = { data: [], error: null }
     ver()
     expect(await screen.findByText("Não encontramos esta página")).toBeTruthy()
-    expect(document.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex")
+    await waitFor(() => expect(document.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex"))
     cleanup()
     falso.tabelas.videos = { data: null, error: { message: "x" } }
     ver()

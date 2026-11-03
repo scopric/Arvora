@@ -64,7 +64,7 @@ describe("Evento", () => {
     montar(<Evento />, "/:lang/evento/:edicao", "/pt/evento/ed-teste")
     await screen.findByText("Indicado Um")
     expect(screen.getByText(/Antes do evento/).textContent).not.toMatch(/,|null|undefined/)
-    expect(document.title).toBe("Edição Teste — Grupo Árvora")
+    await vi.waitFor(() => expect(document.title).toBe("Edição Teste — Grupo Árvora"))
   })
   it("edição inexistente tem tela própria", async () => {
     falso.tabelas.edicoes_publicas = { data: [], error: null }
