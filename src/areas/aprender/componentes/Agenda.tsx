@@ -11,7 +11,7 @@ export function Agenda({ aula }: { aula: AulaAgenda }) {
       <button type="button" onClick={() => baixarIcs(aula, lang)} className={botaoContornoApp}>
         {t("aprender.agenda.ics")}
       </button>
-      <a href={linkGoogleAgenda(aula, lang)} target="_blank" rel="noopener noreferrer" className={linkTexto}>
+      <a href={linkGoogleAgenda(aula, lang)} target="_blank" rel="noopener noreferrer" className={`${linkTexto} pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:items-center`}>
         {t("aprender.agenda.google")}
         <span className="sr-only"> {t("aprender.abreFora")}</span>
       </a>

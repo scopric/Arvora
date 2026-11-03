@@ -301,6 +301,14 @@ describe("/inicio", () => {
     expect(await screen.findByText("Comece por aqui")).toBeTruthy()
     expect(screen.getByRole("link", { name: "Começar" }).getAttribute("href")).toBe("/pt/bem-vindo")
   })
+  it("conta nova com próxima aula: 'Começar' é o dourado e 'Abrir a aula' fica em cinza", async () => {
+    falso.atual = criarFalso(base({ perfis: ok({ onboarding_em: null }) }))
+    montar("inicio", <Inicio />, "/pt/inicio")
+    expect((await screen.findByRole("link", { name: "Começar" })).className).toContain("bg-dourado")
+    const abrir = await screen.findByRole("link", { name: "Abrir a aula" })
+    expect(abrir.className).toContain("bg-fumaca")
+    expect(abrir.className).not.toContain("bg-dourado")
+  })
   it("Clube: próxima aula e sugestões viram prévia bloqueada, sem consultar o Match", async () => {
     falso.atual = criarFalso(base())
     montar("inicio", <Inicio />, "/pt/inicio", "clube")

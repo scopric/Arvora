@@ -9,7 +9,7 @@ import type { Carga } from "../useCarga"
 export function Bloco<T>({ titulo, carga, recarregar, vazio, className = "", children }: { titulo: string; carga: Carga<T>; recarregar: () => void; vazio: string; className?: string; children: (dados: T) => ReactNode }) {
   return (
     <Cartao className={className}>
-      <h2 className="text-corpo font-semibold">{titulo}</h2>
+      <h2 className="text-corpo-p font-semibold text-cinza">{titulo}</h2>
       <div className="mt-4">
         {carga.fase === "carregando" ? <Esqueleto linhas={3} /> : null}
         {carga.fase === "erro" ? <Erro aoTentar={recarregar} /> : null}
