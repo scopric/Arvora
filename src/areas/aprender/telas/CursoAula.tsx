@@ -16,7 +16,7 @@ import { useCarga } from "../useCarga"
 import { foco, linkTexto, miniaturaAula } from "../util"
 
 // Player do curso (ACA-02, ACA-03): vídeo à esquerda, lista de aulas à direita, retoma de onde parou e grava o progresso.
-// Molde MasterClass (lição, telas 93622e8c e 3c27fa73 no cofre): player largo; abaixo, "N. Título" em 24/600 com a
+// Molde MasterClass (lição, telas 93622e8c e 3c27fa73): player largo; abaixo, "N. Título" em 24/600 com a
 // descrição e as ações; painel de vidro à direita com a capa e o nome do curso, a contagem de aulas e a lista com
 // miniatura, duração em pílula e a aula atual marcada (no celular, abaixo do player).
 export function CursoAula() {

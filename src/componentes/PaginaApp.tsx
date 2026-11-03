@@ -2,6 +2,10 @@ import type { ReactNode } from "react"
 import { useT, useTitulo, type Chave } from "../i18n"
 import { LinkVoltar } from "./LinkVoltar"
 
+// Nome de conteúdo em Big Shoulders (Decisão 70): caixa-alta, peso 500 (exceção escrita ao 400/600 da UI), 48 no celular;
+// quem usa acrescenta o tamanho no desktop (`lg:text-conteudo` ou `lg:text-conteudo-g`).
+export const nomeConteudoApp = "font-conteudo text-titulo-g font-[500] tracking-normal break-words text-balance uppercase"
+
 // Moldura das telas do app (Aprender, Rede): <title>, <h1> e largura (1280 do MasterClass). Sem <main>: o layout já
 // tem (id="conteudo"). `voltar` = link acima do título; `rotulo` = eyebrow em cinza; `conteudo` = título em Big
 // Shoulders (só nome de conteúdo: curso, aula, premiado); `meta` = linha em cinza sob o título; `intro` = parágrafo
@@ -26,7 +30,7 @@ export function PaginaApp({ chave, titulo, rotulo, conteudo, meta, intro, voltar
     <>
       {voltar ? <LinkVoltar {...voltar} /> : null}
       {rotulo ? <p className="mb-2 text-corpo-p font-semibold text-cinza">{rotulo}</p> : null}
-      <h1 className={conteudo ? "font-conteudo text-titulo-g font-[500] tracking-normal break-words text-balance uppercase lg:text-conteudo" : "text-titulo-p font-semibold sm:text-titulo"}>
+      <h1 className={conteudo ? `${nomeConteudoApp} lg:text-conteudo` : "text-titulo-p font-semibold sm:text-titulo"}>
         {titulo ?? t(chave)}
       </h1>
       {conteudo && capa ? <span aria-hidden="true" className="mt-4 block h-0.5 w-10 rounded-full bg-dourado" /> : null}

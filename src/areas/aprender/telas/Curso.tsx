@@ -15,7 +15,7 @@ import { useCarga } from "../useCarga"
 import { barraProgresso, linkTexto, miniaturaAula, pilulaDuracao } from "../util"
 
 // Curso: capa, descrição, módulos e aulas com progresso (ACA-01, ACA-03). O nível vale por aula: o Clube vê a amostra
-// (aulas de nível Clube) e o cadeado nas demais. Molde MasterClass (página da classe, tela 20a079e8 no cofre): herói
+// (aulas de nível Clube) e o cadeado nas demais. Molde MasterClass (página da classe, tela 20a079e8): herói
 // com a capa atrás do nome em Big Shoulders, traço dourado, CTA único; aulas numeradas com miniatura, duração em
 // pílula, título e resumo.
 export function Curso() {

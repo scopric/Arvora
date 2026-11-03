@@ -6,7 +6,7 @@ import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { exigirLinha, tabelaSolta, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
-import { caixaSutilAdmin, classeAcao, contagem } from "../lib/estilo"
+import { caixaSutilAdmin, cartaoAdmin, classeAcao, contagem } from "../lib/estilo"
 import { FormularioRegistro, type CampoDef } from "./FormularioRegistro"
 import { AvisoDe, Mostrar } from "./Pagina"
 
@@ -122,7 +122,7 @@ export function CrudTabela(p: CrudProps) {
       </Mostrar>
       <AvisoDe aviso={acao.aviso} />
       {p.podeEditar ? (
-        <div className={p.moldura === false ? caixaSutilAdmin : "rounded-lg p-6 vidro"}>
+        <div className={p.moldura === false ? caixaSutilAdmin : cartaoAdmin}>
           {/* Molde Polar (formulário): título da seção com hairline abaixo; o botão primário fica no fim. */}
           <p className="mb-5 border-b border-fumaca pb-4 text-subtitulo font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
           <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} variante={p.variante} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />

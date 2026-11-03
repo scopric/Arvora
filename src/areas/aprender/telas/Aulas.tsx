@@ -22,7 +22,7 @@ const LIMITE = 120 // PROVISÓRIO: sem paginação no lançamento; 120 aulas cob
 
 // Calendário de aulas (AUL-01, AUL-06): lista por semana, filtro por vertical, .ics e Google Agenda.
 // /bem-estar usa esta mesma tela fixada na vertical `bem-estar` (MEN-01), com o aviso fixo.
-// Molde Luma (lista por data, tela 086033fd no cofre): coluna estreita com a data e um trilho vertical à esquerda;
+// Molde Luma (lista por data, tela 086033fd): coluna estreita com a data e um trilho vertical à esquerda;
 // à direita, cartões de vidro com hora, título, selo e agenda. Filtro de vertical em pílulas de categoria.
 export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
   const t = useT()

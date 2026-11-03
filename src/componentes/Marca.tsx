@@ -1,7 +1,7 @@
 import { Link } from "react-router"
 import { useApp } from "./escopo"
 
-// Símbolo do logo (árvore, recortado de Documentos/Logo no cofre) + nome em caixa alta.
+// Símbolo do logo (árvore, recortado do logo oficial) + nome em caixa alta.
 // App (MasterClass): símbolo de 24px e nome em 16px/600 creme, sem caixa alta nem espaço aberto.
 export function Marca({ to, className = "" }: { to?: string; className?: string }) {
   const app = useApp()

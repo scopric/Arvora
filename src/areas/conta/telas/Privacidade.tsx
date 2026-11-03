@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type SubmitEvent } from "react"
 import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
+import { caixaSutilApp } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
@@ -92,7 +93,7 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
           <fieldset className="grid gap-3 sm:grid-cols-2">
             <legend className="sr-only">{t("conta.privacidade.visib.titulo")}</legend>
             {(["membros", "publico"] as const).map((v) => (
-              <label key={v} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg bg-ardosia px-4 py-3 text-corpo shadow-borda has-checked:shadow-[inset_0_0_0_2px_var(--color-dourado)] has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-dourado">
+              <label key={v} className={`flex min-h-12 cursor-pointer items-center gap-3 text-corpo ${caixaSutilApp} has-checked:shadow-[inset_0_0_0_2px_var(--color-dourado)] has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-dourado`}>
                 <input type="radio" name="visibilidade" value={v} defaultChecked={estado.visibilidade === v} className="size-5 shrink-0 accent-dourado focus-visible:outline-none" />
                 {t(`conta.privacidade.visib.${v}`)}
               </label>

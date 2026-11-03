@@ -1,5 +1,6 @@
 import { useId, type ComponentProps, type ReactNode } from "react"
 import { NavLink } from "react-router"
+import { Cartao } from "../../componentes/Cartao"
 import { linkMenuApp } from "../../componentes/menuApp"
 import { useCaminho, useT, useTitulo, type Chave } from "../../i18n"
 
@@ -45,12 +46,14 @@ export function Secao({ titulo, texto, children }: { titulo: string; texto?: Rea
     <section>
       <h2 className="text-subtitulo font-semibold">{titulo}</h2>
       {texto ? <p className="mt-1 text-corpo text-cinza">{texto}</p> : null}
-      <div className="mt-4 rounded-lg p-6 vidro">{children}</div>
+      <Cartao className="mt-4">{children}</Cartao>
     </section>
   )
 }
 
 // Interruptor (molde Linear): rótulo e ajuda à esquerda, trilho à direita; o dourado é o indicador de "ligado".
+// Trilho com borda cinza (3,6:1 sobre fumaça, 5,3 sobre o vidro) e botão creme; ligado, trilho dourado e botão em breu
+// (8,3:1). A borda e o botão em CanvasText seguem visíveis no modo de cores forçadas.
 // É um <input type="checkbox" role="switch"> de verdade dentro do <label>: nome acessível e teclado vêm de graça.
 // O rótulo fica num <label htmlFor> (é só ele que vira o nome acessível); a ajuda vai por aria-describedby; o trilho é um
 // segundo <label> que envolve só o input, para o clique no trilho também alternar.
@@ -67,7 +70,7 @@ export function Interruptor({ rotulo, ajuda, idAjuda, className = "", ...resto }
         <input id={id} type="checkbox" role="switch" aria-describedby={ajuda ? idDesc : undefined} className="peer sr-only" {...resto} />
         <span
           aria-hidden="true"
-          className="relative h-6 w-11 rounded-full bg-fumaca transition-colors peer-checked:bg-dourado peer-disabled:opacity-50 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-dourado after:absolute after:top-0.5 after:left-0.5 after:size-5 after:rounded-full after:bg-creme after:transition-transform peer-checked:after:translate-x-5"
+          className="relative h-6 w-11 rounded-full border border-cinza bg-fumaca transition-colors peer-checked:border-dourado peer-checked:bg-dourado motion-reduce:transition-none motion-reduce:after:transition-none peer-disabled:opacity-50 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-dourado after:absolute after:top-px after:left-px after:size-5 after:rounded-full after:bg-creme after:transition-[translate,background-color] peer-checked:after:translate-x-5 peer-checked:after:bg-breu forced-colors:after:bg-[CanvasText]! forced-colors:after:[forced-color-adjust:none]"
         />
       </label>
     </div>

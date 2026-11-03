@@ -9,11 +9,11 @@ import { decimalParaCentavos, localParaIso, moeda } from "../lib/formato"
 import type { Plano, Receita } from "../lib/relatorio"
 import { AreaTexto } from "./Campos"
 import { AvisoDe } from "./Pagina"
-import { classeAcao } from "../lib/estilo"
+import { cartaoAdmin, classeAcao } from "../lib/estilo"
 
 const ORIGENS = ["ingresso", "pix", "transferencia", "evento", "outro"] as const
 const TIPOS = ["assinatura", "curso", "produto_digital", "ingresso"] as const
-const caixa = "space-y-4 rounded-lg p-6 vidro"
+const caixa = `space-y-4 ${cartaoAdmin}`
 const grade = "grid gap-5 sm:grid-cols-2"
 
 // Escolhe um membro pelo nome (a equipe não lê e-mail em `perfis`). `valor` é o id do perfil ou "".

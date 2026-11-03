@@ -119,7 +119,7 @@ export function Network() {
               <option value="oferece">{t("rede.network.oferece")}</option>
               <option value="procura">{t("rede.network.procura")}</option>
             </Selecao>
-            {/* Para o Clube o dourado da tela é o do Bloqueado: o botão fica em cinza. */}
+            {/* Para o Clube não há dourado na tela (o CTA do Bloqueado é cinza, Decisão 70): o botão fica em cinza cheio, desabilitado pelo fieldset. */}
             <div className="flex gap-3 border-t border-placa pt-4 sm:col-span-2 lg:col-span-1">
               {cadeado ? null : <Botao type="reset" variante="contorno" className="flex-1">{t("rede.network.limpar")}</Botao>}
               <Botao type="submit" variante={cadeado ? "secundario" : "primario"} className="flex-1">

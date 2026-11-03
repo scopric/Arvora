@@ -2,7 +2,7 @@ import { useState, type SubmitEvent } from "react"
 import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
-import { Cartao } from "../../../componentes/Cartao"
+import { Cartao, cartaoApp } from "../../../componentes/Cartao"
 import { Campo } from "../../../componentes/Campo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
@@ -11,7 +11,7 @@ import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { campoApp, useEstiloCampo } from "../../../componentes/campoEstilo"
 import { linkTextoApp } from "../../../componentes/menuApp"
-import { PaginaApp } from "../../../componentes/PaginaApp"
+import { PaginaApp, nomeConteudoApp } from "../../../componentes/PaginaApp"
 import { useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -78,7 +78,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
               <Selo tom={p.publicado_em ? "destaque" : "neutro"}>{t(p.publicado_em ? "rede.meuAward.publicado" : "rede.meuAward.naoPublicado")}</Selo>
             </div>
             <div>
-              <h3 className="font-conteudo text-titulo-g font-[500] tracking-normal break-words text-balance uppercase lg:text-conteudo-g lg:tracking-[-0.01em]">{p.nome}</h3>
+              <h3 className={`${nomeConteudoApp} lg:text-conteudo-g lg:tracking-[-0.01em]`}>{p.nome}</h3>
               <span aria-hidden="true" className="mt-4 block h-0.5 w-10 rounded-full bg-dourado" />
               <p className="mt-4 inline-flex items-center rounded-full border border-dourado px-3 py-1 text-corpo-p font-semibold text-dourado">{categoria} · {edicao}</p>
             </div>
@@ -111,7 +111,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
       {enviado && !pend ? <Aviso tipo="ok">{t("rede.meuAward.enviado")}</Aviso> : null}
 
       {editando ? (
-        <form onSubmit={pedir} className="space-y-5 rounded-lg p-6 vidro">
+        <form onSubmit={pedir} className={`space-y-5 ${cartaoApp}`}>
           <h2 className="text-subtitulo font-semibold">{t("rede.meuAward.pedirAlteracao")}</h2>
           <p className="text-corpo text-cinza">{t(pend ? "rede.meuAward.substitui" : "rede.meuAward.passaPorAprovacao")}</p>
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}

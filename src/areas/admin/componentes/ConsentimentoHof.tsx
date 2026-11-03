@@ -7,6 +7,7 @@ import { dataHora } from "../lib/formato"
 import { EDITA, usePode } from "../lib/papel"
 import { FormularioRegistro, type CampoDef } from "./FormularioRegistro"
 import { AvisoDe, Mostrar } from "./Pagina"
+import { Cartao } from "../../../componentes/Cartao"
 import { classeAcao } from "../lib/estilo"
 
 // Consentimento do Hall of Fame (HOF-04): data e versão do documento ficam em `consentimentos`. Super_admin e editor registram e revogam
@@ -49,7 +50,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
         ]
         const doc = d.docs.find((x) => x.id === d.atual?.documento_id)
         return (
-          <div className="space-y-4 rounded-lg p-6 vidro">
+          <Cartao className="space-y-4">
             <h3 className="text-corpo font-semibold">{t("admin.consent.titulo")}</h3>
             {d.atual ? (
               <div className="space-y-2 text-corpo-p">
@@ -84,7 +85,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
                 />
               </>
             )}
-          </div>
+          </Cartao>
         )
       }}
     </Mostrar>

@@ -8,6 +8,7 @@ vi.mock("../../../lib/supabase", async () => (await import("../mockSupabase")).m
 vi.mock("../../../lib/sessao", () => ({ useAuth: () => ({ sessao: { user: { id: "eu", email: "eu@exemplo.invalid" } }, carregando: false }), sair: vi.fn() }))
 
 import { AcessoContext, type Acesso } from "../../../lib/acesso"
+import { EscopoApp } from "../../../componentes/escopo"
 import { renderiza, simularDialog } from "../../../testeUtil"
 import { resp, zerar } from "../mockSupabase"
 import { Comunidade } from "./Comunidade"
@@ -24,6 +25,8 @@ simularDialog()
 const base: Acesso = { carregando: false, erro: false, nivel: "grupo", premiado: false, equipe: false, papel: null, recarregar: () => {} }
 const com = (a: Partial<Acesso>, ui: ReactNode) => <AcessoContext value={{ ...base, ...a }}><main>{ui}</main></AcessoContext>
 const mostra = (ui: ReactNode, url = "/pt", a: Partial<Acesso> = {}) => renderiza(com(a, ui), url)
+// No escopo do app (como sob o LayoutMembro): só onde a classe testada existe apenas nesse ramo (Botao `pequeno`).
+const mostraApp = (ui: ReactNode, url = "/pt", a: Partial<Acesso> = {}) => renderiza(<EscopoApp value>{com(a, ui)}</EscopoApp>, url)
 const ok = (data: unknown) => ({ data, error: null })
 const erro = (message: string, code = "P0001") => ({ data: null, error: { message, code } })
 // Vitrine fictícia (sem nome real).
@@ -151,6 +154,37 @@ describe("Network", () => {
     mostra(<Network />)
     expect(await screen.findByText(/Nenhum membro com esses filtros/)).toBeTruthy()
   })
+
+  it("Limpar zera os filtros aplicados, refaz a busca sem filtro e esvazia o campo Cidade", async () => {
+    mostra(<Network />)
+    expect(await screen.findByText("Ana Exemplo")).toBeTruthy()
+    const cidade = screen.getByLabelText<HTMLInputElement>("Cidade")
+    await userEvent.type(cidade, "Cork")
+    await userEvent.selectOptions(screen.getByLabelText("Tipo"), "oferece")
+    await userEvent.click(screen.getByRole("button", { name: "Buscar" }))
+    await waitFor(() => expect(chamou("rpc.buscar_membros").at(-1)?.args).toMatchObject({ filtro_cidade: "Cork", filtro_tipo: "oferece" }))
+    const antes = chamou("rpc.buscar_membros").length
+    await userEvent.click(screen.getByRole("button", { name: "Limpar" }))
+    await waitFor(() => expect(chamou("rpc.buscar_membros").length).toBeGreaterThan(antes))
+    // toEqual ignora chaves undefined: falha se QUALQUER filtro sobrar depois do Limpar.
+    expect(chamou("rpc.buscar_membros").at(-1)?.args).toEqual({ limite: 30, pular: 0 })
+    expect(cidade.value).toBe("")
+    expect(screen.getByLabelText<HTMLSelectElement>("Tipo").value).toBe("")
+  })
+
+  it("setores falhando (membros não): mostra o erro e 'Tentar de novo' recarrega só as listas", async () => {
+    resp.tabelas.setores = erro("x")
+    mostra(<Network />)
+    expect(await screen.findByText("Ana Exemplo")).toBeTruthy()
+    expect((await screen.findByRole("alert")).textContent).toMatch(/não conseguimos carregar/i)
+    expect(screen.queryByRole("option", { name: "Tecnologia" })).toBeNull()
+    const buscas = chamou("rpc.buscar_membros").length
+    resp.tabelas.setores = ok([{ id: 1, nome: "Tecnologia", nome_en: "Technology" }])
+    await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }))
+    expect(await screen.findByRole("option", { name: "Tecnologia" })).toBeTruthy()
+    expect(screen.queryByRole("alert")).toBeNull()
+    expect(chamou("rpc.buscar_membros")).toHaveLength(buscas) // a lista de membros não foi refeita
+  })
 })
 
 function perfilNaRota() {
@@ -269,6 +303,29 @@ describe("Match", () => {
     await semViolacoes()
   })
 
+  it("três sugestões, a 1ª com pedido pendente: só a 1ª livre (Bia) tem o 'Pedir conexão' primário; a outra (Caio) é contorno", async () => {
+    const bia = { ...ana, id: "bia", nome: "Bia Exemplo", slug: "bia-exemplo" }
+    const caio = { ...ana, id: "caio", nome: "Caio Exemplo", slug: "caio-exemplo" }
+    resp.tabelas.consentimentos = ok([{ id: 1, revogado_em: null }])
+    resp.tabelas.sugestoes_match = ok([
+      { id: 1, sugerido_id: "ana", semana: "2026-10-26", motivo: "oferece Contabilidade", pontuacao: 3 },
+      { id: 2, sugerido_id: "bia", semana: "2026-10-26", motivo: "mesma cidade", pontuacao: 2 },
+      { id: 3, sugerido_id: "caio", semana: "2026-10-26", motivo: "mesmo setor", pontuacao: 1 },
+    ])
+    resp.tabelas.perfis_vitrine = ok([ana, bia, caio])
+    resp.tabelas.conexoes = ok([{ id: 1, solicitante_id: "eu", destinatario_id: "ana", status: "pendente", origem: "match", mensagem: null, respondida_em: null, pedida_em: "2026-10-30T10:00:00Z" }])
+    mostra(<Match />)
+    expect(await screen.findByText("Caio Exemplo")).toBeTruthy()
+    const pedir = screen.getAllByRole("button", { name: "Pedir conexão" })
+    expect(pedir).toHaveLength(2)
+    const [daBia, doCaio] = ["Bia Exemplo", "Caio Exemplo"].map((n) => pedir.find((b) => screen.getByText(n).closest("li")!.contains(b))!)
+    // Fora do LayoutMembro o Botao sai no ramo público (bg-destaque); no app é o dourado (bg-dourado).
+    expect(daBia.className).toMatch(/bg-dourado|bg-destaque/)
+    expect(doCaio.className).not.toMatch(/bg-dourado|bg-destaque/)
+    expect(doCaio.classList.contains("border")).toBe(true)
+    expect(within(screen.getByText("Ana Exemplo").closest("li")!).getByText("Pedido enviado")).toBeTruthy()
+  })
+
   it("monta o motivo em EN a partir de motivo_dados", async () => {
     resp.tabelas.consentimentos = ok([{ id: 1, revogado_em: null }])
     resp.tabelas.sugestoes_match = ok([{ id: 1, sugerido_id: "ana", semana: "2026-10-26", motivo: "texto antigo", pontuacao: 3, motivo_dados: { categoria_id: 4, mesma_cidade: true, cidade: "Dublin" } }])
@@ -322,6 +379,19 @@ describe("Conexões", () => {
     mostra(<Conexoes />)
     await userEvent.click(await screen.findByRole("tab", { name: /Enviados/ }))
     expect(screen.getByText(/Pedido não aceito/)).toBeTruthy()
+  })
+
+  it("conexão aceita: 'Ver contato' é botão pequeno (Ghost 40px) ao lado de 'Desfazer'", async () => {
+    resp.tabelas.conexoes = ok([c({ status: "aceita" })])
+    mostraApp(<Conexoes />)
+    await userEvent.click(await screen.findByRole("tab", { name: /Conexões \(1\)/ }))
+    const linha = screen.getByText("Ana Exemplo").closest("li")!
+    const ver = within(linha).getByRole("button", { name: "Ver contato" })
+    const desfazer = within(linha).getByRole("button", { name: "Desfazer conexão" })
+    expect(ver.classList.contains("min-h-10")).toBe(true)
+    expect(ver.className).not.toContain("min-h-12")
+    expect(desfazer.classList.contains("min-h-10")).toBe(true)
+    expect(desfazer.parentElement!.contains(ver)).toBe(true) // mesma fileira de ações
   })
 
   it("Clube vê o cadeado", async () => {

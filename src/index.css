@@ -16,8 +16,7 @@
   --font-titulo: "Newsreader Variable", Georgia, serif;
   --font-corpo: "Schibsted Grotesk Variable", system-ui, sans-serif;
 
-  /* App (membro e admin), estilo-base MasterClass com a paleta Árvora (Decisão 70; fontes em
-     Arvora/Documentos/Refero Styles/redesenho-2026-11-02/masterclass/). Cada superfície do MasterClass virou um tom da
+  /* App (membro e admin), estilo-base MasterClass com a paleta Árvora (Decisão 70; DESIGN.md e tokens colhidos no Refero). Cada superfície do MasterClass virou um tom da
      Árvora com a MESMA luminosidade (L em OKLCH); só a matiz muda (do verde-floresta #112019 até a do creme).
      Contraste WCAG: cinza 7,7 sobre breu · 5,4 sobre placa; creme 18,1 · 12,7; dourado 8,3 sobre breu e breu sobre
      dourado 8,3 (texto sobre dourado é sempre breu: creme dá 2,2). */
@@ -30,14 +29,6 @@
   /* Nome de conteúdo (curso, aula, premiado, nome no perfil): condensada no papel do Sohne Schmal do MasterClass,
      caixa-alta, peso 500, nunca abaixo de 48px nem em UI (Decisão 70). */
   --font-conteudo: "Big Shoulders Display Variable", "Arial Narrow", sans-serif;
-
-  /* PROVISÓRIO: apelidos dos tokens do redesenho Linear (Decisão 55), para o marco 1 não quebrar as telas antes de
-     cada uma ser refeita no seu marco. Saem no fechamento; tokens-antigos.test.ts barra o uso. */
-  --color-obsidiana: var(--color-placa);
-  --color-grafite: var(--color-placa);
-  --color-nevoa: var(--color-cinza);
-  --color-bruma: var(--color-creme);
-  --color-osso: var(--color-creme);
 
   /* Escala do MasterClass com entrelinha e espaço embutidos (nomes só do app; o público não os usa).
      Mínimo de corpo 14 ("Don't" do DESIGN.md); legenda (12) só em selo e contagem; texto corrido em 16 (PRD §17.7.3).
@@ -73,7 +64,6 @@
   /* Elevação só por inset (MasterClass): sem sombra externa. Hairline placa sobre breu/carvão, fumaca sobre placa. */
   --shadow-borda: inset 0 0 0 1px var(--color-placa);
   --shadow-borda-placa: inset 0 0 0 1px var(--color-fumaca);
-  --shadow-flutuante: var(--shadow-borda-placa); /* PROVISÓRIO: apelido, sai no fechamento */
 
   --shadow-brilho: 0 0 20px 5px rgb(157 181 138 / 0.35);
 
@@ -114,13 +104,24 @@
   }
 }
 
-/* Vidro (Decisão 70, desvio consciente do MasterClass, que usa superfícies opacas): só em contêiner (cartão, barra,
-   trilho, popover, diálogo, folha), nunca em texto. Placa a 62% com desfoque, brilho de 1px no topo e hairline creme/7%.
-   Contraste medido contra o ponto mais claro do fundo (#1b3528): cinza 5,0 · creme 12,1. `vidro-fundo` é o vidro
-   mais escuro (carvão a 72%) para barra, trilho, tab bar, painel de filtros e tabela. */
-/* Sem transparência (preferência do sistema) ou sem suporte a backdrop-filter, os painéis ficam opacos. As regras
-   ficam dentro da própria utility (camada utilities): em @layer base perderiam sempre, e não valeriam com variantes. */
+/* Vidro (Decisões 70 e 71, desvio consciente do MasterClass, que usa superfícies opacas): só em contêiner, nunca em
+   texto. `vidro` = placa a 62% (cartão, painel); `vidro-fundo` = carvão a 72% (bloco escuro: tabela, vazio, erro,
+   filtros, trilho, sidebar do admin); brilho de 1px no topo e hairline creme. Contraste no ponto mais claro do fundo
+   (#1b3528): cinza 5,3 e creme 12,5 sobre `vidro`; cinza 6,9 sobre `vidro-fundo`.
+   O desfoque (backdrop-filter) fica só no que fica POR CIMA de conteúdo que rola: `vidro-barra` (barra superior e tab
+   bar, fixas) e `vidro-flutuante` (popover, diálogo, folha). No fluxo, sobre o palco (degradê liso), o desfoque dá os
+   mesmos pixels e custa GPU por elemento, então `vidro` e `vidro-fundo` não desfocam (fechamento, 03/11/2026).
+   Sem transparência (preferência do sistema) todos ficam opacos; sem suporte a backdrop-filter, os que desfocam ficam
+   opacos. As regras moram dentro de cada utility (camada utilities): em @layer base perderiam sempre e não valeriam
+   com variantes. */
 @utility vidro {
+  background-color: color-mix(in oklab, var(--color-placa) 62%, transparent);
+  box-shadow: inset 0 1px 0 0 rgb(244 244 239 / 0.1), inset 0 0 0 1px rgb(244 244 239 / 0.07);
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-placa);
+  }
+}
+@utility vidro-flutuante {
   background-color: color-mix(in oklab, var(--color-placa) 62%, transparent);
   backdrop-filter: blur(20px) saturate(1.15);
   box-shadow: inset 0 1px 0 0 rgb(244 244 239 / 0.1), inset 0 0 0 1px rgb(244 244 239 / 0.07);
@@ -134,6 +135,13 @@
 }
 @utility vidro-fundo {
   background-color: color-mix(in oklab, var(--color-carvao) 72%, transparent);
+  box-shadow: inset 0 1px 0 0 rgb(244 244 239 / 0.08), inset 0 0 0 1px rgb(244 244 239 / 0.06);
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-carvao);
+  }
+}
+@utility vidro-barra {
+  background-color: color-mix(in oklab, var(--color-carvao) 72%, transparent);
   backdrop-filter: blur(20px) saturate(1.15);
   box-shadow: inset 0 1px 0 0 rgb(244 244 239 / 0.08), inset 0 0 0 1px rgb(244 244 239 / 0.06);
   @media (prefers-reduced-transparency: reduce) {
@@ -142,6 +150,25 @@
   }
   @supports not (backdrop-filter: blur(1px)) {
     background-color: var(--color-carvao);
+  }
+}
+
+/* Vidro dentro de vidro não existe (Decisões 70 e 71): o descendente de um contêiner de vidro vira caixa sutil em
+   ardósia, sem desfoque (Erro, Vazio e Tabela dentro de um cartão; miniatura dentro do painel). Fica fora de camada de
+   propósito: declaração sem camada vence as utilities. O `vidro-flutuante` (popover, diálogo) escapa da regra; a
+   variante (`lg:vidro-fundo`, `before:vidro-barra`) conta como ancestral; como descendente, `lg:vidro-fundo` (só em lg). */
+:is(.vidro, .vidro-fundo, .vidro-barra, .vidro-flutuante, [class*=":vidro"]) :is(.vidro, .vidro-fundo) {
+  backdrop-filter: none;
+  background-color: var(--color-ardosia);
+  box-shadow: var(--shadow-borda);
+}
+/* O `lg:vidro-fundo` só é vidro a partir de lg; aninhado, só vira ardósia lá. Por ser fora de camada, a regra também
+   vence ring, shadow e bg do elemento aninhado: não use esses utilitários num vidro que fica dentro de outro. */
+@media (width >= 64rem) {
+  :is(.vidro, .vidro-fundo, .vidro-barra, .vidro-flutuante, [class*=":vidro"]) .lg\:vidro-fundo {
+    backdrop-filter: none;
+    background-color: var(--color-ardosia);
+    box-shadow: var(--shadow-borda);
   }
 }
 

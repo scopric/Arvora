@@ -1,4 +1,5 @@
 import { focoApp, linkTextoApp } from "../../componentes/menuApp"
+import { caixaSutilApp, cartaoApp } from "../../componentes/Cartao"
 import { APP_URL } from "../../site"
 import { supabase } from "../../lib/supabase"
 
@@ -135,8 +136,8 @@ export function linhas<T>(r: { data: T[] | null; error: unknown }): T[] {
 export const foco = focoApp
 export const linkTexto = linkTextoApp
 // Cartão de vidro, caixa sutil e barra de progresso do app (Decisão 70). <progress> nativo pintado: trilho fumaça, valor dourado.
-export const cartao = "rounded-lg p-6 vidro"
-export const caixaSutil = "rounded-lg bg-ardosia px-4 py-3 text-corpo shadow-borda"
+export const cartao = cartaoApp
+export const caixaSutil = `${caixaSutilApp} text-corpo`
 export const barraProgresso =
   "h-1.5 w-40 appearance-none overflow-hidden rounded-full bg-fumaca accent-dourado [&::-moz-progress-bar]:bg-dourado [&::-webkit-progress-bar]:bg-fumaca [&::-webkit-progress-value]:bg-dourado"
 // Miniatura de aula sem imagem (o banco não guarda capa por aula): bloco 16:9 escuro com o número grande; a duração vai em pílula.

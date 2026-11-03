@@ -14,7 +14,7 @@ import { useCarga } from "../useCarga"
 import { dataCurta, linkTexto } from "../util"
 
 // Detalhe da tarefa: instruções, resposta (texto e arquivo), devolutiva da equipe e reenvio quando o status é "ajustar".
-// Molde Linear (detalhe da issue, tela c0d1f40b no cofre): o enunciado ao centro e as propriedades (status, prazo,
+// Molde Linear (detalhe da issue, tela c0d1f40b): o enunciado ao centro e as propriedades (status, prazo,
 // envio, aula) num painel de vidro à direita (no celular, abaixo).
 export function Tarefa() {
   const { id } = useParams()

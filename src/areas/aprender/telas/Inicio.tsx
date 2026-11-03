@@ -22,7 +22,7 @@ type Continua = { percentual: number; aulas: { slug: string; titulo: string; mod
 type Salvo = { id: number; aulas: { slug: string; titulo: string } | null; videos: { slug: string; titulo: string } | null }
 type Sugestao = { id: number; sugerido_id: string; motivo: string; nome: string }
 
-// Início: composição própria sobre três moldes do cofre (não há tela única no Refero que junte saudação, próximos
+// Início: composição própria sobre três moldes do Refero (não há tela única no Refero que junte saudação, próximos
 // eventos e progresso): Mercury c5295ca8 (saudação + atalhos em pílula + grade de cartões com rótulo pequeno em cima e
 // o valor grande embaixo), Partiful 29ecaeb7 (próximo evento em destaque com a data em pílula) e Brilliant f841b4a0
 // ("Jump back in": a aula em andamento como cartão com capa e barra de progresso). Cartões de vidro em 2 colunas.

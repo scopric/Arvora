@@ -3,7 +3,7 @@ import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Botao } from "../../../componentes/Botao"
-import { Cartao } from "../../../componentes/Cartao"
+import { Cartao, caixaSutilApp } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
@@ -29,7 +29,7 @@ function PreviaClube() {
   return (
     <div className="space-y-4">
       {[1, 2].map((n) => (
-        <div key={n} className="rounded-lg p-5 vidro">
+        <div key={n} className="rounded-lg bg-ardosia p-5 shadow-borda">
           <p className="text-corpo font-semibold">{t("rede.match.previaNome")}</p>
           <p className="text-corpo-p text-cinza">{t("rede.match.previaMotivo")}</p>
         </div>
@@ -192,7 +192,7 @@ export function Match() {
                         </>
                       }
                     >
-                      <div className="mt-4 rounded-lg bg-ardosia px-4 py-3 text-corpo-p shadow-borda">
+                      <div className={`mt-4 text-corpo-p ${caixaSutilApp}`}>
                         <p className="font-semibold text-cinza">{t("rede.match.porque")}</p>
                         <p className="mt-1 text-creme">{frase(s)}</p>
                       </div>

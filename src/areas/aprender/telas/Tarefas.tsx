@@ -16,7 +16,7 @@ import { dataCurta } from "../util"
 
 // Minhas tarefas (AUL-04, AUL-09): Pendentes · Enviadas · Aprovadas · Ajustar. Pendente = exercício liberado, ainda sem
 // entrega, em vertical que aceita entregas (Bem-Estar fica de fora até a decisão jurídica).
-// Molde Linear (lista de issues, tela adf9d449 no cofre): abas por status com contagem; linhas compactas de vidro com
+// Molde Linear (lista de issues, tela adf9d449): abas por status com contagem; linhas compactas de vidro com
 // ícone de status, título, "Exercício n", data e selo à direita.
 export function Tarefas() {
   const t = useT()

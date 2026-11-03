@@ -38,7 +38,7 @@ export function Dialogo({ aberto, titulo, aoFechar, children }: { aberto: boolea
         e.preventDefault()
         aoFechar()
       }}
-      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl p-6 text-creme vidro backdrop:bg-breu/70 backdrop:backdrop-blur-sm"
+      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl p-6 text-creme vidro-flutuante backdrop:bg-breu/70 backdrop:backdrop-blur-sm"
     >
       <h2 id={id} className="text-subtitulo font-semibold">{titulo}</h2>
       {aberto ? children : null}

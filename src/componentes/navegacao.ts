@@ -1,5 +1,5 @@
 import type { Chave } from "../i18n"
-import type { Nivel } from "../lib/acesso"
+import { temNivel, type Nivel } from "../lib/acesso"
 import type { NomeIcone } from "./Icone"
 
 // Evento da edição atual. PROVISÓRIO: a edição vem do banco (admin/edicoes); até lá, um slug fixo.
@@ -29,7 +29,7 @@ export const AREAS: Area[] = [
     secoes: "menu.secoesAprender",
     itens: [
       { rotulo: "menu.aulas", rota: "/aulas", icone: "video", minimo: "grupo" },
-      { rotulo: "menu.academy", rota: "/academy", icone: "aprender" },
+      { rotulo: "menu.academy", rota: "/academy", icone: "aprender", minimo: "clube" },
       { rotulo: "menu.bemEstar", rota: "/bem-estar", icone: "folha", minimo: "grupo" },
       { rotulo: "menu.tarefas", rota: "/tarefas", icone: "check", minimo: "grupo" },
     ],
@@ -43,7 +43,7 @@ export const AREAS: Area[] = [
       { rotulo: "menu.network", rota: "/network", icone: "rede", minimo: "clube" },
       { rotulo: "menu.comunidade", rota: "/comunidade", icone: "balao", minimo: "clube" },
       { rotulo: "menu.match", rota: "/match", icone: "faisca", minimo: "grupo" },
-      { rotulo: "menu.conexoes", rota: "/conexoes", icone: "elo" },
+      { rotulo: "menu.conexoes", rota: "/conexoes", icone: "elo", minimo: "grupo" },
     ],
   },
   {
@@ -68,6 +68,17 @@ export function areaDe(caminho: string): Area | undefined {
   return AREAS.find((a) => dentro(caminho, a.rota) || a.itens.some((i) => dentro(caminho, i.rota)) || (a.rota === "/awards" && dentro(caminho, "/evento")))
 }
 
+// Destino do link de uma área (trilho e tab bar) para o nível da pessoa. Só muda quando a seção da própria área está
+// trancada para ela: aí vai para a 1ª seção que ela abre de fato (o Clube entra em Aprender pelo Academy, não numa tela
+// bloqueada). Áreas cuja rota não é seção (Awards → /awards) e nível ainda desconhecido ficam na rota da área; sem
+// nenhuma seção aberta, também (a tela da área mostra o cadeado com a prévia).
+export function destinoArea(rota: string, nivel: Nivel | null): string {
+  const area = AREAS.find((a) => a.rota === rota)
+  const propria = area?.itens.find((i) => i.rota === rota)
+  if (!area || nivel === null || !propria?.minimo || temNivel(nivel, propria.minimo)) return rota
+  return area.itens.find((i) => !i.minimo || temNivel(nivel, i.minimo))?.rota ?? rota
+}
+
 export type Aba = { rotulo: Chave; rota: string; icone: NomeIcone }
 // Bottom tab bar (PRD §17.3.2). "Mais" abre a folha e não está aqui.
 export const ABAS: Aba[] = [
@@ -89,7 +100,7 @@ export const MAIS: Item[] = [
 ]
 export const AVATAR: Item[] = [
   { rotulo: "menu.perfil", rota: "/perfil", icone: "pessoa" },
-  { rotulo: "menu.conexoes", rota: "/conexoes", icone: "elo" },
+  { rotulo: "menu.conexoes", rota: "/conexoes", icone: "elo", minimo: "grupo" },
   { rotulo: "menu.meuAward", rota: "/meu-award", icone: "award", soPremiado: true },
   { rotulo: "menu.notificacoes", rota: "/notificacoes", icone: "sino" },
   { rotulo: "menu.configuracoes", rota: "/configuracoes", icone: "engrenagem" },

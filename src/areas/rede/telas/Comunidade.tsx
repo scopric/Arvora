@@ -109,7 +109,7 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
         {!editando ? (
           <div className="mt-4 flex flex-wrap gap-2">
             {podeEditar ? <Botao pequeno onClick={() => setEditando(true)} aria-label={`${t("rede.comunidade.editar")} ${quem}`}>{t("rede.comunidade.editar")}</Botao> : null}
-            {meu && !item.oculto_em ? <Botao pequeno onClick={() => setApagando(true)} aria-label={`${t("rede.comunidade.apagar")} ${quem}`}>{t("rede.comunidade.apagar")}</Botao> : null}
+            {meu && !item.oculto_em ? <Botao pequeno variante="perigo" onClick={() => setApagando(true)} aria-label={`${t("rede.comunidade.apagar")} ${quem}`}>{t("rede.comunidade.apagar")}</Botao> : null}
             {!meu && item.autor_id ? <Botao pequeno onClick={() => setDenunciando(true)} aria-label={`${t("rede.comunidade.denunciar")} ${quem}`}>{t("rede.comunidade.denunciar")}</Botao> : null}
           </div>
         ) : null}

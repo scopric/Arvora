@@ -10,7 +10,7 @@ import { LinkVoltar } from "../../../componentes/LinkVoltar"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT } from "../../../i18n"
 import { linkTextoApp } from "../../../componentes/menuApp"
-import { MolduraApp, PaginaApp } from "../../../componentes/PaginaApp"
+import { MolduraApp, PaginaApp, nomeConteudoApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -89,7 +89,7 @@ export function NetworkPerfil() {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
           <Avatar nome={nomeOk} grande />
           <div className="min-w-0 flex-1">
-            <h1 className="font-conteudo text-titulo-g font-[500] tracking-normal break-words text-balance uppercase lg:text-conteudo">{nomeOk ?? t("rede.networkPerfil.titulo")}</h1>
+            <h1 className={`${nomeConteudoApp} lg:text-conteudo`}>{nomeOk ?? t("rede.networkPerfil.titulo")}</h1>
             {perfil.empresa_nome ? <p className="mt-3 text-corpo text-creme">{perfil.empresa_nome}</p> : null}
             {local ? <p className="text-corpo-p text-cinza">{local}</p> : null}
             {redes ? (

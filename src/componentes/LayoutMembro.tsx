@@ -12,7 +12,7 @@ import { Marca } from "./Marca"
 import { SeletorIdioma } from "./SeletorIdioma"
 import { Selo } from "./Selo"
 import { focoApp, itemTrilhoApp, linkListaApp, pilulaNavApp } from "./menuApp"
-import { ABAS, AREAS, AVATAR, MAIS, areaDe, type Item } from "./navegacao"
+import { ABAS, AREAS, AVATAR, MAIS, areaDe, destinoArea, type Item } from "./navegacao"
 
 // Casca do membro (Decisão 70): estrutura do app do MasterClass (telas 5ef9a9fb e 93622e8c) com a camada de vidro
 // sobre o palco verde aprovada em 03/11: trilho de ícones de vidro à esquerda com a marca e as quatro áreas
@@ -22,6 +22,9 @@ import { ABAS, AREAS, AVATAR, MAIS, areaDe, type Item } from "./navegacao"
 const foco = focoApp
 
 // Item bloqueado por nível continua clicável (leva à página com a prévia, PRD §17.1); o leitor de tela ouve o motivo.
+// Nível só quando o acesso já chegou sem erro; antes disso, os links das áreas apontam para a rota da própria área.
+const nivelConhecido = (a: Acesso) => (a.carregando || a.erro ? null : a.nivel)
+
 function LinkItem({ item, acesso, classe }: { item: Item; acesso: Acesso; classe: string }) {
   const t = useT()
   const caminho = useCaminho()
@@ -45,7 +48,8 @@ function LinkItem({ item, acesso, classe }: { item: Item; acesso: Acesso; classe
 
 // Trilho de ícones (desktop): sidebar compacta de vidro com a marca e as quatro áreas; o rótulo vai no title e para o
 // leitor de tela. O ativo é por prefixo da área, não por rota exata: /academy/vendas acende "Aprender".
-function Trilho({ caminhoAtual }: { caminhoAtual: string }) {
+function Trilho({ caminhoAtual, acesso }: { caminhoAtual: string; acesso: Acesso }) {
+  const nivel = nivelConhecido(acesso)
   const t = useT()
   const caminho = useCaminho()
   const ativa = areaDe(caminhoAtual)
@@ -53,7 +57,7 @@ function Trilho({ caminhoAtual }: { caminhoAtual: string }) {
     <nav aria-label={t("menu.membro")} className="app fixed inset-y-3 left-3 z-20 hidden w-16 flex-col items-center gap-1 rounded-xl py-3 vidro-fundo lg:flex">
       <Marca to={caminho("/inicio")} className="mb-2 justify-center [&>span]:sr-only" />
       {AREAS.map((a) => (
-        <Link key={a.rota} to={caminho(a.rota)} title={t(a.rotulo)} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={itemTrilhoApp}>
+        <Link key={a.rota} to={caminho(destinoArea(a.rota, nivel))} title={t(a.rotulo)} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={itemTrilhoApp}>
           <Icone nome={a.icone} className="size-5" />
           <span className="sr-only">{t(a.rotulo)}</span>
         </Link>
@@ -132,7 +136,7 @@ function MenuAvatar({ acesso }: { acesso: Acesso }) {
         {email.charAt(0) || "?"}
       </button>
       {aberto ? (
-        <div className="absolute right-0 z-30 mt-2 w-72 rounded-lg p-2 vidro">
+        <div className="absolute right-0 z-30 mt-2 w-72 rounded-lg p-2 vidro-flutuante">
           <p className="truncate px-3 pt-1.5 text-corpo-p text-creme">{email}</p>
           <p className="flex flex-wrap items-center gap-2 px-3 pt-1 pb-2 text-corpo-p text-cinza">
             {t("nivel.rotulo")}: {t(`nivel.${acesso.nivel}`)}
@@ -168,7 +172,7 @@ function FolhaMais({ acesso, aberta, fechar }: { acesso: Acesso; aberta: boolean
   }, [aberta])
   return (
     // Clicar no fundo (o próprio <dialog>, que não tem padding) fecha a folha.
-    <dialog ref={ref} aria-label={t("menu.mais")} onClose={fechar} onClick={(e) => e.target === e.currentTarget && fechar()} className="app m-0 mt-auto w-full max-w-none rounded-t-xl p-0 text-creme vidro backdrop:bg-breu/70 backdrop:backdrop-blur-sm lg:hidden">
+    <dialog ref={ref} aria-label={t("menu.mais")} onClose={fechar} onClick={(e) => e.target === e.currentTarget && fechar()} className="app m-0 mt-auto w-full max-w-none rounded-t-xl p-0 text-creme vidro-flutuante backdrop:bg-breu/70 backdrop:backdrop-blur-sm lg:hidden">
       <div className="p-3">
         <div className="flex items-center justify-between px-3 pb-2">
           <p className="text-corpo font-semibold">{t("menu.mais")}</p>
@@ -191,13 +195,14 @@ function BarraAbas({ acesso, caminhoAtual }: { acesso: Acesso; caminhoAtual: str
   const t = useT()
   const caminho = useCaminho()
   const ativa = areaDe(caminhoAtual)
+  const nivel = nivelConhecido(acesso)
   const [mais, setMais] = useState(false)
   const item = `relative flex min-h-14 min-w-11 flex-1 flex-col items-center justify-center gap-1 text-corpo-p font-semibold text-cinza aria-[current=page]:text-dourado aria-[current=page]:before:absolute aria-[current=page]:before:inset-x-5 aria-[current=page]:before:top-0 aria-[current=page]:before:h-0.5 aria-[current=page]:before:rounded-full aria-[current=page]:before:bg-dourado ${foco}`
   return (
     <>
-      <nav aria-label={t("menu.abas")} className="app fixed inset-x-0 bottom-0 z-20 flex vidro-fundo lg:hidden">
+      <nav aria-label={t("menu.abas")} className="app fixed inset-x-0 bottom-0 z-20 flex vidro-barra lg:hidden">
         {ABAS.map((a) => (
-          <Link key={a.rota} to={caminho(a.rota)} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={item}>
+          <Link key={a.rota} to={caminho(destinoArea(a.rota, nivel))} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={item}>
             <Icone nome={a.icone} className="size-5" />
             {t(a.rotulo)}
           </Link>
@@ -216,7 +221,7 @@ function BarraAbas({ acesso, caminhoAtual }: { acesso: Acesso; caminhoAtual: str
 // sino e avatar no topo. A proteção por login fica em App.tsx (RotaProtegida acima deste layout). A tela de dentro
 // não renderiza <main>. Carregando/erro do acesso aparecem aqui; quando chega a tela, o nível já é conhecido.
 // `conteudoPublico`: páginas públicas abertas com sessão (planos, biblioteca…) ficam com o visual público dentro
-// da casca (Decisão 55): o escopo do app vale só para a barra, as seções e a tab bar.
+// da casca (Decisões 55 e 70): o escopo do app vale só para a barra, as seções e a tab bar.
 export function LayoutMembro({ conteudoPublico = false }: { conteudoPublico?: boolean }) {
   const t = useT()
   const caminho = useCaminho()
@@ -226,10 +231,12 @@ export function LayoutMembro({ conteudoPublico = false }: { conteudoPublico?: bo
     <EscopoApp value>
       <div className={`flex min-h-dvh flex-col text-creme lg:pl-22 ${conteudoPublico ? "bg-fundo" : "app"}`}>
         <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-40 focus:m-2 focus:rounded-lg focus:bg-creme focus:px-4 focus:py-3 focus:text-breu">{t("menu.pular")}</a>
-        <Trilho caminhoAtual={caminhoAtual} />
+        <Trilho caminhoAtual={caminhoAtual} acesso={acesso} />
         <header className="app sticky top-0 z-20 px-4 pt-3 lg:px-6">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-3 py-2 vidro-fundo sm:px-4 lg:min-h-16">
-            <Marca to={caminho("/inicio")} className="[&>span]:hidden lg:hidden" />
+          {/* O vidro da barra mora num ::before: com backdrop-filter na própria barra, ela viraria "backdrop root" e o
+              popover do avatar (vidro-flutuante, dentro dela) só desfocaria a barra, não a página que rola por baixo. */}
+          <div className="relative isolate flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-3 py-2 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-xl before:vidro-barra sm:px-4 lg:min-h-16">
+            <Marca to={caminho("/inicio")} className="[&>span]:sr-only lg:hidden" />
             <Secoes caminhoAtual={caminhoAtual} acesso={acesso} />
             {/* Centro reservado para a busca global (LEG-04, P1). */}
             <div className="flex-1" />

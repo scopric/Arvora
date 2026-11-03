@@ -1,4 +1,5 @@
 import { botaoPequenoApp } from "../../../componentes/botaoEstilo"
+import { caixaSutilApp, cartaoApp } from "../../../componentes/Cartao"
 import { linkTextoApp } from "../../../componentes/menuApp"
 
 // Link de texto do admin (coluna principal da tabela): o mesmo link de texto do app, com 44px de alvo no toque.
@@ -9,6 +10,8 @@ export const contagem = (n: number, noLimite: boolean, t: (c: "admin.comum.linha
 // Botão pequeno de ação em linha de tabela (ghost do Linear; 44px no toque).
 export const classeAcao = botaoPequenoApp
 // Caixa sutil em ardósia (Decisão 70) para subblocos dentro de um cartão de vidro e painéis de ações.
-export const caixaSutilAdmin = "rounded-lg bg-ardosia px-4 py-3 shadow-borda"
+export const caixaSutilAdmin = caixaSutilApp
+// Cartão de vidro para <form>/<section> do admin (o mesmo do Cartao).
+export const cartaoAdmin = cartaoApp
 // Célula de número (molde Dock/Intercom): rótulo 14 em cinza, número grande 600 tabular, num bloco de vidro-fundo.
 export const celulaNumeroAdmin = "rounded-lg p-5 vidro-fundo"

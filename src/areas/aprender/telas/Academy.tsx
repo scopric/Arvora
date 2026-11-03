@@ -14,7 +14,7 @@ import { useCarga } from "../useCarga"
 import { dados, foco } from "../util"
 
 // Catálogo (ACA-01): cursos publicados, filtro por trilha. O Clube vê todos; o cadeado marca o que é do Grupo.
-// Molde MasterClass (telas 5ef9a9fb e 4b456354, no cofre): fileira de tiles de categoria (as trilhas) com ícone, a ativa
+// Molde MasterClass (telas 5ef9a9fb e 4b456354): fileira de tiles de categoria (as trilhas) com ícone, a ativa
 // com anel dourado; grade de 3 colunas com capa 16:9 sem moldura, meta em cinza, título 24/600 e descrição.
 // Não há painel "Filtros": a única dimensão de filtro que o banco oferece é a trilha, que já está nos tiles.
 export function Academy() {

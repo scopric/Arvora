@@ -4,6 +4,7 @@ import { Abas } from "../../../componentes/Abas"
 import { Aviso } from "../../../componentes/Aviso"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Botao } from "../../../componentes/Botao"
+import { caixaSutilApp } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
@@ -58,7 +59,7 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
               {p?.empresa_nome ? `${p.empresa_nome} · ` : ""}{dia(c.pedida_em, idioma)}
               {c.origem === "match" ? ` · ${t("rede.conexoes.viaMatch")}` : ""}
             </p>
-            {c.mensagem ? <p className="mt-3 rounded-lg bg-ardosia px-4 py-3 text-corpo whitespace-pre-wrap shadow-borda">{c.mensagem}</p> : null}
+            {c.mensagem ? <p className={`mt-3 text-corpo whitespace-pre-wrap ${caixaSutilApp}`}>{c.mensagem}</p> : null}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3 pl-13 sm:shrink-0 sm:pl-0">
@@ -78,7 +79,7 @@ function Linha({ c, uid, perfis, aoMudar }: { c: Conexao; uid: string; perfis: M
           {c.status === "aceita" ? (
             <>
               <Contato outroId={outroId} pequeno />
-              <Botao pequeno onClick={() => setDesfazendo(true)} ocupado={ocupado}>{t("rede.conexoes.desfazer")}</Botao>
+              <Botao pequeno variante="perigo" onClick={() => setDesfazendo(true)} ocupado={ocupado}>{t("rede.conexoes.desfazer")}</Botao>
             </>
           ) : null}
         </div>

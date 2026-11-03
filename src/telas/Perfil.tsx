@@ -2,7 +2,7 @@ import { useEffect, useState, type SubmitEvent } from "react"
 import { Link } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
-import { Cartao } from "../componentes/Cartao"
+import { Cartao, cartaoApp } from "../componentes/Cartao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { useEstiloCampo } from "../componentes/campoEstilo"
 import { linkTextoApp } from "../componentes/menuApp"
@@ -95,7 +95,7 @@ export function Perfil() {
       {estado.fase === "carregando" ? <p role="status" className="text-cinza">{t("comum.carregando")}</p> : null}
       {estado.fase === "erro" ? <Aviso tipo="erro">{t(estado.mensagem)}</Aviso> : null}
       {estado.fase === "pronto" ? (
-        <form key={JSON.stringify(estado.perfil)} onSubmit={salvar} noValidate className="space-y-5 rounded-lg p-6 vidro">
+        <form key={JSON.stringify(estado.perfil)} onSubmit={salvar} noValidate className={`space-y-5 ${cartaoApp}`}>
           {aviso ? <Aviso tipo={aviso.tipo}>{t(aviso.texto)}</Aviso> : null}
           <Campo rotulo={t("perfil.nome")} name="nome" defaultValue={estado.perfil.nome} erro={erros.nome} autoComplete="name" />
           <Campo rotulo={t("perfil.empresa")} name="empresa_nome" defaultValue={estado.perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
