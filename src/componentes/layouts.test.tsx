@@ -61,23 +61,37 @@ beforeEach(() => Object.assign(h, { aal: "aal2", fatores: [], naoVerificados: []
 afterEach(cleanup)
 
 describe("LayoutMembro", () => {
-  it("Clube: itens do Grupo ficam com cadeado e motivo para leitor de tela; Meu Award some sem premiado", () => {
-    montar({ nivel: "clube" }, "/pt/inicio", <LayoutMembro />)
-    const lateral = screen.getByRole("navigation", { name: "Menu do membro" })
-    const aulas = within(lateral).getByRole("link", { name: /Aulas/ })
-    expect(aulas.textContent).toContain("Bloqueado: parte do Grupo Árvora")
-    expect(aulas.getAttribute("title")).toBe("Incluído no Grupo Árvora")
-    expect(aulas.getAttribute("href")).toBe("/pt/aulas") // continua clicável: abre a prévia
-    expect(within(lateral).getByRole("link", { name: "Academy" }).textContent).not.toContain("Bloqueado")
-    expect(within(lateral).queryByRole("link", { name: /Meu Award/ })).toBeNull()
+  it("barra superior tem as 4 áreas e acende a área pelo prefixo da rota", () => {
+    montar({ nivel: "clube" }, "/pt/academy", <LayoutMembro />, "academy")
+    const topo = screen.getByRole("navigation", { name: "Menu do membro" })
+    expect(within(topo).getAllByRole("link").map((l) => l.textContent)).toEqual(["Início", "Aprender", "Rede", "Awards"])
+    expect(within(topo).getByRole("link", { name: "Aprender" }).getAttribute("aria-current")).toBe("page")
+    expect(within(topo).getByRole("link", { name: "Início" }).getAttribute("aria-current")).toBeNull()
     expect(screen.getByRole("heading", { name: "Tela de dentro" })).toBeTruthy()
   })
 
-  it("Grupo premiado: nada bloqueado e Meu Award aparece", () => {
+  it("Clube: seções do Grupo ficam com cadeado e motivo para leitor de tela; Meu Award some sem premiado", () => {
+    montar({ nivel: "clube" }, "/pt/academy", <LayoutMembro />, "academy")
+    const secoes = screen.getByRole("navigation", { name: "Seções de Aprender" })
+    const aulas = within(secoes).getByRole("link", { name: /Aulas/ })
+    expect(aulas.textContent).toContain("Bloqueado: parte do Grupo Árvora")
+    expect(aulas.getAttribute("title")).toBe("Incluído no Grupo Árvora")
+    expect(aulas.getAttribute("href")).toBe("/pt/aulas") // continua clicável: abre a prévia
+    expect(within(secoes).getByRole("link", { name: "Academy" }).textContent).not.toContain("Bloqueado")
+    expect(within(secoes).getByRole("link", { name: "Academy" }).getAttribute("aria-current")).toBe("page")
+    cleanup()
+    montar({ nivel: "clube" }, "/pt/hall-of-fame", <LayoutMembro />, "hall-of-fame")
+    expect(within(screen.getByRole("navigation", { name: "Seções do Awards" })).queryByRole("link", { name: /Meu Award/ })).toBeNull()
+  })
+
+  it("Grupo premiado: nada bloqueado e Meu Award aparece; Início não tem seções", () => {
+    montar({ nivel: "grupo", premiado: true }, "/pt/hall-of-fame", <LayoutMembro />, "hall-of-fame")
+    const secoes = screen.getByRole("navigation", { name: "Seções do Awards" })
+    expect(within(secoes).queryByText(/Bloqueado/)).toBeNull()
+    expect(within(secoes).getByRole("link", { name: /Meu Award/ })).toBeTruthy()
+    cleanup()
     montar({ nivel: "grupo", premiado: true }, "/pt/inicio", <LayoutMembro />)
-    const lateral = screen.getByRole("navigation", { name: "Menu do membro" })
-    expect(within(lateral).queryByText(/Bloqueado/)).toBeNull()
-    expect(within(lateral).getByRole("link", { name: /Meu Award/ })).toBeTruthy()
+    expect(screen.queryByRole("navigation", { name: /Seções/ })).toBeNull()
   })
 
   it("tab bar do celular tem 5 itens (4 links + Mais)", () => {
@@ -113,7 +127,7 @@ describe("LayoutMembro", () => {
 })
 
 describe("LayoutPublico", () => {
-  it("com sessão, rotas de conteúdo abrem na casca do membro (sidebar), não no topo público", () => {
+  it("com sessão, rotas de conteúdo abrem na casca do membro (barra superior), não no topo público", () => {
     montar({}, "/pt/planos", <LayoutPublico />, "planos")
     expect(screen.getByRole("navigation", { name: "Menu do membro" })).toBeTruthy()
     expect(screen.getByRole("heading", { name: "Tela de dentro" })).toBeTruthy()

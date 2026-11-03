@@ -8,51 +8,71 @@ export const EDICAO_ATUAL = "2026"
 export type Item = {
   rotulo: Chave
   rota: string
-  // Ícone de 16px ao lado do rótulo (molde Linear); sempre decorativo.
+  // Ícone ao lado do rótulo (16px nas listas, 20px na tab bar); sempre decorativo.
   icone: NomeIcone
   // Nível mínimo para abrir de fato; abaixo disso o item aparece com cadeado e leva à página com a prévia (PRD §17.1).
   minimo?: Exclude<Nivel, "visitante">
   // Só para premiado (Meu Award): some para os demais.
   soPremiado?: boolean
 }
-export type Grupo = { rotulo?: Chave; itens: Item[] }
+// Área do membro (Decisão 70, casca com barra superior como o app do MasterClass): um link no topo e, dentro dela,
+// as seções em abas. `secoes` nomeia a navegação das abas (um rótulo por área, para os landmarks não se confundirem).
+export type Area = Item & { secoes?: Chave; itens: Item[] }
 
-// Sidebar do membro, na ordem do PRD §17.3.1. Cadeados por nível: PRD §17.3.5.
-export const SIDEBAR: Grupo[] = [
+// Áreas e seções, na ordem do PRD §17.3.1 com a alteração da Decisão 70. Cadeados por nível: PRD §17.3.5.
+export const AREAS: Area[] = [
+  { rotulo: "menu.inicio", rota: "/inicio", icone: "casa", itens: [] },
   {
+    rotulo: "menu.aprender",
+    rota: "/academy",
+    icone: "aprender",
+    secoes: "menu.secoesAprender",
     itens: [
-      { rotulo: "menu.inicio", rota: "/inicio", icone: "casa" },
-      { rotulo: "menu.aulas", rota: "/aulas", icone: "video", minimo: "grupo" },
       { rotulo: "menu.academy", rota: "/academy", icone: "aprender" },
+      { rotulo: "menu.aulas", rota: "/aulas", icone: "video", minimo: "grupo" },
       { rotulo: "menu.bemEstar", rota: "/bem-estar", icone: "folha", minimo: "grupo" },
+      { rotulo: "menu.tarefas", rota: "/tarefas", icone: "check", minimo: "grupo" },
     ],
   },
   {
-    rotulo: "menu.awards",
+    rotulo: "menu.rede",
+    rota: "/network",
+    icone: "rede",
+    secoes: "menu.secoesRede",
+    itens: [
+      { rotulo: "menu.network", rota: "/network", icone: "rede", minimo: "clube" },
+      { rotulo: "menu.comunidade", rota: "/comunidade", icone: "balao", minimo: "clube" },
+      { rotulo: "menu.match", rota: "/match", icone: "faisca", minimo: "grupo" },
+      { rotulo: "menu.conexoes", rota: "/conexoes", icone: "elo" },
+    ],
+  },
+  {
+    rotulo: "menu.awardsAba",
+    rota: "/awards",
+    icone: "award",
+    secoes: "menu.secoesAwards",
     itens: [
       { rotulo: "menu.hallOfFame", rota: "/hall-of-fame", icone: "award" },
       { rotulo: "menu.biblioteca", rota: "/biblioteca", icone: "livro" },
       { rotulo: "menu.originals", rota: "/originals", icone: "filme" },
       { rotulo: "menu.directory", rota: "/directory", icone: "predio" },
-      { rotulo: "menu.network", rota: "/network", icone: "rede", minimo: "clube" },
-      { rotulo: "menu.match", rota: "/match", icone: "faisca", minimo: "grupo" },
       { rotulo: "menu.evento", rota: `/evento/${EDICAO_ATUAL}`, icone: "calendario" },
       { rotulo: "menu.meuAward", rota: "/meu-award", icone: "award", soPremiado: true },
     ],
   },
-  {
-    itens: [
-      { rotulo: "menu.comunidade", rota: "/comunidade", icone: "balao", minimo: "clube" },
-      { rotulo: "menu.tarefas", rota: "/tarefas", icone: "check", minimo: "grupo" },
-    ],
-  },
 ]
+
+const dentro = (caminho: string, rota: string) => caminho === rota || caminho.startsWith(`${rota}/`)
+// Área ativa para um caminho sem o prefixo de idioma ("/academy/vendas" → Aprender); `/evento/*` conta como Awards.
+export function areaDe(caminho: string): Area | undefined {
+  return AREAS.find((a) => dentro(caminho, a.rota) || a.itens.some((i) => dentro(caminho, i.rota)) || (a.rota === "/awards" && dentro(caminho, "/evento")))
+}
 
 export type Aba = { rotulo: Chave; rota: string; icone: NomeIcone }
 // Bottom tab bar (PRD §17.3.2). "Mais" abre a folha e não está aqui.
 export const ABAS: Aba[] = [
   { rotulo: "menu.inicio", rota: "/inicio", icone: "casa" },
-  { rotulo: "menu.aprender", rota: "/aulas", icone: "aprender" },
+  { rotulo: "menu.aprender", rota: "/academy", icone: "aprender" },
   { rotulo: "menu.awardsAba", rota: "/awards", icone: "award" },
   { rotulo: "menu.rede", rota: "/network", icone: "rede" },
 ]

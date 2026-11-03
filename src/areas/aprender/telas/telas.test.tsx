@@ -401,7 +401,7 @@ describe("/academy/:curso e /academy/:curso/:aula", () => {
     const cta = screen.getByRole("link", { name: "Começar o curso" })
     expect(cta.getAttribute("href")).toBe("/pt/academy/f/a")
     expect(cta.className).toBe(botaoPrimarioApp)
-    expect(screen.getByRole("link", { name: "Academy" }).getAttribute("href")).toBe("/pt/academy")
+    expect(screen.getAllByRole("link", { name: "Academy" }).map((l) => l.getAttribute("href"))).toEqual(["/pt/academy"]) // só o "voltar": as seções ficam na casca
     expect(await violacoes()).toEqual([])
   })
   it("Grupo com progresso: 'Continuar' em dourado aponta para a primeira aula não concluída; sem cadeado", async () => {
