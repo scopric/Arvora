@@ -97,24 +97,24 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true,
   return (
     <article className={cartao}>
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-base font-semibold">
+        <h3 className="text-corpo font-semibold">
           {t("aprender.exercicio.n")} {exercicio.ordem}
         </h3>
         {entrega ? <SeloStatus status={entrega.status} /> : <Selo>{t("aprender.exercicio.naoEnviado")}</Selo>}
       </header>
-      <p className="mt-3 max-w-prose text-base whitespace-pre-line">{exercicio.enunciado_md}</p>
+      <p className="mt-3 max-w-prose text-corpo whitespace-pre-line">{exercicio.enunciado_md}</p>
       {exercicio.prazo_dias ? (
-        <p className="mt-2 text-corpo-p text-nevoa">
+        <p className="mt-2 text-corpo-p text-cinza">
           {t("aprender.exercicio.prazo")}: {exercicio.prazo_dias} {t("aprender.exercicio.dias")}
         </p>
       ) : null}
 
       {entrega ? (
-        <section aria-label={t("aprender.exercicio.suaResposta")} className="mt-5 border-t border-grafite pt-4">
-          <h4 className="text-corpo-p font-medium text-bruma">
+        <section aria-label={t("aprender.exercicio.suaResposta")} className="mt-5 border-t border-fumaca pt-4">
+          <h4 className="text-corpo-p font-semibold text-creme">
             {t("aprender.exercicio.suaResposta")} · {dataCurta(entrega.enviada_em, lang)}
           </h4>
-          {entrega.texto ? <p className="mt-2 max-w-prose text-base whitespace-pre-line">{entrega.texto}</p> : null}
+          {entrega.texto ? <p className="mt-2 max-w-prose text-corpo whitespace-pre-line">{entrega.texto}</p> : null}
           {entrega.arquivo_path ? (
             <button
               type="button"
@@ -135,30 +135,30 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true,
             {t("aprender.exercicio.devolutiva")}
             {entrega.corrigido_em ? ` · ${dataCurta(entrega.corrigido_em, lang)}` : ""}
           </h4>
-          <p className="mt-2 max-w-prose text-base whitespace-pre-line">{entrega.devolutiva}</p>
+          <p className="mt-2 max-w-prose text-corpo whitespace-pre-line">{entrega.devolutiva}</p>
         </section>
       ) : null}
-      {entrega?.status === "enviada" ? <p className="mt-4 text-corpo-p text-nevoa">{t("aprender.exercicio.aguardando")}</p> : null}
+      {entrega?.status === "enviada" ? <p className="mt-4 text-corpo-p text-cinza">{t("aprender.exercicio.aguardando")}</p> : null}
 
       {mostrarForm ? (
         <form onSubmit={enviar} noValidate className="mt-5 space-y-4">
           <div>
-            <label htmlFor={`${id}-t`} className="mb-1.5 block text-corpo-p font-medium text-bruma">
+            <label htmlFor={`${id}-t`} className="mb-1.5 block text-corpo-p font-semibold text-creme">
               {reenvio ? t("aprender.exercicio.novaResposta") : t("aprender.exercicio.suaResposta")}
             </label>
             <textarea id={`${id}-t`} rows={6} value={texto} onChange={(e) => setTexto(e.target.value)} className={campoApp} />
           </div>
           {exercicio.aceita_arquivo ? (
             <div>
-              <label htmlFor={`${id}-a`} className="mb-1.5 block text-corpo-p font-medium text-bruma">
+              <label htmlFor={`${id}-a`} className="mb-1.5 block text-corpo-p font-semibold text-creme">
                 {t("aprender.exercicio.anexar")}
               </label>
-              <input id={`${id}-a`} type="file" accept={TIPOS.join(",")} onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} className="block w-full text-corpo-p text-bruma" />
-              <p className="mt-1.5 text-corpo-p text-nevoa">{t("aprender.exercicio.arquivoAjuda")}</p>
+              <input id={`${id}-a`} type="file" accept={TIPOS.join(",")} onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} className="block w-full text-corpo-p text-creme" />
+              <p className="mt-1.5 text-corpo-p text-cinza">{t("aprender.exercicio.arquivoAjuda")}</p>
             </div>
           ) : null}
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
-          <Botao type="submit" variante={primario ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto">
+          <Botao type="submit" variante={primario ? "primario" : "secundario"} ocupado={ocupado} className="sm:w-auto">
             {reenvio ? t("aprender.exercicio.reenviar") : t("aprender.exercicio.enviar")}
           </Botao>
         </form>
@@ -169,7 +169,7 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true,
               <Aviso tipo="erro">{t(erro)}</Aviso>
             </div>
           ) : null}
-          {(!entrega || reenvio) && !podeEnviar ? <p className="mt-4 text-corpo-p text-nevoa">{t(doGrupo ? "aprender.exercicio.semEnvio" : "aprender.exercicio.soGrupo")}</p> : null}
+          {(!entrega || reenvio) && !podeEnviar ? <p className="mt-4 text-corpo-p text-cinza">{t(doGrupo ? "aprender.exercicio.semEnvio" : "aprender.exercicio.soGrupo")}</p> : null}
         </>
       )}
       {ok ? (

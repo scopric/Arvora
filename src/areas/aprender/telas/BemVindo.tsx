@@ -6,7 +6,7 @@ import { Campo, Selecao } from "../../../componentes/Campo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Bloqueado } from "../../../componentes/Bloqueado"
-import { botaoContornoApp } from "../../../componentes/botaoEstilo"
+import { botaoSecundarioApp } from "../../../componentes/botaoEstilo"
 import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
@@ -119,10 +119,11 @@ export function BemVindo() {
   const nomeDe = (c: Cat) => (lang === "en" ? (c.nome_en ?? c.nome) : c.nome)
   const grupoChips = (tipo: Item["tipo"], legenda: Chave) => (
     <fieldset>
-      <legend className="mb-2 text-corpo-p font-medium text-bruma">{t(legenda)}</legend>
-      <div className="flex flex-wrap gap-2">
+      <legend className="mb-3 text-corpo-p font-semibold text-creme">{t(legenda)}</legend>
+      {/* Opções em cartões (molde do onboarding: Attio eb21b4a5 e Brilliant 4345): a marcada ganha anel dourado. */}
+      <div className="grid gap-2 sm:grid-cols-2">
         {categorias.map((c) => (
-          <label key={c.id} className="flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-grafite px-3 text-corpo-p font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:text-creme has-[:checked]:border-bruma has-[:checked]:bg-creme/5 has-[:checked]:text-creme has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-dourado">
+          <label key={c.id} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg bg-ardosia px-4 text-corpo-p font-semibold text-cinza transition-colors hover:text-creme has-[:checked]:text-creme has-[:checked]:ring-1 has-[:checked]:ring-dourado has-[:checked]:ring-inset has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-dourado">
             <input type="checkbox" checked={sel.has(`${tipo}:${c.id}`)} onChange={() => alternar(`${tipo}:${c.id}`)} className="size-4 accent-dourado" />
             {nomeDe(c)}
           </label>
@@ -133,22 +134,23 @@ export function BemVindo() {
 
   return (
     <Pagina chave={chave}>
-      {/* Molde Linear (welcome): coluna estreita, passos com ponto dourado no atual, formulário em cartão. */}
-      <div className="max-w-2xl">
-      <ol className="mb-6 flex flex-wrap gap-x-5 gap-y-1 text-corpo-p" aria-label={t("aprender.bemVindo.passos")}>
+      {/* Molde Linear (welcome, tela 19ed84f4): coluna centrada, um passo por vez, "Passo n de 3" em cinza, pontos
+          de paginação; formulário em cartão de vidro com opções em cartões. */}
+      <div className="mx-auto max-w-xl">
+      <p className="text-corpo-p font-semibold text-cinza">{t("aprender.bemVindo.passoDe").replace("{n}", String(etapa))}</p>
+      <h2 ref={titulo} tabIndex={-1} className="mt-1 mb-6 text-titulo font-semibold outline-none">
+        {t(etapa === 1 ? "aprender.bemVindo.passo1" : etapa === 2 ? (grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube") : "aprender.bemVindo.passo3")}
+      </h2>
+      <ol className="mb-6 flex items-center gap-2" aria-label={t("aprender.bemVindo.passos")}>
         {(["aprender.bemVindo.passo1", grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube", "aprender.bemVindo.passo3"] as Chave[]).map((k, i) => (
-          <li key={k} aria-current={etapa === i + 1 ? "step" : undefined} className={`flex items-center gap-2 ${etapa === i + 1 ? "font-medium text-creme" : "text-nevoa"}`}><span aria-hidden="true" className={`size-1.5 rounded-full ${etapa === i + 1 ? "bg-dourado" : "bg-fumaca"}`} />{i + 1}. {t(k)}</li>
+          <li key={k} aria-current={etapa === i + 1 ? "step" : undefined} className={`h-1.5 rounded-full transition-[width] ${etapa === i + 1 ? "w-8 bg-dourado" : "w-3 bg-fumaca"}`}><span className="sr-only">{i + 1}. {t(k)}</span></li>
         ))}
       </ol>
-      <h2 ref={titulo} tabIndex={-1} className="mb-5 text-titulo-p font-semibold outline-none">
-        {t(etapa === 1 ? "aprender.bemVindo.passo1" : etapa === 2 ? (grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube") : "aprender.bemVindo.passo3")}
-        <span className="ml-3 text-corpo-p font-normal text-nevoa">{t("aprender.bemVindo.passoDe").replace("{n}", String(etapa))}</span>
-      </h2>
       {aviso ? <div className="mb-4"><Aviso tipo="erro">{t(aviso)}</Aviso></div> : null}
 
       {etapa === 1 ? (
         <form onSubmit={salvarPerfil} noValidate className={`${cartao} space-y-5`}>
-          <p className="text-base text-bruma">{t("aprender.bemVindo.perfilTexto")}</p>
+          <p className="text-corpo text-cinza">{t("aprender.bemVindo.perfilTexto")}</p>
           <Campo rotulo={t("perfil.nome")} name="nome" defaultValue={perfil.nome} erro={erros.nome} autoComplete="name" />
           <Campo rotulo={t("perfil.empresa")} name="empresa_nome" defaultValue={perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
           <Selecao rotulo={t("perfil.setor")} name="setor_id" defaultValue={perfil.setor_id?.toString() ?? ""} erro={erros.setor_id}>
@@ -176,18 +178,18 @@ export function BemVindo() {
         <div className={`${cartao} space-y-6`}>
           {grupo ? (
             <>
-              <p className="text-base text-bruma">{t("aprender.bemVindo.redeTexto")}</p>
+              <p className="text-corpo text-cinza">{t("aprender.bemVindo.redeTexto")}</p>
               {grupoChips("procura", "aprender.bemVindo.busco")}
               {grupoChips("oferece", "aprender.bemVindo.ofereco")}
             </>
           ) : (
             <>
-              <p className="text-base text-bruma">{t("aprender.bemVindo.conhecaRede")}</p>
+              <p className="text-corpo text-cinza">{t("aprender.bemVindo.conhecaRede")}</p>
               <Link to={caminho("/network")} className={linkTexto}>{t("aprender.bemVindo.verRede")}</Link>
             </>
           )}
           <div className="flex flex-wrap items-center gap-4">
-            <button type="button" onClick={() => setEtapa(1)} className={botaoContornoApp}>{t("aprender.bemVindo.voltar")}</button>
+            <button type="button" onClick={() => setEtapa(1)} className={botaoSecundarioApp}>{t("aprender.bemVindo.voltar")}</button>
             <Botao ocupado={ocupado} className="sm:w-auto" onClick={() => (grupo ? void salvarRede() : setEtapa(3))}>{t("aprender.bemVindo.continuar")}</Botao>
             <button type="button" onClick={() => setEtapa(3)} className={linkTexto}>{t("aprender.bemVindo.pular")}</button>
           </div>
@@ -199,20 +201,20 @@ export function BemVindo() {
           {grupo ? (
             aula && aula.inicio_em ? (
               <div className={`${cartao} space-y-3`}>
-                <p className="text-corpo-p font-medium text-nevoa">{t("aprender.inicio.proximaAula")}</p>
+                <p className="text-corpo-p font-semibold text-cinza">{t("aprender.inicio.proximaAula")}</p>
                 <h3 className="text-subtitulo font-semibold">{aula.titulo}</h3>
-                <p className="text-base text-bruma"><QuandoAula inicio={aula.inicio_em} /></p>
+                <p className="text-corpo text-cinza"><QuandoAula inicio={aula.inicio_em} /></p>
                 <Agenda aula={{ ...aula, inicio_em: aula.inicio_em }} />
               </div>
             ) : (
-              <p className="text-base text-nevoa">{t("aprender.aulas.vazio")}</p>
+              <p className="text-corpo text-cinza">{t("aprender.aulas.vazio")}</p>
             )
           ) : (
             <Bloqueado frase={t("aprender.aulas.bloqueado")} minimo="grupo" />
           )}
           <div className="flex flex-wrap items-center gap-4">
-            <button type="button" onClick={() => setEtapa(2)} className={botaoContornoApp}>{t("aprender.bemVindo.voltar")}</button>
-            <Botao variante={grupo ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto" onClick={() => void concluir()}>{t("aprender.bemVindo.concluir")}</Botao>
+            <button type="button" onClick={() => setEtapa(2)} className={botaoSecundarioApp}>{t("aprender.bemVindo.voltar")}</button>
+            <Botao ocupado={ocupado} className="sm:w-auto" onClick={() => void concluir()}>{t("aprender.bemVindo.concluir")}</Botao>
           </div>
         </div>
       ) : null}

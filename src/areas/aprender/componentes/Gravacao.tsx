@@ -1,9 +1,10 @@
-import { useRef, useState, type SyntheticEvent } from "react"
+import { useRef, useState, type ReactNode, type SyntheticEvent } from "react"
 import { PlayerVideo } from "../../../componentes/PlayerVideo"
 import { Aviso } from "../../../componentes/Aviso"
-import { Botao } from "../../../componentes/Botao"
+import { botaoColunaApp } from "../../../componentes/botaoEstilo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
+import { Icone } from "../../../componentes/Icone"
 import { useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { useCarga } from "../useCarga"
@@ -12,8 +13,10 @@ import { barraProgresso, dados, gravarProgresso, minutosParaTexto, videoDe } fro
 const A_CADA_SEG = 15 // não grava a cada quadro: no máximo um UPDATE a cada 15 s de vídeo...
 const MIN_ENTRE_GRAVACOES_MS = 10_000 // ...e nunca dois em menos de 10 s reais (arrastar a barra dispara timeupdate em rajada)
 
-// Player da gravação + progresso (ACA-03). o vídeo vem da RPC video_da_aula (o banco confere o nível).
-export function Gravacao({ aulaId, titulo, uid, aoMudarPercentual }: { aulaId: number; titulo: string; uid: string; aoMudarPercentual?: (p: number) => void }) {
+// Player da gravação + progresso (ACA-03). O vídeo vem da RPC video_da_aula (o banco confere o nível).
+// Molde MasterClass (lição): o player em cima; abaixo, à esquerda o cabeçalho que a tela passa em `children`
+// (título e descrição) e à direita a fileira de botões em coluna (ícone sobre rótulo); o progresso numa linha.
+export function Gravacao({ aulaId, titulo, uid, aoMudarPercentual, children }: { aulaId: number; titulo: string; uid: string; aoMudarPercentual?: (p: number) => void; children?: ReactNode }) {
   const t = useT()
   const [estado, recarregar] = useCarga(async () => {
     const [v, p] = await Promise.all([
@@ -60,27 +63,31 @@ export function Gravacao({ aulaId, titulo, uid, aoMudarPercentual }: { aulaId: n
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {video ? (
-        <div onTimeUpdateCapture={(e) => aoTocar(e, false)} onPauseCapture={(e) => aoTocar(e, true)} onEndedCapture={(e) => aoTocar(e, true)}>
+        <div onTimeUpdateCapture={(e) => aoTocar(e, false)} onPauseCapture={(e) => aoTocar(e, true)} onEndedCapture={(e) => aoTocar(e, true)} className="overflow-hidden rounded-lg bg-black">
           {/* #t= retoma de onde parou no <video>; no iframe do provedor não há como (lacuna: provedor não decidido). */}
           <PlayerVideo titulo={titulo} tipo={video.tipo} src={video.tipo === "arquivo" && posicaoSalva > 5 ? `${video.src}#t=${posicaoSalva}` : video.src} />
         </div>
       ) : (
         <Erro>{t("video.indisponivel")}</Erro>
       )}
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">{children}</div>
+        {atual < 100 ? (
+          <button type="button" onClick={() => void salvar(100, posicaoSalva)} className={botaoColunaApp}>
+            <Icone nome="check" className="size-5" />
+            {t("aprender.marcarConcluida")}
+          </button>
+        ) : null}
+      </div>
       {falhou ? <Aviso tipo="erro">{t("aprender.erroProgresso")}</Aviso> : null}
       <div className="flex flex-wrap items-center gap-4">
-        <label className="flex items-center gap-3 text-corpo-p text-nevoa">
+        <label className="flex items-center gap-3 text-corpo-p text-cinza">
           <progress value={atual} max={100} className={barraProgresso} />
           <span className="tabular-nums">{t("aprender.progresso")}: {atual}%</span>
         </label>
-        {posicaoSalva > 5 && atual < 100 ? <span className="text-corpo-p text-nevoa">{t("aprender.parouEm")} {minutosParaTexto(posicaoSalva)}</span> : null}
-        {atual < 100 ? (
-          <Botao variante="contorno" className="sm:w-auto" onClick={() => void salvar(100, posicaoSalva)}>
-            {t("aprender.marcarConcluida")}
-          </Botao>
-        ) : null}
+        {posicaoSalva > 5 && atual < 100 ? <span className="text-corpo-p text-cinza">{t("aprender.parouEm")} {minutosParaTexto(posicaoSalva)}</span> : null}
       </div>
     </div>
   )

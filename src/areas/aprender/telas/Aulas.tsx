@@ -3,7 +3,7 @@ import { Link } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
-import { Selecao } from "../../../componentes/Campo"
+import { PilulaCategoria } from "../../../componentes/PilulaCategoria"
 import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT } from "../../../i18n"
@@ -15,14 +15,15 @@ import { Pagina } from "../componentes/Pagina"
 import { QuandoAula } from "../componentes/QuandoAula"
 import { COLUNAS_AULA, nomeVertical, type AulaLinha } from "../tipos"
 import { useCarga } from "../useCarga"
-import { caixaSutil, dados, formatar, foco, segundaDaSemana } from "../util"
+import { caixaSutil, dados, formatar, foco, hora, segundaDaSemana } from "../util"
 
 type VerticalLinha = { id: number; slug: string; nome: string; nome_en: string | null }
 const LIMITE = 120 // PROVISÓRIO: sem paginação no lançamento; 120 aulas cobrem mais de um ano de duas aulas por semana
 
 // Calendário de aulas (AUL-01, AUL-06): lista por semana, filtro por vertical, .ics e Google Agenda.
 // /bem-estar usa esta mesma tela fixada na vertical `bem-estar` (MEN-01), com o aviso fixo.
-// Molde Linear (lista agrupada): "Próximas / Anteriores" → semana → linhas com selo, título e meta em 13px.
+// Molde Luma (lista por data, tela 086033fd no cofre): coluna estreita com a data e um trilho vertical à esquerda;
+// à direita, cartões de vidro com hora, título, selo e agenda. Filtro de vertical em pílulas de categoria.
 export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
   const t = useT()
   const lang = useIdioma()
@@ -64,7 +65,7 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
           previa={
             <ul className="space-y-2">
               {visiveis.slice(0, 3).map((a) => (
-                <li key={a.id} className="text-base">{a.titulo}</li>
+                <li key={a.id} className="text-corpo">{a.titulo}</li>
               ))}
             </ul>
           }
@@ -83,29 +84,31 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
   }
 
   const bloco = (titulo: string, lista: AulaLinha[]) => (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <h2 className="text-subtitulo font-semibold">{titulo}</h2>
       {semanas(lista).map(([segunda, itens]) => (
-        <div key={segunda}>
-          <h3 className="mb-2 text-corpo-p font-medium text-nevoa">
+        <div key={segunda} className="grid gap-4 sm:grid-cols-[8rem_1fr] sm:gap-6">
+          {/* Coluna da data com o trilho vertical (Luma): a data em cima, a linha desce ao lado dos cartões. */}
+          <h3 className="relative text-corpo-p font-semibold text-cinza sm:pl-5 sm:before:absolute sm:before:top-1.5 sm:before:left-0 sm:before:size-2.5 sm:before:rounded-full sm:before:bg-fumaca sm:after:absolute sm:after:top-5 sm:after:bottom-0 sm:after:left-[4px] sm:after:w-0.5 sm:after:bg-placa">
             {t("aprender.aulas.semanaDe")} {formatar(`${segunda}T12:00:00Z`, lang, { day: "numeric", month: "long" }, "UTC")}
           </h3>
-          <ul className="divide-y divide-grafite rounded-xl shadow-borda">
+          <ul className="space-y-3">
             {itens.map((a) => {
               const live = a.tipo === "ao_vivo" && !a.materiais_publicados_em
               return (
-                <li key={a.id} className="p-4">
+                <li key={a.id} className="rounded-lg p-5 vidro">
                   <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-corpo-p font-semibold tabular-nums">{hora(a.inicio_em!, lang)}</span>
                     <Selo tom={live ? "destaque" : "neutro"}>{live ? t("aprender.aoVivo") : t("aprender.gravada")}</Selo>
                     {progresso.get(a.id) === 100 ? <Selo>{t("aprender.assistida")}</Selo> : null}
-                    <span className="text-corpo-p text-nevoa">{nomeDe(a.vertical_id)}{a.duracao_min ? ` · ${a.duracao_min} ${t("aprender.min")}` : ""}</span>
+                    <span className="text-corpo-p text-cinza">{nomeDe(a.vertical_id)}{a.duracao_min ? ` · ${a.duracao_min} ${t("aprender.min")}` : ""}</span>
                   </div>
-                  <h4 className="mt-2 text-base font-medium">
+                  <h4 className="mt-2 text-subtitulo font-semibold">
                     <Link to={caminho(`/aulas/${a.slug}`)} className={`rounded-sm underline-offset-4 hover:underline ${foco}`}>{a.titulo}</Link>
                   </h4>
-                  <p className="mt-1 text-corpo-p text-nevoa"><QuandoAula inicio={a.inicio_em!} /></p>
+                  <p className="mt-1 text-corpo-p text-cinza"><QuandoAula inicio={a.inicio_em!} /></p>
                   {live && new Date(a.inicio_em!).getTime() > agora ? (
-                    <div className="mt-3"><Agenda aula={{ ...a, inicio_em: a.inicio_em! }} /></div>
+                    <div className="mt-4"><Agenda aula={{ ...a, inicio_em: a.inicio_em! }} /></div>
                   ) : null}
                 </li>
               )
@@ -121,13 +124,11 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
       <div className="space-y-10">
         {bemEstar ? <p className={caixaSutil}>{t("aprender.bemEstar.aviso")}</p> : null}
         {!verticalFixa && verticais.length > 1 ? (
-          <div className="w-56">
-            <Selecao rotulo={t("aprender.aulas.vertical")} value={filtro} onChange={(e) => setFiltro(e.target.value)}>
-              <option value="">{t("aprender.aulas.todas")}</option>
-              {verticais.map((v) => (
-                <option key={v.id} value={v.id}>{nomeVertical(v, lang)}</option>
-              ))}
-            </Selecao>
+          <div role="group" aria-label={t("aprender.aulas.vertical")} className="flex flex-wrap gap-2">
+            <PilulaCategoria ativa={filtro === ""} onClick={() => setFiltro("")}>{t("aprender.aulas.todas")}</PilulaCategoria>
+            {verticais.map((v) => (
+              <PilulaCategoria key={v.id} ativa={filtro === String(v.id)} onClick={() => setFiltro(String(v.id))}>{nomeVertical(v, lang)}</PilulaCategoria>
+            ))}
           </div>
         ) : null}
         {visiveis.length === 0 ? <Vazio>{t("aprender.aulas.vazio")}</Vazio> : null}
