@@ -2,7 +2,7 @@ import { Link } from "react-router"
 import type { ReactNode } from "react"
 import { useCaminho, useT } from "../i18n"
 import type { Nivel } from "../lib/acesso"
-import { botaoPrimarioApp, botaoPublico } from "./botaoEstilo"
+import { botaoPublico, botaoSecundarioApp } from "./botaoEstilo"
 import { useApp } from "./escopo"
 import { Icone } from "./Icone"
 
@@ -16,21 +16,22 @@ export function Bloqueado({ previa, frase, minimo = "grupo" }: { previa?: ReactN
   const rotulo = t(grupo ? "bloqueado.rotulo" : "bloqueado.rotuloClube")
   const cta = t(grupo ? "bloqueado.upgrade" : "bloqueado.upgradeClube")
   if (app) {
-    // App (Linear): cartão carvão; o véu é uma faixa sólida no rodapé com hairline em cima, sem degradê. A prévia continua à vista.
+    // App (MasterClass): bloco carvão; o véu é uma faixa sólida em ardósia no rodapé com hairline em cima, sem degradê.
+    // O CTA do cadeado é secundário (cinza): o único dourado da tela continua sendo a ação principal dela (Decisão 70).
     return (
-      <section aria-label={rotulo} className="relative overflow-hidden rounded-xl bg-carvao shadow-borda">
+      <section aria-label={rotulo} className="relative overflow-hidden rounded-lg vidro-fundo">
         {previa ? (
           <div aria-hidden="true" inert className="pointer-events-none max-h-72 overflow-hidden p-6 blur-sm select-none">
             {previa}
           </div>
         ) : null}
-        <div className={`flex flex-col items-start gap-4 p-6 ${previa ? "absolute inset-x-0 bottom-0 border-t border-grafite bg-carvao" : ""}`}>
-          <p className="flex items-center gap-2 text-xs font-medium text-nevoa">
-            <Icone nome="cadeado" className="size-3.5" />
+        <div className={`flex flex-col items-start gap-4 p-6 ${previa ? "absolute inset-x-0 bottom-0 border-t border-placa bg-ardosia" : ""}`}>
+          <p className="flex items-center gap-2 text-corpo-p font-semibold text-cinza">
+            <Icone nome="cadeado" className="size-4" />
             {rotulo}
           </p>
-          <p className="max-w-prose text-base">{frase}</p>
-          <Link to={caminho("/planos")} className={botaoPrimarioApp}>
+          <p className="max-w-prose text-corpo">{frase}</p>
+          <Link to={caminho("/planos")} className={botaoSecundarioApp}>
             {cta}
           </Link>
         </div>

@@ -10,11 +10,12 @@ import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { campoApp, useEstiloCampo } from "../../../componentes/campoEstilo"
+import { focoApp } from "../../../componentes/menuApp"
 import { PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
-import { DialogoDenuncia } from "../componentes"
+import { Avatar, DialogoDenuncia } from "../componentes"
 import { nomeDe, ok, quando, useCarga, vitrinesPorId } from "../lib"
 
 const JANELA_EDICAO_MS = 15 * 60_000 // PROVISÓRIO: igual ao banco (editar até 15 min depois de criar)
@@ -74,34 +75,45 @@ function Mensagem({ tipo, item, autor, uid, aoMudar }: { tipo: Tipo; item: Item;
     aoMudar()
   }
 
+  // Molde Peerlist: avatar 40 à esquerda; nome 16/600 com a hora em cinza embaixo; o texto e as ações alinham com o nome.
+  const nome = autor ?? t(item.autor_id ? "rede.comunidade.membro" : "rede.comunidade.exMembro")
   return (
-    <article className={`${tipo === "posts" ? "rounded-xl p-4 shadow-borda" : "border-t border-grafite pt-3 first:border-t-0 first:pt-0"} ${item.oculto_em ? "opacity-60" : ""}`}>
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 text-legenda">
-        <strong className="text-creme">{autor ?? t(item.autor_id ? "rede.comunidade.membro" : "rede.comunidade.exMembro")}</strong>
-        <time dateTime={item.criado_em} className="text-nevoa">{quando(item.criado_em, idioma)}</time>
-        {item.editado_em ? <span className="text-nevoa">{t("rede.comunidade.editado")}</span> : null}
-        {item.oculto_em ? <Selo tom="alerta">{t("rede.comunidade.emAnalise")}</Selo> : null}
-      </header>
-      {editando ? (
-        <form onSubmit={salvar} className="mt-3 space-y-3">
-          <label htmlFor={`ed-${tipo}-${item.id}`} className="sr-only">{t("rede.comunidade.editar")}</label>
-          <textarea id={`ed-${tipo}-${item.id}`} name="corpo" defaultValue={item.corpo} rows={3} maxLength={tipo === "posts" ? 5000 : 2000} required className={campoApp} />
-          <div className="flex gap-3">
-            <Botao type="submit" variante="contorno" ocupado={ocupado} className="sm:w-auto">{t("rede.comunidade.salvar")}</Botao>
-            <Botao type="button" variante="contorno" onClick={() => setEditando(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>
-          </div>
-        </form>
-      ) : (
-        <p className="mt-2 text-base break-words whitespace-pre-wrap">{item.corpo}</p>
-      )}
-      {erro ? <div className="mt-3"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
-      {!editando ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {podeEditar ? <Botao variante="contorno" onClick={() => setEditando(true)} aria-label={`${t("rede.comunidade.editar")} ${quem}`}>{t("rede.comunidade.editar")}</Botao> : null}
-          {meu && !item.oculto_em ? <Botao variante="contorno" onClick={() => setApagando(true)} aria-label={`${t("rede.comunidade.apagar")} ${quem}`}>{t("rede.comunidade.apagar")}</Botao> : null}
-          {!meu && item.autor_id ? <Botao variante="contorno" onClick={() => setDenunciando(true)} aria-label={`${t("rede.comunidade.denunciar")} ${quem}`}>{t("rede.comunidade.denunciar")}</Botao> : null}
+    <article className={`${tipo === "posts" ? "rounded-lg p-5 vidro sm:p-6" : "border-t border-placa pt-4 first:border-t-0 first:pt-0"} ${item.oculto_em ? "opacity-60" : ""}`}>
+      <header className="flex items-start gap-3">
+        <Avatar nome={autor} />
+        <div className="min-w-0 flex-1">
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <strong className="text-corpo font-semibold text-creme">{nome}</strong>
+            {item.oculto_em ? <Selo tom="alerta">{t("rede.comunidade.emAnalise")}</Selo> : null}
+          </p>
+          <p className="text-corpo-p text-cinza">
+            <time dateTime={item.criado_em}>{quando(item.criado_em, idioma)}</time>
+            {item.editado_em ? <span> · {t("rede.comunidade.editado")}</span> : null}
+          </p>
         </div>
-      ) : null}
+      </header>
+      <div className="sm:pl-13">
+        {editando ? (
+          <form onSubmit={salvar} className="mt-3 space-y-3">
+            <label htmlFor={`ed-${tipo}-${item.id}`} className="sr-only">{t("rede.comunidade.editar")}</label>
+            <textarea id={`ed-${tipo}-${item.id}`} name="corpo" defaultValue={item.corpo} rows={3} maxLength={tipo === "posts" ? 5000 : 2000} required className={campoApp} />
+            <div className="flex gap-3">
+              <Botao type="submit" variante="secundario" ocupado={ocupado} className="sm:w-auto">{t("rede.comunidade.salvar")}</Botao>
+              <Botao type="button" variante="contorno" onClick={() => setEditando(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao>
+            </div>
+          </form>
+        ) : (
+          <p className="mt-3 text-corpo break-words whitespace-pre-wrap">{item.corpo}</p>
+        )}
+        {erro ? <div className="mt-3"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
+        {!editando ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {podeEditar ? <Botao pequeno onClick={() => setEditando(true)} aria-label={`${t("rede.comunidade.editar")} ${quem}`}>{t("rede.comunidade.editar")}</Botao> : null}
+            {meu && !item.oculto_em ? <Botao pequeno variante="perigo" onClick={() => setApagando(true)} aria-label={`${t("rede.comunidade.apagar")} ${quem}`}>{t("rede.comunidade.apagar")}</Botao> : null}
+            {!meu && item.autor_id ? <Botao pequeno onClick={() => setDenunciando(true)} aria-label={`${t("rede.comunidade.denunciar")} ${quem}`}>{t("rede.comunidade.denunciar")}</Botao> : null}
+          </div>
+        ) : null}
+      </div>
       <DialogoConfirmar aberto={apagando} titulo={t("rede.comunidade.apagarTitulo")} texto={t("rede.comunidade.apagarTexto")} confirmar={t("rede.comunidade.apagar")} perigo aoConfirmar={() => void apagar()} aoCancelar={() => setApagando(false)} />
       <DialogoDenuncia alvo={tipo === "posts" ? { post_id: item.id } : { comentario_id: item.id }} aberto={denunciando} aoFechar={() => setDenunciando(false)} />
     </article>
@@ -128,12 +140,13 @@ function Caixa({ rotulo, botao, maximo, aoEnviar, primario }: { rotulo: string; 
     setErro(!feito)
     if (feito) form.reset()
   }
+  // Molde Threads (composer): a caixa de post novo é um cartão de vidro; a de comentário fica nua, no fim da lista de comentários.
   return (
-    <form onSubmit={enviar} className={`space-y-3 ${primario ? "rounded-xl p-4 shadow-borda" : ""}`}>
+    <form onSubmit={enviar} className={`space-y-3 ${primario ? "rounded-lg p-5 vidro sm:p-6" : ""}`}>
       <label htmlFor={id} className={campo.rotulo}>{rotulo}</label>
       <textarea id={id} name="corpo" rows={3} maxLength={maximo} required className={campoApp} />
       {erro ? <Aviso tipo="erro">{t("rede.comunidade.erroPublicar")}</Aviso> : null}
-      <div className="flex justify-end"><Botao type="submit" variante={primario ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto">{botao}</Botao></div>
+      <div className="flex justify-end"><Botao type="submit" variante={primario ? "primario" : "secundario"} ocupado={ocupado} className="sm:w-auto">{botao}</Botao></div>
     </form>
   )
 }
@@ -149,7 +162,7 @@ function Comentarios({ postId, uid }: { postId: number; uid: string }) {
   if (estado.fase === "carregando") return <Esqueleto linhas={2} />
   if (estado.fase === "erro") return <Erro aoTentar={recarregar}>{t("rede.comunidade.erroComentarios")}</Erro>
   return (
-    <div className="space-y-3 border-l-2 border-grafite pl-4">
+    <div className="space-y-4 border-l-2 border-placa pl-4">
       {estado.dados.lista.map((c) => (
         <Mensagem key={c.id} tipo="comentarios" item={c} autor={estado.dados.autores.get(c.autor_id ?? "")?.nome ?? null} uid={uid} aoMudar={recarregar} />
       ))}
@@ -174,11 +187,11 @@ function Post({ item, autor, uid, aoMudar }: { item: Item; autor: string | null;
     <li className="space-y-3">
       <Mensagem tipo="posts" item={item} autor={autor} uid={uid} aoMudar={aoMudar} />
       {!item.oculto_em ? (
-        <div className="pl-4">
-          <Botao variante="contorno" aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
+        <div className="pl-5 sm:pl-6">
+          <Botao pequeno aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
             {t(aberto ? "rede.comunidade.fecharComentarios" : "rede.comunidade.verComentarios")}
           </Botao>
-          {aberto ? <div className="mt-3"><Comentarios postId={item.id} uid={uid} /></div> : null}
+          {aberto ? <div className="mt-4"><Comentarios postId={item.id} uid={uid} /></div> : null}
         </div>
       ) : null}
     </li>
@@ -209,7 +222,7 @@ function Espaco({ espacoId, uid }: { espacoId: number; uid: string }) {
       {estado.fase === "erro" ? <Erro aoTentar={recarregar}>{t("rede.comunidade.erroPosts")}</Erro> : null}
       {estado.fase === "pronto" && estado.dados.lista.length === 0 ? <Vazio>{t("rede.comunidade.vazio")}</Vazio> : null}
       {estado.fase === "pronto" && estado.dados.lista.length > 0 ? (
-        <ul className="space-y-4">
+        <ul className="space-y-6">
           {estado.dados.lista.map((p) => (
             <Post key={p.id} item={p} autor={estado.dados.autores.get(p.autor_id ?? "")?.nome ?? null} uid={uid} aoMudar={recarregar} />
           ))}
@@ -247,10 +260,10 @@ export function Comunidade() {
 
   return (
     <PaginaApp chave="rede.comunidade.titulo" estreita>
-      <details className="rounded-md bg-creme/2 px-4 py-1 shadow-borda">
-        <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11">{t("rede.comunidade.regrasTitulo")}</summary>
+      <details className="rounded-lg px-4 py-1 vidro-fundo">
+        <summary className={`min-h-10 cursor-pointer rounded-sm py-2 text-corpo-p font-semibold text-cinza pointer-coarse:min-h-11 hover:text-creme ${focoApp}`}>{t("rede.comunidade.regrasTitulo")}</summary>
         {/* PROVISÓRIO: regras de convivência a validar pelo cliente (PRD COM-02) */}
-        <ul className="mt-1 mb-3 list-disc space-y-1 pl-5 text-base text-bruma">
+        <ul className="mt-1 mb-3 list-disc space-y-1 pl-5 text-corpo text-cinza">
           <li>{t("rede.comunidade.regra1")}</li>
           <li>{t("rede.comunidade.regra2")}</li>
           <li>{t("rede.comunidade.regra3")}</li>

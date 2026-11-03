@@ -22,6 +22,7 @@ vi.mock("../../../lib/sessao", () => ({
   sair: vi.fn(),
 }))
 
+import { grupoDe } from "../formato"
 import { Notificacoes } from "./Notificacoes"
 
 const item = (id: number, lida: string | null) => ({ id, titulo: `Aviso ${id}`, link: "/tarefas", lida_em: lida, criado_em: "2026-10-30T12:00:00Z" })
@@ -86,3 +87,17 @@ describe("tela Notificações", () => {
     expect(await violacoes()).toEqual([])
   })
 })
+
+describe("grupoDe", () => {
+  const agora = new Date("2026-11-03T01:00:00").getTime() // 1h da manhã, hora local
+  const h = (n: number) => new Date(agora - n * 3_600_000).toISOString()
+  it("hoje = mesmo dia civil ou futuro; 7 dias corridos; o resto é antes", () => {
+    expect(grupoDe(h(0.5), agora)).toBe("hoje")
+    expect(grupoDe(h(-2), agora)).toBe("hoje") // relógio do navegador atrasado
+    expect(grupoDe(h(2), agora)).toBe("semana") // ontem às 23h
+    expect(grupoDe(h(6 * 24), agora)).toBe("semana")
+    expect(grupoDe(h(8 * 24), agora)).toBe("antes")
+    expect(grupoDe("data inválida", agora)).toBe("antes")
+  })
+})
+

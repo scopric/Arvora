@@ -49,11 +49,11 @@ function BlocoEmail() {
   }
 
   return (
-    <Secao titulo={t("conta.email.titulo")} texto={<>{t("conta.email.atual")}: <span className="font-medium text-creme">{sessao?.user.email}</span></>}>
+    <Secao titulo={t("conta.email.titulo")} texto={<>{t("conta.email.atual")}: <span className="font-semibold text-creme">{sessao?.user.email}</span></>}>
       <form onSubmit={trocar} noValidate className="space-y-5">
         {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
         <Campo rotulo={t("conta.email.novo")} name="email" type="email" autoComplete="email" erro={erro} />
-        <Botao type="submit" variante="contorno" ocupado={ocupado} className="sm:w-auto">{t("conta.email.botao")}</Botao>
+        <Botao type="submit" variante="secundario" ocupado={ocupado} className="sm:w-auto">{t("conta.email.botao")}</Botao>
       </form>
     </Secao>
   )
@@ -122,12 +122,12 @@ function BlocoSenha() {
         <Campo rotulo={t("conta.senha.nova")} name="senha" type="password" autoComplete="new-password" erro={erros.senha} />
         {pedeCodigo ? (
           <>
-            <p className="text-base text-bruma">{t("conta.senha.codigoTexto")}</p>
+            <p className="text-corpo text-cinza">{t("conta.senha.codigoTexto")}</p>
             <Campo rotulo={t("conta.senha.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" erro={erros.codigo} />
           </>
         ) : null}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Botao type="submit" variante="contorno" ocupado={ocupado} className="sm:w-auto">{t("conta.senha.botao")}</Botao>
+          <Botao type="submit" variante="secundario" ocupado={ocupado} className="sm:w-auto">{t("conta.senha.botao")}</Botao>
           {pedeCodigo ? (
             <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => void novoCodigo()} className="sm:w-auto">{t("conta.senha.novoCodigo")}</Botao>
           ) : null}
@@ -222,7 +222,7 @@ function DoisFatores() {
     <form onSubmit={(e) => void confirmar(e, fator, remover)} noValidate className="mt-5 space-y-5">
       <Campo rotulo={t("mfa.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" maxLength={7} />
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Botao type="submit" variante="contorno" ocupado={ocupado} className="sm:w-auto">{t(remover ? "conta.dois.removerBotao" : "mfa.botao")}</Botao>
+        <Botao type="submit" variante={remover ? "perigo" : "secundario"} ocupado={ocupado} className="sm:w-auto">{t(remover ? "conta.dois.removerBotao" : "mfa.botao")}</Botao>
         {remover ? <Botao type="button" variante="contorno" disabled={ocupado} onClick={() => setRemovendo(false)} className="sm:w-auto">{t("comum.cancelar")}</Botao> : null}
       </div>
     </form>
@@ -236,13 +236,13 @@ function DoisFatores() {
         {estado.fase === "erro" ? <Erro aoTentar={() => (setEstado({ fase: "carregando" }), descobrir().then(setEstado, () => setEstado({ fase: "erro" })))}>{t("mfa.erro")}</Erro> : null}
         {estado.fase === "pronto" && estado.fatores.length === 0 ? (
           <>
-            <p className="text-base font-medium">{t("conta.dois.inativa")}</p>
-            <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => void cadastrar()} className="sm:w-auto">{t("conta.dois.cadastrar")}</Botao>
+            <p className="text-corpo font-semibold">{t("conta.dois.inativa")}</p>
+            <Botao type="button" variante="secundario" ocupado={ocupado} onClick={() => void cadastrar()} className="sm:w-auto">{t("conta.dois.cadastrar")}</Botao>
           </>
         ) : null}
         {estado.fase === "pronto" && estado.fatores.length > 0 ? (
           <>
-            <p className="text-base font-medium">{t("conta.dois.ativa")}</p>
+            <p className="text-corpo font-semibold">{t("conta.dois.ativa")}</p>
             {removendo ? (
               <>
                 <Aviso tipo="erro">{t("conta.dois.removerTexto")}</Aviso>
@@ -255,12 +255,12 @@ function DoisFatores() {
         ) : null}
         {estado.fase === "qr" ? (
           <>
-            <p className="text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
+            <p className="text-corpo text-cinza">{t("mfa.cadastrar.texto")}</p>
             {/* data: URI de SVG gerado pelo Supabase; img-src do CSP já libera data: */}
-            <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="size-48 rounded-md bg-white p-2" />
-            <p className="text-legenda text-nevoa">{t("mfa.qr.segredo")}</p>
-            <p className="font-mono text-legenda break-all select-all">{estado.segredo}</p>
-            <p className="text-base text-bruma">{t("mfa.verificar.texto")}</p>
+            <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="size-48 rounded-lg bg-white p-2" />
+            <p className="text-corpo-p text-cinza">{t("mfa.qr.segredo")}</p>
+            <p className="text-corpo-p tracking-wider break-all select-all">{estado.segredo}</p>
+            <p className="text-corpo text-cinza">{t("mfa.verificar.texto")}</p>
             {formCodigo(estado.fator, null)}
           </>
         ) : null}

@@ -58,7 +58,7 @@ function BlocoExportar() {
   return (
     <Secao titulo={t("conta.dados.exportar.titulo")} texto={t("conta.dados.exportar.texto")}>
       {erro ? <div className="mb-4"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
-      <Botao type="button" variante="contorno" ocupado={baixando} onClick={() => void baixar()} className="sm:w-auto">{t("conta.dados.exportar.botao")}</Botao>
+      <Botao type="button" variante="secundario" ocupado={baixando} onClick={() => void baixar()} className="sm:w-auto">{t("conta.dados.exportar.botao")}</Botao>
     </Secao>
   )
 }
@@ -107,8 +107,8 @@ function BlocoPedidos({ uid }: { uid: string }) {
         <div className="space-y-4">
           {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exportacao")} className="sm:w-auto">{t("conta.dados.pedido.exportacao")}</Botao>
-            <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => setConfirmar("exclusao")} className="sm:w-auto">{t("conta.dados.pedido.exclusao")}</Botao>
+            <Botao type="button" variante="secundario" ocupado={ocupado} onClick={() => setConfirmar("exportacao")} className="sm:w-auto">{t("conta.dados.pedido.exportacao")}</Botao>
+            <Botao type="button" variante="secundario" ocupado={ocupado} onClick={() => setConfirmar("exclusao")} className="sm:w-auto">{t("conta.dados.pedido.exclusao")}</Botao>
           </div>
         </div>
         <DialogoConfirmar
@@ -123,7 +123,7 @@ function BlocoPedidos({ uid }: { uid: string }) {
       </Secao>
       {/* A lista fica fora do painel: a Tabela, o Vazio e o Erro já têm moldura própria. */}
       <section>
-        <h2 className="text-base font-semibold">{t("conta.dados.lista.titulo")}</h2>
+        <h2 className="text-subtitulo font-semibold">{t("conta.dados.lista.titulo")}</h2>
         <div className="mt-4 space-y-4">
           {lista.fase === "carregando" ? <Esqueleto linhas={2} /> : null}
           {lista.fase === "erro" ? <Erro aoTentar={() => (setLista({ fase: "carregando" }), setTentativa((n) => n + 1))}>{t("conta.erroCarregar")}</Erro> : null}
@@ -175,7 +175,7 @@ function BlocoExcluir() {
 
   return (
     <Secao titulo={t("conta.dados.excluir.titulo")}>
-      <div className="space-y-2 text-base text-bruma">
+      <div className="space-y-2 text-corpo text-cinza">
         <p>{t("perfil.excluir.aviso")}</p>
         <ul className="list-disc space-y-1 pl-5">
           <li>{t("perfil.excluir.perde")}</li>
@@ -190,7 +190,7 @@ function BlocoExcluir() {
         <Botao type="button" variante="perigo" onClick={() => setDialogo(true)} className="mt-5 sm:w-auto">{t("conta.dados.excluir.abrir")}</Botao>
       ) : (
         <form onSubmit={excluir} noValidate className="mt-5 space-y-5">
-          <p className="text-base font-medium">{t("conta.dados.excluir.etapa2")}</p>
+          <p className="text-corpo font-semibold">{t("conta.dados.excluir.etapa2")}</p>
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
           <Campo rotulo={t("perfil.excluir.email")} name="confirmar_email" type="email" autoComplete="off" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
           <Campo rotulo={t("perfil.excluir.senha")} name="confirmar_senha" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />

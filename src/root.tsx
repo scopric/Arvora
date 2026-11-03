@@ -32,6 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 // Fontes pré-carregadas: sem isso o navegador só as descobre depois de baixar o CSS (cadeia html → css → fonte).
+// A Big Shoulders (só nomes de conteúdo no app) fica fora: 35 KB a mais em toda página pública, que não a usa.
 export const links = () =>
   [corpoUrl, tituloUrl].map((href) => ({ rel: "preload", href, as: "font", type: "font/woff2", crossOrigin: "anonymous" as const }))
 

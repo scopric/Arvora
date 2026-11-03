@@ -11,12 +11,12 @@ import { useSairSeNaoForEquipe } from "../lib/sairDoPainel"
 import { BotaoSair } from "./ContasSeparadas"
 import { NaoEncontrada } from "./NaoEncontrada"
 import { SeletorIdioma } from "./SeletorIdioma"
-import { focoApp, linkMenuApp, rotuloGrupoApp } from "./menuApp"
+import { botaoPequenoApp } from "./botaoEstilo"
+import { linkMenuApp, rotuloGrupoApp } from "./menuApp"
 import { MENU_ADMIN } from "./navegacao"
 
-// Mesma casca do membro (molde: configurações do app do Linear): sidebar no breu com grupos rotulados, conteúdo num
-// painel carvão com hairline. O tema claro do PRD §17.7.2 saiu (Decisão 53).
-const foco = focoApp
+// Admin mantém a sidebar (molde: configurações do app do Linear, tela 04b0ed10) sobre os tokens do MasterClass
+// (Decisão 70): aside de vidro flutuante com grupos rotulados, conteúdo direto sobre o palco verde. O tema claro do PRD §17.7.2 saiu (Decisão 53).
 const linkMenu = linkMenuApp
 
 function Menu() {
@@ -55,7 +55,7 @@ export function LayoutAdmin() {
   if (acesso.carregando || acesso.erro) {
     return (
       <EscopoApp value>
-        <div className="app min-h-dvh bg-breu text-creme">
+        <div className="app min-h-dvh text-creme">
           {acesso.carregando ? <Esqueleto linhas={4} className="mx-auto max-w-3xl px-6 py-16" /> : <div className="mx-auto max-w-3xl px-6 py-16"><Erro aoTentar={acesso.recarregar}>{t("acesso.erro")}</Erro></div>}
         </div>
       </EscopoApp>
@@ -66,18 +66,18 @@ export function LayoutAdmin() {
 
   return (
     <EscopoApp value>
-      <div className="app min-h-dvh bg-breu text-creme">
+      <div className="app min-h-dvh text-creme">
         <Mfa>
           <div className="flex min-h-dvh max-lg:flex-col">
-            <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-40 focus:m-2 focus:rounded-md focus:bg-creme focus:px-4 focus:py-3 focus:text-breu">{t("menu.pular")}</a>
-            <aside className="shrink-0 px-3 py-3 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-60 lg:flex-col lg:overflow-y-auto">
+            <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-40 focus:m-2 focus:rounded-lg focus:bg-creme focus:px-4 focus:py-3 focus:text-breu">{t("menu.pular")}</a>
+            <aside className="shrink-0 px-3 py-3 vidro-fundo lg:sticky lg:top-3 lg:m-3 lg:flex lg:h-[calc(100dvh-1.5rem)] lg:w-60 lg:flex-col lg:overflow-y-auto lg:rounded-xl">
               <div className="flex items-center justify-between gap-2 px-2 py-1">
-                <p className="text-[11px] font-medium text-nevoa">{t("admin.faixa")}</p>
+                <p className="text-legenda font-semibold text-cinza">{t("admin.faixa")}</p>
                 <SeletorIdioma />
               </div>
               <BotaoSair destino={caminho("/entrar")} className="mt-2 px-2" />
               <details className="mt-2 lg:hidden">
-                <summary className={`flex min-h-9 cursor-pointer list-none items-center justify-between rounded-md border border-grafite px-3 text-legenda font-medium text-bruma pointer-coarse:min-h-11 hover:text-creme ${foco}`}>
+                <summary className={`${botaoPequenoApp} w-full cursor-pointer list-none justify-between`}>
                   {t("menu.mais")}
                   <Icone nome="menu" className="size-4" />
                 </summary>
@@ -85,7 +85,7 @@ export function LayoutAdmin() {
               </details>
               <div className="max-lg:hidden"><Menu /></div>
             </aside>
-            <main id="conteudo" tabIndex={-1} className="min-w-0 flex-1 bg-carvao outline-none lg:my-2 lg:mr-2 lg:rounded-xl lg:shadow-borda">
+            <main id="conteudo" tabIndex={-1} className="min-w-0 flex-1 outline-none">
               <Outlet />
             </main>
           </div>

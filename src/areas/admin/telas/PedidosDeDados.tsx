@@ -8,7 +8,7 @@ import { Vazio } from "../../../componentes/Vazio"
 import { useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { AreaTexto } from "../componentes/Campos"
-import { AvisoDe, Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
+import { Barra, AvisoDe, Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
 import { exigir, exigirLinha, useAcao, useCarga } from "../lib/consulta"
 import { dataCurta, hojeEmDublin } from "../lib/formato"
 import { SUPER, usePode } from "../lib/papel"
@@ -38,8 +38,8 @@ function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
       <AreaTexto rotulo={t("admin.pedidos.observacao")} rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-2">
-        <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={() => void salvar(status)} className="sm:w-auto">{t("admin.comum.salvar")}</Botao>
-        {p.status !== "concluido" ? <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => setConfirmando(true)} className="sm:w-auto">{t("admin.pedidos.atendido")}</Botao> : null}
+        <Botao type="button" pequeno ocupado={acao.ocupado} onClick={() => void salvar(status)}>{t("admin.comum.salvar")}</Botao>
+        {p.status !== "concluido" ? <Botao type="button" pequeno disabled={acao.ocupado} onClick={() => setConfirmando(true)}>{t("admin.pedidos.atendido")}</Botao> : null}
       </div>
       <DialogoConfirmar
         aberto={confirmando} titulo={t("admin.pedidos.atendidoTitulo")} texto={t("admin.pedidos.atendidoTexto")} confirmar={t("admin.pedidos.atendido")}
@@ -64,12 +64,14 @@ export function PedidosDeDados() {
   const hoje = hojeEmDublin()
   return (
     <Pagina titulo="admin.pedidosDeDados.titulo" intro="admin.pedidos.intro">
-      <div className="max-w-xs">
-        <Selecao rotulo={t("admin.pedidos.mostrar")} value={abertos ? "abertos" : "todos"} onChange={(e) => setAbertos(e.target.value === "abertos")}>
-          <option value="abertos">{t("admin.pedidos.abertos")}</option>
-          <option value="todos">{t("admin.comum.todos")}</option>
-        </Selecao>
-      </div>
+      <Barra>
+        <div className="w-56 max-w-full">
+          <Selecao rotulo={t("admin.pedidos.mostrar")} value={abertos ? "abertos" : "todos"} onChange={(e) => setAbertos(e.target.value === "abertos")}>
+            <option value="abertos">{t("admin.pedidos.abertos")}</option>
+            <option value="todos">{t("admin.comum.todos")}</option>
+          </Selecao>
+        </div>
+      </Barra>
       <Mostrar carga={carga}>
         {(linhas) =>
           linhas.length === 0 ? (

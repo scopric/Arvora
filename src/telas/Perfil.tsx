@@ -2,6 +2,7 @@ import { useEffect, useState, type SubmitEvent } from "react"
 import { Link } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
+import { Cartao, cartaoApp } from "../componentes/Cartao"
 import { Campo, Selecao } from "../componentes/Campo"
 import { useEstiloCampo } from "../componentes/campoEstilo"
 import { linkTextoApp } from "../componentes/menuApp"
@@ -88,15 +89,14 @@ export function Perfil() {
   }
 
   return (
-    // Dentro do LayoutMembro (menu, marca e "Sair" vêm de lá).
-    <PaginaApp chave="titulo.perfil" titulo={t("perfil.titulo")} estreita>
-
-      {estado.fase === "carregando" ? <p role="status" className="text-nevoa">{t("comum.carregando")}</p> : null}
+    // Dentro do LayoutMembro (menu, marca e "Sair" vêm de lá). Molde Linear (settings > Profile): formulário num cartão
+    // de vidro, campos empilhados; "Salvar" é o único dourado da tela. Assinatura e dados ficam em cartões abaixo.
+    <PaginaApp chave="titulo.perfil" titulo={t("perfil.titulo")} meta={sessao?.user.email ? `${t("perfil.emailConta")} ${sessao.user.email}` : undefined} estreita>
+      {estado.fase === "carregando" ? <p role="status" className="text-cinza">{t("comum.carregando")}</p> : null}
       {estado.fase === "erro" ? <Aviso tipo="erro">{t(estado.mensagem)}</Aviso> : null}
       {estado.fase === "pronto" ? (
-        <form key={JSON.stringify(estado.perfil)} onSubmit={salvar} noValidate className="space-y-5">
+        <form key={JSON.stringify(estado.perfil)} onSubmit={salvar} noValidate className={`space-y-5 ${cartaoApp}`}>
           {aviso ? <Aviso tipo={aviso.tipo}>{t(aviso.texto)}</Aviso> : null}
-          <p className="text-legenda text-nevoa">{t("perfil.emailConta")} {sessao?.user.email}</p>
           <Campo rotulo={t("perfil.nome")} name="nome" defaultValue={estado.perfil.nome} erro={erros.nome} autoComplete="name" />
           <Campo rotulo={t("perfil.empresa")} name="empresa_nome" defaultValue={estado.perfil.empresa_nome ?? ""} erro={erros.empresa_nome} autoComplete="organization" />
           <Selecao rotulo={t("perfil.setor")} name="setor_id" defaultValue={estado.perfil.setor_id?.toString() ?? ""} erro={erros.setor_id}>
@@ -129,21 +129,21 @@ export function Perfil() {
 
           {/* A visibilidade agora se muda em Configurações > Privacidade; o campo segue no envio só porque o schema o exige. */}
           <input type="hidden" name="visibilidade" value={estado.perfil.visibilidade} />
-          <p className="text-legenda">
-            <Link to={caminho("/configuracoes/privacidade")} className={linkTextoApp}>{t("conta.perfil.linkPrivacidade")}</Link>
+          <p className="text-corpo-p">
+            <Link to={caminho("/configuracoes/privacidade")} className={`inline-flex items-center pointer-coarse:min-h-11 ${linkTextoApp}`}>{t("conta.perfil.linkPrivacidade")}</Link>
           </p>
 
-          <Botao type="submit" ocupado={ocupado}>{t("perfil.salvar")}</Botao>
+          <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("perfil.salvar")}</Botao>
         </form>
       ) : null}
       {uid ? <BlocoAssinatura uid={uid} /> : null}
 
-      <section className="mt-12 border-t border-creme/15 pt-8">
-        <h2 className="text-sm font-semibold">{t("perfil.dados.titulo")}</h2>
-        <p className="mt-2 text-legenda">
+      <Cartao className="mt-6">
+        <h2 className="text-subtitulo font-semibold">{t("perfil.dados.titulo")}</h2>
+        <p className="mt-2 text-corpo">
           <Link to={caminho("/configuracoes/dados")} className={linkTextoApp}>{t("conta.perfil.linkDados")}</Link>
         </p>
-      </section>
+      </Cartao>
     </PaginaApp>
   )
 }
@@ -168,15 +168,16 @@ function BlocoAssinatura({ uid }: { uid: string }) {
 
   if (estado === "carregando" || estado === "sem") return null
   return (
-    <section className="mt-12 space-y-3 border-t border-creme/15 pt-8">
-      <h2 className="font-titulo text-2xl font-medium">{t("perfil.assinatura.titulo")}</h2>
+    <Cartao className="mt-6 space-y-3">
+      <h2 className="text-subtitulo font-semibold">{t("perfil.assinatura.titulo")}</h2>
       {estado === "erro" ? <Aviso tipo="erro">{t("perfil.assinatura.erro")}</Aviso> : null}
       {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
       {estado === "com" ? (
         <Botao
           type="button"
-          variante="contorno"
+          variante="secundario"
           ocupado={ocupado}
+          className="sm:w-auto"
           onClick={async () => {
             setErro(null)
             setOcupado(true)
@@ -188,6 +189,6 @@ function BlocoAssinatura({ uid }: { uid: string }) {
           {t("perfil.assinatura.gerenciar")}
         </Botao>
       ) : null}
-    </section>
+    </Cartao>
   )
 }

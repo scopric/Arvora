@@ -3,14 +3,16 @@ import { Link } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Botao } from "../../../componentes/Botao"
+import { Cartao, caixaSutilApp } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
+import { Icone } from "../../../componentes/Icone"
 import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { botaoContornoApp } from "../../../componentes/botaoEstilo"
-import { linkTextoApp } from "../../../componentes/menuApp"
+import { focoApp, linkTextoApp } from "../../../componentes/menuApp"
 import { PaginaApp } from "../../../componentes/PaginaApp"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
@@ -27,9 +29,9 @@ function PreviaClube() {
   return (
     <div className="space-y-4">
       {[1, 2].map((n) => (
-        <div key={n} className="rounded-xl p-5 shadow-borda">
-          <p className="text-base font-semibold">{t("rede.match.previaNome")}</p>
-          <p className="text-legenda text-nevoa">{t("rede.match.previaMotivo")}</p>
+        <div key={n} className="rounded-lg bg-ardosia p-5 shadow-borda">
+          <p className="text-corpo font-semibold">{t("rede.match.previaNome")}</p>
+          <p className="text-corpo-p text-cinza">{t("rede.match.previaMotivo")}</p>
         </div>
       ))}
     </div>
@@ -118,18 +120,19 @@ export function Match() {
     const ligado = d.vigentes.length > 0
     if (!ligado) {
       // Primeira vez: pede o opt-in. Desligado: explica e deixa religar. Sem documento vigente não liga (aviso).
+      // Molde B150 (cartão de identidade): opt-in num cartão de vidro centrado; o texto legal fica num bloco em ardósia rolável.
       corpo = (
-        <section className="max-w-2xl rounded-xl p-6 shadow-borda">
-          <h2 className="text-corpo-g font-semibold">{t(d.ja ? "rede.match.desligadoTitulo" : "rede.match.primeiraTitulo")}</h2>
-          <p className="mt-3 max-w-prose text-base text-bruma">{t(d.ja ? "rede.match.desligadoTexto" : "rede.match.primeiraTexto")}</p>
+        <Cartao className="mx-auto max-w-2xl">
+          <h2 className="text-subtitulo font-semibold">{t(d.ja ? "rede.match.desligadoTitulo" : "rede.match.primeiraTitulo")}</h2>
+          <p className="mt-3 max-w-prose text-corpo text-cinza">{t(d.ja ? "rede.match.desligadoTexto" : "rede.match.primeiraTexto")}</p>
           {d.documento ? (
             <>
-              <details open className="mt-5 rounded-md bg-creme/2 px-4 py-1 shadow-borda">
-                <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11">{d.documento.titulo} · v{d.documento.versao}</summary>
-                <p className="mt-1 mb-3 max-h-64 overflow-y-auto text-base whitespace-pre-wrap">{d.documento.conteudo_md}</p>
+              <details open className="mt-5 rounded-lg bg-ardosia px-4 py-1 shadow-borda">
+                <summary className={`min-h-10 cursor-pointer rounded-sm py-2 text-corpo-p font-semibold text-cinza pointer-coarse:min-h-11 hover:text-creme ${focoApp}`}>{d.documento.titulo} · v{d.documento.versao}</summary>
+                <p className="mt-1 mb-3 max-h-64 overflow-y-auto text-corpo whitespace-pre-wrap">{d.documento.conteudo_md}</p>
               </details>
-              <label className="mt-5 flex items-start gap-3 text-base">
-                <input type="checkbox" checked={lido} onChange={(e) => setLido(e.target.checked)} className="mt-1 size-4 accent-dourado" />
+              <label className="mt-5 flex items-start gap-3 text-corpo">
+                <input type="checkbox" checked={lido} onChange={(e) => setLido(e.target.checked)} className="mt-1 size-5 accent-dourado" />
                 <span>{t("rede.match.li")} (v{d.documento.versao})</span>
               </label>
             </>
@@ -143,7 +146,7 @@ export function Match() {
             ) : null}
             {!d.ja ? <Link to={caminho("/inicio")} className={botaoContornoApp}>{t("rede.match.agoraNao")}</Link> : null}
           </div>
-        </section>
+        </Cartao>
       )
     } else {
       const porOutro = new Map(d.minhas.map((c) => [c.solicitante_id === uid ? c.destinatario_id : c.solicitante_id, c]))
@@ -157,13 +160,14 @@ export function Match() {
         return partes.length ? partes.join("; ") : s.motivo
       }
       const visiveis = d.sugestoes.filter((s) => d.perfis?.get(s.sugerido_id))
+      const primeiraLivre = visiveis.find((s) => !porOutro.get(s.sugerido_id))?.id // a única com "Pedir conexão" dourado
       corpo = (
         <>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="flex items-center gap-3"><Selo tom="destaque">{t("rede.match.ligado")}</Selo>
-              {d.semana ? <span className="text-legenda text-nevoa">{t("rede.match.semana")} {dia(`${d.semana}T12:00:00`, idioma)}</span> : null}
+              {d.semana ? <span className="text-corpo-p text-cinza">{t("rede.match.semana")} {dia(`${d.semana}T12:00:00`, idioma)}</span> : null}
             </p>
-            <Botao variante="contorno" onClick={() => setDesligando(true)} className="sm:w-auto">{t("rede.match.desligar")}</Botao>
+            <Botao variante="secundario" onClick={() => setDesligando(true)} className="sm:w-auto">{t("rede.match.desligar")}</Botao>
           </div>
           {erro ? <div className="mt-4"><Aviso tipo="erro">{t(erro)}</Aviso></div> : null}
           <div className="mt-6">
@@ -173,6 +177,8 @@ export function Match() {
               <ul className="grid gap-4 md:grid-cols-2">
                 {visiveis.map((s) => {
                   const p = d.perfis!.get(s.sugerido_id)!
+                  const conexao = porOutro.get(s.sugerido_id)
+                  // Molde B150: só a primeira sugestão sem conexão leva o botão dourado; as outras ficam em Ghost (um primário por tela).
                   return (
                     <CartaoPerfil
                       key={s.id}
@@ -181,22 +187,24 @@ export function Match() {
                       tags={(d.itens ?? []).filter((i) => i.perfil_id === s.sugerido_id).map((i) => <Etiqueta key={i.categoria_id}>{nomeCategoria(d.categorias ?? [], i.categoria_id, idioma)}</Etiqueta>)}
                       acoes={
                         <>
-                          <AcaoConexao uid={uid} outroId={s.sugerido_id} nome={p.nome ?? ""} origem="match" conexao={porOutro.get(s.sugerido_id)} aoMudar={recarregar} destaque={false} />
-                          <Link to={caminho(`/network/${p.slug ?? s.sugerido_id}`)} className={`inline-flex min-h-9 items-center text-legenda pointer-coarse:min-h-11 ${linkTextoApp}`}>{t("rede.match.verPerfil")}</Link>
+                          <AcaoConexao uid={uid} outroId={s.sugerido_id} nome={p.nome ?? ""} origem="match" conexao={conexao} aoMudar={recarregar} destaque={s.id === primeiraLivre} />
+                          <Link to={caminho(`/network/${p.slug ?? s.sugerido_id}`)} className={`inline-flex min-h-10 items-center text-corpo-p pointer-coarse:min-h-11 ${linkTextoApp}`}>{t("rede.match.verPerfil")}</Link>
                         </>
                       }
                     >
-                      <p className="mt-4 border-l-2 border-grafite pl-3 text-legenda text-bruma">
-                        <span className="block font-medium text-nevoa">{t("rede.match.porque")}</span>
-                        {frase(s)}
-                      </p>
+                      <div className={`mt-4 text-corpo-p ${caixaSutilApp}`}>
+                        <p className="font-semibold text-cinza">{t("rede.match.porque")}</p>
+                        <p className="mt-1 text-creme">{frase(s)}</p>
+                      </div>
+                      {/* Dado oculto (B150 "This information is hidden"): o contato só aparece depois do aceite. */}
+                      {conexao?.status !== "aceita" ? <p className="mt-3 flex items-center gap-2 text-corpo-p text-cinza"><Icone nome="cadeado" className="size-4" />{t("rede.match.oculto")}</p> : null}
                     </CartaoPerfil>
                   )
                 })}
               </ul>
             )}
           </div>
-          <p className="mt-8 text-legenda text-nevoa">{t("rede.match.rodape")}</p>
+          <p className="mt-8 text-corpo-p text-cinza">{t("rede.match.rodape")}</p>
           <DialogoConfirmar aberto={desligando} titulo={t("rede.match.desligarTitulo")} texto={t("rede.match.desligarTexto")} confirmar={t("rede.match.desligar")} aoConfirmar={() => void desligar(d.vigentes)} aoCancelar={() => setDesligando(false)} />
         </>
       )

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, SubmitEvent } from "react"
 import { LinkVoltar } from "../../../componentes/LinkVoltar"
 import { useT, useTitulo, type Chave } from "../../../i18n"
 import { Vazio } from "../../../componentes/Vazio"
@@ -17,8 +17,8 @@ export function Pagina({ titulo, intro, acoes, voltar, children }: { titulo: Cha
       {voltar ? <LinkVoltar {...voltar} /> : null}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-subtitulo font-semibold sm:text-titulo-p">{t(titulo)}</h1>
-          {intro ? <p className="mt-3 max-w-prose text-base text-nevoa">{t(intro)}</p> : null}
+          <h1 className="text-titulo-p font-semibold sm:text-titulo">{t(titulo)}</h1>
+          {intro ? <p className="mt-3 max-w-prose text-corpo text-cinza">{t(intro)}</p> : null}
         </div>
         {acoes}
       </div>
@@ -27,21 +27,25 @@ export function Pagina({ titulo, intro, acoes, voltar, children }: { titulo: Cha
   )
 }
 
-// Barra acima de uma tabela (molde Attio/Linear): filtros e busca à esquerda, ações à direita (o primário fica aqui).
-export function Barra({ acoes, children }: { acoes?: ReactNode; children?: ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-end justify-between gap-3">
+// Barra acima de uma tabela (molde Attio 4230ed22 + Linear 43379d51): bloco de vidro-fundo com busca e filtros à
+// esquerda e ações à direita (o primário "Novo" fica aqui). Com `onSubmit` vira <form> (filtros aplicados ao enviar).
+export function Barra({ acoes, children, onSubmit }: { acoes?: ReactNode; children?: ReactNode; onSubmit?: (e: SubmitEvent<HTMLFormElement>) => void }) {
+  const classe = "flex flex-wrap items-end justify-between gap-3 rounded-lg p-4 vidro-fundo"
+  const dentro = (
+    <>
       <div className="flex flex-wrap items-end gap-3">{children}</div>
       {acoes ? <div className="flex flex-wrap gap-2">{acoes}</div> : null}
-    </div>
+    </>
   )
+  return onSubmit ? <form onSubmit={onSubmit} className={classe}>{dentro}</form> : <div className={classe}>{dentro}</div>
 }
 
-export function Secao({ titulo, children }: { titulo: Chave; children: ReactNode }) {
+// Seção (molde Polar/Linear): título 20/600 fora do bloco; o conteúdo decide a própria moldura.
+export function Secao({ titulo, className = "", children }: { titulo: Chave; className?: string; children: ReactNode }) {
   const t = useT()
   return (
-    <section>
-      <h2 className="mb-4 text-corpo-g font-semibold">{t(titulo)}</h2>
+    <section className={className || undefined}>
+      <h2 className="mb-4 text-subtitulo font-semibold">{t(titulo)}</h2>
       {children}
     </section>
   )

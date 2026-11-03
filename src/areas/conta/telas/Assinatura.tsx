@@ -12,7 +12,7 @@ import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { dataCurta, dinheiro, prazoArrependimento } from "../formato"
 import { Pagina, Secao } from "../Pagina"
-import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { botaoPrimarioApp, botaoSecundarioApp } from "../../../componentes/botaoEstilo"
 
 type Linha = {
   status: string
@@ -93,18 +93,19 @@ function Plano({ a }: { a: Linha }) {
 
   return (
     <Secao titulo={a.planos?.nome ?? t("conta.assinatura.titulo")}>
-      {/* Molde Mercury (Plan & Billing): situação, preço e data em células lado a lado; "Gerenciar" abaixo. */}
+      {/* Molde Linear 5ae078a0 (Billing): plano atual num cartão com situação, preço e data em células; "Gerenciar no Stripe"
+          em cinza cheio. Sem "plano superior" nem "faturas": o catálogo fica em /planos e as faturas no portal do Stripe. */}
       <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-3">
         <div>
-          <dt className="text-legenda text-nevoa">{t("conta.assinatura.situacao")}</dt>
+          <dt className="text-corpo-p text-cinza">{t("conta.assinatura.situacao")}</dt>
           <dd className="mt-1"><Selo tom={sit.tom}>{t(sit.selo)}</Selo></dd>
         </div>
         {a.planos && !manual ? (
-          <div><dt className="text-legenda text-nevoa">{t("conta.assinatura.valor")}</dt><dd className="mt-0.5 text-corpo-g font-medium">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} <span className="text-legenda text-nevoa">/ {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</span></dd></div>
+          <div><dt className="text-corpo-p text-cinza">{t("conta.assinatura.valor")}</dt><dd className="mt-0.5 text-subtitulo font-semibold tabular-nums">{dinheiro(a.planos.valor_centavos, a.planos.moeda, idioma)} <span className="text-corpo-p font-normal text-cinza">/ {t(a.planos.intervalo === "ano" ? "conta.assinatura.ano" : "conta.assinatura.mes")}</span></dd></div>
         ) : null}
         <div>
-          <dt className="text-legenda text-nevoa">{t(sit.data)}</dt>
-          <dd className="mt-0.5 text-corpo-g font-medium tabular-nums"><time dateTime={a.periodo_fim}>{dataCurta(a.periodo_fim, idioma)}</time></dd>
+          <dt className="text-corpo-p text-cinza">{t(sit.data)}</dt>
+          <dd className="mt-0.5 text-subtitulo font-semibold tabular-nums"><time dateTime={a.periodo_fim}>{dataCurta(a.periodo_fim, idioma)}</time></dd>
         </div>
       </dl>
       {sit.aviso ? <div className="mt-5"><Aviso tipo="erro">{t(sit.aviso)}</Aviso></div> : null}
@@ -113,7 +114,7 @@ function Plano({ a }: { a: Linha }) {
         <div className="mt-6">
           <Botao
             type="button"
-            variante="contorno"
+            variante="secundario"
             ocupado={ocupado}
             className="sm:w-auto"
             onClick={async () => {
@@ -126,7 +127,7 @@ function Plano({ a }: { a: Linha }) {
           >
             {t("conta.assinatura.gerenciar")}
           </Botao>
-          <p className="mt-2 text-legenda text-nevoa">{t("conta.assinatura.gerenciarAjuda")}</p>
+          <p className="mt-2 text-corpo-p text-cinza">{t("conta.assinatura.gerenciarAjuda")}</p>
         </div>
       ) : null}
     </Secao>
@@ -143,19 +144,19 @@ function DireitoDeCancelar({ a }: { a: Linha | null }) {
   const prazo = vigenteStripe ? prazoArrependimento(a.stripe_criada_em ?? a.criado_em) : null
   return (
     <Secao titulo={t("conta.direito.titulo")}>
-      <div className="space-y-3 text-base text-bruma">
+      <div className="space-y-3 text-corpo text-cinza">
         <p>{t("conta.direito.p1")}</p>
         <p>{t("conta.direito.p2")}</p>
         <p>{t("conta.direito.p3")}</p>
         <p>{t("conta.direito.p4")}</p>
         {prazo ? (
-          <p className="font-medium text-creme">
+          <p className="font-semibold text-creme">
             {t(prazo.aberto ? "conta.direito.ate" : "conta.direito.passou")}
             {prazo.aberto ? <> <time dateTime={prazo.fim}>{dataCurta(prazo.fim, idioma)}</time>.</> : null}
           </p>
         ) : null}
       </div>
-      <Link to={caminho("/suporte")} className={`mt-5 ${botaoContornoApp}`}>
+      <Link to={caminho("/suporte")} className={`mt-5 ${botaoSecundarioApp}`}>
         {t("conta.direito.suporte")}
       </Link>
     </Secao>

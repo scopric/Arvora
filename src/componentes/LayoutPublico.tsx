@@ -130,7 +130,7 @@ export function LayoutPublico() {
   const t = useT()
   const { sessao } = useAuth()
   const segmento = useLocation().pathname.split("/")[2]
-  // O miolo mantém o visual público (Decisão 55): só a casca fica no escopo do app.
+  // O miolo mantém o visual público (Decisões 55 e 70): só a casca fica no escopo do app.
   if (sessao && COM_CASCA_DO_MEMBRO.has(segmento)) return <LayoutMembro conteudoPublico />
   return (
     <div className="min-h-dvh">

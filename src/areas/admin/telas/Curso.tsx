@@ -56,7 +56,7 @@ export function Curso() {
             </Secao>
             <Secao titulo="admin.curso.modulos">
               <CrudTabela
-                variante="contorno"
+                variante="secundario"
                 tabela="modulos" colunas="id, curso_id, titulo, ordem" campos={MODULO} ordem={[{ coluna: "ordem" }]} filtro={{ coluna: "curso_id", valor: d.curso.id }}
                 fixos={{ curso_id: d.curso.id }} podeEditar={pode} podeApagar legenda="admin.curso.modulos" vazio="admin.curso.semModulos" aoMudar={carga.recarregar}
               />
@@ -64,7 +64,7 @@ export function Curso() {
             <Secao titulo="admin.curso.aulas">
               {d.modulos.length === 0 ? <Vazio>{t("admin.curso.semModulos")}</Vazio> : d.modulos.map((m) => (
                 <div key={m.id} className="mb-4">
-                  <h3 className="text-base font-semibold">{m.titulo}</h3>
+                  <h3 className="text-corpo font-semibold">{m.titulo}</h3>
                   <ul className="mt-2 space-y-1">
                     {d.aulas.filter((a) => a.modulo_id === m.id).map((a) => (
                       <li key={a.id} className="flex items-center gap-3">

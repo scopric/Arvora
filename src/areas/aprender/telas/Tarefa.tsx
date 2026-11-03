@@ -1,20 +1,25 @@
+import type { ReactNode } from "react"
 import { Link, useParams } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
-import { useCaminho, useT } from "../../../i18n"
+import { Selo } from "../../../componentes/Selo"
+import { useCaminho, useIdioma, useT } from "../../../i18n"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
-import { Exercicio } from "../componentes/Exercicio"
+import { Exercicio, SeloStatus } from "../componentes/Exercicio"
 import { Pagina } from "../componentes/Pagina"
 import { carregarTarefas } from "../tarefas"
 import { useCarga } from "../useCarga"
-import { linkTexto } from "../util"
+import { dataCurta, linkTexto } from "../util"
 
 // Detalhe da tarefa: instruções, resposta (texto e arquivo), devolutiva da equipe e reenvio quando o status é "ajustar".
+// Molde Linear (detalhe da issue, tela c0d1f40b): o enunciado ao centro e as propriedades (status, prazo,
+// envio, aula) num painel de vidro à direita (no celular, abaixo).
 export function Tarefa() {
   const { id } = useParams()
   const t = useT()
+  const lang = useIdioma()
   const caminho = useCaminho()
   const acesso = useAcesso()
   const { sessao } = useAuth()
@@ -33,14 +38,24 @@ export function Tarefa() {
   if (!item) return <Pagina chave={chave} titulo={t("aprender.naoEncontrada")} voltar={voltar}>{null}</Pagina>
 
   const { exercicio, entrega } = item
+  const propriedade = (rotulo: string, valor: ReactNode) => (
+    <div className="flex items-start justify-between gap-4 py-2.5">
+      <dt className="text-corpo-p text-cinza">{rotulo}</dt>
+      <dd className="text-right text-corpo-p">{valor}</dd>
+    </div>
+  )
   return (
     <Pagina chave={chave} titulo={exercicio.aulas?.titulo ?? t(chave)} voltar={voltar}>
-      {exercicio.aulas ? (
-        <p className="mb-6">
-          <Link to={caminho(`/aulas/${exercicio.aulas.slug}`)} className={linkTexto}>{t("aprender.tarefa.verAula")}</Link>
-        </p>
-      ) : null}
-      <Exercicio exercicio={exercicio} entrega={entrega} uid={uid} podeEnviar={!!exercicio.aulas?.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} doGrupo={temNivel(acesso.nivel, "grupo")} aoAtualizar={recarregar} />
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <Exercicio exercicio={exercicio} entrega={entrega} uid={uid} podeEnviar={!!exercicio.aulas?.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} doGrupo={temNivel(acesso.nivel, "grupo")} aoAtualizar={recarregar} />
+        <dl className="divide-y divide-fumaca rounded-lg px-4 py-1 vidro lg:sticky lg:top-24 lg:self-start">
+          {propriedade(t("aprender.exercicio.n"), String(exercicio.ordem))}
+          {propriedade(t("aprender.tarefa.status"), entrega ? <SeloStatus status={entrega.status} /> : <Selo>{t("aprender.exercicio.naoEnviado")}</Selo>)}
+          {exercicio.prazo_dias ? propriedade(t("aprender.exercicio.prazo"), `${exercicio.prazo_dias} ${t("aprender.exercicio.dias")}`) : null}
+          {entrega ? propriedade(t("aprender.tarefa.enviadaEm"), dataCurta(entrega.enviada_em, lang)) : null}
+          {exercicio.aulas ? propriedade(t("aprender.aula.titulo"), <Link to={caminho(`/aulas/${exercicio.aulas.slug}`)} className={linkTexto}>{t("aprender.tarefa.verAula")}</Link>) : null}
+        </dl>
+      </div>
     </Pagina>
   )
 }

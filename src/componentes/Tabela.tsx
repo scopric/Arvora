@@ -14,15 +14,16 @@ const publico = {
   td: "px-4 py-3",
 }
 
-// App (molde Attio/Linear): hairline grafite, cabeçalho 12px/510 névoa sem fundo, linhas compactas com hover sutil, números tabulares.
+// App (molde Attio sobre os tokens do MasterClass): bloco carvão sem borda, cabeçalho 14px/600 cinza sem fundo,
+// divisórias em placa, hover sutil, números tabulares.
 const app = {
-  regiao: "overflow-x-auto rounded-xl border border-grafite focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado",
-  tabela: "w-full min-w-max text-left text-legenda",
-  cabecalho: "border-b border-grafite",
-  th: "px-4 py-2.5 text-xs font-medium text-nevoa",
-  corpo: "divide-y divide-grafite",
-  linha: "hover:bg-creme/2",
-  td: "px-4 py-2.5 tabular-nums",
+  regiao: "overflow-x-auto rounded-lg vidro-fundo focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado",
+  tabela: "w-full min-w-max text-left text-corpo-p",
+  cabecalho: "border-b border-placa",
+  th: "px-4 py-3 text-corpo-p font-semibold text-cinza",
+  corpo: "divide-y divide-placa",
+  linha: "hover:bg-creme/3",
+  td: "px-4 py-3 tabular-nums",
 }
 
 // Tabela simples: <table> de verdade (cabeçalho com scope), rolagem lateral no celular dentro de região focável (teclado alcança).
@@ -55,7 +56,7 @@ export function Tabela<L>({ colunas, linhas, id, legenda, contagem }: { colunas:
           ))}
         </tbody>
       </table>
-      {contagem ? <p className="sticky left-0 border-t border-grafite px-4 py-2 text-xs text-nevoa tabular-nums">{contagem}</p> : null}
+      {contagem ? <p className="sticky left-0 border-t border-placa px-4 py-2 text-legenda text-cinza tabular-nums">{contagem}</p> : null}
     </div>
   )
 }

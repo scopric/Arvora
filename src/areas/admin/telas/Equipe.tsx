@@ -87,7 +87,7 @@ export function Equipe() {
           <Selecao rotulo={t("admin.equipe.papel")} value={novoPapel} onChange={(e) => setNovoPapel(e.target.value as PapelEquipe)}>
             {PAPEIS.map((p) => <option key={p} value={p}>{t(`admin.papel.${p}`)}</option>)}
           </Selecao>
-          <Botao type="button" variante="contorno" onClick={() => void buscar()} className="sm:w-auto">{t("admin.equipe.procurar")}</Botao>
+          <Botao type="button" variante="secundario" onClick={() => void buscar()} className="sm:w-auto">{t("admin.equipe.procurar")}</Botao>
         </div>
         <ul className="mt-4 space-y-2">
           {achados.map((a) => (

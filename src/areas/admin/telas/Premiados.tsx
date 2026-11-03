@@ -6,7 +6,7 @@ import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { Mostrar, Pagina } from "../componentes/Pagina"
+import { Barra, Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { EDITA, usePode } from "../lib/papel"
 import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
@@ -25,19 +25,21 @@ export function Premiados() {
     return { premiados: exigir(premiados), edicoes: exigir(edicoes) }
   }, [pode])
   return (
-    <Pagina titulo="admin.premiados.titulo" intro="admin.premiados.intro" acoes={pode ? <Link className={botaoPrimarioApp} to={caminho("/admin/premiados/novo")}>{t("admin.premiados.novo")}</Link> : null}>
+    <Pagina titulo="admin.premiados.titulo" intro="admin.premiados.intro">
       <Mostrar carga={carga}>
         {({ premiados, edicoes }) => {
           const nome = new Map(edicoes.map((e) => [e.id, e.nome]))
           const linhas = premiados.filter((p) => !edicao || String(p.edicao_id) === edicao)
           return (
             <>
-              <div className="max-w-xs">
-                <Selecao rotulo={t("admin.videos.edicao")} value={edicao} onChange={(e) => setEdicao(e.target.value)}>
-                  <option value="">{t("admin.comum.todos")}</option>
-                  {edicoes.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
-                </Selecao>
-              </div>
+              <Barra acoes={pode ? <Link className={botaoPrimarioApp} to={caminho("/admin/premiados/novo")}>{t("admin.premiados.novo")}</Link> : null}>
+                <div className="w-56 max-w-full">
+                  <Selecao rotulo={t("admin.videos.edicao")} value={edicao} onChange={(e) => setEdicao(e.target.value)}>
+                    <option value="">{t("admin.comum.todos")}</option>
+                    {edicoes.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
+                  </Selecao>
+                </div>
+              </Barra>
               {linhas.length === 0 ? (
                 <Vazio>{t("admin.premiados.vazio")}</Vazio>
               ) : (

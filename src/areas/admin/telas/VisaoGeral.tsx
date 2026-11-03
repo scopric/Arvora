@@ -8,12 +8,14 @@ import { useCarga } from "../lib/consulta"
 import { hojeEmDublin } from "../lib/formato"
 import { APROVA_EMPRESA, CORRIGE, EDITA, MODERA, SUPER } from "../lib/papel"
 import { useAcesso } from "../../../lib/acesso"
+import { celulaNumeroAdmin } from "../lib/estilo"
 
 type CartaoDef = { chave: string; titulo: Chave; rota: string; papeis: PapelEquipe[]; contar: () => PromiseLike<{ count: number | null; error: unknown }> }
 const contar = { count: "exact", head: true } as const
 
 // Visão geral: o que está esperando alguém da equipe. Cada célula só aparece para o papel que pode agir nela.
-// Molde Polar/Stripe: um painel só, dividido em células por hairline; número grande 510, rótulo 13px.
+// Molde Dock 84f44ffa + Mercury a06ca922: células iguais em vidro-fundo (rótulo 14 em cinza, número 48/600 tabular),
+// 3 por linha no desktop. A célula inteira é clicável (link esticado); o foco contorna a célula.
 export function VisaoGeral() {
   const t = useT()
   const caminho = useCaminho()
@@ -42,14 +44,12 @@ export function VisaoGeral() {
           lista.every((c) => c.n === 0) ? (
             <Vazio>{t("admin.vazio.nada")}</Vazio>
           ) : (
-            <ul className={`relative grid overflow-hidden rounded-xl after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:shadow-borda ${lista.length === 1 ? "" : lista.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
+            <ul className={`grid gap-4 ${lista.length === 1 ? "" : lista.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
               {lista.map((c) => (
-                // Células por hairline (border-b/r de cada li); a moldura é um ::after por cima, para o hover não a cobrir. Colunas pela quantidade.
-                // A célula inteira é clicável (link esticado por ::after); o foco contorna a célula, não só o texto.
-                <li key={c.chave} className="relative border-r border-b border-grafite p-5 transition-colors has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-dourado hover:bg-obsidiana">
-                  <p className="text-legenda font-medium text-nevoa">{t(c.titulo)}</p>
-                  <p className="mt-2 text-titulo-p font-medium tabular-nums">{c.n}</p>
-                  <Link className={`mt-3 inline-flex min-h-9 items-center gap-1 text-legenda font-medium text-bruma after:absolute after:inset-0 focus-visible:outline-none`} to={caminho(c.rota)}>
+                <li key={c.chave} className={`relative transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-dourado hover:bg-placa/60 ${celulaNumeroAdmin}`}>
+                  <p className="text-corpo-p font-semibold text-cinza">{t(c.titulo)}</p>
+                  <p className={`mt-2 text-titulo-g font-semibold tabular-nums ${c.n > 0 ? "text-creme" : "text-cinza"}`}>{c.n}</p>
+                  <Link className="mt-3 inline-flex min-h-9 items-center gap-1 text-corpo-p font-semibold text-cinza after:absolute after:inset-0 hover:text-creme focus-visible:outline-none" to={caminho(c.rota)}>
                     {t("admin.visao.abrir")} <span aria-hidden="true">→</span>
                   </Link>
                 </li>

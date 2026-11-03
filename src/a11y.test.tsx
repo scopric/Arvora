@@ -13,6 +13,7 @@ import { Rotas } from "./App"
 import { Abas } from "./componentes/Abas"
 import { Aviso } from "./componentes/Aviso"
 import { Botao } from "./componentes/Botao"
+import { PilulaCategoria } from "./componentes/PilulaCategoria"
 import { Campo } from "./componentes/Campo"
 import { DialogoConfirmar } from "./componentes/DialogoConfirmar"
 import { BannerCookies } from "./componentes/BannerCookies"
@@ -64,6 +65,7 @@ const layouts: [string, () => void][] = ["pt", "en"].flatMap((l): [string, () =>
   [`layout público /${l}/hall-of-fame`, () => render(<MemoryRouter initialEntries={[`/${l}/hall-of-fame`]}><Rotas /></MemoryRouter>)],
   [`layout membro (Clube) /${l}/inicio`, () => comAcesso({ nivel: "clube" }, `/${l}/inicio`)],
   [`layout membro (Grupo, premiado) /${l}/network`, () => comAcesso({ nivel: "grupo", premiado: true }, `/${l}/network`)],
+  [`layout membro (Clube) /${l}/hall-of-fame com sessão: casca do app, miolo público e seções do Awards`, () => comAcesso({ nivel: "clube" }, `/${l}/hall-of-fame`)],
   [`layout admin /${l}/admin/aulas`, () => comAcesso({ equipe: true, papel: "super_admin" }, `/${l}/admin/aulas`)],
 ])
 
@@ -113,6 +115,9 @@ describe("acessibilidade dos componentes comuns no escopo do app (axe)", () => {
           <Campo rotulo="Nome" ajuda="Como aparece no perfil" />
           <Botao>Salvar</Botao>
           <Botao variante="contorno">Cancelar</Botao>
+          <Botao variante="secundario">Voltar</Botao>
+          <PilulaCategoria ativa>Vendas</PilulaCategoria>
+          <PilulaCategoria>Liderança</PilulaCategoria>
           <Aviso tipo="ok">Salvo.</Aviso>
           <DialogoConfirmar aberto titulo="Confirmar" texto="Tem certeza?" aoConfirmar={() => {}} aoCancelar={() => {}} />
         </main>

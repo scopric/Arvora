@@ -31,6 +31,8 @@ const TRANSMISSAO: CampoDef[] = [
 ]
 
 // Cadastro e publicação de aula (PRD §17.4.5): dados, transmissão principal/reserva, materiais, exercícios, Agendar e Publicar materiais.
+const secao = "py-6 first:pt-0 last:pb-0"
+
 export function AulaForm() {
   const t = useT()
   const lang = useIdioma()
@@ -99,16 +101,18 @@ export function AulaForm() {
 
           return (
             <div className="grid gap-8 xl:grid-cols-[1fr_20rem]">
-              <div className="space-y-8">
-                <Secao titulo="admin.aula.dados">
-                  {pode ? <FormularioRegistro campos={campos} linha={aula} aoSalvar={salvarAula} variante={aulaId === null ? "primario" : "contorno"} /> : <p>{aula?.titulo}</p>}
+              {/* Molde Polar 85c29d59: um cartão só, com as seções separadas por hairline; o único dourado é "Salvar" na aula nova
+                  e "Publicar materiais" na aula existente (painel à direita). */}
+              <Cartao className="divide-y divide-fumaca">
+                <Secao titulo="admin.aula.dados" className={secao}>
+                  {pode ? <FormularioRegistro campos={campos} linha={aula} aoSalvar={salvarAula} variante={aulaId === null ? "primario" : "secundario"} /> : <p>{aula?.titulo}</p>}
                 </Secao>
                 {aula ? (
                   <>
                     {aula.tipo === "ao_vivo" && pode ? (
-                      <Secao titulo="admin.aula.transmissao">
+                      <Secao titulo="admin.aula.transmissao" className={secao}>
                         <FormularioRegistro
-                          variante="contorno"
+                          variante="secundario"
                           campos={TRANSMISSAO} linha={d.transmissao ?? { abre_min_antes: 15 }}
                           aoSalvar={async (c) => {
                             if (d.transmissao) exigirLinha(await supabase.from("transmissoes").update(c as never).eq("aula_id", aula.id).select("aula_id"))
@@ -118,31 +122,31 @@ export function AulaForm() {
                         />
                       </Secao>
                     ) : null}
-                    <Secao titulo="admin.aula.materiais">
+                    <Secao titulo="admin.aula.materiais" className={secao}>
                       {pode ? <MateriaisAula aulaId={aula.id} materiais={d.materiais} aoMudar={carga.recarregar} /> : null}
                     </Secao>
-                    <Secao titulo="admin.aula.exercicios">
+                    <Secao titulo="admin.aula.exercicios" className={secao}>
                       <CrudTabela
-                        variante="contorno"
+                        variante="secundario" moldura={false}
                         tabela="exercicios" colunas="id, aula_id, ordem, enunciado_md, prazo_dias, aceita_arquivo" campos={EXERCICIO} ordem={[{ coluna: "ordem" }]}
                         filtro={{ coluna: "aula_id", valor: aula.id }} fixos={{ aula_id: aula.id }} podeEditar={pode} podeApagar legenda="admin.aula.exercicios" vazio="admin.aula.semExercicios"
                       />
                     </Secao>
                   </>
                 ) : null}
-              </div>
+              </Cartao>
               {aula ? (
                 <div className="space-y-4">
                   <Cartao>
-                    <h2 className="text-corpo-g font-semibold">{t("admin.aula.previa")}</h2>
-                    <p className="mt-3 text-base font-semibold">{aula.titulo}</p>
-                    <p className="mt-1 text-legenda text-nevoa">
+                    <h2 className="text-subtitulo font-semibold">{t("admin.aula.previa")}</h2>
+                    <p className="mt-3 text-corpo font-semibold">{aula.titulo}</p>
+                    <p className="mt-1 text-corpo-p text-cinza">
                       {t(`admin.aulas.tipo.${aula.tipo}`)} · {t(`nivel.${aula.nivel_minimo}`)}
                       {aula.duracao_min ? ` · ${aula.duracao_min} min` : ""}
                     </p>
-                    <p className="mt-1 text-legenda text-nevoa">{dataHora(aula.inicio_em, lang)} ({FUSO}) · {dataHora(aula.inicio_em, lang, "America/Sao_Paulo")} (Brasília)</p>
+                    <p className="mt-1 text-corpo-p text-cinza">{dataHora(aula.inicio_em, lang)} ({FUSO}) · {dataHora(aula.inicio_em, lang, "America/Sao_Paulo")} (Brasília)</p>
                     <div className="mt-3"><Selo tom={estado === "publicados" ? "destaque" : "neutro"}>{t(`admin.aulas.estado.${estado}`)}</Selo></div>
-                    <ul className="mt-3 text-legenda">
+                    <ul className="mt-3 text-corpo-p">
                       {(["resumo", "ebook", "exercicios"] as const).map((m) => {
                         const x = d.materiais.find((y) => y.tipo === m)
                         return <li key={m}>{t(`admin.aula.material.${m}`)}: {x ? t(`admin.aula.materialStatus.${x.status}`) : t("admin.aula.materialStatus.vazio")}</li>
@@ -153,13 +157,13 @@ export function AulaForm() {
                     <div className="space-y-3">
                       <AvisoDe aviso={acao.aviso} />
                       <Botao
-                        type="button" variante="contorno" ocupado={acao.ocupado} disabled={estado !== "rascunho" || (aula.tipo === "ao_vivo" && !aula.inicio_em)}
+                        type="button" variante="secundario" ocupado={acao.ocupado} disabled={estado !== "rascunho" || (aula.tipo === "ao_vivo" && !aula.inicio_em)}
                         onClick={() => void acao.rodar(async () => { exigirLinha(await supabase.from("aulas").update({ agendada_em: new Date().toISOString() }).eq("id", aula.id).select("id")); carga.recarregar() }, "admin.aula.agendada")}
                       >
                         {t("admin.aula.agendar")}
                       </Botao>
                       <Botao type="button" ocupado={acao.ocupado} disabled={estado === "publicados" || falta !== null} onClick={() => setConfirmar(true)}>{t("admin.aula.publicarMateriais")}</Botao>
-                      {falta ? <p className="text-legenda text-nevoa">{t(falta)}</p> : null}
+                      {falta ? <p className="text-corpo-p text-cinza">{t(falta)}</p> : null}
                     </div>
                   ) : null}
                 </div>

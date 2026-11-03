@@ -3,6 +3,7 @@ import { Abas } from "../../../componentes/Abas"
 import { Bloqueado } from "../../../componentes/Bloqueado"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
+import { Icone } from "../../../componentes/Icone"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { temNivel, useAcesso } from "../../../lib/acesso"
@@ -15,7 +16,8 @@ import { dataCurta } from "../util"
 
 // Minhas tarefas (AUL-04, AUL-09): Pendentes · Enviadas · Aprovadas · Ajustar. Pendente = exercício liberado, ainda sem
 // entrega, em vertical que aceita entregas (Bem-Estar fica de fora até a decisão jurídica).
-// Molde Linear (lista de issues): abas em pílula, linhas com título, meta em 13px e selo de status à direita.
+// Molde Linear (lista de issues, tela adf9d449): abas por status com contagem; linhas compactas de vidro com
+// ícone de status, título, "Exercício n", data e selo à direita.
 export function Tarefas() {
   const t = useT()
   const lang = useIdioma()
@@ -49,14 +51,16 @@ export function Tarefas() {
           chave: k,
           rotulo: `${t(rotulo)} (${lista.length})`,
           conteudo: lista.length ? (
-            <ul className="divide-y divide-grafite overflow-hidden rounded-xl shadow-borda">
+            <ul className="divide-y divide-placa overflow-hidden rounded-lg vidro-fundo">
               {lista.map(({ exercicio, entrega }) => (
                 <li key={exercicio.id}>
-                  <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex min-h-12 items-center gap-4 px-4 py-3 transition-colors hover:bg-creme/2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dourado`}>
+                  <Link to={caminho(`/tarefas/${exercicio.id}`)} className={`flex min-h-14 items-center gap-4 px-4 py-3 transition-colors hover:bg-creme/3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dourado`}>
+                    <Icone nome={entrega?.status === "aprovada" ? "check" : "arquivo"} className={`size-4 shrink-0 ${entrega?.status === "aprovada" ? "text-destaque" : "text-cinza"}`} />
                     <span className="min-w-0 flex-1">
-                      <span className="block text-base font-medium">{exercicio.aulas?.titulo}</span>
-                      <span className="mt-0.5 block text-legenda text-nevoa">
+                      <span className="block text-corpo font-semibold">{exercicio.aulas?.titulo}</span>
+                      <span className="mt-0.5 block text-corpo-p text-cinza">
                         {t("aprender.exercicio.n")} {exercicio.ordem}
+                        {exercicio.prazo_dias ? ` · ${t("aprender.exercicio.prazo")}: ${exercicio.prazo_dias} ${t("aprender.exercicio.dias")}` : ""}
                         {entrega ? ` · ${dataCurta(entrega.enviada_em, lang)}` : ""}
                       </span>
                     </span>

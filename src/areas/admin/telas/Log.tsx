@@ -5,7 +5,7 @@ import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
+import { Barra, Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { FINANCEIRO, usePode } from "../lib/papel"
@@ -42,9 +42,9 @@ export function Log() {
   if (!pode) return <Pagina titulo="admin.log.titulo"><SemPermissao /></Pagina>
   return (
     <Pagina titulo="admin.log.titulo" intro="admin.log.intro">
-      <div className="max-w-xs">
-        <Campo rotulo={t("admin.log.filtroTabela")} value={filtro} onChange={(e) => setFiltro(e.target.value)} />
-      </div>
+      <Barra>
+        <div className="w-64 max-w-full"><Campo rotulo={t("admin.log.filtroTabela")} value={filtro} onChange={(e) => setFiltro(e.target.value)} /></div>
+      </Barra>
       <Mostrar carga={carga}>
         {({ linhas, nomes }) =>
           linhas.length === 0 ? (
@@ -62,8 +62,8 @@ export function Log() {
                     chave: "det", titulo: t("admin.log.detalhe"),
                     celula: (l) => (
                       <details>
-                        <summary className={`min-h-9 cursor-pointer py-2 text-legenda pointer-coarse:min-h-11 ${classeLink}`}>{t("admin.log.ver")}</summary>
-                        <ul className="mt-2 max-w-md space-y-1 text-legenda">
+                        <summary className={`min-h-9 cursor-pointer py-2 text-corpo-p pointer-coarse:min-h-11 ${classeLink}`}>{t("admin.log.ver")}</summary>
+                        <ul className="mt-2 max-w-md space-y-1 text-corpo-p">
                           {mudancas(l.antes, l.depois).map((m) => (
                             <li key={m}><strong>{t(`admin.campo.${m}` as Chave) || m}</strong>: {valor(l.antes, m)} → {valor(l.depois, m)}</li>
                           ))}
@@ -73,7 +73,7 @@ export function Log() {
                   },
                 ]}
               />
-              {linhas.length >= limite ? <Botao variante="contorno" className="sm:w-auto" onClick={() => setLimite((n) => n + PAGINA)}>{t("admin.comum.carregarMais")}</Botao> : null}
+              {linhas.length >= limite ? <Botao variante="secundario" className="sm:w-auto" onClick={() => setLimite((n) => n + PAGINA)}>{t("admin.comum.carregarMais")}</Botao> : null}
             </>
           )
         }

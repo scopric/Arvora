@@ -98,7 +98,7 @@ export function Mfa({ children }: { children: ReactNode }) {
   const formulario = (fator: string) => (
     <form onSubmit={(e) => verificar(e, fator)} noValidate className="mt-6 space-y-5">
       {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
-      <Campo rotulo={t("mfa.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" maxLength={7} />
+      <Campo rotulo={t("mfa.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" maxLength={7} className="text-center text-titulo-p tracking-[0.3em] indent-[0.3em] tabular-nums" />
       <Botao type="submit" ocupado={ocupado}>{t("mfa.botao")}</Botao>
     </form>
   )
@@ -108,30 +108,30 @@ export function Mfa({ children }: { children: ReactNode }) {
     <main className="flex min-h-dvh items-center justify-center px-4 py-16">
       <Cartao className="w-full max-w-md">
       <Titulo />
-      <h1 className="text-subtitulo font-semibold">{t("mfa.titulo")}</h1>
+      <h1 className="text-titulo-p font-semibold">{t("mfa.titulo")}</h1>
       {estado.fase === "carregando" ? <Esqueleto className="mt-8" /> : null}
       {estado.fase === "erro" ? <div className="mt-8"><Erro aoTentar={carregar}>{t("mfa.erro")}</Erro></div> : null}
       {estado.fase === "cadastrar" ? (
         <>
-          <p className="mt-3 text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
+          <p className="mt-3 text-corpo text-cinza">{t("mfa.cadastrar.texto")}</p>
           {aviso ? <div className="mt-6"><Aviso tipo="erro">{t(aviso)}</Aviso></div> : null}
           <Botao onClick={cadastrar} ocupado={ocupado} className="mt-6">{t("mfa.cadastrar.botao")}</Botao>
         </>
       ) : null}
       {estado.fase === "qr" ? (
         <>
-          <p className="mt-3 text-base text-bruma">{t("mfa.cadastrar.texto")}</p>
+          <p className="mt-3 text-corpo text-cinza">{t("mfa.cadastrar.texto")}</p>
           {/* data: URI de SVG gerado pelo Supabase; img-src do CSP já libera data: */}
-          <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="mt-6 size-48 rounded-md bg-white p-2" />
-          <p className="mt-4 text-legenda text-nevoa">{t("mfa.qr.segredo")}</p>
-          <p className="mt-1 font-mono text-legenda break-all select-all">{estado.segredo}</p>
-          <p className="mt-6 text-base text-bruma">{t("mfa.verificar.texto")}</p>
+          <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="mt-6 size-48 rounded-lg bg-white p-2" />
+          <p className="mt-4 text-corpo-p text-cinza">{t("mfa.qr.segredo")}</p>
+          <p className="mt-1 font-mono text-corpo-p break-all select-all">{estado.segredo}</p>
+          <p className="mt-6 text-corpo text-cinza">{t("mfa.verificar.texto")}</p>
           {formulario(estado.fator)}
         </>
       ) : null}
       {estado.fase === "verificar" ? (
         <>
-          <p className="mt-3 text-base text-bruma">{t("mfa.verificar.texto")}</p>
+          <p className="mt-3 text-corpo text-cinza">{t("mfa.verificar.texto")}</p>
           {formulario(estado.fator)}
         </>
       ) : null}

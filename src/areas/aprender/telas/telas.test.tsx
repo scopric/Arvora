@@ -11,7 +11,7 @@ vi.mock("../../../lib/supabase", () => ({
 }))
 vi.mock("../../../lib/sessao", () => ({ useAuth: () => ({ sessao: { user: { id: "u1", email: "a@b.com" } }, carregando: false }), sair: vi.fn() }))
 
-import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 import { AcessoContext, type Nivel } from "../../../lib/acesso"
 import { chamadas, criarFalso, type Resposta } from "../testeSupabase"
 import { Academy } from "./Academy"
@@ -132,6 +132,19 @@ describe("/aulas/:slug gravada e exercícios", () => {
     montarGravada({ "rpc:video_da_aula": { data: null, error: { message: "TypeError: Failed to fetch", code: "" } } })
     expect(await screen.findByRole("button", { name: /tentar de novo/i })).toBeTruthy()
     expect(screen.queryByText(/não conseguimos abrir este vídeo/i)).toBeNull()
+  })
+  it("com o vídeo em erro ou indisponível o título da aula continua na tela, e 'Marcar como concluída' só existe com vídeo", async () => {
+    montarGravada({ "rpc:video_da_aula": { data: null, error: { message: "TypeError: Failed to fetch", code: "" } } })
+    await screen.findByRole("button", { name: /tentar de novo/i })
+    expect(screen.getByRole("heading", { level: 1, name: "Live de proposta" })).toBeTruthy()
+    expect(screen.queryByRole("button", { name: "Marcar como concluída" })).toBeNull()
+  })
+  it("'Marcar como concluída' grava 100% e some", async () => {
+    montarGravada({ "rpc:video_da_aula": ok("https://video.invalid/a.mp4"), "progresso_aula.update": ok([{ aula_id: 5 }]) })
+    await userEvent.click(await screen.findByRole("button", { name: "Marcar como concluída" }))
+    await waitFor(() => expect(chamadas.find((c) => c.tabela === "progresso_aula" && c.metodo === "update")?.args[0]).toEqual({ percentual: 100, posicao_seg: 0 }))
+    expect(screen.queryByRole("button", { name: "Marcar como concluída" })).toBeNull()
+    expect(screen.getByRole("heading", { level: 1, name: "Live de proposta" })).toBeTruthy()
   })
   it("progresso nunca regride: voltar o vídeo grava a posição mas mantém o maior percentual (inteiro)", async () => {
     montarGravada({ "rpc:video_da_aula": ok("https://video.invalid/a.mp4"), progresso_aula: ok({ percentual: 80, posicao_seg: 70 }), "progresso_aula.update": ok([{ aula_id: 5 }]) })
@@ -288,6 +301,14 @@ describe("/inicio", () => {
     expect(await screen.findByText("Comece por aqui")).toBeTruthy()
     expect(screen.getByRole("link", { name: "Começar" }).getAttribute("href")).toBe("/pt/bem-vindo")
   })
+  it("conta nova com próxima aula: 'Começar' é o dourado e 'Abrir a aula' fica em cinza", async () => {
+    falso.atual = criarFalso(base({ perfis: ok({ onboarding_em: null }) }))
+    montar("inicio", <Inicio />, "/pt/inicio")
+    expect((await screen.findByRole("link", { name: "Começar" })).className).toContain("bg-dourado")
+    const abrir = await screen.findByRole("link", { name: "Abrir a aula" })
+    expect(abrir.className).toContain("bg-fumaca")
+    expect(abrir.className).not.toContain("bg-dourado")
+  })
   it("Clube: próxima aula e sugestões viram prévia bloqueada, sem consultar o Match", async () => {
     falso.atual = criarFalso(base())
     montar("inicio", <Inicio />, "/pt/inicio", "clube")
@@ -388,7 +409,7 @@ describe("/academy/:curso e /academy/:curso/:aula", () => {
   const respostas = (extra: Record<string, Resposta> = {}) => ({
     "cursos.single": ok(curso), modulos: ok([{ id: 10, titulo: "Módulo 1", ordem: 1 }]), aulas: ok(aulas), progresso_aula: ok([]), ...extra,
   })
-  it("Clube: lista numerada com duração, cadeado nas aulas do Grupo e 'Começar' em contorno", async () => {
+  it("Clube: lista numerada com duração, cadeado nas aulas do Grupo e 'Começar' em dourado", async () => {
     falso.atual = criarFalso(respostas())
     montar("academy/:curso", <Curso />, "/pt/academy/f", "clube")
     const modulo = (await screen.findByRole("heading", { name: "Módulo 1" })).closest("section")!
@@ -400,8 +421,8 @@ describe("/academy/:curso e /academy/:curso/:aula", () => {
     expect(within(itens[1]).getByText(/bloqueado: parte do grupo/i)).toBeTruthy()
     const cta = screen.getByRole("link", { name: "Começar o curso" })
     expect(cta.getAttribute("href")).toBe("/pt/academy/f/a")
-    expect(cta.className).toBe(botaoContornoApp)
-    expect(screen.getByRole("link", { name: "Academy" }).getAttribute("href")).toBe("/pt/academy")
+    expect(cta.className).toBe(botaoPrimarioApp)
+    expect(screen.getAllByRole("link", { name: "Academy" }).map((l) => l.getAttribute("href"))).toEqual(["/pt/academy"]) // só o "voltar": as seções ficam na casca
     expect(await violacoes()).toEqual([])
   })
   it("Grupo com progresso: 'Continuar' em dourado aponta para a primeira aula não concluída; sem cadeado", async () => {
@@ -420,8 +441,8 @@ describe("/academy/:curso e /academy/:curso/:aula", () => {
     montar("academy/:curso/:aula", <CursoAula />, "/pt/academy/f/a", "clube")
     const lista = await screen.findByRole("navigation", { name: "Aulas do curso" })
     const atuais = within(lista).getAllByRole("link", { current: "page" })
-    expect(atuais.map((a) => a.textContent)).toEqual(["Abertura"])
-    expect(within(lista).getByRole("link", { name: /^Proposta/ }).textContent).toMatch(/bloqueado: parte do grupo/i)
+    expect(atuais.map((a) => a.textContent)).toEqual(["1. Abertura"]) // o número vai só para o leitor de tela; a miniatura é decorativa
+    expect(within(lista).getByRole("link", { name: /^2\. Proposta/ }).textContent).toMatch(/bloqueado: parte do grupo/i)
     expect(screen.getByRole("link", { name: /^Próxima aula: Fechamento/ }).getAttribute("href")).toBe("/pt/academy/f/c")
     expect(screen.getByRole("link", { name: "Fundamentos" }).getAttribute("href")).toBe("/pt/academy/f")
     await waitFor(() => expect(chamadas.some((c) => c.tabela === "rpc" && c.metodo === "video_da_aula")).toBe(true)) // a liberada pede o vídeo

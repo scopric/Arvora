@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from "react"
-import { Cartao } from "../../../componentes/Cartao"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Selo } from "../../../componentes/Selo"
 import { Tabela, type Coluna } from "../../../componentes/Tabela"
@@ -7,7 +6,7 @@ import { Vazio } from "../../../componentes/Vazio"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { exigirLinha, tabelaSolta, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
-import { classeAcao, contagem } from "../lib/estilo"
+import { caixaSutilAdmin, cartaoAdmin, classeAcao, contagem } from "../lib/estilo"
 import { FormularioRegistro, type CampoDef } from "./FormularioRegistro"
 import { AvisoDe, Mostrar } from "./Pagina"
 
@@ -34,8 +33,10 @@ export type CrudProps = {
   aoEditar?: (l: Linha) => Promise<Linha>
   // chamado depois de gravar/apagar (ex.: recarregar a página-mãe)
   aoMudar?: () => void
-  // "contorno" quando a tabela é secundária na tela (um primário por tela)
-  variante?: "primario" | "contorno"
+  // "secundario" (cinza cheio) quando a tabela é secundária na tela (um primário por tela)
+  variante?: "primario" | "secundario"
+  // false quando a tabela já está dentro de um cartão de vidro (AulaForm): o formulário vai em ardósia, sem vidro sobre vidro
+  moldura?: boolean
 }
 
 function mostrar(c: CampoDef, l: Linha, lang: string, t: (c: Chave) => string): ReactNode {
@@ -121,10 +122,11 @@ export function CrudTabela(p: CrudProps) {
       </Mostrar>
       <AvisoDe aviso={acao.aviso} />
       {p.podeEditar ? (
-        <Cartao>
-          <p className="mb-5 text-corpo-g font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
+        <div className={p.moldura === false ? caixaSutilAdmin : cartaoAdmin}>
+          {/* Molde Polar (formulário): título da seção com hairline abaixo; o botão primário fica no fim. */}
+          <p className="mb-5 border-b border-fumaca pb-4 text-subtitulo font-semibold">{editando ? t("admin.comum.editando") : t("admin.comum.novo")}</p>
           <FormularioRegistro key={formKey} campos={p.campos} linha={editando} aoSalvar={salvar} variante={p.variante} aoCancelar={editando ? () => { setEditando(null); setFormKey((k) => k + 1) } : undefined} />
-        </Cartao>
+        </div>
       ) : null}
       <DialogoConfirmar
         aberto={apagar !== null}

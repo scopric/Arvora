@@ -29,8 +29,8 @@ function Ebook({ caminho }: { caminho: string }) {
   return (
     <div className="space-y-3">
       {erro ? <Aviso tipo="erro">{t("aprender.ebook.erro")}</Aviso> : null}
-      <Botao onClick={baixar} className="sm:w-auto">{t("aprender.ebook.baixar")}</Botao>
-      <p className="text-legenda text-nevoa">{t("aprender.ebook.uso")}</p>
+      <Botao variante="secundario" onClick={baixar} className="sm:w-auto">{t("aprender.ebook.baixar")}</Botao>
+      <p className="text-corpo-p text-cinza">{t("aprender.ebook.uso")}</p>
     </div>
   )
 }
@@ -72,7 +72,7 @@ export function Materiais({ aulaId, uid, podeEnviar, doGrupo }: { aulaId: number
           chave: "resumo",
           rotulo: t("aprender.aba.resumo"),
           conteudo: resumo?.conteudo_md ? (
-            <div className="max-w-prose space-y-4 text-base leading-relaxed">
+            <div className="max-w-prose space-y-4 text-corpo leading-relaxed">
               {resumo.conteudo_md.split(/\n{2,}/).map((p, i) => (
                 <p key={i} className="whitespace-pre-line">{p}</p>
               ))}

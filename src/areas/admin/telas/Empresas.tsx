@@ -64,12 +64,12 @@ export function Empresas() {
                       <li key={e.id}>
                         <Cartao>
                           <div className="flex items-start justify-between gap-3">
-                            <h3 className="text-base font-semibold">{e.nome}</h3>
+                            <h3 className="text-corpo font-semibold">{e.nome}</h3>
                             <Selo tom="alerta">{t("admin.empresas.pendente")}</Selo>
                           </div>
-                          <p className="mt-1 text-legenda text-nevoa">{[e.cidade, e.pais].filter(Boolean).join(" · ") || "—"}</p>
-                          {e.site ? <p className="mt-1 text-legenda"><a className={classeLink} href={e.site} target="_blank" rel="noopener noreferrer">{e.site}</a></p> : null}
-                          {e.descricao ? <p className="mt-3 text-base text-bruma">{e.descricao}</p> : null}
+                          <p className="mt-1 text-corpo-p text-cinza">{[e.cidade, e.pais].filter(Boolean).join(" · ") || "—"}</p>
+                          {e.site ? <p className="mt-1 text-corpo-p"><a className={classeLink} href={e.site} target="_blank" rel="noopener noreferrer">{e.site}</a></p> : null}
+                          {e.descricao ? <p className="mt-3 text-corpo">{e.descricao}</p> : null}
                           {aprova ? (
                             <div className="mt-4 flex gap-3">
                               <button type="button" className={classeAcao} disabled={acao.ocupado} onClick={() => void decidir(e.id, true)}>{t("admin.empresas.aprovar")}</button>

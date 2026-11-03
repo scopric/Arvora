@@ -9,11 +9,11 @@ import { decimalParaCentavos, localParaIso, moeda } from "../lib/formato"
 import type { Plano, Receita } from "../lib/relatorio"
 import { AreaTexto } from "./Campos"
 import { AvisoDe } from "./Pagina"
-import { classeAcao } from "../lib/estilo"
+import { cartaoAdmin, classeAcao } from "../lib/estilo"
 
 const ORIGENS = ["ingresso", "pix", "transferencia", "evento", "outro"] as const
 const TIPOS = ["assinatura", "curso", "produto_digital", "ingresso"] as const
-const caixa = "space-y-4 rounded-xl p-5 shadow-borda"
+const caixa = `space-y-4 ${cartaoAdmin}`
 const grade = "grid gap-5 sm:grid-cols-2"
 
 // Escolhe um membro pelo nome (a equipe não lê e-mail em `perfis`). `valor` é o id do perfil ou "".
@@ -35,7 +35,7 @@ export function SeletorMembro({ rotulo, valor, aoMudar }: { rotulo: Chave; valor
         <div className="flex-1">
           <Campo rotulo={t("admin.rel.membroBuscar")} value={busca} onChange={(e) => setBusca(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void procurar() } }} />
         </div>
-        <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={() => void procurar()} className="sm:w-auto">{t("admin.rel.membroProcurar")}</Botao>
+        <Botao type="button" variante="secundario" ocupado={acao.ocupado} onClick={() => void procurar()} className="sm:w-auto">{t("admin.rel.membroProcurar")}</Botao>
       </div>
       <AvisoDe aviso={acao.aviso} />
       {achados.length > 0 ? (
@@ -106,12 +106,12 @@ export function LancarReceita({ ciclo, planos, aoFeito }: { ciclo: { inicio: str
         <Campo rotulo={t("admin.comum.descricao")} value={v.descricao} onChange={muda("descricao")} />
       </div>
       <SeletorMembro rotulo="admin.rel.membroOpcional" valor={v.membro} aoMudar={(id) => setV((a) => ({ ...a, membro: id }))} />
-      <label className="block text-legenda font-medium text-bruma">
+      <label className="block text-corpo-p font-semibold text-creme">
         {t("admin.rel.comprovante")} *
-        <input ref={ref} type="file" accept="application/pdf,image/png,image/jpeg" className="mt-2 block w-full text-legenda text-bruma" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
+        <input ref={ref} type="file" accept="application/pdf,image/png,image/jpeg" className="mt-2 block w-full text-corpo-p text-cinza" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
       </label>
       <AvisoDe aviso={acao.aviso} />
-      <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.lancar")}</Botao>
+      <Botao type="submit" variante="secundario" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.lancar")}</Botao>
     </form>
   )
 }
@@ -146,7 +146,7 @@ export function LancarEstorno({ receitas, aoFeito }: { receitas: Receita[]; aoFe
   }
   return (
     <form onSubmit={enviar} noValidate className={caixa}>
-      <p className="text-base text-bruma">{t("admin.rel.estornoIntro")}</p>
+      <p className="text-corpo text-cinza">{t("admin.rel.estornoIntro")}</p>
       <div className={grade}>
         <Selecao rotulo={`${t("admin.rel.estornoTipo")} *`} value={v.tipo} onChange={muda("tipo")}>
           <option value="reembolso">{t("admin.rel.estornoTipo.reembolso")}</option>
@@ -161,7 +161,7 @@ export function LancarEstorno({ receitas, aoFeito }: { receitas: Receita[]; aoFe
         <Campo rotulo={`${t("admin.rel.devolvidoEm")} *`} type="date" value={v.devolvido_em} onChange={muda("devolvido_em")} />
       </div>
       <AvisoDe aviso={acao.aviso} />
-      <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.estornoLancar")}</Botao>
+      <Botao type="submit" variante="secundario" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.estornoLancar")}</Botao>
     </form>
   )
 }
@@ -190,7 +190,7 @@ export function ConcederAcesso({ receitas, planos, aoFeito }: { receitas: Receit
   }
   return (
     <form onSubmit={enviar} noValidate className={caixa}>
-      <p className="text-base text-bruma">{t("admin.rel.acessoIntro")}</p>
+      <p className="text-corpo text-cinza">{t("admin.rel.acessoIntro")}</p>
       <SeletorMembro rotulo="admin.rel.membro" valor={membro} aoMudar={setMembro} />
       <div className={grade}>
         <Selecao rotulo={`${t("admin.rel.acessoReceita")} *`} value={receita} onChange={(e) => setReceita(e.target.value)}>
@@ -200,7 +200,7 @@ export function ConcederAcesso({ receitas, planos, aoFeito }: { receitas: Receit
         <Campo rotulo={`${t("admin.rel.acessoAte")} *`} type="date" value={ate} onChange={(e) => setAte(e.target.value)} />
       </div>
       <AvisoDe aviso={acao.aviso} />
-      <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.acessoConceder")}</Botao>
+      <Botao type="submit" variante="secundario" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.acessoConceder")}</Botao>
     </form>
   )
 }
@@ -242,7 +242,7 @@ export function Cambio({ aoFeito }: { aoFeito: () => void }) {
         </div>
         <AvisoDe aviso={acao.aviso} />
         <AvisoDe aviso={confirma.aviso} />
-        <Botao type="submit" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.cadastrarCambio")}</Botao>
+        <Botao type="submit" variante="secundario" ocupado={acao.ocupado} className="sm:w-auto">{t("admin.rel.cadastrarCambio")}</Botao>
       </form>
       <DialogoConfirmar
         aberto={pendente !== null} titulo={t("admin.rel.cambioConfirmarTitulo")} confirmar={t("admin.rel.cambioTrocar")}
@@ -269,7 +269,7 @@ export function Anular({ id, cliente, aoFeito }: { id: number; cliente: string |
   const acao = useAcao()
   return (
     <details className="max-md:hidden">
-      <summary className="min-h-9 cursor-pointer py-2 text-legenda font-medium text-bruma pointer-coarse:min-h-11" aria-label={`${t("admin.rel.anularDe")} ${cliente ?? `#${id}`}`}>{t("admin.rel.anular")}</summary>
+      <summary className="min-h-9 cursor-pointer py-2 text-corpo-p font-semibold text-cinza pointer-coarse:min-h-11" aria-label={`${t("admin.rel.anularDe")} ${cliente ?? `#${id}`}`}>{t("admin.rel.anular")}</summary>
       <div className="mt-2 w-64 space-y-2">
         <AreaTexto rotulo={t("admin.rel.motivoAnulacao")} rows={2} value={motivo} onChange={(e) => setMotivo(e.target.value)} />
         <AvisoDe aviso={acao.aviso} />

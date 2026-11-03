@@ -3,6 +3,7 @@
 export const aprenderPt = {
   "aprender.inicio.titulo": "Início",
   "aprender.inicio.ola": "Olá",
+  "aprender.inicio.abrirAula": "Abrir a aula",
   "aprender.bemVindo.titulo": "Bem-vindo",
   "aprender.aulas.titulo": "Aulas",
   "aprender.aula.titulo": "Aula",
@@ -128,6 +129,8 @@ export const aprenderPt = {
   "aprender.status.aprovada": "Aprovado",
   "aprender.status.enviada": "Enviado",
   "aprender.tarefa.verAula": "Ver a aula",
+  "aprender.tarefa.status": "Status",
+  "aprender.tarefa.enviadaEm": "Enviada em",
   "aprender.tarefas.ajustar": "Ajustar",
   "aprender.tarefas.aprovadas": "Aprovadas",
   "aprender.tarefas.enviadas": "Enviadas",

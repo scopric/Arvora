@@ -1,4 +1,5 @@
 import { focoApp, linkTextoApp } from "../../componentes/menuApp"
+import { caixaSutilApp, cartaoApp } from "../../componentes/Cartao"
 import { APP_URL } from "../../site"
 import { supabase } from "../../lib/supabase"
 
@@ -134,8 +135,11 @@ export function linhas<T>(r: { data: T[] | null; error: unknown }): T[] {
 // Foco e link de texto desta área (só existe no app): os mesmos do app (menuApp.ts). Botões-link usam botaoEstilo.ts direto.
 export const foco = focoApp
 export const linkTexto = linkTextoApp
-// Cartão, caixa sutil e barra de progresso do app (molde Linear). <progress> nativo pintado: trilho fumaça, valor dourado.
-export const cartao = "rounded-xl p-5 shadow-borda"
-export const caixaSutil = "rounded-md bg-creme/2 px-4 py-3 text-base shadow-borda"
+// Cartão de vidro, caixa sutil e barra de progresso do app (Decisão 70). <progress> nativo pintado: trilho fumaça, valor dourado.
+export const cartao = cartaoApp
+export const caixaSutil = `${caixaSutilApp} text-corpo`
 export const barraProgresso =
-  "h-1 w-40 appearance-none overflow-hidden rounded-full bg-fumaca accent-dourado [&::-moz-progress-bar]:bg-dourado [&::-webkit-progress-bar]:bg-fumaca [&::-webkit-progress-value]:bg-dourado"
+  "h-1.5 w-40 appearance-none overflow-hidden rounded-full bg-fumaca accent-dourado [&::-moz-progress-bar]:bg-dourado [&::-webkit-progress-bar]:bg-fumaca [&::-webkit-progress-value]:bg-dourado"
+// Miniatura de aula sem imagem (o banco não guarda capa por aula): bloco 16:9 escuro com o número grande; a duração vai em pílula.
+export const miniaturaAula = "relative flex aspect-video w-28 shrink-0 items-center justify-center rounded-lg vidro-fundo text-subtitulo font-semibold text-cinza tabular-nums sm:w-36"
+export const pilulaDuracao = "absolute right-1.5 bottom-1.5 rounded-full bg-breu/80 px-2 py-0.5 text-legenda font-semibold text-creme tabular-nums"
