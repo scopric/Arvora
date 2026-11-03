@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { caminhoInterno, ehAppSeparado, ehPainel, enderecoCerto, inicioDepoisDoLogin, linkSite } from "./enderecos"
+import { barraContaDoPainel, caminhoInterno, ehAppSeparado, ehPainel, enderecoCerto, inicioDepoisDoLogin, linkSite } from "./enderecos"
 
 const S = "https://www.x.com", A = "https://app.x.com", P = "https://alpha.x.com"
 const sites = { site: S, app: A, admin: P }
@@ -62,5 +62,14 @@ describe("enderecoCerto", () => {
     const um = { site: S, app: S, admin: S }
     expect(ehPainel(S, um)).toBe(false)
     expect(ehAppSeparado(S, um)).toBe(false)
+  })
+  it("conta da equipe no app só confirma e redefine a senha", () => {
+    expect(barraContaDoPainel(A, "/pt/planos", true, sites)).toBe(true)
+    expect(barraContaDoPainel(A, "/pt/checkout/sucesso", true, sites)).toBe(true)
+    expect(barraContaDoPainel(A, "/pt/redefinir-senha", true, sites)).toBe(false)
+    expect(barraContaDoPainel(A, "/pt/confirmar", true, sites)).toBe(false)
+    expect(barraContaDoPainel(A, "/pt/planos", false, sites)).toBe(false)
+    expect(barraContaDoPainel(P, "/pt/admin", true, sites)).toBe(false)
+    expect(barraContaDoPainel(S, "/pt/planos", true, { site: S, app: S, admin: S })).toBe(false)
   })
 })

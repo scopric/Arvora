@@ -62,6 +62,7 @@ export const nucleoPt = {
   "selo.premiado": "Premiado",
   "acesso.erro": "Não conseguimos conferir o seu acesso agora.",
   "contaPainel.titulo": "Esta conta é do painel",
+  "contaPainel.irPainel": "Ir para o painel",
   "contaPainel.texto": "Contas da equipe entram só no painel de administração. Para usar a área do membro, entre com uma conta de membro.",
   "mfa.titulo": "Verificação em duas etapas",
   "mfa.cadastrar.texto": "O painel de administração exige um segundo fator. Cadastre um aplicativo autenticador (como Google Authenticator ou 1Password) para continuar.",

@@ -5,7 +5,10 @@ import { Erro } from "./Erro"
 import { EscopoApp } from "./escopo"
 import { Esqueleto } from "./Esqueleto"
 import { Icone } from "./Icone"
+import { Carregando } from "./Carregando"
 import { Mfa } from "./Mfa"
+import { useSairSeNaoForEquipe } from "../lib/sairDoPainel"
+import { BotaoSair } from "./ContasSeparadas"
 import { NaoEncontrada } from "./NaoEncontrada"
 import { SeletorIdioma } from "./SeletorIdioma"
 import { focoApp, linkMenuApp, rotuloGrupoApp } from "./menuApp"
@@ -45,7 +48,9 @@ function Menu() {
 // nunca como "sem acesso". No celular o menu abre num <details>.
 export function LayoutAdmin() {
   const t = useT()
+  const caminho = useCaminho()
   const acesso = useAcesso()
+  const saindo = useSairSeNaoForEquipe(acesso.equipe, acesso.carregando, acesso.erro)
 
   if (acesso.carregando || acesso.erro) {
     return (
@@ -56,6 +61,7 @@ export function LayoutAdmin() {
       </EscopoApp>
     )
   }
+  if (saindo) return <Carregando />
   if (!acesso.equipe) return <NaoEncontrada />
 
   return (
@@ -69,6 +75,7 @@ export function LayoutAdmin() {
                 <p className="text-[11px] font-medium text-nevoa">{t("admin.faixa")}</p>
                 <SeletorIdioma />
               </div>
+              <BotaoSair destino={caminho("/entrar")} className="mt-2 px-2" />
               <details className="mt-2 lg:hidden">
                 <summary className={`flex min-h-9 cursor-pointer list-none items-center justify-between rounded-md border border-grafite px-3 text-legenda font-medium text-bruma pointer-coarse:min-h-11 hover:text-creme ${foco}`}>
                   {t("menu.mais")}

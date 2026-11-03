@@ -48,6 +48,14 @@ export function ehAppSeparado(origem: string, { app, admin }: Enderecos = OFICIA
   return origem === app && app !== admin
 }
 
+// Conta da equipe com sessão no app separado: vê só a tela "conta do painel", exceto confirmar e redefinir a senha
+// (o e-mail de recuperação cai no app, Site URL do Supabase).
+export function barraContaDoPainel(origem: string, caminho: string, equipe: boolean, sites: Enderecos = OFICIAIS): boolean {
+  if (!equipe || !ehAppSeparado(origem, sites)) return false
+  const area = caminho.split("/")[2]
+  return area !== "confirmar" && area !== "redefinir-senha"
+}
+
 // Destino padrão depois do login: no painel, o próprio painel.
 export function inicioDepoisDoLogin(origem: string, sites: Enderecos = OFICIAIS): "/admin" | "/inicio" {
   return ehPainel(origem, sites) ? "/admin" : "/inicio"

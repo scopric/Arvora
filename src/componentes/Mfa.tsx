@@ -1,10 +1,11 @@
 import { useEffect, useState, type ReactNode, type SubmitEvent } from "react"
-import { useT, useTitulo, type Chave } from "../i18n"
+import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { supabase } from "../lib/supabase"
 import { Aviso } from "./Aviso"
 import { Botao } from "./Botao"
 import { Campo } from "./Campo"
 import { Cartao } from "./Cartao"
+import { BotaoSair } from "./ContasSeparadas"
 import { Erro } from "./Erro"
 import { Esqueleto } from "./Esqueleto"
 
@@ -35,6 +36,7 @@ function Titulo() {
 
 export function Mfa({ children }: { children: ReactNode }) {
   const t = useT()
+  const caminho = useCaminho()
   const [estado, setEstado] = useState<Estado>({ fase: "carregando" })
   const [aviso, setAviso] = useState<Chave | null>(null)
   const [ocupado, setOcupado] = useState(false)
@@ -133,6 +135,8 @@ export function Mfa({ children }: { children: ReactNode }) {
           {formulario(estado.fator)}
         </>
       ) : null}
+      {/* Sem o aplicativo à mão: trocar de conta ou sair (Decisão 67). */}
+      <BotaoSair destino={caminho("/entrar")} className="mt-6" />
       </Cartao>
     </main>
   )

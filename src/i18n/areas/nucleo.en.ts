@@ -63,6 +63,7 @@ export const nucleoEn: Record<keyof typeof nucleoPt, string> = {
   "selo.premiado": "Award winner",
   "acesso.erro": "We could not check your access right now.",
   "contaPainel.titulo": "This is an admin account",
+  "contaPainel.irPainel": "Go to the admin panel",
   "contaPainel.texto": "Team accounts can only use the admin panel. To use the member area, log in with a member account.",
   "mfa.titulo": "Two-step verification",
   "mfa.cadastrar.texto": "The admin area requires a second factor. Set up an authenticator app (such as Google Authenticator or 1Password) to continue.",
