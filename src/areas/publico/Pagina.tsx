@@ -14,7 +14,6 @@ export function Pagina({ titulo, apoio, largura = "max-w-6xl", children }: { tit
   )
 }
 
-
 // Registro que não existe (slug errado, despublicado): página própria, sem <main> (o layout já tem), em vez da NaoEncontrada da base.
 export function SemRegistro({ voltar, rotulo }: { voltar: string; rotulo: Chave }) {
   const t = useT()
