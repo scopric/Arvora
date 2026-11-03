@@ -15,6 +15,14 @@ describe("404 de verdade", () => {
     expect(ler(join(raiz, "404.html"))).toBe("<html>spa</html>")
   })
 
+  it("o build roda gerar-404 depois de externalizar-scripts (404.html sem script inline, que a CSP bloquearia)", () => {
+    expect(JSON.parse(ler("package.json")).scripts.build).toMatch(/externalizar-scripts\.mjs.*gerar-404\.mjs/)
+  })
+
+  // Aqui a fonte do rewrite roda como RegExp do JavaScript, não pelo path-to-regexp da Vercel; os dois
+  // já discordaram ("/" casava aqui e não lá). Ao mudar a fonte, conferir também com @vercel/routing-utils
+  // (ou trocar por path-to-regexp aqui se ele entrar como devDependency).
+
   const re = new RegExp(`^${JSON.parse(ler("vercel.json")).rewrites[0].source}$`)
   const app = ler("src/App.tsx")
   const areas = readdirSync("src/areas").filter((a) => a !== "admin" && existsSync(`src/areas/${a}/rotas.tsx`))
