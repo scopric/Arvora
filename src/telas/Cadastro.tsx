@@ -102,9 +102,6 @@ export function Cadastro() {
           ) : null}
         </div>
         <Turnstile key={captcha.reinicio} onToken={captcha.setToken} />
-        <Botao type="submit" ocupado={ocupado}>
-          {t("cadastro.botao")}
-        </Botao>
         {/* PROVISÓRIO: textos cadastro.legal.* a validar com o solicitor. Só informa e linka; o aceite registrado é no checkout. */}
         <p className="text-sm text-creme/70">
           {t("cadastro.legal.antes")}{" "}
@@ -112,6 +109,9 @@ export function Cadastro() {
           {t("cadastro.legal.meio")}{" "}
           <a href={linkSite(caminho("/privacidade"))} className={linkLegal}>{t("publico.privacidade.titulo")}</a>.
         </p>
+        <Botao type="submit" ocupado={ocupado}>
+          {t("cadastro.botao")}
+        </Botao>
       </form>
       <p className="mt-6 text-sm text-creme/70">
         {t("cadastro.jaTemConta")}{" "}

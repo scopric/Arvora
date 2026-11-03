@@ -126,8 +126,9 @@ export const pt = {
   "cadastro.nome": "Nome",
   "cadastro.maior18": "Tenho 18 anos ou mais.",
   "cadastro.botao": "Criar conta",
-  "cadastro.legal.antes": "Ao criar a conta, você concorda com os",  // PROVISÓRIO: validar com o solicitor
-  "cadastro.legal.meio": "e declara ter lido a",  // PROVISÓRIO: validar com o solicitor
+  // PROVISÓRIO: aviso legal do cadastro a validar com o solicitor.
+  "cadastro.legal.antes": "Ao criar a conta, você concorda com os",
+  "cadastro.legal.meio": "e declara ter lido a",
   "cadastro.jaTemConta": "Já tem conta?",
   "cadastro.entrar": "Entrar",
   "cadastro.enviado.titulo": "Confira seu e-mail",

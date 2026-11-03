@@ -36,7 +36,10 @@ describe("Cadastro: links legais", () => {
   })
 
   it("sem endereços separados (local/prévia): links relativos", async () => {
+    vi.stubEnv("VITE_SITE_URL", "https://mesmo.exemplo.invalid")
+    vi.stubEnv("VITE_APP_URL", "https://mesmo.exemplo.invalid")
     await ver("/pt/cadastro")
     expect(screen.getByRole("link", { name: "Termos de uso" }).getAttribute("href")).toBe("/pt/termos")
+    expect(screen.getByRole("link", { name: "Política de privacidade" }).getAttribute("href")).toBe("/pt/privacidade")
   })
 })
