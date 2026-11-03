@@ -49,8 +49,8 @@ describe("DirectoryEmpresa", () => {
     ver()
     expect(await screen.findByText("Não encontramos esta página")).toBeTruthy()
     expect(falso.chamadas.filter((c) => c.tabela === "setores" || c.tabela === "premiados")).toEqual([])
-    expect(document.title).toBe("Não encontramos esta página — Grupo Árvora")
-    expect(document.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex")
+    await waitFor(() => expect(document.title).toBe("Não encontramos esta página — Grupo Árvora"))
+    await waitFor(() => expect(document.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex"))
   })
   it("título da aba com o nome da empresa; erro nas consultas de apoio aparece; selo exige premiado publicado", async () => {
     falso.tabelas.empresas = { data: [{ id: 1, nome: "Alfa", setor_id: 1, cidade: null, pais: null, logo_path: null }], error: null }

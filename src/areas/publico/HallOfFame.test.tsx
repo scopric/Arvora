@@ -51,6 +51,6 @@ describe("Hall of Fame", () => {
     detalhe()
     expect(await screen.findByRole("heading", { level: 1, name: "Não encontramos esta página" })).toBeTruthy()
     expect(screen.getByRole("link", { name: "Voltar ao Hall of Fame" }).getAttribute("href")).toBe("/pt/hall-of-fame")
-    expect(document.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex")
+    await waitFor(() => expect(document.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex"))
   })
 })
