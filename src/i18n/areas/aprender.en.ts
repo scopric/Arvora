@@ -4,6 +4,7 @@ import type { aprenderPt } from "./aprender.pt"
 export const aprenderEn: Record<keyof typeof aprenderPt, string> = {
   "aprender.inicio.titulo": "Home",
   "aprender.inicio.ola": "Hi",
+  "aprender.inicio.abrirAula": "Open the lesson",
   "aprender.bemVindo.titulo": "Welcome",
   "aprender.aulas.titulo": "Classes",
   "aprender.aula.titulo": "Class",

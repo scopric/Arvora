@@ -1,10 +1,11 @@
 import { Link } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
-import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { botaoPrimarioApp, botaoSecundarioApp, pilulaCategoriaApp } from "../../../componentes/botaoEstilo"
+import { Cartao } from "../../../componentes/Cartao"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone, type NomeIcone } from "../../../componentes/Icone"
-import { useCaminho, useT, type Chave } from "../../../i18n"
+import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -14,21 +15,23 @@ import { Pagina } from "../componentes/Pagina"
 import { QuandoAula } from "../componentes/QuandoAula"
 import { COLUNAS_AULA, type AulaLinha } from "../tipos"
 import { useCarga } from "../useCarga"
-import { dados, foco, linhas, linkTexto } from "../util"
+import { dados, dataCurta, foco, linhas, linkTexto } from "../util"
 
 type Continua = { percentual: number; aulas: { slug: string; titulo: string; modulos: { cursos: { slug: string } | null } | null } | null }
 type Salvo = { id: number; aulas: { slug: string; titulo: string } | null; videos: { slug: string; titulo: string } | null }
 type Sugestao = { id: number; sugerido_id: string; motivo: string; nome: string }
 
-// Molde Mercury (dashboard): saudação, linha de atalhos em pílula, grade de cartões em 2 colunas.
-const cartao = "rounded-xl p-5 shadow-borda"
-const atalho = `inline-flex min-h-9 items-center gap-2 rounded-full border border-grafite px-3 text-corpo-p font-medium text-bruma transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 hover:text-creme ${foco}`
-const lista = "divide-y divide-grafite"
+// Início: composição própria sobre três moldes do cofre (não há tela única no Refero que junte saudação, próximos
+// eventos e progresso): Mercury c5295ca8 (saudação + atalhos em pílula + grade de cartões), Partiful 29ecaeb7
+// (próximo evento em destaque com a data em pílula) e Brilliant f841b4a0 ("Jump back in": continuar de onde parou
+// com barra de progresso). Cartões de vidro em 2 colunas; um dourado por tela.
+const lista = "divide-y divide-placa"
 const item = "flex flex-col items-start gap-1 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-const meta = "shrink-0 text-corpo-p text-nevoa tabular-nums"
+const meta = "shrink-0 text-corpo-p text-cinza tabular-nums"
 
 export function Inicio() {
   const t = useT()
+  const lang = useIdioma()
   const caminho = useCaminho()
   const acesso = useAcesso()
   const { sessao } = useAuth()
@@ -79,42 +82,48 @@ export function Inicio() {
     { rotulo: "menu.comunidade", rota: "/comunidade", icone: "balao", mostrar: clube },
     { rotulo: "menu.tarefas", rota: "/tarefas", icone: "check", mostrar: grupo },
   ]
+  // Um dourado por tela: com conta nova, "Começar" é o primário e a próxima aula fica em secundário.
+  const ctaProxima = contaNova ? botaoSecundarioApp : botaoPrimarioApp
 
   return (
     <Pagina
       chave="aprender.inicio.titulo"
       titulo={nome ? `${t("aprender.inicio.ola")}, ${nome}` : t("aprender.inicio.ola")}
       acoes={atalhos.filter((a) => a.mostrar).map((a) => (
-        <Link key={a.rota} to={caminho(a.rota)} className={atalho}>
-          <Icone nome={a.icone} className="size-4 text-nevoa" />
+        <Link key={a.rota} to={caminho(a.rota)} className={pilulaCategoriaApp}>
+          <Icone nome={a.icone} className="size-4" />
           {t(a.rotulo)}
         </Link>
       ))}
     >
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         {contaNova ? (
-          <section className={`${cartao} lg:col-span-2`}>
-            <h2 className="text-base font-semibold">{t("aprender.inicio.comece")}</h2>
-            <ol className="mt-3 list-decimal space-y-1 pl-5 text-base text-bruma">
+          <Cartao className="lg:col-span-2">
+            <h2 className="text-subtitulo font-semibold">{t("aprender.inicio.comece")}</h2>
+            <ol className="mt-3 list-decimal space-y-1 pl-5 text-corpo text-creme">
               <li>{t("aprender.inicio.passo1")}</li>
               <li>{t(grupo ? "aprender.inicio.passo2" : "aprender.inicio.passo2Clube")}</li>
               <li>{t("aprender.inicio.passo3")}</li>
             </ol>
-            {/* Um primário por tela: o CTA do Bloqueado é secundário, então "Começar" é o dourado para todos (Decisão 70). */}
             <Link to={caminho("/bem-vindo")} className={`${botaoPrimarioApp} mt-5`}>{t("aprender.inicio.comecar")}</Link>
-          </section>
+          </Cartao>
         ) : null}
 
         {grupo ? (
           <Bloco className="lg:col-span-2" titulo={t("aprender.inicio.proximaAula")} carga={proxima} recarregar={recProxima} vazio={t("aprender.aulas.vazio")}>
             {(a) =>
               a && a.inicio_em ? (
-                <div>
-                  <h3 className="text-titulo-p font-semibold">
-                    <Link to={caminho(`/aulas/${a.slug}`)} className={`rounded-sm underline-offset-4 hover:underline ${foco}`}>{a.titulo}</Link>
-                  </h3>
-                  <p className="mt-2 text-base text-bruma"><QuandoAula inicio={a.inicio_em} /></p>
-                  <div className="mt-5"><Agenda aula={{ ...a, inicio_em: a.inicio_em }} /></div>
+                // Partiful: o próximo evento em destaque, com a data numa pílula e a ação principal ao lado.
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <span className="inline-flex items-center rounded-full bg-fumaca px-3 py-1 text-corpo-p font-semibold tabular-nums">{dataCurta(a.inicio_em, lang)}</span>
+                    <h3 className="mt-3 text-titulo-p font-semibold">
+                      <Link to={caminho(`/aulas/${a.slug}`)} className={`rounded-sm underline-offset-4 hover:underline ${foco}`}>{a.titulo}</Link>
+                    </h3>
+                    <p className="mt-2 text-corpo text-cinza"><QuandoAula inicio={a.inicio_em} /></p>
+                    <div className="mt-5"><Agenda aula={{ ...a, inicio_em: a.inicio_em }} /></div>
+                  </div>
+                  <Link to={caminho(`/aulas/${a.slug}`)} className={`${ctaProxima} shrink-0`}>{t("aprender.inicio.abrirAula")}</Link>
                 </div>
               ) : null
             }
@@ -122,20 +131,21 @@ export function Inicio() {
         ) : (
           // Um cadeado só para os dois blocos do Grupo: dois "Bloqueado" iguais repetem o landmark (axe: landmark-unique).
           <section className="space-y-4 lg:col-span-2">
-            <h2 className="text-base font-semibold">{t("aprender.inicio.proximaESugestoes")}</h2>
+            <h2 className="text-subtitulo font-semibold">{t("aprender.inicio.proximaESugestoes")}</h2>
             <Bloqueado frase={t("aprender.inicio.parteDoGrupo")} />
           </section>
         )}
 
         <Bloco titulo={t("aprender.inicio.continue")} carga={continua} recarregar={recContinua} vazio={t("aprender.inicio.continueVazio")}>
           {(l) => (
+            // Brilliant ("Jump back in"): cada aula com a barra de progresso dourada e o percentual.
             <ul className={lista}>
               {l.map((c) =>
                 c.aulas ? (
                   <li key={c.aulas.slug} className={item}>
                     <Link to={caminho(c.aulas.modulos?.cursos ? `/academy/${c.aulas.modulos.cursos.slug}/${c.aulas.slug}` : `/aulas/${c.aulas.slug}`)} className={linkTexto}>{c.aulas.titulo}</Link>
                     <span className={`${meta} flex items-center gap-2`}>
-                      <span aria-hidden="true" className="h-1 w-16 overflow-hidden rounded-full bg-fumaca"><span className="block h-full rounded-full bg-dourado" style={{ width: `${c.percentual}%` }} /></span>
+                      <span aria-hidden="true" className="h-1.5 w-24 overflow-hidden rounded-full bg-fumaca"><span className="block h-full rounded-full bg-dourado" style={{ width: `${c.percentual}%` }} /></span>
                       {c.percentual}%
                     </span>
                   </li>
@@ -165,8 +175,8 @@ export function Inicio() {
                 <ul className={lista}>
                   {l.map((s) => (
                     <li key={s.id} className="py-3 first:pt-0">
-                      <p className="font-medium">{s.nome}</p>
-                      <p className="mt-1 text-corpo-p text-nevoa">{s.motivo}</p>
+                      <p className="font-semibold">{s.nome}</p>
+                      <p className="mt-1 text-corpo-p text-cinza">{s.motivo}</p>
                     </li>
                   ))}
                 </ul>
@@ -180,14 +190,15 @@ export function Inicio() {
           <Bloco titulo={t("aprender.inicio.conexoes")} carga={pendentes} recarregar={recPendentes} vazio="">
             {(n) =>
               n > 0 ? (
+                // Mercury (célula de número): o valor grande em 48/600, o texto embaixo.
                 <div>
-                  <p className="text-titulo font-medium tabular-nums">{n}</p>
-                  <p className="mt-1 text-base text-bruma">
+                  <p className="text-titulo-g font-semibold tabular-nums">{n}</p>
+                  <p className="mt-1 text-corpo text-creme">
                     {t(n === 1 ? "aprender.inicio.pedidoPendente" : "aprender.inicio.pedidosPendentes")} <Link to={caminho("/conexoes")} className={linkTexto}>{t("aprender.inicio.ver")}</Link>
                   </p>
                 </div>
               ) : (
-                <p className="text-base text-nevoa">
+                <p className="text-corpo text-cinza">
                   {t("aprender.inicio.semPedidos")} <Link to={caminho("/conexoes")} className={linkTexto}>{t("aprender.inicio.ver")}</Link>
                 </p>
               )
@@ -208,10 +219,10 @@ export function Inicio() {
         </Bloco>
 
         {acesso.premiado ? (
-          <section className={cartao}>
-            <h2 className="text-base font-semibold">{t("menu.meuAward")}</h2>
+          <Cartao>
+            <h2 className="text-corpo font-semibold">{t("menu.meuAward")}</h2>
             <Link to={caminho("/meu-award")} className={`${linkTexto} mt-4 inline-block`}>{t("aprender.inicio.verMeuAward")}</Link>
-          </section>
+          </Cartao>
         ) : null}
       </div>
     </Pagina>

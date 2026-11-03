@@ -3,6 +3,7 @@
 export const aprenderPt = {
   "aprender.inicio.titulo": "Início",
   "aprender.inicio.ola": "Olá",
+  "aprender.inicio.abrirAula": "Abrir a aula",
   "aprender.bemVindo.titulo": "Bem-vindo",
   "aprender.aulas.titulo": "Aulas",
   "aprender.aula.titulo": "Aula",
