@@ -30,7 +30,7 @@ export const nucleoPt = {
   "menu.directory": "Directory",
   "menu.network": "Business Network",
   "menu.match": "Business Match",
-  "menu.evento": "Evento 2026", // PROVISÓRIO: ano e edição atual a definir
+  "menu.evento": "Evento",
   "menu.meuAward": "Meu Award",
   "menu.comunidade": "Comunidade",
   "menu.tarefas": "Tarefas",
