@@ -16,7 +16,7 @@ export function CartaoVideo({ video, base }: { video: VideoLista; base: string }
   return (
     <li className="relative">
       <Cartao className="h-full transition-colors focus-within:border-creme/60 hover:border-creme/60">
-        <h2 className="font-titulo text-2xl leading-tight font-bold uppercase">
+        <h2 className="font-titulo text-2xl leading-tight font-normal">
           <Link to={caminho(`${base}/${video.slug}`)} className="after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
             {video.titulo}
           </Link>

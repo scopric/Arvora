@@ -10,7 +10,8 @@ import { useAuth } from "../../../lib/sessao"
 import { useCaminho, useIdioma, useT, useTitulo } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { nomeLocalizado, urlImagem } from "../formatos"
-import { Pagina, linkContorno } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkContorno } from "../../../componentes/botaoEstilo"
 import { useConsulta } from "../usarConsulta"
 
 // Lista de empresas publicadas (DIR-01). Filtros de área e cidade ficam na URL.
@@ -77,7 +78,7 @@ export function Directory() {
               <li key={e.id} className="relative">
                 <Cartao className="h-full transition-colors focus-within:border-creme/60 hover:border-creme/60">
                   {logo ? <img src={logo} alt="" loading="lazy" className="mb-4 h-12 w-auto max-w-40 object-contain" /> : null}
-                  <h2 className="font-titulo text-2xl leading-tight font-bold uppercase">
+                  <h2 className="font-titulo text-2xl leading-tight font-normal">
                     <Link to={caminho(`/directory/${e.slug}`)} className="after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">{e.nome}</Link>
                   </h2>
                   <p className="mt-2 text-creme/80">{[s && nomeLocalizado(s, idioma), e.cidade, e.pais].filter(Boolean).join(" · ")}</p>

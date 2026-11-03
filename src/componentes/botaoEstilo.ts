@@ -1,3 +1,11 @@
+// Botão do site público (D22 pílula 44 px; D54): base única da home, de Botao e dos links do topo.
+export const botaoPublico =
+  "inline-flex min-h-11 items-center justify-center rounded-full px-6 text-base font-medium transition-[box-shadow,border-color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
+
+// Links com cara de botão no site público (Pagina): um só primário, igual ao Botao.
+export const linkPrimario = `${botaoPublico} bg-destaque text-fundo hover:shadow-brilho`
+export const linkContorno = `${botaoPublico} border border-creme/30 text-creme hover:border-creme/60`
+
 // Classes do botão no app (molde Linear). Um só lugar: Botao, Bloqueado e os links-botão das áreas (aprender, admin)
 // montam a partir daqui. Primário = o único botão cromático da tela (dourado, raio 6, 14px/510); contorno = ghost com
 // hairline; perigo = ghost vermelho. 36px de altura, 44 no toque.

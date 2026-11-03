@@ -2,7 +2,7 @@ import { Link } from "react-router"
 import type { ReactNode } from "react"
 import { useCaminho, useT } from "../i18n"
 import type { Nivel } from "../lib/acesso"
-import { botaoPrimarioApp } from "./botaoEstilo"
+import { botaoPrimarioApp, botaoPublico } from "./botaoEstilo"
 import { useApp } from "./escopo"
 import { Icone } from "./Icone"
 
@@ -50,7 +50,7 @@ export function Bloqueado({ previa, frase, minimo = "grupo" }: { previa?: ReactN
           {rotulo}
         </p>
         <p className="max-w-prose text-lg">{frase}</p>
-        <Link to={caminho("/planos")} className="inline-flex min-h-12 items-center justify-center rounded-lg bg-creme px-6 font-semibold text-fundo transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">
+        <Link to={caminho("/planos")} className={`${botaoPublico} bg-destaque text-fundo hover:shadow-brilho`}>
           {cta}
         </Link>
       </div>

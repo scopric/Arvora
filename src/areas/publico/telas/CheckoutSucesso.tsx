@@ -5,7 +5,8 @@ import { Esqueleto } from "../../../componentes/Esqueleto"
 import { useCaminho, useT, useTitulo } from "../../../i18n"
 import { useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
-import { Pagina, linkContorno, linkPrimario } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkContorno, linkPrimario } from "../../../componentes/botaoEstilo"
 
 const A_CADA_MS = 3000
 const DESISTE_MS = 30_000

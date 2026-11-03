@@ -7,9 +7,12 @@ import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
 import { useIdioma, useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { useCaptcha } from "../lib/captcha"
+import { linkSite } from "../lib/enderecos"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { cadastroSchema, errosPorCampo, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
+
+const linkLegal = "underline decoration-dourado underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
 
 export function Cadastro() {
   const { sessao } = useAuth()
@@ -99,6 +102,13 @@ export function Cadastro() {
           ) : null}
         </div>
         <Turnstile key={captcha.reinicio} onToken={captcha.setToken} />
+        {/* PROVISÓRIO: textos cadastro.legal.* a validar com o solicitor. Só informa e linka; o aceite registrado é no checkout. */}
+        <p className="text-sm text-creme/70">
+          {t("cadastro.legal.antes")}{" "}
+          <a href={linkSite(caminho("/termos"))} className={linkLegal}>{t("publico.termos.titulo")}</a>{" "}
+          {t("cadastro.legal.meio")}{" "}
+          <a href={linkSite(caminho("/privacidade"))} className={linkLegal}>{t("publico.privacidade.titulo")}</a>.
+        </p>
         <Botao type="submit" ocupado={ocupado}>
           {t("cadastro.botao")}
         </Botao>
