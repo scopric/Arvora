@@ -78,10 +78,30 @@ describe("tela Meu perfil", () => {
 
   it("não envia nada ao banco com campo inválido", async () => {
     renderiza(<Perfil />)
-    await userEvent.type(await screen.findByRole("textbox", { name: "País" }), "x1")
+    await userEvent.type(await screen.findByRole("textbox", { name: "LinkedIn" }), "linkedin.com/in/ana")
     await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }))
-    expect(await screen.findByText(/código de 2 letras/i)).toBeTruthy()
+    expect(await screen.findByText(/começando com https:\/\/linkedin.com/i)).toBeTruthy()
     expect(resp.chamadas).toBe(0)
+  })
+
+  it("país é lista: escolher Irlanda grava IE (não IR)", async () => {
+    renderiza(<Perfil />)
+    const pais = await screen.findByRole("combobox", { name: "País" })
+    expect(pais.getAttribute("autocomplete")).toBe("country")
+    await userEvent.selectOptions(pais, "Irlanda")
+    await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }))
+    await waitFor(() => expect(resp.chamadas).toBe(1))
+    expect(resp.ultimo).toMatchObject({ pais: "IE" })
+  })
+
+  it("código antigo fora da lista aparece no select e volta igual ao salvar", async () => {
+    resp.perfil = { data: { ...perfilOk, pais: "XX" }, error: null }
+    renderiza(<Perfil />)
+    const pais = (await screen.findByRole("combobox", { name: "País" })) as HTMLSelectElement
+    expect(pais.value).toBe("XX")
+    await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }))
+    await waitFor(() => expect(resp.chamadas).toBe(1))
+    expect(resp.ultimo).toMatchObject({ pais: "XX" })
   })
 
   it("exportar, excluir e visibilidade saíram: ficam só os links para as Configurações", async () => {

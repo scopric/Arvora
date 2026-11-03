@@ -32,7 +32,7 @@ export function FormularioRegistro({
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const { carga, erros: faltas } = paraCarga(campos, v, linha)
-    const msgs = Object.fromEntries(Object.entries(faltas).map(([k, m]) => [k, t(m === "numero" ? "admin.erro.numero" : "admin.erro.obrigatorio")]))
+    const msgs = Object.fromEntries(Object.entries(faltas).map(([k, m]) => [k, t(m === "numero" ? "admin.erro.numero" : m === "url" ? "admin.erro.url" : "admin.erro.obrigatorio")]))
     setErros(msgs)
     if (Object.keys(msgs).length > 0) return
     await acao.rodar(() => aoSalvar(carga), "admin.comum.salvo")

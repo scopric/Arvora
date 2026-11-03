@@ -19,5 +19,7 @@ describe("navegação do membro", () => {
     expect(areaDe("/academy")?.rota).toBe("/aulas")
     expect(areaDe("/conexoes")?.rota).toBe("/network")
     expect(areaDe("/hall-of-fame")?.rota).toBe("/awards")
+    expect(areaDe("/evento")?.rota).toBe("/awards")
+    expect(areaDe("/evento/dublin-2026")?.rota).toBe("/awards")
   })
 })

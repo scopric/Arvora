@@ -7,6 +7,7 @@ import { Campo, Selecao } from "../componentes/Campo"
 import { useEstiloCampo } from "../componentes/campoEstilo"
 import { linkTextoApp } from "../componentes/menuApp"
 import { PaginaApp } from "../componentes/PaginaApp"
+import { SelecaoPais } from "../componentes/SelecaoPais"
 import { useCaminho, useIdioma, useT, type Chave } from "../i18n"
 import { abrirPortal } from "../lib/assinatura"
 import { useAuth } from "../lib/sessao"
@@ -107,9 +108,9 @@ export function Perfil() {
               </option>
             ))}
           </Selecao>
-          <div className="grid gap-5 sm:grid-cols-[1fr_8rem]">
+          <div className="grid gap-5 sm:grid-cols-2">
             <Campo rotulo={t("perfil.cidade")} name="cidade" defaultValue={estado.perfil.cidade ?? ""} erro={erros.cidade} autoComplete="address-level2" />
-            <Campo rotulo={t("perfil.pais")} name="pais" defaultValue={estado.perfil.pais ?? ""} erro={erros.pais} maxLength={2} placeholder="IE" ajuda={t("perfil.pais.ajuda")} />
+            <SelecaoPais valor={estado.perfil.pais} erro={erros.pais} />
           </div>
           <Campo rotulo="LinkedIn" name="linkedin_url" type="url" defaultValue={estado.perfil.linkedin_url ?? ""} erro={erros.linkedin_url} placeholder={t("perfil.linkedin.exemplo")} />
           <Campo rotulo="Instagram" name="instagram" defaultValue={estado.perfil.instagram ?? ""} erro={erros.instagram} placeholder={t("perfil.instagram.exemplo")} />

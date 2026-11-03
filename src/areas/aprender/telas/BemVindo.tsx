@@ -6,6 +6,7 @@ import { Campo, Selecao } from "../../../componentes/Campo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Bloqueado } from "../../../componentes/Bloqueado"
+import { SelecaoPais } from "../../../componentes/SelecaoPais"
 import { botaoSecundarioApp } from "../../../componentes/botaoEstilo"
 import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { temNivel, useAcesso } from "../../../lib/acesso"
@@ -159,9 +160,9 @@ export function BemVindo() {
               <option key={s.id} value={s.id}>{lang === "en" ? (s.nome_en ?? s.nome) : s.nome}</option>
             ))}
           </Selecao>
-          <div className="grid gap-5 sm:grid-cols-[1fr_8rem]">
+          <div className="grid gap-5 sm:grid-cols-2">
             <Campo rotulo={t("perfil.cidade")} name="cidade" defaultValue={perfil.cidade ?? ""} erro={erros.cidade} autoComplete="address-level2" />
-            <Campo rotulo={t("perfil.pais")} name="pais" defaultValue={perfil.pais ?? ""} erro={erros.pais} maxLength={2} ajuda={t("perfil.pais.ajuda")} />
+            <SelecaoPais valor={perfil.pais} erro={erros.pais} />
           </div>
           <Selecao rotulo={t("perfil.visibilidade.legenda")} name="visibilidade" defaultValue={perfil.visibilidade} erro={erros.visibilidade}>
             <option value="membros">{t("perfil.visibilidade.membros")}</option>
