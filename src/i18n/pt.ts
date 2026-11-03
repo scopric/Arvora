@@ -200,7 +200,7 @@ export const pt = {
   "perfil.setor.selecione": "Selecione",
   "perfil.cidade": "Cidade",
   "perfil.pais": "País",
-  "perfil.pais.ajuda": "2 letras",
+  "perfil.pais.selecione": "Selecione",
   "perfil.linkedin.exemplo": "https://linkedin.com/in/seu-nome",
   "perfil.instagram.exemplo": "seu.usuario",
   "perfil.bio": "Sobre você",
