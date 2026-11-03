@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from "react-router"
+import { NavLink, Outlet } from "react-router"
 import { useCaminho, useT } from "../i18n"
 import { useAcesso } from "../lib/acesso"
 import { Erro } from "./Erro"
@@ -45,7 +45,6 @@ function Menu() {
 // nunca como "sem acesso". No celular o menu abre num <details>.
 export function LayoutAdmin() {
   const t = useT()
-  const caminho = useCaminho()
   const acesso = useAcesso()
 
   if (acesso.carregando || acesso.erro) {
@@ -70,10 +69,6 @@ export function LayoutAdmin() {
                 <p className="text-[11px] font-medium text-nevoa">{t("admin.faixa")}</p>
                 <SeletorIdioma />
               </div>
-              <Link to={caminho("/inicio")} className={`${linkMenu} mt-2`}>
-                <Icone nome="seta" className="size-4 shrink-0" />
-                {t("admin.voltar")}
-              </Link>
               <details className="mt-2 lg:hidden">
                 <summary className={`flex min-h-9 cursor-pointer list-none items-center justify-between rounded-md border border-grafite px-3 text-legenda font-medium text-bruma pointer-coarse:min-h-11 hover:text-creme ${foco}`}>
                   {t("menu.mais")}

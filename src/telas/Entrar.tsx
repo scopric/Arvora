@@ -7,7 +7,7 @@ import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
 import { useCaminho, useT, useTitulo, type Chave } from "../i18n"
 import { useCaptcha } from "../lib/captcha"
-import { caminhoInterno, inicioDepoisDoLogin } from "../lib/enderecos"
+import { caminhoInterno, ehPainel, inicioDepoisDoLogin } from "../lib/enderecos"
 import { useAuth } from "../lib/sessao"
 import { supabase } from "../lib/supabase"
 import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
@@ -86,12 +86,15 @@ export function Entrar() {
           {t("entrar.esqueci")}
         </Link>
       </p>
-      <p className="mt-3 text-sm text-creme/70">
-        {t("entrar.semConta")}{" "}
-        <Link to={caminho("/cadastro")} className="underline decoration-dourado underline-offset-4">
-          {t("entrar.criarConta")}
-        </Link>
-      </p>
+      {/* No painel ninguém cria conta: contas da equipe são criadas à parte (Decisão 67). */}
+      {ehPainel(window.location.origin) ? null : (
+        <p className="mt-3 text-sm text-creme/70">
+          {t("entrar.semConta")}{" "}
+          <Link to={caminho("/cadastro")} className="underline decoration-dourado underline-offset-4">
+            {t("entrar.criarConta")}
+          </Link>
+        </p>
+      )}
     </LayoutAuth>
   )
 }

@@ -19,14 +19,14 @@ export function enderecoCerto(origem: string, caminho: string, { site, app, admi
   if (![site, app, admin].includes(origem)) return null
   const [, lang, area] = caminho.split("/")
   if (lang !== "pt" && lang !== "en") return null
-  const ehPainel = origem === admin && admin !== app && admin !== site
+  const painel = ehPainel(origem, { site, app, admin })
   if (!area) {
-    if (ehPainel) return `${admin}/${lang}/admin`
+    if (painel) return `${admin}/${lang}/admin`
     if (origem === app && app !== site) return `${app}/${lang}/inicio`
     return null
   }
   if (NOS_DOIS.has(area) && origem !== admin) return null
-  const alvo = area === "admin" || (area === "entrar" && ehPainel) ? admin : DO_APP.has(area) || NOS_DOIS.has(area) ? app : site
+  const alvo = area === "admin" || (area === "entrar" && painel) ? admin : DO_APP.has(area) || NOS_DOIS.has(area) ? app : site
   return alvo === origem ? null : alvo + caminho
 }
 
@@ -40,7 +40,15 @@ export function caminhoInterno(de: string | null | undefined): string | null {
   return de && /^\/(?!\/)[^\\\s]*$/.test(de) ? de : null
 }
 
+// Painel e app em endereços próprios (Decisão 67: contas separadas). Com tudo no mesmo endereço (local, prévias), ambos são falsos.
+export function ehPainel(origem: string, { site, app, admin }: Enderecos = OFICIAIS): boolean {
+  return origem === admin && admin !== app && admin !== site
+}
+export function ehAppSeparado(origem: string, { app, admin }: Enderecos = OFICIAIS): boolean {
+  return origem === app && app !== admin
+}
+
 // Destino padrão depois do login: no painel, o próprio painel.
-export function inicioDepoisDoLogin(origem: string, { site, app, admin }: Enderecos = OFICIAIS): "/admin" | "/inicio" {
-  return origem === admin && admin !== app && admin !== site ? "/admin" : "/inicio"
+export function inicioDepoisDoLogin(origem: string, sites: Enderecos = OFICIAIS): "/admin" | "/inicio" {
+  return ehPainel(origem, sites) ? "/admin" : "/inicio"
 }
