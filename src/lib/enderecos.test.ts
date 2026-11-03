@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { caminhoInterno, enderecoCerto, inicioDepoisDoLogin, linkSite } from "./enderecos"
+import { barraContaDoPainel, caminhoInterno, ehAppSeparado, ehPainel, enderecoCerto, inicioDepoisDoLogin, linkSite } from "./enderecos"
 
 const S = "https://www.x.com", A = "https://app.x.com", P = "https://alpha.x.com"
 const sites = { site: S, app: A, admin: P }
@@ -56,5 +56,24 @@ describe("enderecoCerto", () => {
     expect(caminhoInterno("/pt/planos")).toBe("/pt/planos")
     for (const ruim of ["//evil.com", "/\\evil.com", "/\t/evil.com", "https://evil.com", "javascript:x", "", null, undefined])
       expect(caminhoInterno(ruim)).toBeNull()
+  })
+  it("painel e app separados só com endereços próprios", () => {
+    expect(ehPainel(P, sites)).toBe(true)
+    expect(ehPainel(A, sites)).toBe(false)
+    expect(ehAppSeparado(A, sites)).toBe(true)
+    expect(ehAppSeparado(P, sites)).toBe(false)
+    const um = { site: S, app: S, admin: S }
+    expect(ehPainel(S, um)).toBe(false)
+    expect(ehAppSeparado(S, um)).toBe(false)
+  })
+  it("conta da equipe no app só confirma e redefine a senha", () => {
+    expect(barraContaDoPainel(A, "/pt/planos", true, sites)).toBe(true)
+    expect(barraContaDoPainel(A, "/pt/checkout/sucesso", true, sites)).toBe(true)
+    expect(barraContaDoPainel(A, "/pt/redefinir-senha", true, sites)).toBe(false)
+    expect(barraContaDoPainel(A, "/pt/confirmar", true, sites)).toBe(false)
+    expect(barraContaDoPainel(A, "/confirmar", true, sites)).toBe(false)
+    expect(barraContaDoPainel(A, "/pt/planos", false, sites)).toBe(false)
+    expect(barraContaDoPainel(P, "/pt/admin", true, sites)).toBe(false)
+    expect(barraContaDoPainel(S, "/pt/planos", true, { site: S, app: S, admin: S })).toBe(false)
   })
 })
