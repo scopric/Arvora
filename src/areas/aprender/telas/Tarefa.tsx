@@ -50,9 +50,9 @@ export function Tarefa() {
         <Exercicio exercicio={exercicio} entrega={entrega} uid={uid} podeEnviar={!!exercicio.aulas?.verticais?.aceita_entregas && temNivel(acesso.nivel, "grupo")} doGrupo={temNivel(acesso.nivel, "grupo")} aoAtualizar={recarregar} />
         <dl className="divide-y divide-fumaca rounded-lg px-4 py-1 vidro lg:sticky lg:top-24 lg:self-start">
           {propriedade(t("aprender.exercicio.n"), String(exercicio.ordem))}
-          {propriedade(t("aprender.tarefas.titulo"), entrega ? <SeloStatus status={entrega.status} /> : <Selo>{t("aprender.exercicio.naoEnviado")}</Selo>)}
+          {propriedade(t("aprender.tarefa.status"), entrega ? <SeloStatus status={entrega.status} /> : <Selo>{t("aprender.exercicio.naoEnviado")}</Selo>)}
           {exercicio.prazo_dias ? propriedade(t("aprender.exercicio.prazo"), `${exercicio.prazo_dias} ${t("aprender.exercicio.dias")}`) : null}
-          {entrega ? propriedade(t("aprender.exercicio.suaResposta"), dataCurta(entrega.enviada_em, lang)) : null}
+          {entrega ? propriedade(t("aprender.tarefa.enviadaEm"), dataCurta(entrega.enviada_em, lang)) : null}
           {exercicio.aulas ? propriedade(t("aprender.aula.titulo"), <Link to={caminho(`/aulas/${exercicio.aulas.slug}`)} className={linkTexto}>{t("aprender.tarefa.verAula")}</Link>) : null}
         </dl>
       </div>

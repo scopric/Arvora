@@ -33,8 +33,9 @@ export function Gravacao({ aulaId, titulo, uid, aoMudarPercentual, children }: {
   const ultimaEm = useRef(0) // hora real (ms) da última gravação
   const maior = useRef<number | null>(null) // maior percentual já gravado: o progresso nunca regride
 
-  if (estado.fase === "carregando") return <Esqueleto linhas={6} />
-  if (estado.fase === "erro") return <Erro aoTentar={recarregar}>{t("aprender.erroVideo")}</Erro>
+  // O cabeçalho (children: h1 e descrição) aparece em todos os estados: a pessoa sempre sabe em que aula está.
+  if (estado.fase === "carregando") return <div className="space-y-6"><Esqueleto linhas={6} />{children}</div>
+  if (estado.fase === "erro") return <div className="space-y-6"><Erro aoTentar={recarregar}>{t("aprender.erroVideo")}</Erro>{children}</div>
   const video = videoDe(estado.dados.videoId)
   const atual = percentual ?? estado.dados.progresso?.percentual ?? 0
   const posicaoSalva = estado.dados.progresso?.posicao_seg ?? 0
@@ -74,7 +75,7 @@ export function Gravacao({ aulaId, titulo, uid, aoMudarPercentual, children }: {
       )}
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">{children}</div>
-        {atual < 100 ? (
+        {video && atual < 100 ? (
           <button type="button" onClick={() => void salvar(100, posicaoSalva)} className={botaoColunaApp}>
             <Icone nome="check" className="size-5" />
             {t("aprender.marcarConcluida")}

@@ -133,12 +133,12 @@ export function BemVindo() {
   )
 
   return (
-    <Pagina chave={chave}>
+    <Pagina chave={chave} estreita>
       {/* Molde Linear (welcome, tela 19ed84f4): coluna centrada, um passo por vez, "Passo n de 3" em cinza, pontos
           de paginação; formulário em cartão de vidro com opções em cartões. */}
-      <div className="mx-auto max-w-xl">
+      <div>
       <p className="text-corpo-p font-semibold text-cinza">{t("aprender.bemVindo.passoDe").replace("{n}", String(etapa))}</p>
-      <h2 ref={titulo} tabIndex={-1} className="mt-1 mb-6 text-titulo font-semibold outline-none">
+      <h2 ref={titulo} tabIndex={-1} className="mt-1 mb-6 text-titulo-p font-semibold outline-none sm:text-titulo">
         {t(etapa === 1 ? "aprender.bemVindo.passo1" : etapa === 2 ? (grupo ? "aprender.bemVindo.passo2" : "aprender.bemVindo.passo2Clube") : "aprender.bemVindo.passo3")}
       </h2>
       <ol className="mb-6 flex items-center gap-2" aria-label={t("aprender.bemVindo.passos")}>

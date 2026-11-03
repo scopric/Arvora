@@ -15,7 +15,7 @@ import { Pagina } from "../componentes/Pagina"
 import { QuandoAula } from "../componentes/QuandoAula"
 import { COLUNAS_AULA, nomeVertical, type AulaLinha } from "../tipos"
 import { useCarga } from "../useCarga"
-import { caixaSutil, dados, formatar, foco, hora, segundaDaSemana } from "../util"
+import { caixaSutil, dados, formatar, foco, segundaDaSemana } from "../util"
 
 type VerticalLinha = { id: number; slug: string; nome: string; nome_en: string | null }
 const LIMITE = 120 // PROVISÓRIO: sem paginação no lançamento; 120 aulas cobrem mais de um ano de duas aulas por semana
@@ -98,7 +98,6 @@ export function Aulas({ verticalFixa }: { verticalFixa?: string }) {
               return (
                 <li key={a.id} className="rounded-lg p-5 vidro">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-corpo-p font-semibold tabular-nums">{hora(a.inicio_em!, lang)}</span>
                     <Selo tom={live ? "destaque" : "neutro"}>{live ? t("aprender.aoVivo") : t("aprender.gravada")}</Selo>
                     {progresso.get(a.id) === 100 ? <Selo>{t("aprender.assistida")}</Selo> : null}
                     <span className="text-corpo-p text-cinza">{nomeDe(a.vertical_id)}{a.duracao_min ? ` · ${a.duracao_min} ${t("aprender.min")}` : ""}</span>

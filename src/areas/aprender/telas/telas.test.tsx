@@ -133,6 +133,19 @@ describe("/aulas/:slug gravada e exercícios", () => {
     expect(await screen.findByRole("button", { name: /tentar de novo/i })).toBeTruthy()
     expect(screen.queryByText(/não conseguimos abrir este vídeo/i)).toBeNull()
   })
+  it("com o vídeo em erro ou indisponível o título da aula continua na tela, e 'Marcar como concluída' só existe com vídeo", async () => {
+    montarGravada({ "rpc:video_da_aula": { data: null, error: { message: "TypeError: Failed to fetch", code: "" } } })
+    await screen.findByRole("button", { name: /tentar de novo/i })
+    expect(screen.getByRole("heading", { level: 1, name: "Live de proposta" })).toBeTruthy()
+    expect(screen.queryByRole("button", { name: "Marcar como concluída" })).toBeNull()
+  })
+  it("'Marcar como concluída' grava 100% e some", async () => {
+    montarGravada({ "rpc:video_da_aula": ok("https://video.invalid/a.mp4"), "progresso_aula.update": ok([{ aula_id: 5 }]) })
+    await userEvent.click(await screen.findByRole("button", { name: "Marcar como concluída" }))
+    await waitFor(() => expect(chamadas.find((c) => c.tabela === "progresso_aula" && c.metodo === "update")?.args[0]).toEqual({ percentual: 100, posicao_seg: 0 }))
+    expect(screen.queryByRole("button", { name: "Marcar como concluída" })).toBeNull()
+    expect(screen.getByRole("heading", { level: 1, name: "Live de proposta" })).toBeTruthy()
+  })
   it("progresso nunca regride: voltar o vídeo grava a posição mas mantém o maior percentual (inteiro)", async () => {
     montarGravada({ "rpc:video_da_aula": ok("https://video.invalid/a.mp4"), progresso_aula: ok({ percentual: 80, posicao_seg: 70 }), "progresso_aula.update": ok([{ aula_id: 5 }]) })
     const video = (await screen.findByLabelText("Live de proposta")) as HTMLVideoElement
@@ -420,8 +433,8 @@ describe("/academy/:curso e /academy/:curso/:aula", () => {
     montar("academy/:curso/:aula", <CursoAula />, "/pt/academy/f/a", "clube")
     const lista = await screen.findByRole("navigation", { name: "Aulas do curso" })
     const atuais = within(lista).getAllByRole("link", { current: "page" })
-    expect(atuais.map((a) => a.textContent)).toEqual(["Abertura"])
-    expect(within(lista).getByRole("link", { name: /^Proposta/ }).textContent).toMatch(/bloqueado: parte do grupo/i)
+    expect(atuais.map((a) => a.textContent)).toEqual(["1. Abertura"]) // o número vai só para o leitor de tela; a miniatura é decorativa
+    expect(within(lista).getByRole("link", { name: /^2\. Proposta/ }).textContent).toMatch(/bloqueado: parte do grupo/i)
     expect(screen.getByRole("link", { name: /^Próxima aula: Fechamento/ }).getAttribute("href")).toBe("/pt/academy/f/c")
     expect(screen.getByRole("link", { name: "Fundamentos" }).getAttribute("href")).toBe("/pt/academy/f")
     await waitFor(() => expect(chamadas.some((c) => c.tabela === "rpc" && c.metodo === "video_da_aula")).toBe(true)) // a liberada pede o vídeo

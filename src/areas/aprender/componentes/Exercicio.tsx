@@ -131,7 +131,7 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true,
 
       {entrega && entrega.status !== "enviada" && entrega.devolutiva ? (
         <section aria-label={t("aprender.exercicio.devolutiva")} className="mt-5 border-l-2 border-destaque pl-4">
-          <h4 className="text-corpo-p font-medium text-destaque">
+          <h4 className="text-corpo-p font-semibold text-destaque">
             {t("aprender.exercicio.devolutiva")}
             {entrega.corrigido_em ? ` · ${dataCurta(entrega.corrigido_em, lang)}` : ""}
           </h4>

@@ -40,7 +40,7 @@ export function PaginaApp({ chave, titulo, rotulo, conteudo, meta, intro, voltar
       {capa ? (
         <div className="relative overflow-hidden rounded-xl">
           <img src={capa} alt="" className="absolute inset-0 size-full object-cover" />
-          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-breu via-breu/85 to-breu/30" />
+          <div aria-hidden="true" className="absolute inset-0 bg-breu/85 sm:bg-transparent sm:bg-linear-to-r sm:from-breu sm:via-breu/85 sm:to-breu/30" />
           <div className="relative max-w-2xl px-6 py-10 sm:px-8 lg:min-h-96 lg:py-16">{cabecalho}</div>
         </div>
       ) : (

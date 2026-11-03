@@ -87,18 +87,19 @@ export function Curso() {
                   return (
                     <li key={a.id}>
                       <Link to={caminho(`/academy/${curso.slug}/${a.slug}`)} className={`flex items-center gap-4 rounded-lg py-3 transition-colors hover:bg-creme/3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dourado sm:gap-5`}>
-                        <span className={miniaturaAula}>
+                        <span aria-hidden="true" className={miniaturaAula}>
                           <span>{numero}</span>
                           {a.duracao_min ? <span className={pilulaDuracao}>{a.duracao_min} {t("aprender.min")}</span> : null}
                           {pct === 100 ? <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-0.5 rounded-b-lg bg-dourado" /> : pct > 0 ? <span aria-hidden="true" className="absolute bottom-0 left-0 h-0.5 rounded-bl-lg bg-dourado" style={{ width: `${pct}%` }} /> : null}
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-subtitulo font-semibold">{numero}. {a.titulo}</span>
+                          <span className="block text-subtitulo font-semibold">{numero}. {a.titulo}{a.duracao_min ? <> <span className="sr-only">({a.duracao_min} {t("aprender.min")})</span></> : null}</span>
                           {a.descricao ? <span className="mt-1 line-clamp-2 block text-corpo text-cinza">{a.descricao}</span> : null}
                         </span>
                         {!livre ? (
                           <>
                             <Icone nome="cadeado" className="size-4 shrink-0 text-cinza" />
+                            {" "}
                             <span className="sr-only">{t("bloqueado.rotulo")}</span>
                           </>
                         ) : pct === 100 ? (

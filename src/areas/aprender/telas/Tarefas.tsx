@@ -60,6 +60,7 @@ export function Tarefas() {
                       <span className="block text-corpo font-semibold">{exercicio.aulas?.titulo}</span>
                       <span className="mt-0.5 block text-corpo-p text-cinza">
                         {t("aprender.exercicio.n")} {exercicio.ordem}
+                        {exercicio.prazo_dias ? ` · ${t("aprender.exercicio.prazo")}: ${exercicio.prazo_dias} ${t("aprender.exercicio.dias")}` : ""}
                         {entrega ? ` · ${dataCurta(entrega.enviada_em, lang)}` : ""}
                       </span>
                     </span>

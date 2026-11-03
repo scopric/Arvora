@@ -73,7 +73,7 @@ export function CursoAula() {
         </div>
         <nav aria-label={t("aprender.curso.lista")} className="rounded-lg p-3 vidro lg:sticky lg:top-24 lg:self-start">
           <div className="flex items-center gap-3 px-2 pt-1 pb-3">
-            {capa ? <img src={capa} alt="" className="aspect-video w-20 rounded-md object-cover" /> : null}
+            {capa ? <img src={capa} alt="" className="aspect-video w-20 rounded-lg object-cover" /> : null}
             <div className="min-w-0">
               <p className="truncate text-corpo font-semibold">{curso.titulo}</p>
               <p className="text-corpo-p text-cinza tabular-nums">{feitas} {t("aprender.curso.de")} {aulas.length} {t("aprender.curso.aulasConcluidas")}</p>
@@ -81,7 +81,7 @@ export function CursoAula() {
           </div>
           {modulos.map((m) => (
             <section key={m.id} className="border-t border-fumaca pt-2">
-              <h2 className="px-2 pt-2 pb-1 text-legenda font-semibold text-cinza">{m.titulo}</h2>
+              <h2 className="px-2 pt-2 pb-1 text-corpo-p font-semibold text-cinza">{m.titulo}</h2>
               <ol className="space-y-1">
                 {aulas.filter((a) => a.modulo_id === m.id).map((a) => {
                   const numero = aulas.indexOf(a) + 1
@@ -93,16 +93,17 @@ export function CursoAula() {
                         <span aria-hidden="true" data-n={numero} className={`${miniaturaAula} w-20 text-corpo before:content-[attr(data-n)] sm:w-20`}>
                           {pct(a.id) > 0 ? <span aria-hidden="true" className="absolute bottom-0 left-0 h-0.5 rounded-bl-lg bg-dourado" style={{ width: `${pct(a.id)}%` }} /> : null}
                         </span>
-                        <span className="min-w-0 flex-1">{a.titulo}</span>
+                        <span className="min-w-0 flex-1"><span className="sr-only">{numero}.</span> {a.titulo}</span>
                         {!livre ? (
                           <>
                             <Icone nome="cadeado" className="size-3.5 shrink-0 text-cinza" />
+                            {" "}
                             <span className="sr-only">{t("bloqueado.rotulo")}</span>
                           </>
                         ) : pct(a.id) === 100 ? (
-                          <span className="shrink-0 text-legenda text-destaque">{t("aprender.assistida")}</span>
+                          <span className="shrink-0 text-corpo-p text-destaque">{t("aprender.assistida")}</span>
                         ) : pct(a.id) > 0 ? (
-                          <span className="shrink-0 text-legenda tabular-nums">{pct(a.id)}%</span>
+                          <span className="shrink-0 text-corpo-p tabular-nums">{pct(a.id)}%</span>
                         ) : null}
                       </Link>
                     </li>

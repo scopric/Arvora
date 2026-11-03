@@ -128,6 +128,8 @@ export const aprenderPt = {
   "aprender.status.aprovada": "Aprovado",
   "aprender.status.enviada": "Enviado",
   "aprender.tarefa.verAula": "Ver a aula",
+  "aprender.tarefa.status": "Status",
+  "aprender.tarefa.enviadaEm": "Enviada em",
   "aprender.tarefas.ajustar": "Ajustar",
   "aprender.tarefas.aprovadas": "Aprovadas",
   "aprender.tarefas.enviadas": "Enviadas",
