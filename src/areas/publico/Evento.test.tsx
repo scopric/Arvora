@@ -7,7 +7,9 @@ vi.mock("../../lib/sessao", async () => (await import("./supabaseFalso")).modulo
 import { montar } from "./montar"
 import { estado, falso, zerar } from "./supabaseFalso"
 import { Awards } from "./telas/Awards"
-import { Evento } from "./telas/Evento"
+import { MemoryRouter, Route, Routes, useParams } from "react-router"
+import { render } from "@testing-library/react"
+import { Evento, EventoAtual } from "./telas/Evento"
 
 const base = { id: 1, nome: "Edição Teste", cidade: "Dublin", pais: "IE", descricao: null, durante_inicio: "2026-11-10T10:00:00Z" }
 beforeEach(() => {
@@ -70,6 +72,44 @@ describe("Evento", () => {
     falso.tabelas.edicoes_publicas = { data: [], error: null }
     montar(<Evento />, "/:lang/evento/:edicao", "/pt/evento/x")
     expect(await screen.findByText("Não encontramos esta página")).toBeTruthy()
+  })
+})
+
+function Destino() {
+  const { lang, edicao } = useParams()
+  return <p>destino: /{lang}/evento/{edicao}</p>
+}
+describe("Evento atual (/evento)", () => {
+  const abrir = () =>
+    render(
+      <MemoryRouter initialEntries={["/pt/evento"]}>
+        <Routes>
+          <Route path="/:lang/evento" element={<EventoAtual />} />
+          <Route path="/:lang/evento/:edicao" element={<Destino />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+  const ed = (slug: string, fim: string) => ({ slug, durante_fim: fim })
+  it("vai para a próxima edição (ou a em curso), não para a que já passou nem para a mais distante", async () => {
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-03T12:00:00Z") })
+    falso.tabelas.edicoes_publicas = { data: [ed("dublin-2025", "2025-11-12T20:00:00Z"), ed("dublin-2026", "2026-11-12T20:00:00Z"), ed("dublin-2027", "2027-11-12T20:00:00Z")], error: null }
+    abrir()
+    expect(await screen.findByText("destino: /pt/evento/dublin-2026")).toBeTruthy()
+    expect(falso.chamadas.some((c) => c.tabela === "edicoes_publicas" && c.op === "not" && c.args[0] === "publicada_em")).toBe(true)
+    vi.useRealTimers()
+  })
+  it("sem edição futura, a mais recente que já passou", async () => {
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-03T12:00:00Z") })
+    falso.tabelas.edicoes_publicas = { data: [ed("edicao-qa", "2024-05-01T20:00:00Z"), ed("exemplo-dublin-2025", "2025-11-12T20:00:00Z")], error: null }
+    abrir()
+    expect(await screen.findByText("destino: /pt/evento/exemplo-dublin-2025")).toBeTruthy()
+    vi.useRealTimers()
+  })
+  it("sem edição publicada, em breve", async () => {
+    falso.tabelas.edicoes_publicas = { data: [], error: null }
+    abrir()
+    expect(await screen.findByText("Em breve.")).toBeTruthy()
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBeTruthy()
   })
 })
 
