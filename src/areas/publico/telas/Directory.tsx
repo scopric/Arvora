@@ -10,7 +10,8 @@ import { useAuth } from "../../../lib/sessao"
 import { useCaminho, useIdioma, useT, useTitulo } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { nomeLocalizado, urlImagem } from "../formatos"
-import { Pagina, linkContorno } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkContorno } from "../../../componentes/botaoEstilo"
 import { useConsulta } from "../usarConsulta"
 
 // Lista de empresas publicadas (DIR-01). Filtros de área e cidade ficam na URL.

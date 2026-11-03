@@ -15,7 +15,8 @@ import { supabase } from "../../../lib/supabase"
 import { errosPorCampo, type CamposDeErro } from "../../../lib/validacao"
 import { nomeLocalizado } from "../formatos"
 import { criarSlug } from "../slug"
-import { Pagina, linkPrimario } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkPrimario } from "../../../componentes/botaoEstilo"
 import { useConsulta } from "../usarConsulta"
 
 const vazioParaNulo = (v: string) => (v === "" ? null : v)

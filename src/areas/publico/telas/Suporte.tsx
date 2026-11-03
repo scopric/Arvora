@@ -1,6 +1,7 @@
 import { Aviso } from "../../../componentes/Aviso"
 import { useT, useTitulo, type Chave } from "../../../i18n"
-import { Pagina, linkPrimario } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkPrimario } from "../../../componentes/botaoEstilo"
 
 // E-mail de suporte vem de VITE_EMAIL_SUPORTE (o domínio ainda não existe; nunca no código). Sem a variável ou com valor
 // que não parece e-mail, a tela diz que o canal está em definição em vez de esconder o problema.

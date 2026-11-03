@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import { Link } from "react-router"
-import { botaoPublico } from "../../componentes/botaoEstilo"
+import { linkPrimario } from "../../componentes/botaoEstilo"
 import { useCaminho, useT, type Chave } from "../../i18n"
 
 // Moldura das telas da área: <h1> no estilo do site e coluna de conteúdo. A tela não renderiza <main> (o layout já tem).
@@ -14,10 +14,6 @@ export function Pagina({ titulo, apoio, largura = "max-w-6xl", children }: { tit
   )
 }
 
-// Links com cara de botão usam a mesma base do Botao público (D22): um só primário no site.
-export const linkBotao = botaoPublico
-export const linkPrimario = `${linkBotao} bg-destaque text-fundo hover:shadow-brilho`
-export const linkContorno = `${linkBotao} border border-creme/30 text-creme hover:border-creme/60`
 
 // Registro que não existe (slug errado, despublicado): página própria, sem <main> (o layout já tem), em vez da NaoEncontrada da base.
 export function SemRegistro({ voltar, rotulo }: { voltar: string; rotulo: Chave }) {
