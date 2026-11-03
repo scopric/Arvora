@@ -2,9 +2,6 @@ import type { Chave } from "../i18n"
 import { temNivel, type Nivel } from "../lib/acesso"
 import type { NomeIcone } from "./Icone"
 
-// Evento da edição atual. PROVISÓRIO: a edição vem do banco (admin/edicoes); até lá, um slug fixo.
-export const EDICAO_ATUAL = "2026"
-
 export type Item = {
   rotulo: Chave
   rota: string
@@ -56,7 +53,7 @@ export const AREAS: Area[] = [
       { rotulo: "menu.biblioteca", rota: "/biblioteca", icone: "livro" },
       { rotulo: "menu.originals", rota: "/originals", icone: "filme" },
       { rotulo: "menu.directory", rota: "/directory", icone: "predio" },
-      { rotulo: "menu.evento", rota: `/evento/${EDICAO_ATUAL}`, icone: "calendario" },
+      { rotulo: "menu.evento", rota: "/evento", icone: "calendario" }, // /evento redireciona para a edição atual (lida do banco)
       { rotulo: "menu.meuAward", rota: "/meu-award", icone: "award", soPremiado: true },
     ],
   },

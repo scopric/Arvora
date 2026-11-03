@@ -70,6 +70,12 @@ describe("LayoutMembro", () => {
     expect(screen.getByRole("heading", { name: "Tela de dentro" })).toBeTruthy()
   })
 
+  it("Evento nas seções de Awards aponta para /evento (a edição atual vem do banco), sem ano fixo", () => {
+    montar({ nivel: "clube" }, "/pt/hall-of-fame", <LayoutMembro />, "hall-of-fame")
+    const secoes = screen.getByRole("navigation", { name: "Seções do Awards" })
+    expect(within(secoes).getByRole("link", { name: "Evento" }).getAttribute("href")).toBe("/pt/evento")
+  })
+
   it("Clube: seções do Grupo ficam com cadeado e motivo para leitor de tela; Meu Award some sem premiado", () => {
     montar({ nivel: "clube" }, "/pt/academy", <LayoutMembro />, "academy")
     const secoes = screen.getByRole("navigation", { name: "Seções de Aprender" })

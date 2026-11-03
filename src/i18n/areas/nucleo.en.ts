@@ -31,7 +31,7 @@ export const nucleoEn: Record<keyof typeof nucleoPt, string> = {
   "menu.directory": "Directory",
   "menu.network": "Business Network",
   "menu.match": "Business Match",
-  "menu.evento": "Event 2026",
+  "menu.evento": "Event",
   "menu.meuAward": "My Award",
   "menu.comunidade": "Community",
   "menu.tarefas": "Assignments",
