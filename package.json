@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "react-router dev --port 5190",
-    "build": "node scripts/checar-ambiente.mjs && react-router typegen && tsc -b && react-router build && node scripts/externalizar-scripts.mjs && node scripts/gerar-robots-sitemap.mjs",
+    "build": "node scripts/checar-ambiente.mjs && react-router typegen && tsc -b && react-router build && node scripts/externalizar-scripts.mjs && node scripts/gerar-robots-sitemap.mjs && node scripts/gerar-404.mjs",
     "lint": "oxlint --deny-warnings",
     "typecheck": "react-router typegen && tsc -b --noEmit",
     "preview": "npx serve build/client",
