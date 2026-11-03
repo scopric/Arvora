@@ -22,9 +22,9 @@ export const botaoApp = {
 export const botaoPrimarioApp = `${botaoApp.base} ${botaoApp.primario}`
 export const botaoSecundarioApp = `${botaoApp.base} ${botaoApp.secundario}`
 export const botaoContornoApp = `${botaoApp.base} ${botaoApp.contorno}`
-// Botão pequeno de ação em linha (tabela, lista de notificações): secundário de 40px, 44 no toque.
-export const botaoPequenoApp = `inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-fumaca px-3 text-corpo-p font-semibold text-creme transition-colors pointer-coarse:min-h-11 hover:bg-fumaca/80 ${focoApp} disabled:cursor-not-allowed disabled:opacity-60`
+// Botão pequeno de ação em linha (tabela, lista de notificações): Ghost de 40px (ações repetidas por item), 44 no toque.
+export const botaoPequenoApp = `inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-creme/40 px-3 text-corpo-p font-semibold text-creme transition-colors pointer-coarse:min-h-11 hover:bg-creme/5 ${focoApp} disabled:cursor-not-allowed disabled:opacity-60`
 // Botão em coluna (ícone de 20px sobre o rótulo de 14px), a fileira de ações sob o player do MasterClass.
 export const botaoColunaApp = `inline-flex min-h-16 min-w-28 flex-col items-center justify-center gap-1 rounded-lg bg-fumaca px-4 text-corpo-p font-semibold text-creme transition-colors hover:bg-fumaca/80 ${focoApp} disabled:cursor-not-allowed disabled:opacity-60`
 // Pílula de categoria ("Category Pill" do MasterClass): dourado em traço; a ativa (aria-current ou aria-pressed) enche.
-export const pilulaCategoriaApp = `inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border border-dourado px-4 text-corpo-p font-semibold text-dourado transition-colors pointer-coarse:min-h-11 hover:bg-dourado/10 aria-[current=true]:bg-dourado aria-[current=true]:text-breu aria-pressed:bg-dourado aria-pressed:text-breu ${focoApp}`
+export const pilulaCategoriaApp = `inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border border-dourado px-4 text-corpo-p font-semibold text-dourado transition-colors pointer-coarse:min-h-11 hover:bg-dourado/10 aria-[current=page]:bg-dourado aria-[current=page]:text-breu aria-pressed:bg-dourado aria-pressed:text-breu ${focoApp}`

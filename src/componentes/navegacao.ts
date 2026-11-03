@@ -24,7 +24,7 @@ export const AREAS: Area[] = [
   { rotulo: "menu.inicio", rota: "/inicio", icone: "casa", itens: [] },
   {
     rotulo: "menu.aprender",
-    rota: "/academy",
+    rota: "/aulas",
     icone: "aprender",
     secoes: "menu.secoesAprender",
     itens: [
@@ -72,7 +72,7 @@ export type Aba = { rotulo: Chave; rota: string; icone: NomeIcone }
 // Bottom tab bar (PRD §17.3.2). "Mais" abre a folha e não está aqui.
 export const ABAS: Aba[] = [
   { rotulo: "menu.inicio", rota: "/inicio", icone: "casa" },
-  { rotulo: "menu.aprender", rota: "/academy", icone: "aprender" },
+  { rotulo: "menu.aprender", rota: "/aulas", icone: "aprender" },
   { rotulo: "menu.awardsAba", rota: "/awards", icone: "award" },
   { rotulo: "menu.rede", rota: "/network", icone: "rede" },
 ]

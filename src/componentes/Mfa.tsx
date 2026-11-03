@@ -98,7 +98,7 @@ export function Mfa({ children }: { children: ReactNode }) {
   const formulario = (fator: string) => (
     <form onSubmit={(e) => verificar(e, fator)} noValidate className="mt-6 space-y-5">
       {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
-      <Campo rotulo={t("mfa.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" maxLength={7} />
+      <Campo rotulo={t("mfa.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" maxLength={7} className="text-center text-titulo-p tracking-[0.3em] tabular-nums" />
       <Botao type="submit" ocupado={ocupado}>{t("mfa.botao")}</Botao>
     </form>
   )
@@ -122,7 +122,7 @@ export function Mfa({ children }: { children: ReactNode }) {
         <>
           <p className="mt-3 text-corpo text-cinza">{t("mfa.cadastrar.texto")}</p>
           {/* data: URI de SVG gerado pelo Supabase; img-src do CSP já libera data: */}
-          <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="mt-6 size-48 rounded-md bg-white p-2" />
+          <img src={estado.qr} alt={t("mfa.qr.alt")} width="192" height="192" className="mt-6 size-48 rounded-lg bg-white p-2" />
           <p className="mt-4 text-corpo-p text-cinza">{t("mfa.qr.segredo")}</p>
           <p className="mt-1 font-mono text-corpo-p break-all select-all">{estado.segredo}</p>
           <p className="mt-6 text-corpo text-cinza">{t("mfa.verificar.texto")}</p>

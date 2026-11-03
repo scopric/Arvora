@@ -24,7 +24,7 @@ export function PaginaApp({ chave, titulo, rotulo, conteudo, meta, intro, voltar
     <div className={`mx-auto px-4 py-8 sm:px-6 lg:py-12 ${estreita ? "max-w-3xl" : "max-w-[1280px]"}`}>
       {voltar ? <LinkVoltar {...voltar} /> : null}
       {rotulo ? <p className="mb-2 text-corpo-p font-semibold text-cinza">{rotulo}</p> : null}
-      <h1 className={conteudo ? "font-conteudo text-titulo-g font-medium text-balance uppercase lg:text-conteudo" : "text-titulo-p font-semibold sm:text-titulo"}>
+      <h1 className={conteudo ? "font-conteudo text-titulo-g font-[500] tracking-normal text-balance uppercase lg:text-conteudo" : "text-titulo-p font-semibold sm:text-titulo"}>
         {titulo ?? t(chave)}
       </h1>
       {meta ? <p className="mt-3 text-corpo-p text-cinza">{meta}</p> : null}

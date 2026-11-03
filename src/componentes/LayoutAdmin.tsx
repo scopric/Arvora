@@ -69,7 +69,7 @@ export function LayoutAdmin() {
       <div className="app min-h-dvh bg-breu text-creme">
         <Mfa>
           <div className="flex min-h-dvh max-lg:flex-col">
-            <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-40 focus:m-2 focus:rounded-md focus:bg-creme focus:px-4 focus:py-3 focus:text-breu">{t("menu.pular")}</a>
+            <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-40 focus:m-2 focus:rounded-lg focus:bg-creme focus:px-4 focus:py-3 focus:text-breu">{t("menu.pular")}</a>
             <aside className="shrink-0 bg-carvao px-3 py-3 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-60 lg:flex-col lg:overflow-y-auto">
               <div className="flex items-center justify-between gap-2 px-2 py-1">
                 <p className="text-legenda font-semibold text-cinza">{t("admin.faixa")}</p>

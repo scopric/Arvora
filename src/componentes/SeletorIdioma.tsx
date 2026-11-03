@@ -7,10 +7,10 @@ const publico = {
   item: "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 font-mono text-xs font-semibold tracking-[0.08em] text-creme/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque aria-[current=true]:bg-creme/12 aria-[current=true]:text-white",
 }
 
-// App (MasterClass, pílula segmentada em ardósia): 32px de altura, 14px/600 cinza; o atual ganha fundo fumaça e texto creme.
+// App (MasterClass, pílula segmentada em carvão): 32px de altura, 14px/600 cinza; o atual ganha fundo fumaça, texto creme e anel dourado (forma + cor).
 const app = {
-  nav: "flex items-center rounded-full bg-ardosia p-0.5",
-  item: "inline-flex h-8 min-w-10 items-center justify-center rounded-full px-3 text-corpo-p font-semibold text-cinza transition-colors pointer-coarse:min-h-11 pointer-coarse:min-w-11 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-[current=true]:bg-fumaca aria-[current=true]:text-creme",
+  nav: "flex items-center rounded-full bg-carvao p-0.5",
+  item: "inline-flex h-8 min-w-10 items-center justify-center rounded-full px-3 text-corpo-p font-semibold text-cinza transition-colors pointer-coarse:min-h-11 pointer-coarse:min-w-11 hover:text-creme focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado aria-[current=true]:bg-fumaca aria-[current=true]:text-creme aria-[current=true]:ring-1 aria-[current=true]:ring-dourado aria-[current=true]:ring-inset",
 }
 
 // Troca só o prefixo de idioma; o resto do caminho, a busca e o hash ficam. O nome completo do idioma vai no

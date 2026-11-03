@@ -52,7 +52,7 @@ function Denuncias({ pergunta }: { pergunta: (p: Pergunta) => void }) {
                       </div>
                       <p className="mt-3 font-semibold">{x.motivo}</p>
                       {x.texto ? <p className="mt-1 text-base">{x.texto}</p> : null}
-                      {post || com ? <blockquote className="mt-3 border-l-2 border-grafite pl-3 text-base text-bruma whitespace-pre-wrap">{(post ?? com)?.corpo}</blockquote> : null}
+                      {post || com ? <blockquote className="mt-3 border-l-2 border-fumaca pl-3 text-base text-cinza whitespace-pre-wrap">{(post ?? com)?.corpo}</blockquote> : null}
                       {x.empresa_id ? <p className="mt-3 text-base">{d.empresas.get(x.empresa_id) ?? "—"}</p> : null}
                       <div className="mt-4 flex flex-wrap gap-3">
                         {post || com ? (

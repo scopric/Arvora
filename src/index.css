@@ -26,7 +26,7 @@
   --color-ardosia: #122018; /* slate: barra superior, blocos aninhados, campos, folha "Mais" */
   --color-placa: #222f26; /* charcoal plate: painel lateral, cartão, popover, diálogo; hairline sobre breu/carvão */
   --color-fumaca: #3d493d; /* smoke: botão secundário cheio, trilho, esqueleto; hairline sobre placa */
-  --color-cinza: #9ea392; /* ash mute: texto secundário e meta, placeholder, ícone inativo, thead, borda de campo */
+  --color-cinza: #9ea392; /* ash mute: texto secundário e meta, placeholder, ícone inativo, thead, borda de campo; nunca texto sobre fumaça (3,65) */
   /* Nome de conteúdo (curso, aula, premiado, nome no perfil): condensada no papel do Sohne Schmal do MasterClass,
      caixa-alta, peso 500, nunca abaixo de 48px nem em UI (Decisão 70). */
   --font-conteudo: "Big Shoulders Display Variable", "Arial Narrow", sans-serif;
@@ -73,9 +73,6 @@
   /* Elevação só por inset (MasterClass): sem sombra externa. Hairline placa sobre breu/carvão, fumaca sobre placa. */
   --shadow-borda: inset 0 0 0 1px var(--color-placa);
   --shadow-borda-placa: inset 0 0 0 1px var(--color-fumaca);
-  --shadow-campo: inset 0 0 0 1px var(--color-cinza);
-  --shadow-campo-foco: inset 0 0 0 2px var(--color-cinza);
-  --shadow-ativo: inset 0 0 0 2px var(--color-fumaca);
   --shadow-flutuante: var(--shadow-borda-placa); /* PROVISÓRIO: apelido, sai no fechamento */
 
   --shadow-brilho: 0 0 20px 5px rgb(157 181 138 / 0.35);

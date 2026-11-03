@@ -84,6 +84,19 @@ describe("LayoutMembro", () => {
     expect(within(screen.getByRole("navigation", { name: "Seções do Awards" })).queryByRole("link", { name: /Meu Award/ })).toBeNull()
   })
 
+  it("Rede: Clube vê Network aberto e Match com cadeado; a tab bar acende a área pelo prefixo da rota", () => {
+    montar({ nivel: "clube" }, "/pt/network", <LayoutMembro />, "network")
+    const secoes = screen.getByRole("navigation", { name: "Seções da Rede" })
+    expect(within(secoes).getByRole("link", { name: /Business Network/ }).textContent).not.toContain("Bloqueado")
+    expect(within(secoes).getByRole("link", { name: /Match/ }).textContent).toContain("Bloqueado: parte do Grupo Árvora")
+    const abas = screen.getByRole("navigation", { name: "Navegação rápida" })
+    expect(within(abas).getByRole("link", { name: "Rede" }).getAttribute("aria-current")).toBe("page")
+    expect(within(abas).getByRole("link", { name: "Aprender" }).getAttribute("aria-current")).toBeNull()
+    cleanup()
+    montar({ nivel: "grupo" }, "/pt/tarefas", <LayoutMembro />, "tarefas")
+    expect(within(screen.getByRole("navigation", { name: "Navegação rápida" })).getByRole("link", { name: "Aprender" }).getAttribute("aria-current")).toBe("page")
+  })
+
   it("Grupo premiado: nada bloqueado e Meu Award aparece; Início não tem seções", () => {
     montar({ nivel: "grupo", premiado: true }, "/pt/hall-of-fame", <LayoutMembro />, "hall-of-fame")
     const secoes = screen.getByRole("navigation", { name: "Seções do Awards" })

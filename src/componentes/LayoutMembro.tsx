@@ -72,6 +72,18 @@ function Secoes({ caminhoAtual, acesso }: { caminhoAtual: string; acesso: Acesso
   )
 }
 
+// Cartão do plano (gatilho de upgrade do PRD §6.2): saiu da sidebar e mora no popover do avatar.
+function CartaoPlano({ nivel }: { nivel: Acesso["nivel"] }) {
+  const t = useT()
+  const caminho = useCaminho()
+  const grupo = nivel === "grupo"
+  return (
+    <Link to={caminho(grupo ? "/configuracoes/assinatura" : "/planos")} className={`block rounded-lg bg-ardosia px-3 py-2.5 text-corpo-p text-creme transition-colors hover:bg-fumaca/50 ${foco}`}>
+      {t(grupo ? "menu.cartao.grupo" : nivel === "clube" ? "menu.cartao.clube" : "menu.cartao.sem")}
+    </Link>
+  )
+}
+
 // Popover do avatar: Esc fecha e devolve o foco ao botão; clicar fora ou sair do foco também fecha.
 function MenuAvatar({ acesso }: { acesso: Acesso }) {
   const t = useT()
@@ -120,7 +132,8 @@ function MenuAvatar({ acesso }: { acesso: Acesso }) {
             {t("nivel.rotulo")}: {t(`nivel.${acesso.nivel}`)}
             {acesso.premiado ? <Selo tom="dourado">{t("selo.premiado")}</Selo> : null}
           </p>
-          <ul className="space-y-0.5 border-t border-fumaca pt-2">
+          <CartaoPlano nivel={acesso.nivel} />
+          <ul className="mt-2 space-y-0.5 border-t border-fumaca pt-2">
             {AVATAR.map((item) => (
               <li key={item.rota}><LinkItem item={item} acesso={acesso} classe={linkListaApp} /></li>
             ))}
@@ -168,19 +181,20 @@ function FolhaMais({ acesso, aberta, fechar }: { acesso: Acesso; aberta: boolean
   )
 }
 
-function BarraAbas({ acesso }: { acesso: Acesso }) {
+function BarraAbas({ acesso, caminhoAtual }: { acesso: Acesso; caminhoAtual: string }) {
   const t = useT()
   const caminho = useCaminho()
+  const ativa = areaDe(caminhoAtual)
   const [mais, setMais] = useState(false)
-  const item = `relative flex min-h-14 min-w-11 flex-1 flex-col items-center justify-center gap-1 text-legenda font-semibold text-cinza aria-[current=page]:text-dourado aria-[current=page]:before:absolute aria-[current=page]:before:inset-x-5 aria-[current=page]:before:top-0 aria-[current=page]:before:h-0.5 aria-[current=page]:before:rounded-full aria-[current=page]:before:bg-dourado ${foco}`
+  const item = `relative flex min-h-14 min-w-11 flex-1 flex-col items-center justify-center gap-1 text-corpo-p font-semibold text-cinza aria-[current=page]:text-dourado aria-[current=page]:before:absolute aria-[current=page]:before:inset-x-5 aria-[current=page]:before:top-0 aria-[current=page]:before:h-0.5 aria-[current=page]:before:rounded-full aria-[current=page]:before:bg-dourado ${foco}`
   return (
     <>
       <nav aria-label={t("menu.abas")} className="app fixed inset-x-0 bottom-0 z-20 flex border-t border-placa bg-carvao lg:hidden">
         {ABAS.map((a) => (
-          <NavLink key={a.rota} to={caminho(a.rota)} className={item}>
+          <Link key={a.rota} to={caminho(a.rota)} aria-current={ativa?.rota === a.rota ? "page" : undefined} className={item}>
             <Icone nome={a.icone} className="size-5" />
             {t(a.rotulo)}
-          </NavLink>
+          </Link>
         ))}
         <button type="button" aria-haspopup="dialog" aria-expanded={mais} onClick={() => setMais(true)} className={item}>
           <Icone nome="menu" className="size-5" />
@@ -231,7 +245,7 @@ export function LayoutMembro({ conteudoPublico = false }: { conteudoPublico?: bo
             )}
           </EscopoApp>
         </main>
-        <BarraAbas acesso={acesso} />
+        <BarraAbas acesso={acesso} caminhoAtual={caminhoAtual} />
       </div>
     </EscopoApp>
   )

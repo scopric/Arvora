@@ -73,7 +73,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
               <Selo tom={p.publicado_em ? "destaque" : "neutro"}>{t(p.publicado_em ? "rede.meuAward.publicado" : "rede.meuAward.naoPublicado")}</Selo>
             </div>
             <div>
-              <h3 className="font-conteudo text-titulo leading-none font-normal tracking-normal text-balance sm:text-titulo-g">{p.nome}</h3>
+              <h3 className="font-conteudo text-titulo-g font-[500] tracking-normal text-balance uppercase lg:text-conteudo-g">{p.nome}</h3>
               <p className="mt-2 text-corpo-p font-medium text-dourado">{categoria} · {edicao}</p>
             </div>
             {!foto ? <p className="text-corpo-p text-nevoa">{t("rede.meuAward.semFoto")}</p> : null}

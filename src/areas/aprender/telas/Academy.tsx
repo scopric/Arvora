@@ -70,7 +70,7 @@ export function Academy() {
                       </span>
                     ) : null}
                   </p>
-                  <h2 className="mt-1 font-conteudo text-titulo-p leading-none font-normal tracking-normal">
+                  <h2 className="mt-1 text-titulo-p font-semibold">
                     <Link to={caminho(`/academy/${c.slug}`)} className={`rounded-sm underline-offset-4 group-hover:underline after:absolute after:inset-0 ${foco}`}>{c.titulo}</Link>
                   </h2>
                   {c.descricao ? <p className="mt-1.5 line-clamp-2 text-corpo-p text-nevoa">{c.descricao}</p> : null}

@@ -3,6 +3,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, 
 import "./index.css"
 import corpoUrl from "@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url"
 import tituloUrl from "@fontsource-variable/newsreader/files/newsreader-latin-opsz-normal.woff2?url"
+import conteudoUrl from "@fontsource-variable/big-shoulders-display/files/big-shoulders-display-latin-wght-normal.woff2?url"
 import { BannerCookies } from "./componentes/BannerCookies"
 import { Carregando } from "./componentes/Carregando"
 import { ehIdioma, textosDe, useIdiomaUrl } from "./i18n"
@@ -33,7 +34,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 // Fontes pré-carregadas: sem isso o navegador só as descobre depois de baixar o CSS (cadeia html → css → fonte).
 export const links = () =>
-  [corpoUrl, tituloUrl].map((href) => ({ rel: "preload", href, as: "font", type: "font/woff2", crossOrigin: "anonymous" as const }))
+  [corpoUrl, tituloUrl, conteudoUrl].map((href) => ({ rel: "preload", href, as: "font", type: "font/woff2", crossOrigin: "anonymous" as const }))
 
 export function meta({ params }: { params: { lang?: string } }) {
   const dic = textosDe(ehIdioma(params.lang) ? params.lang : "pt")
