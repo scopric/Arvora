@@ -51,6 +51,8 @@ export function paraCarga(campos: CampoDef[], v: Valores, anterior: Linha | null
       if (texto === "" && c.soEscrita) continue
       if (texto === "") {
         if (c.obrigatorio) erros[c.chave] = "obrigatorio"
+        // `ordem` vazia: a coluna é `not null default 0`; omitir deixa o banco usar 0 (insert) ou manter o valor (update)
+        if (c.chave === "ordem" && !c.obrigatorio) continue
         carga[c.chave] = null
       } else if (c.tipo === "numero") {
         if (Number.isNaN(Number(texto))) erros[c.chave] = "numero"

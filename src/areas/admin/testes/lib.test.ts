@@ -74,8 +74,13 @@ describe("formulário genérico", () => {
     expect(v.convite).toBe("")
     const { carga, erros } = paraCarga(campos, { ...v, nome: "Árvore Nova", inicio: "2026-07-01T12:00" }, { publicado_em: "2026-01-01T00:00:00Z" })
     expect(erros).toEqual({})
-    expect(carga).toMatchObject({ nome: "Árvore Nova", slug: "arvore-nova", ordem: null, inicio: "2026-07-01T11:00:00.000Z", publicado_em: "2026-01-01T00:00:00Z" })
+    expect(carga).toMatchObject({ nome: "Árvore Nova", slug: "arvore-nova", inicio: "2026-07-01T11:00:00.000Z", publicado_em: "2026-01-01T00:00:00Z" })
     expect("convite" in carga).toBe(false)
+  })
+  it("ordem vazia não entra na carga (o banco usa 0 ou mantém o valor); preenchida entra como número", () => {
+    const base = { nome: "Ana", slug: "", inicio: "", publicado_em: false, convite: "" }
+    expect("ordem" in paraCarga(campos, { ...base, ordem: " " }, null).carga).toBe(false)
+    expect(paraCarga(campos, { ...base, ordem: "3" }, null).carga.ordem).toBe(3)
   })
 })
 
