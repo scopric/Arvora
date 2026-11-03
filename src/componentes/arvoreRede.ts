@@ -6,7 +6,7 @@ const SEMENTE = 20261022
 const PROF_MAX = 6
 export const PASSO = 0.6 // s de atraso por nível; 6 × 0,6 + 0,9 s de traço = 4,5 s
 
-// Gerador pseudoaleatório com semente fixa (mulberry32): a mesma árvore em todo render e no pré-render.
+// Gerador pseudoaleatório com semente fixa (mulberry32): a mesma árvore em todo render.
 function mulberry32(a: number) {
   return () => {
     a = (a + 0x6d2b79f5) | 0

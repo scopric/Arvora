@@ -10,7 +10,10 @@ describe("enderecoCerto", () => {
     expect(ir(S, "/pt/entrar")).toBe(`${A}/pt/entrar`)
     expect(ir(S, "/en/aulas/x")).toBe(`${A}/en/aulas/x`)
     expect(ir(S, "/pt/admin/aulas")).toBe(`${P}/pt/admin/aulas`)
-    expect(ir(S, "/pt/hall-of-fame")).toBeNull()
+    expect(ir(S, "/pt/hall-of-fame/ed/x")).toBeNull()
+    // Hall of Fame vive nos dois (NOS_DOIS): o app não devolve ao site; o painel manda para o app.
+    expect(ir(A, "/pt/hall-of-fame")).toBeNull()
+    expect(ir(P, "/pt/hall-of-fame")).toBe(`${A}/pt/hall-of-fame`)
     expect(ir(S, "/pt")).toBeNull()
     expect(ir(S, "/pt/biblioteca/x")).toBeNull()
   })

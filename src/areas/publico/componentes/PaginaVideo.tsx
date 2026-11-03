@@ -92,7 +92,7 @@ function VideoCompleto({ id, titulo }: { id: number; titulo: string }) {
   return <PlayerVideo titulo={titulo} tipo="embed" src={r.dados} />
 }
 
-// BIB-02: quem aparece no vídeo, com link para o Hall of Fame (página pré-renderizada: <a> comum) ou para o Directory.
+// BIB-02: quem aparece no vídeo, com link para o Hall of Fame ou para o Directory.
 function Citados({ videoId }: { videoId: number }) {
   const t = useT()
   const caminho = useCaminho()
@@ -115,7 +115,7 @@ function Citados({ videoId }: { videoId: number }) {
             const p = c.premiados
             const e = c.empresas
             if (p?.edicoes) {
-              return <li key={c.id}><a href={caminho(`/hall-of-fame/${p.edicoes.slug}/${p.slug}`)} className="underline decoration-dourado underline-offset-4">{p.nome}</a> <span className="text-creme/70">· {t("selo.premiado")}</span></li>
+              return <li key={c.id}><Link to={caminho(`/hall-of-fame/${p.edicoes.slug}/${p.slug}`)} className="underline decoration-dourado underline-offset-4">{p.nome}</Link> <span className="text-creme/70">· {t("selo.premiado")}</span></li>
             }
             if (e) return <li key={c.id}><Link to={caminho(`/directory/${e.slug}`)} className="underline decoration-dourado underline-offset-4">{e.nome}</Link> <span className="text-creme/70">· {t("menu.directory")}</span></li>
             return null

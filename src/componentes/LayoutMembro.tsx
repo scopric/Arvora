@@ -41,11 +41,7 @@ function LinkItem({ item, acesso }: { item: Item; acesso: Acesso }) {
       ) : null}
     </>
   )
-  return item.externo ? (
-    <a href={caminho(item.rota)} title={dica} className={linkMenu}>{conteudo}</a>
-  ) : (
-    <NavLink to={caminho(item.rota)} title={dica} className={linkMenu}>{conteudo}</NavLink>
-  )
+  return <NavLink to={caminho(item.rota)} title={dica} className={linkMenu}>{conteudo}</NavLink>
 }
 
 function CartaoPlano({ nivel }: { nivel: Acesso["nivel"] }) {

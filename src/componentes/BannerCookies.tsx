@@ -3,7 +3,7 @@ import { textosDe, useIdiomaUrl } from "../i18n"
 import { aoMudarConsentimento, gravarConsentimento, lerConsentimento, type Escolha } from "../lib/consentimento"
 import { Botao } from "./Botao"
 
-// Vive no layout raiz (cobre também as páginas pré-renderizadas); idioma pela URL.
+// Vive no layout raiz (cobre todas as telas); idioma pela URL.
 // Só no cliente: no servidor/hidratação o snapshot é false, então o HTML não diverge.
 // Textos (cookies.*) PROVISÓRIOS: a validar pelo cliente/solicitor.
 export function BannerCookies() {

@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react"
 import axe from "axe-core"
-import { createRoutesStub, MemoryRouter } from "react-router"
+import { MemoryRouter } from "react-router"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 const estado = vi.hoisted(() => ({ sessao: null as unknown }))
@@ -27,9 +27,6 @@ import { Tabela } from "./componentes/Tabela"
 import { Vazio } from "./componentes/Vazio"
 import { AcessoContext } from "./lib/acesso"
 import { renderiza, simularDialog } from "./testeUtil"
-import HallOfFame, { loader as loaderHall } from "./rotas/hall-of-fame"
-import Premiado, { loader as loaderPremiado } from "./rotas/premiado"
-import premiados from "./dados/premiados-exemplo.json" with { type: "json" }
 
 simularDialog()
 afterEach(() => {
@@ -43,7 +40,6 @@ async function violacoes() {
   return r.violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target).join(", ")}`)
 }
 
-const p = premiados[0]
 const telas: [string, () => void][] = [
   ...["pt", "en"].flatMap((l): [string, () => void][] =>
     ["", "/entrar", "/cadastro", "/recuperar-senha"].map((c) => [
@@ -51,16 +47,6 @@ const telas: [string, () => void][] = [
       () => render(<MemoryRouter initialEntries={[`/${l}${c}`]}><Rotas /></MemoryRouter>),
     ]),
   ),
-  ...["pt", "en"].flatMap((l): [string, () => void][] => [
-    [`/${l}/hall-of-fame`, () => {
-      const Stub = createRoutesStub([{ path: "/:lang/hall-of-fame", Component: HallOfFame, loader: loaderHall as never }])
-      render(<Stub initialEntries={[`/${l}/hall-of-fame`]} />)
-    }],
-    [`/${l}/hall-of-fame/${p.edicao}/${p.slug}`, () => {
-      const Stub = createRoutesStub([{ path: "/:lang/hall-of-fame/:edicao/:slug", Component: Premiado, loader: loaderPremiado as never }])
-      render(<Stub initialEntries={[`/${l}/hall-of-fame/${p.edicao}/${p.slug}`]} />)
-    }],
-  ]),
 ]
 
 // Layouts: público (visitante), membro (Clube e Grupo) e admin (equipe em aal2), nos dois idiomas.
@@ -75,6 +61,7 @@ const comAcesso = (acesso: object, url: string) => {
 }
 const layouts: [string, () => void][] = ["pt", "en"].flatMap((l): [string, () => void][] => [
   [`layout público /${l}/planos`, () => render(<MemoryRouter initialEntries={[`/${l}/planos`]}><Rotas /></MemoryRouter>)],
+  [`layout público /${l}/hall-of-fame`, () => render(<MemoryRouter initialEntries={[`/${l}/hall-of-fame`]}><Rotas /></MemoryRouter>)],
   [`layout membro (Clube) /${l}/inicio`, () => comAcesso({ nivel: "clube" }, `/${l}/inicio`)],
   [`layout membro (Grupo, premiado) /${l}/network`, () => comAcesso({ nivel: "grupo", premiado: true }, `/${l}/network`)],
   [`layout admin /${l}/admin/aulas`, () => comAcesso({ equipe: true, papel: "super_admin" }, `/${l}/admin/aulas`)],

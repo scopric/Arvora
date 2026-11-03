@@ -28,6 +28,13 @@ describe("robots.txt e sitemap.xml", () => {
     expect(readFileSync(join(raiz, "robots.txt"), "utf8")).toContain("Sitemap: https://x.test/sitemap.xml")
   })
 
+  it("sem nenhuma página pré-renderizada: só robots, sem sitemap e sem erro", () => {
+    const raiz = build([])
+    rodar(raiz, { VITE_SITE_URL: "https://x.test" })
+    expect(existsSync(join(raiz, "sitemap.xml"))).toBe(false)
+    expect(readFileSync(join(raiz, "robots.txt"), "utf8")).not.toContain("Sitemap")
+  })
+
   it("falha se uma página existe só em um idioma", () => {
     const raiz = build(["pt/hall-of-fame"])
     expect(() => rodar(raiz, { VITE_SITE_URL: "https://x.test" })).toThrow()
