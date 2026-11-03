@@ -23,7 +23,7 @@ export function NaoEncontrada() {
           404
         </p>
         <div className="-mt-[clamp(2rem,8vw,7rem)] relative">
-          <h1 className="font-titulo text-4xl font-bold sm:text-6xl">{dic["sistema.naoEncontrada"]}</h1>
+          <h1 className="font-titulo text-4xl font-normal sm:text-6xl">{dic["sistema.naoEncontrada"]}</h1>
           <p className="mt-3 max-w-md text-creme/75 text-pretty">{dic["sistema.naoEncontradaTexto"]}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a

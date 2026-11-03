@@ -1,7 +1,8 @@
 import { useEffect } from "react"
 import { Link, useLocation } from "react-router"
 import { Cena } from "../componentes/Cena"
-import { botaoPublico as botao, linkPublico, RodapePublico, TopoPublico } from "../componentes/LayoutPublico"
+import { botaoPublico as botao } from "../componentes/botaoEstilo"
+import { linkPublico, RodapePublico, TopoPublico } from "../componentes/LayoutPublico"
 import { useCaminho, useT, useTitulo } from "../i18n"
 import { useAuth } from "../lib/sessao"
 

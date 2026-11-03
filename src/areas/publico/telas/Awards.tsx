@@ -49,7 +49,7 @@ export function Awards() {
             <li key={a.chave} className="relative">
               <Cartao className="h-full transition-colors focus-within:border-creme/60 hover:border-creme/60">
                 {a.chave === "hall" ? <p className="mb-3 font-mono text-xs tracking-[0.2em] text-dourado uppercase">{t("publico.awards.destaqueHall")}</p> : null}
-                <h2 className="font-titulo text-3xl font-bold uppercase">
+                <h2 className="font-titulo text-3xl font-normal">
                   {destino === null ? (
                     nome
                   ) : a.externo ? (

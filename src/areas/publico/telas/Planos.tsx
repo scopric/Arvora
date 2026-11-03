@@ -12,7 +12,8 @@ import { useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
 import { iniciarCheckoutComAceite } from "../checkout"
-import { Pagina, linkContorno, linkPrimario } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkContorno, linkPrimario } from "../../../componentes/botaoEstilo"
 import { useConsulta } from "../usarConsulta"
 
 type Nivel = "clube" | "grupo"
@@ -86,7 +87,7 @@ export function Planos() {
   // Sem planos ou erro de leitura: nunca uma vitrine vazia, e sim o caminho para o suporte (PRD §17.4.1).
   const semPlanos = (
     <Cartao>
-      <h2 className="font-titulo text-3xl font-bold uppercase">{t("publico.planos.semPlanos.titulo")}</h2>
+      <h2 className="font-titulo text-3xl font-normal">{t("publico.planos.semPlanos.titulo")}</h2>
       <p className="mt-3 max-w-prose text-creme/80">{t("publico.planos.semPlanos.texto")}</p>
       <Link to={caminho("/suporte")} className={`${linkPrimario} mt-6`}>
         {t("publico.planos.falarSuporte")}
@@ -136,7 +137,7 @@ export function Planos() {
     return (
       <Cartao key={nivel} className={`flex flex-col ${nivel === "grupo" ? "border-destaque! border-2" : ""}`}>
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-titulo text-4xl font-bold uppercase">{t(nivel === "clube" ? "nivel.clube" : "nivel.grupo")}</h2>
+          <h2 className="font-titulo text-4xl font-normal">{t(nivel === "clube" ? "nivel.clube" : "nivel.grupo")}</h2>
           {nivel === "grupo" ? <Selo tom="destaque">{t("publico.planos.recomendado")}</Selo> : null}
         </div>
         <p className="mt-2 text-creme/80">{t(nivel === "clube" ? "publico.planos.clube.resumo" : "publico.planos.grupo.resumo")}</p>
@@ -199,7 +200,7 @@ export function Planos() {
 
           {escolhido ? (
             <form key={escolhido.id} id="aceite" onSubmit={ir} noValidate aria-labelledby="aceite-titulo" className="mt-10 space-y-5 rounded-2xl border border-creme/20 p-6">
-              <h2 id="aceite-titulo" ref={formRef} tabIndex={-1} className="font-titulo text-3xl font-bold uppercase outline-none">
+              <h2 id="aceite-titulo" ref={formRef} tabIndex={-1} className="font-titulo text-3xl font-normal outline-none">
                 {t("publico.planos.aceite.titulo")}
               </h2>
               <p className="text-creme/80">
@@ -235,7 +236,7 @@ export function Planos() {
           ) : null}
 
           <section aria-labelledby="comparar" className="mt-16">
-            <h2 id="comparar" className="mb-4 font-titulo text-3xl font-bold uppercase">
+            <h2 id="comparar" className="mb-4 font-titulo text-3xl font-normal">
               {t("publico.planos.comparar")}
             </h2>
             <Tabela
@@ -253,7 +254,7 @@ export function Planos() {
       )}
 
       <section aria-labelledby="faq" className="mt-16">
-        <h2 id="faq" className="mb-4 font-titulo text-3xl font-bold uppercase">
+        <h2 id="faq" className="mb-4 font-titulo text-3xl font-normal">
           {t("publico.planos.faq.titulo")}
         </h2>
         <div className="max-w-3xl divide-y divide-creme/15 border-y border-creme/15">

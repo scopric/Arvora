@@ -1,6 +1,7 @@
 import { Link } from "react-router"
 import { useCaminho, useT, useTitulo } from "../../../i18n"
-import { Pagina, linkPrimario } from "../Pagina"
+import { Pagina } from "../Pagina"
+import { linkPrimario } from "../../../componentes/botaoEstilo"
 
 export function CheckoutCancelado() {
   const t = useT()

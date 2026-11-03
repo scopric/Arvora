@@ -2,14 +2,13 @@ import { Link, Outlet, useLocation } from "react-router"
 import { useCaminho, useT } from "../i18n"
 import { linkSite } from "../lib/enderecos"
 import { useAuth } from "../lib/sessao"
+import { botaoPublico } from "./botaoEstilo"
 import { LayoutMembro } from "./LayoutMembro"
 import { Marca } from "./Marca"
 import { SeletorIdioma } from "./SeletorIdioma"
 
 export const linkPublico =
   "inline-flex min-h-11 items-center rounded-full px-4 text-creme transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
-export const botaoPublico =
-  "inline-flex min-h-11 items-center justify-center rounded-full px-6 text-base font-medium transition-[box-shadow,border-color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destaque"
 
 // Topo e rodapé da home (extraídos de EmBreve sem mudar o visual). `completo` acrescenta o menu do site público (PRD §17.3.1),
 // usado nas demais páginas públicas; a home segue como estava.
