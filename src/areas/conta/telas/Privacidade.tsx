@@ -88,19 +88,18 @@ function BlocoVisibilidade({ uid }: { uid: string }) {
       {estado.fase === "pronto" ? (
         <form key={estado.visibilidade} onSubmit={salvar} className="space-y-4">
           {msg ? <Aviso tipo={msg.tipo}>{t(msg.texto)}</Aviso> : null}
-          <fieldset className="space-y-3">
+          {/* Opções em cartões de ardósia; a marcada troca a hairline por um anel dourado de 2px; o foco vai no cartão, não no rádio. */}
+          <fieldset className="grid gap-3 sm:grid-cols-2">
             <legend className="sr-only">{t("conta.privacidade.visib.titulo")}</legend>
-            <label className="flex min-h-9 items-center gap-3 text-base pointer-coarse:min-h-11">
-              <input type="radio" name="visibilidade" value="membros" defaultChecked={estado.visibilidade === "membros"} className="size-4 accent-dourado" />
-              {t("conta.privacidade.visib.membros")}
-            </label>
-            <label className="flex min-h-9 items-center gap-3 text-base pointer-coarse:min-h-11">
-              <input type="radio" name="visibilidade" value="publico" defaultChecked={estado.visibilidade === "publico"} className="size-4 accent-dourado" />
-              {t("conta.privacidade.visib.publico")}
-            </label>
+            {(["membros", "publico"] as const).map((v) => (
+              <label key={v} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg bg-ardosia px-4 py-3 text-corpo shadow-borda has-checked:shadow-[inset_0_0_0_2px_var(--color-dourado)] has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-dourado">
+                <input type="radio" name="visibilidade" value={v} defaultChecked={estado.visibilidade === v} className="size-5 shrink-0 accent-dourado focus-visible:outline-none" />
+                {t(`conta.privacidade.visib.${v}`)}
+              </label>
+            ))}
           </fieldset>
           {estado.visibilidade === "publico" ? (
-            <p className="text-corpo-p text-nevoa">{t(estado.aprovado ? "conta.privacidade.visib.aprovado" : "conta.privacidade.visib.aguarda")}</p>
+            <p className="text-corpo-p text-cinza">{t(estado.aprovado ? "conta.privacidade.visib.aprovado" : "conta.privacidade.visib.aguarda")}</p>
           ) : null}
           <Botao type="submit" ocupado={ocupado} className="sm:w-auto">{t("conta.privacidade.visib.salvar")}</Botao>
         </form>
@@ -133,8 +132,8 @@ function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar:
 
   return (
     <section>
-      <h2 ref={titulo} tabIndex={-1} className="text-base font-semibold outline-none">{t("conta.consent.lista.titulo")}</h2>
-      <p className="mt-1 text-corpo-p text-nevoa">{t("conta.consent.lista.texto")}</p>
+      <h2 ref={titulo} tabIndex={-1} className="text-subtitulo font-semibold outline-none">{t("conta.consent.lista.titulo")}</h2>
+      <p className="mt-1 text-corpo text-cinza">{t("conta.consent.lista.texto")}</p>
       <div className="mt-4 space-y-4">
         {falhou ? <Aviso tipo="erro">{t("conta.consent.erro")}</Aviso> : null}
         {aceites.length === 0 ? (
@@ -164,7 +163,7 @@ function ListaConsentimentos({ aceites, aoMudar }: { aceites: Aceite[]; aoMudar:
                   ) : a.documentos_legais?.tipo === "cookies" ? (
                     <Link to={caminho("/cookies")} className={linkTextoApp}>{t("conta.consent.cookies")}</Link>
                   ) : (
-                    <span className="text-nevoa">{t("conta.consent.condicao")}</span>
+                    <span className="text-cinza">{t("conta.consent.condicao")}</span>
                   ),
               },
             ]}

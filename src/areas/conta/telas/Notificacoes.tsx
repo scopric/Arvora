@@ -5,19 +5,20 @@ import { Botao } from "../../../componentes/Botao"
 import { botaoPequenoApp } from "../../../componentes/botaoEstilo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
-import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT } from "../../../i18n"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
-import { dataCurta } from "../formato"
+import { dataCurta, grupoDe, horaCurta } from "../formato"
 import { Pagina } from "../Pagina"
 
 const agora = () => new Date().toISOString()
 type Item = { id: number; titulo: string; titulo_en: string | null; link: string | null; lida_em: string | null; criado_em: string }
 type Estado = { fase: "carregando" } | { fase: "erro" } | { fase: "pronto"; itens: Item[] }
 
-// Molde Attio/Linear (notificações): lista densa; a não lida tem peso 510 e o selo "Nova" (ponto dourado); ações pequenas por linha.
+// Molde Linear dd96ee35 + Jace 141b9b34: lista densa agrupada por data (Hoje · Esta semana · Antes) num bloco de
+// vidro-fundo; a não lida tem ponto dourado e peso 600 (o texto "Nova" fica só para leitor de tela); tempo em cinza;
+// ações em Ghost 40 px por linha; "Marcar todas" em cinza cheio. Nenhum dourado cheio na tela.
 export function Notificacoes() {
   const t = useT()
   const idioma = useIdioma()
@@ -28,6 +29,7 @@ export function Notificacoes() {
   const [tentativa, setTentativa] = useState(0)
   const [falhou, setFalhou] = useState(false)
   const [ocupado, setOcupado] = useState(false)
+  const [agoraMs] = useState(() => Date.now()) // ponytail: uma leitura por montagem; na virada do dia os grupos só mudam ao remontar
 
   // Título em inglês quando existe (avisos antigos só têm o português).
   const titulo = (i: Item) => (idioma === "en" && i.titulo_en) || i.titulo
@@ -76,6 +78,7 @@ export function Notificacoes() {
     )
 
   const naoLidas = estado.fase === "pronto" ? estado.itens.filter((i) => !i.lida_em) : []
+  const grupos = (["hoje", "semana", "antes"] as const).map((g) => ({ g, itens: estado.fase === "pronto" ? estado.itens.filter((i) => grupoDe(i.criado_em, agoraMs) === g) : [] })).filter((x) => x.itens.length > 0)
   return (
     <Pagina titulo="conta.notificacoes.titulo" menu={false}>
       {estado.fase === "carregando" ? <Esqueleto linhas={4} /> : null}
@@ -86,22 +89,29 @@ export function Notificacoes() {
           {falhou ? <Aviso tipo="erro">{t("conta.notificacoes.erroAcao")}</Aviso> : null}
           {naoLidas.length > 0 ? (
             <div className="flex justify-end">
-              <Botao type="button" variante="contorno" ocupado={ocupado} onClick={() => void marcarTodas(naoLidas)} className="sm:w-auto">
+              <Botao type="button" variante="secundario" ocupado={ocupado} onClick={() => void marcarTodas(naoLidas)} className="sm:w-auto">
                 {t("conta.notificacoes.marcarTodas")}
               </Botao>
             </div>
           ) : null}
-          <ul aria-label={t("conta.notificacoes.lista")} className="divide-y divide-grafite rounded-xl shadow-borda">
-            {estado.itens.map((i) => (
-              <li key={i.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <p className={i.lida_em ? "text-base text-bruma" : "text-base font-medium"}>{titulo(i)}</p>
-                  <p className="mt-1 flex flex-wrap items-center gap-2 text-corpo-p text-nevoa">
-                    <time dateTime={i.criado_em}>{dataCurta(i.criado_em, idioma)}</time>
-                    {i.lida_em ? null : <Selo tom="dourado">{t("conta.notificacoes.nova")}</Selo>}
-                  </p>
+          <div className="rounded-lg vidro-fundo">
+            {grupos.map(({ g, itens }) => (
+              <div key={g} className="border-t border-placa first:border-t-0">
+                <h2 className="px-5 pt-5 pb-1 text-corpo-p font-semibold text-cinza">{t(`conta.notificacoes.${g}`)}</h2>
+                <ul aria-label={`${t("conta.notificacoes.lista")}: ${t(`conta.notificacoes.${g}`)}`} className="divide-y divide-placa">
+            {itens.map((i) => (
+              <li key={i.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex min-w-0 items-start gap-3">
+                  <span aria-hidden="true" className={`mt-2 size-2 shrink-0 rounded-full ${i.lida_em ? "bg-transparent" : "bg-dourado"}`} />
+                  <div className="min-w-0">
+                    <p className={i.lida_em ? "text-corpo text-cinza" : "text-corpo font-semibold"}>
+                      {titulo(i)}
+                      {i.lida_em ? null : <>{" "}<span className="sr-only">{t("conta.notificacoes.nova")}</span></>}
+                    </p>
+                    <p className="mt-0.5 text-corpo-p text-cinza"><time dateTime={i.criado_em}>{g === "hoje" ? horaCurta(i.criado_em, idioma) : dataCurta(i.criado_em, idioma)}</time></p>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pl-5 sm:pl-0">
                   {i.link ? (
                     <Link to={caminho(i.link)} aria-label={`${t("conta.notificacoes.abrir")}: ${titulo(i)}`} className={botaoPequenoApp}>
                       {t("conta.notificacoes.abrir")}
@@ -118,7 +128,10 @@ export function Notificacoes() {
                 </div>
               </li>
             ))}
-          </ul>
+                </ul>
+              </div>
+            ))}
+          </div>
         </>
       ) : null}
     </Pagina>

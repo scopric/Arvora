@@ -167,4 +167,7 @@ export const contaEn: Record<keyof typeof contaPt, string> = {
   "conta.dados.excluir.dialogoTexto": "Deletion is permanent and cannot be undone. In the next step we ask for your email and password to confirm.",
   "conta.dados.excluir.continuar": "Continue",
   "conta.dados.excluir.etapa2": "Last step: confirm with the account email and password.",
+  "conta.notificacoes.hoje": "Today",
+  "conta.notificacoes.semana": "Last 7 days",
+  "conta.notificacoes.antes": "Earlier",
 }

@@ -112,30 +112,37 @@
       radial-gradient(55% 45% at 92% 100%, #12291e 0%, transparent 65%);
     background-attachment: fixed;
   }
-  /* Sem transparência (preferência do sistema) ou sem suporte a backdrop-filter: os painéis ficam opacos. */
-  @media (prefers-reduced-transparency: reduce) {
-    .vidro { background-color: var(--color-placa); backdrop-filter: none; }
-    .vidro-fundo { background-color: var(--color-carvao); backdrop-filter: none; }
-  }
-  @supports not (backdrop-filter: blur(1px)) {
-    .vidro { background-color: var(--color-placa); }
-    .vidro-fundo { background-color: var(--color-carvao); }
-  }
 }
 
 /* Vidro (Decisão 70, desvio consciente do MasterClass, que usa superfícies opacas): só em contêiner (cartão, barra,
    trilho, popover, diálogo, folha), nunca em texto. Placa a 62% com desfoque, brilho de 1px no topo e hairline creme/7%.
    Contraste medido contra o ponto mais claro do fundo (#1b3528): cinza 5,0 · creme 12,1. `vidro-fundo` é o vidro
    mais escuro (carvão a 72%) para barra, trilho, tab bar, painel de filtros e tabela. */
+/* Sem transparência (preferência do sistema) ou sem suporte a backdrop-filter, os painéis ficam opacos. As regras
+   ficam dentro da própria utility (camada utilities): em @layer base perderiam sempre, e não valeriam com variantes. */
 @utility vidro {
   background-color: color-mix(in oklab, var(--color-placa) 62%, transparent);
   backdrop-filter: blur(20px) saturate(1.15);
   box-shadow: inset 0 1px 0 0 rgb(244 244 239 / 0.1), inset 0 0 0 1px rgb(244 244 239 / 0.07);
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-placa);
+    backdrop-filter: none;
+  }
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--color-placa);
+  }
 }
 @utility vidro-fundo {
   background-color: color-mix(in oklab, var(--color-carvao) 72%, transparent);
   backdrop-filter: blur(20px) saturate(1.15);
   box-shadow: inset 0 1px 0 0 rgb(244 244 239 / 0.08), inset 0 0 0 1px rgb(244 244 239 / 0.06);
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-carvao);
+    backdrop-filter: none;
+  }
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--color-carvao);
+  }
 }
 
 @keyframes subir {
