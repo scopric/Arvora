@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Selo } from "../../../componentes/Selo"
 import { useIdioma, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
@@ -24,6 +25,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
   const pode = usePode(EDITA)
   const acao = useAcao()
   const [versao, setVersao] = useState(0)
+  const [revogando, setRevogando] = useState(false)
   const carga = useCarga(async () => {
     if (!pode) return null
     const docs = exigir(await supabase.from("documentos_legais").select("id, versao, idioma, vigente_desde").eq("tipo", "hall_of_fame").order("vigente_desde", { ascending: false }))
@@ -62,7 +64,16 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
                 ) : (
                   <>
                     <Selo tom="destaque">{t("admin.consent.vigente")}</Selo>{" "}
-                    <button type="button" className={classeAcao} disabled={acao.ocupado} onClick={() => void acao.rodar(async () => { exigirLinha(await supabase.from("consentimentos").update({ revogado_em: new Date().toISOString() }).eq("id", d.atual!.id).select("id")); setVersao((v) => v + 1); aoMudar() }, "admin.consent.revogou")}>{t("admin.consent.revogar")}</button>
+                    <button type="button" className={classeAcao} disabled={acao.ocupado} onClick={() => setRevogando(true)}>{t("admin.consent.revogar")}</button>
+                    <DialogoConfirmar
+                      aberto={revogando} perigo titulo={t("admin.consent.revogarTitulo")} texto={t("admin.consent.revogarTexto")} confirmar={t("admin.consent.revogar")}
+                      aoCancelar={() => setRevogando(false)}
+                      aoConfirmar={() => {
+                        setRevogando(false)
+                        const alvo = d.atual!.id
+                        void acao.rodar(async () => { exigirLinha(await supabase.from("consentimentos").update({ revogado_em: new Date().toISOString() }).eq("id", alvo).select("id")); setVersao((v) => v + 1); aoMudar() }, "admin.consent.revogou")
+                      }}
+                    />
                   </>
                 )}
                 <AvisoDe aviso={acao.aviso} />

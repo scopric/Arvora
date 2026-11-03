@@ -23,23 +23,30 @@ function Linha({ p, aoMudar }: { p: Pedido; aoMudar: () => void }) {
   const [status, setStatus] = useState<Status>(p.status)
   const [confirmando, setConfirmando] = useState(false)
   const [obs, setObs] = useState(p.observacao ?? "")
+  const [erroObs, setErroObs] = useState(false)
   const acao = useAcao()
-  const salvar = (novo: Status) =>
-    acao.rodar(async () => {
+  const salvar = (novo: Status) => {
+    // GDPR art. 12(4): a recusa tem de dizer o motivo ao titular
+    const semMotivo = novo === "recusado" && obs.trim() === ""
+    setErroObs(semMotivo)
+    if (semMotivo) return
+    return acao.rodar(async () => {
       exigirLinha(await supabase.from("pedidos_gdpr").update({ status: novo, observacao: obs.trim() === "" ? null : obs }).eq("id", p.id).select("id"))
       setStatus(novo)
       aoMudar()
     }, "admin.comum.salvo")
+  }
   return (
     <div className="space-y-3">
       <Selecao rotulo={t("admin.comum.status")} value={status} onChange={(e) => setStatus(e.target.value as Status)}>
-        {STATUS.map((s) => <option key={s} value={s}>{t(`admin.pedidos.status.${s}`)}</option>)}
+        {/* Recusado não vira Concluído (achado B10): a recusa é a resposta final ao titular. */}
+        {STATUS.filter((s) => !(p.status === "recusado" && s === "concluido")).map((s) => <option key={s} value={s}>{t(`admin.pedidos.status.${s}`)}</option>)}
       </Selecao>
-      <AreaTexto rotulo={t("admin.pedidos.observacao")} rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
+      <AreaTexto rotulo={t("admin.pedidos.observacao")} erro={erroObs ? t("admin.pedidos.recusaSemMotivo") : undefined} rows={2} value={obs} onChange={(e) => { setObs(e.target.value); if (erroObs && e.target.value.trim() !== "") setErroObs(false) }} />
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-2">
         <Botao type="button" pequeno ocupado={acao.ocupado} onClick={() => void salvar(status)}>{t("admin.comum.salvar")}</Botao>
-        {p.status !== "concluido" ? <Botao type="button" pequeno disabled={acao.ocupado} onClick={() => setConfirmando(true)}>{t("admin.pedidos.atendido")}</Botao> : null}
+        {p.status !== "concluido" && p.status !== "recusado" ? <Botao type="button" pequeno disabled={acao.ocupado} onClick={() => setConfirmando(true)}>{t("admin.pedidos.atendido")}</Botao> : null}
       </div>
       <DialogoConfirmar
         aberto={confirmando} titulo={t("admin.pedidos.atendidoTitulo")} texto={t("admin.pedidos.atendidoTexto")} confirmar={t("admin.pedidos.atendido")}

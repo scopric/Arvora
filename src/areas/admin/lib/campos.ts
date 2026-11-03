@@ -37,10 +37,10 @@ export function paraValores(campos: CampoDef[], linha: Linha | null): Valores {
 }
 
 // Valores do formulário → carga para o banco. Vazio vira null; "publicado" mantém a data antiga ou usa agora.
-// Devolve `erros` por campo (obrigatório vazio, número inválido) e não monta carga se houver erro.
-export function paraCarga(campos: CampoDef[], v: Valores, anterior: Linha | null): { carga: Linha; erros: Record<string, "obrigatorio" | "numero"> } {
+// Devolve `erros` por campo (obrigatório vazio, número inválido, URL que não é https absoluta) e não monta carga se houver erro.
+export function paraCarga(campos: CampoDef[], v: Valores, anterior: Linha | null): { carga: Linha; erros: Record<string, "obrigatorio" | "numero" | "url"> } {
   const carga: Linha = {}
-  const erros: Record<string, "obrigatorio" | "numero"> = {}
+  const erros: Record<string, "obrigatorio" | "numero" | "url"> = {}
   for (const c of campos) {
     const x = v[c.chave]
     if (c.tipo === "checkbox") carga[c.chave] = x === true
@@ -57,6 +57,10 @@ export function paraCarga(campos: CampoDef[], v: Valores, anterior: Linha | null
       } else if (c.tipo === "numero") {
         if (Number.isNaN(Number(texto))) erros[c.chave] = "numero"
         carga[c.chave] = Number(texto)
+      } else if (c.tipo === "url") {
+        // o form tem noValidate: sem isto passaria "javascript:..." ou texto solto
+        if (!ehUrlHttps(texto)) erros[c.chave] = "url"
+        carga[c.chave] = texto
       } else if (c.tipo === "dataHora") carga[c.chave] = localParaIso(texto)
       else carga[c.chave] = texto
     }
@@ -64,3 +68,5 @@ export function paraCarga(campos: CampoDef[], v: Valores, anterior: Linha | null
   return { carga, erros }
 }
 
+
+export const ehUrlHttps = (texto: string) => URL.canParse(texto) && new URL(texto).protocol === "https:"

@@ -27,6 +27,7 @@ export function Equipe() {
   const [busca, setBusca] = useState("")
   const [achados, setAchados] = useState<{ id: string; nome: string }[]>([])
   const [novoPapel, setNovoPapel] = useState<PapelEquipe>("editor")
+  const [adicionando, setAdicionando] = useState<{ perfil: string; nome: string; papel: PapelEquipe } | null>(null)
   const carga = useCarga(async () => {
     const eq = exigir(await supabase.from("equipe").select("perfil_id, papel, criado_em").order("criado_em"))
     const nomes = eq.length ? exigir(await supabase.from("perfis").select("id, nome").in("id", eq.map((e) => e.perfil_id))) : []
@@ -47,9 +48,9 @@ export function Equipe() {
       carga.recarregar()
       if (perfil === eu) recarregarAcesso()
     }, "admin.comum.salvo")
-  const adicionar = (perfil: string) =>
+  const adicionar = (perfil: string, papel: PapelEquipe) =>
     acao.rodar(async () => {
-      exigirLinha(await supabase.from("equipe").insert({ perfil_id: perfil, papel: novoPapel }).select("perfil_id"))
+      exigirLinha(await supabase.from("equipe").insert({ perfil_id: perfil, papel }).select("perfil_id"))
       setAchados([])
       setBusca("")
       carga.recarregar()
@@ -93,11 +94,16 @@ export function Equipe() {
           {achados.map((a) => (
             <li key={a.id} className="flex items-center gap-3">
               <span>{a.nome}</span>
-              <button type="button" className={classeAcao} onClick={() => void adicionar(a.id)}>{t("admin.equipe.adicionarEste")}</button>
+              <button type="button" className={classeAcao} aria-label={`${t("admin.equipe.adicionarEste")}: ${a.nome}`} onClick={() => setAdicionando({ perfil: a.id, nome: a.nome, papel: novoPapel })}>{t("admin.equipe.adicionarEste")}</button>
             </li>
           ))}
         </ul>
       </Secao>
+      <DialogoConfirmar
+        aberto={adicionando !== null} titulo={t("admin.equipe.adicionarTitulo")} texto={adicionando ? `${adicionando.nome}: ${t(`admin.papel.${adicionando.papel}`)}. ${t("admin.equipe.adicionarTexto")}` : ""} confirmar={t("admin.equipe.adicionarEste")}
+        aoCancelar={() => setAdicionando(null)}
+        aoConfirmar={() => { const x = adicionando; setAdicionando(null); if (x) void adicionar(x.perfil, x.papel) }}
+      />
       <DialogoConfirmar
         aberto={trocar !== null} titulo={t("admin.equipe.trocarTitulo")} texto={trocar ? `${trocar.nome}: ${t(`admin.papel.${trocar.papel}`)}. ${t("admin.equipe.trocarTexto")}` : ""} confirmar={t("admin.equipe.trocar")}
         aoCancelar={() => setTrocar(null)}
