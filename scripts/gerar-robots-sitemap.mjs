@@ -19,9 +19,10 @@ const achar = (dir, rel = "") =>
     return n === "index.html" && rel ? [rel] : []
   })
 
-if (site) {
-  const caminhos = achar(join(raiz, idiomas[0]))
-  if (!caminhos.length) throw new Error("gerar-robots-sitemap: nenhuma página pré-renderizada encontrada")
+// Sem páginas pré-renderizadas (hoje tudo é SPA) não há o que listar: só robots.txt, sem sitemap vazio.
+const caminhos = existsSync(join(raiz, idiomas[0])) ? achar(join(raiz, idiomas[0])) : []
+
+if (site && caminhos.length) {
   for (const l of idiomas)
     for (const c of caminhos)
       if (!existsSync(join(raiz, l, c, "index.html"))) throw new Error(`gerar-robots-sitemap: falta /${l}${c}`)
@@ -43,6 +44,6 @@ if (site) {
   )
   robots += `\nSitemap: ${xml(site)}/sitemap.xml\n`
 } else {
-  console.warn("gerar-robots-sitemap: VITE_SITE_URL ausente; sitemap.xml não gerado")
+  console.warn(`gerar-robots-sitemap: ${site ? "nenhuma página pré-renderizada" : "VITE_SITE_URL ausente"}; sitemap.xml não gerado`)
 }
 writeFileSync(`${raiz}/robots.txt`, robots)

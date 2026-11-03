@@ -7,11 +7,11 @@ import { supabase } from "../../../lib/supabase"
 import { Pagina } from "../Pagina"
 import { useConsulta } from "../usarConsulta"
 
-type Ambiente = { chave: string; nome: Chave; texto: Chave; minimo: Nivel; caminho: string | null; externo?: boolean }
+type Ambiente = { chave: string; nome: Chave; texto: Chave; minimo: Nivel; caminho: string | null }
 
 // Os 7 ambientes (deck s12; PRD §17.4.3). `minimo` só escolhe o cadeado: quem barra de verdade é o RLS. Network já mostra a lista ao Clube.
 const AMBIENTES: Omit<Ambiente, "caminho">[] = [
-  { chave: "hall", nome: "menu.hallOfFame", texto: "publico.awards.hall", minimo: "visitante", externo: true },
+  { chave: "hall", nome: "menu.hallOfFame", texto: "publico.awards.hall", minimo: "visitante" },
   { chave: "biblioteca", nome: "menu.biblioteca", texto: "publico.awards.biblioteca", minimo: "visitante" },
   { chave: "originals", nome: "menu.originals", texto: "publico.awards.originals", minimo: "visitante" },
   { chave: "directory", nome: "menu.directory", texto: "publico.awards.directory", minimo: "visitante" },
@@ -52,8 +52,6 @@ export function Awards() {
                 <h2 className="font-titulo text-3xl font-bold uppercase">
                   {destino === null ? (
                     nome
-                  ) : a.externo ? (
-                    <a href={caminho(destino)} className="after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">{nome}</a>
                   ) : (
                     <Link to={caminho(destino)} className="after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado">{nome}</Link>
                   )}

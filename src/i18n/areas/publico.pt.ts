@@ -189,5 +189,8 @@ export const publicoPt = {
   "publico.evento.assistir": "Assistir à transmissão",
   "publico.evento.gravacao": "Gravação da cerimônia",
   "publico.evento.premiados": "Premiados",
+  "publico.hof.vazio": "Os premiados aparecem aqui assim que forem publicados.",
+  "publico.hof.voltar": "Voltar ao Hall of Fame",
+  "publico.hof.materia": "Ler a matéria",
   "publico.evento.convite": "A conversa continua dentro do Grupo Árvora. Conheça os planos.",
 }

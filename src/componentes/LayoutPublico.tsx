@@ -13,13 +13,12 @@ export const botaoPublico =
 
 // Topo e rodapé da home (extraídos de EmBreve sem mudar o visual). `completo` acrescenta o menu do site público (PRD §17.3.1),
 // usado nas demais páginas públicas; a home segue como estava.
-// Hall of Fame é página pré-renderizada fora do app: <a> comum (carga nova), não <Link>.
 function ItensMenu() {
   const t = useT()
   const caminho = useCaminho()
   return (
     <>
-      <a href={caminho("/hall-of-fame")} className={linkPublico}>{t("menu.hallOfFame")}</a>
+      <Link to={caminho("/hall-of-fame")} className={linkPublico}>{t("menu.hallOfFame")}</Link>
       <Link to={caminho("/directory")} className={linkPublico}>{t("menu.directory")}</Link>
       <Link to={caminho("/biblioteca")} className={linkPublico}>{t("menu.biblioteca")}</Link>
       <Link to={caminho("/planos")} className={linkPublico}>{t("menu.planos")}</Link>
@@ -108,7 +107,7 @@ export function RodapePublico() {
             </>
           )}
           <li><Link to={caminho("/planos")} className={linkRodape}>{t("menu.planos")}</Link></li>
-          <li><a href={caminho("/hall-of-fame")} className={linkRodape}>{t("menu.hallOfFame")}</a></li>
+          <li><Link to={caminho("/hall-of-fame")} className={linkRodape}>{t("menu.hallOfFame")}</Link></li>
         </Coluna>
         <Coluna id="rodape-legal" titulo={t("home.rodape.legal")}>
           <li><Link to={caminho("/suporte")} className={linkRodape}>{t("menu.suporte")}</Link></li>
@@ -124,7 +123,7 @@ export function RodapePublico() {
 
 // Páginas de conteúdo que, com sessão, abrem dentro da casca do membro (PRD §17.2.2: "logado, a página muda de estado").
 // Termos, privacidade e checkout seguem com o topo público.
-const COM_CASCA_DO_MEMBRO = new Set(["awards", "biblioteca", "originals", "directory", "evento", "suporte", "planos"])
+const COM_CASCA_DO_MEMBRO = new Set(["awards", "biblioteca", "originals", "directory", "hall-of-fame", "evento", "suporte", "planos"])
 
 // Layout das páginas públicas (PRD §17.2.1). A tela de dentro não renderiza <main>: ele é daqui (id="conteudo", alvo do "pular").
 // Com sessão, as rotas de conteúdo acima usam o LayoutMembro (sidebar/abas); visitante e as demais ficam com o topo público.
