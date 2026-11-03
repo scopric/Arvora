@@ -35,7 +35,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
     return { docs, atual }
   }, [pode, id, versao])
 
-  if (!pode) return <p className="text-corpo-p text-nevoa">{id ? `${t("admin.consent.registrado")} #${id}` : t("admin.consent.soSuper")}</p>
+  if (!pode) return <p className="text-corpo-p text-cinza">{id ? `${t("admin.consent.registrado")} #${id}` : t("admin.consent.soSuper")}</p>
   return (
     <Mostrar carga={carga}>
       {(d) => {
@@ -49,8 +49,8 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
         ]
         const doc = d.docs.find((x) => x.id === d.atual?.documento_id)
         return (
-          <div className="space-y-4 rounded-xl p-5 shadow-borda">
-            <h3 className="text-base font-semibold">{t("admin.consent.titulo")}</h3>
+          <div className="space-y-4 rounded-lg p-6 vidro">
+            <h3 className="text-corpo font-semibold">{t("admin.consent.titulo")}</h3>
             {d.atual ? (
               <div className="space-y-2 text-corpo-p">
                 <p>
@@ -73,7 +73,7 @@ export function ConsentimentoHof({ id, emailInicial, nomeInicial, aoRegistrar, a
               <>
                 <h4 className="font-semibold">{d.atual ? t("admin.consent.novoRegistro") : t("admin.consent.registrar")}</h4>
                 <FormularioRegistro
-                  variante="contorno"
+                  variante="secundario"
                   campos={campos} linha={{ titular_email: emailInicial ?? "", titular_nome: nomeInicial ?? "", documento_id: d.docs[0]?.id }}
                   aoSalvar={async (c) => {
                     const r = await supabase.from("consentimentos").insert(c as never).select("id")

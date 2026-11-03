@@ -9,11 +9,12 @@ import { AvisoDe, Mostrar, Pagina, SemPermissao } from "../componentes/Pagina"
 import { abrirAssinado, exigir, exigirSemDados, useAcao, useCarga } from "../lib/consulta"
 import { dataHora } from "../lib/formato"
 import { CORRIGE, usePode } from "../lib/papel"
-import { classeLink } from "../lib/estilo"
+import { caixaSutilAdmin, classeLink } from "../lib/estilo"
 
 type Entrega = { id: number; exercicio_id: number; perfil_id: string; texto: string | null; arquivo_path: string | null; enviada_em: string }
 
-function Item({ e, titulo, membro, enunciado, prazo, aoMudar }: { e: Entrega; titulo: string; membro: string; enunciado: string; prazo: number | null; aoMudar: () => void }) {
+// `destaque`: só a primeira entrega da fila leva "Aprovar" dourado (um primário por tela); as outras ficam em cinza cheio.
+function Item({ e, titulo, membro, enunciado, prazo, aoMudar, destaque }: { e: Entrega; titulo: string; membro: string; enunciado: string; prazo: number | null; aoMudar: () => void; destaque: boolean }) {
   const t = useT()
   const lang = useIdioma()
   const [devolutiva, setDevolutiva] = useState("")
@@ -30,24 +31,27 @@ function Item({ e, titulo, membro, enunciado, prazo, aoMudar }: { e: Entrega; ti
   const [agora] = useState(() => Date.now())
   const dias = Math.max(0, Math.floor((agora - Date.parse(e.enviada_em)) / 86400000))
   return (
-    <Cartao>
-      <h2 className="text-base font-semibold">{membro} · {titulo}</h2>
-      <p className="mt-1 text-corpo-p text-nevoa">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}
+    // Molde Linear 42256ca3 (composição própria): entrega à esquerda; devolutiva e ações num painel de ardósia à direita.
+    <Cartao className="grid gap-5 xl:grid-cols-[1fr_20rem]">
+      <div className="min-w-0">
+      <h2 className="text-corpo font-semibold">{membro} · {titulo}</h2>
+      <p className="mt-1 text-corpo-p text-cinza">{t("admin.correcao.enviadaEm")} {dataHora(e.enviada_em, lang)} · {dias} {t("admin.correcao.diasNaFila")}
         {prazo !== null ? <> · {t("admin.correcao.prazo")}: {prazo} {t("admin.correcao.diasPrazo")}</> : null}
         {/* O prazo é o do membro para entregar (informativo), não o da correção. Aviso por e-mail ao corretor/membro: depende da conta do Resend (ainda não existe). */}
       </p>
-      <p className="mt-3 text-base text-bruma">{enunciado}</p>
-      {e.texto ? <p className="mt-3 whitespace-pre-wrap">{e.texto}</p> : null}
+      <p className="mt-3 text-corpo text-cinza">{enunciado}</p>
+      {e.texto ? <p className="mt-3 text-corpo whitespace-pre-wrap">{e.texto}</p> : null}
       {e.arquivo_path ? (
         <button type="button" className={`mt-3 inline-flex min-h-9 items-center text-corpo-p pointer-coarse:min-h-11 ${classeLink}`} onClick={() => void acao.rodar(() => abrirAssinado("entregas", e.arquivo_path!))}>{t("admin.correcao.abrirArquivo")}</button>
       ) : null}
-      <div className="mt-4">
-        <AreaTexto rotulo={t("admin.correcao.devolutiva")} rows={3} value={devolutiva} erro={erro} onChange={(x) => setDevolutiva(x.target.value)} />
       </div>
-      <div className="mt-3"><AvisoDe aviso={acao.aviso} /></div>
-      <div className="mt-3 flex flex-wrap gap-3">
-        <Botao type="button" variante="contorno" ocupado={acao.ocupado} onClick={() => corrigir("aprovada")} className="sm:w-auto">{t("admin.correcao.aprovar")}</Botao>
-        <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => corrigir("ajustar")} className="sm:w-auto">{t("admin.correcao.pedirAjuste")}</Botao>
+      <div className={`space-y-3 ${caixaSutilAdmin}`}>
+        <AreaTexto rotulo={t("admin.correcao.devolutiva")} rows={3} value={devolutiva} erro={erro} onChange={(x) => setDevolutiva(x.target.value)} />
+        <AvisoDe aviso={acao.aviso} />
+        <div className="flex flex-wrap gap-3">
+          <Botao type="button" variante={destaque ? "primario" : "secundario"} ocupado={acao.ocupado} onClick={() => corrigir("aprovada")} className="sm:w-auto">{t("admin.correcao.aprovar")}</Botao>
+          <Botao type="button" variante="contorno" disabled={acao.ocupado} onClick={() => corrigir("ajustar")} className="sm:w-auto">{t("admin.correcao.pedirAjuste")}</Botao>
+        </div>
       </div>
     </Cartao>
   )
@@ -81,11 +85,11 @@ export function Correcao() {
             <Vazio>{t("admin.correcao.vazio")}</Vazio>
           ) : (
             <ul className="space-y-4">
-              {d.entregas.map((e) => {
+              {d.entregas.map((e, i) => {
                 const ex = d.exercicios.get(e.exercicio_id)
                 return (
                   <li key={e.id}>
-                    <Item e={e} titulo={ex ? (d.aulas.get(ex.aula_id) ?? "—") : "—"} membro={d.perfis.get(e.perfil_id) ?? "—"} enunciado={ex?.enunciado_md ?? ""} prazo={ex?.prazo_dias ?? null} aoMudar={carga.recarregar} />
+                    <Item e={e} titulo={ex ? (d.aulas.get(ex.aula_id) ?? "—") : "—"} membro={d.perfis.get(e.perfil_id) ?? "—"} enunciado={ex?.enunciado_md ?? ""} prazo={ex?.prazo_dias ?? null} aoMudar={carga.recarregar} destaque={i === 0} />
                   </li>
                 )
               })}

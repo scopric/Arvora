@@ -55,16 +55,16 @@ export function Membro() {
                 {perfil.suspenso_em ? <Selo tom="alerta">{t("admin.membros.suspenso")}</Selo> : null}
               </div>
               <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                {super_ ? <div><dt className="text-corpo-p text-nevoa">{t("admin.membro.email")}</dt><dd>{emailErro ? <span role="alert" className="text-red-300">{t("admin.membro.emailErro")}</span> : (email ?? "—")}</dd></div> : null}
-                <div><dt className="text-corpo-p text-nevoa">{t("admin.membros.empresa")}</dt><dd>{perfil.empresa_nome ?? "—"}</dd></div>
-                <div><dt className="text-corpo-p text-nevoa">{t("admin.comum.cidade")}</dt><dd>{[perfil.cidade, perfil.pais].filter(Boolean).join(", ") || "—"}</dd></div>
-                <div><dt className="text-corpo-p text-nevoa">{t("admin.membros.visibilidade")}</dt><dd>{t(`admin.membros.vis.${perfil.visibilidade}`)}</dd></div>
-                <div><dt className="text-corpo-p text-nevoa">{t("admin.membros.desde")}</dt><dd>{dataCurta(perfil.criado_em)}</dd></div>
+                {super_ ? <div><dt className="text-corpo-p text-cinza">{t("admin.membro.email")}</dt><dd>{emailErro ? <span role="alert" className="text-red-300">{t("admin.membro.emailErro")}</span> : (email ?? "—")}</dd></div> : null}
+                <div><dt className="text-corpo-p text-cinza">{t("admin.membros.empresa")}</dt><dd>{perfil.empresa_nome ?? "—"}</dd></div>
+                <div><dt className="text-corpo-p text-cinza">{t("admin.comum.cidade")}</dt><dd>{[perfil.cidade, perfil.pais].filter(Boolean).join(", ") || "—"}</dd></div>
+                <div><dt className="text-corpo-p text-cinza">{t("admin.membros.visibilidade")}</dt><dd>{t(`admin.membros.vis.${perfil.visibilidade}`)}</dd></div>
+                <div><dt className="text-corpo-p text-cinza">{t("admin.membros.desde")}</dt><dd>{dataCurta(perfil.criado_em)}</dd></div>
               </dl>
-              {perfil.bio ? <p className="mt-4 max-w-prose text-base text-bruma">{perfil.bio}</p> : null}
+              {perfil.bio ? <p className="mt-4 max-w-prose text-corpo">{perfil.bio}</p> : null}
               <div className="mt-4 space-y-3">
                 <AvisoDe aviso={acao.aviso} />
-                {modera ? <Botao type="button" variante={perfil.suspenso_em ? "contorno" : "perigo"} disabled={acao.ocupado} onClick={() => setConfirmar(true)} className="sm:w-auto">{perfil.suspenso_em ? t("admin.membro.reativar") : t("admin.membro.suspender")}</Botao> : null}
+                {modera ? <Botao type="button" variante={perfil.suspenso_em ? "secundario" : "perigo"} disabled={acao.ocupado} onClick={() => setConfirmar(true)} className="sm:w-auto">{perfil.suspenso_em ? t("admin.membro.reativar") : t("admin.membro.suspender")}</Botao> : null}
               </div>
             </Cartao>
             {financeiro ? (
@@ -83,7 +83,7 @@ export function Membro() {
                     ]}
                   />
                 )}
-                <p className="mt-4 text-corpo-p text-nevoa">{t("admin.membro.stripeNota")}</p>
+                <p className="mt-4 text-corpo-p text-cinza">{t("admin.membro.stripeNota")}</p>
                 <ul className="mt-2 space-y-1">
                   {clientes.map((c) => (
                     <li key={c.stripe_customer_id}>

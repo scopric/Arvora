@@ -127,6 +127,18 @@ describe("Correção de tarefas", () => {
     await waitFor(() => expect(chamou("rpc:corrigir_entrega")).toHaveLength(1))
     expect(chamou("rpc:corrigir_entrega")[0].args[0]).toEqual({ entrega: 5, novo_status: "ajustar", devolutiva: "Detalhe mais a meta" })
   })
+  it("só a primeira entrega da fila leva o 'Aprovar' dourado; as outras ficam em cinza", async () => {
+    estado.respostas["entregas"] = { data: [
+      { id: 5, exercicio_id: 2, perfil_id: "p1", texto: "A", arquivo_path: null, enviada_em: "2026-10-25T10:00:00Z" },
+      { id: 6, exercicio_id: 2, perfil_id: "p1", texto: "B", arquivo_path: null, enviada_em: "2026-10-26T10:00:00Z" },
+    ], error: null }
+    montar(<Correcao />, "/correcao", "/pt/admin/correcao", "corretor")
+    const aprovar = await screen.findAllByRole("button", { name: "Aprovar" })
+    expect(aprovar).toHaveLength(2)
+    // No teste o Botao renderiza o ramo público (sem .app): o primário é bg-destaque; no app é bg-dourado.
+    expect(aprovar[0].className).toMatch(/bg-dourado|bg-destaque/)
+    expect(aprovar[1].className).not.toMatch(/bg-dourado|bg-destaque/)
+  })
   it("mostra o prazo de entrega do exercício, sem marcar atraso", async () => {
     estado.respostas["exercicios"] = { data: [{ id: 2, aula_id: 3, enunciado_md: "Descreva sua meta", prazo_dias: 3 }], error: null }
     montar(<Correcao />, "/correcao", "/pt/admin/correcao", "corretor")
@@ -240,6 +252,15 @@ describe("Pedidos de dados, Equipe, Membros, Visão geral, Temas, Moderação", 
     montar(<Membros />, "/membros", "/pt/admin/membros", "moderador")
     await screen.findByText("Ana Exemplo")
     expect(screen.queryByText(/Plano e situação/)).toBeNull()
+  })
+  it("Membros: Enter no campo de busca envia a Barra e consulta pelo nome", async () => {
+    estado.respostas["perfis"] = { data: [{ id: "p1", nome: "Ana Exemplo", empresa_nome: null, cidade: null, pais: null, visibilidade: "membros", suspenso_em: null, criado_em: "2026-01-01T00:00:00Z" }], error: null }
+    montar(<Membros />, "/membros", "/pt/admin/membros", "moderador")
+    await screen.findByText("Ana Exemplo")
+    const antes = chamou("perfis").length
+    await userEvent.type(screen.getByLabelText("Buscar por nome"), "Ana{Enter}")
+    await waitFor(() => expect(chamou("perfis").length).toBeGreaterThan(antes))
+    expect(screen.getByRole("button", { name: "Filtrar" }).closest("form")).not.toBeNull()
   })
   it("Visão geral: cada papel vê só os cartões em que pode agir", async () => {
     for (const t of ["empresas", "denuncias", "pedidos_gdpr", "aulas", "entregas", "premiados"]) estado.respostas[t] = { data: null, count: 3, error: null }

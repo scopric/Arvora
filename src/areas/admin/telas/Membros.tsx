@@ -7,7 +7,7 @@ import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { Mostrar, Pagina } from "../componentes/Pagina"
+import { Barra, Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
 import { dataCurta } from "../lib/formato"
 import { FINANCEIRO, usePode } from "../lib/papel"
@@ -54,24 +54,26 @@ export function Membros() {
 
   return (
     <Pagina titulo="admin.membros.titulo" intro={financeiro ? "admin.membros.intro" : "admin.membros.introSemPlano"}>
-      <form className="grid gap-4 sm:grid-cols-[1fr_12rem_auto] sm:items-end" onSubmit={(e) => { e.preventDefault(); setBusca(nome); setLimite(PAGINA) }}>
-        <Campo rotulo={t("admin.membros.buscar")} value={nome} onChange={(e) => setNome(e.target.value)} />
-        <Selecao rotulo={t("admin.membros.situacao")} value={suspensos ? "suspensos" : ""} onChange={(e) => { setSuspensos(e.target.value === "suspensos"); setLimite(PAGINA) }}>
-          <option value="">{t("admin.comum.todos")}</option>
-          <option value="suspensos">{t("admin.membros.soSuspensos")}</option>
-        </Selecao>
-        <Botao type="submit" variante="contorno" className="sm:w-auto">{t("admin.membros.filtrar")}</Botao>
-      </form>
-      {financeiro ? (
-        <div className="max-w-xs">
-          <Selecao rotulo={t("admin.membros.nivel")} value={nivel} onChange={(e) => { setNivel(e.target.value); setLimite(PAGINA) }}>
+      {/* Molde Attio/Linear: busca e filtros numa barra de vidro-fundo; "Filtrar" em cinza cheio (nenhum dourado na tela). */}
+      <Barra onSubmit={(e) => { e.preventDefault(); setBusca(nome); setLimite(PAGINA) }} acoes={<Botao type="submit" variante="secundario" className="sm:w-auto">{t("admin.membros.filtrar")}</Botao>}>
+        <div className="w-64 max-w-full"><Campo rotulo={t("admin.membros.buscar")} value={nome} onChange={(e) => setNome(e.target.value)} /></div>
+        <div className="w-48 max-w-full">
+          <Selecao rotulo={t("admin.membros.situacao")} value={suspensos ? "suspensos" : ""} onChange={(e) => { setSuspensos(e.target.value === "suspensos"); setLimite(PAGINA) }}>
             <option value="">{t("admin.comum.todos")}</option>
-            <option value="clube">{t("nivel.clube")}</option>
-            <option value="grupo">{t("nivel.grupo")}</option>
-            <option value="nenhum">{t("admin.membros.semAssinatura")}</option>
+            <option value="suspensos">{t("admin.membros.soSuspensos")}</option>
           </Selecao>
         </div>
-      ) : null}
+        {financeiro ? (
+          <div className="w-48 max-w-full">
+            <Selecao rotulo={t("admin.membros.nivel")} value={nivel} onChange={(e) => { setNivel(e.target.value); setLimite(PAGINA) }}>
+              <option value="">{t("admin.comum.todos")}</option>
+              <option value="clube">{t("nivel.clube")}</option>
+              <option value="grupo">{t("nivel.grupo")}</option>
+              <option value="nenhum">{t("admin.membros.semAssinatura")}</option>
+            </Selecao>
+          </div>
+        ) : null}
+      </Barra>
       <Mostrar carga={carga}>
         {({ perfis, niveis }) => {
           const linhas = perfis
@@ -90,7 +92,7 @@ export function Membros() {
                   { chave: "desde", titulo: t("admin.membros.desde"), celula: (l) => dataCurta(l.criado_em) },
                 ]}
               />
-              {perfis.length >= limite ? <Botao variante="contorno" className="sm:w-auto" onClick={() => setLimite((n) => n + PAGINA)}>{t("admin.comum.carregarMais")}</Botao> : null}
+              {perfis.length >= limite ? <Botao variante="secundario" className="sm:w-auto" onClick={() => setLimite((n) => n + PAGINA)}>{t("admin.comum.carregarMais")}</Botao> : null}
             </>
           )
         }}

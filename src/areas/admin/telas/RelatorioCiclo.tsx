@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react"
 import { Botao } from "../../../componentes/Botao"
+import { focoApp } from "../../../componentes/menuApp"
 import { Campo, Selecao } from "../../../componentes/Campo"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Aviso } from "../../../componentes/Aviso"
@@ -16,7 +17,7 @@ import { cicloDe, cicloFim, dataCurta, dataHora, hojeEmDublin, moeda } from "../
 import { FINANCEIRO, SUPER, usePode } from "../lib/papel"
 import { bloqueia } from "../lib/regras"
 import type { LinhaRel, Plano, Receita, Relatorio, Versao } from "../lib/relatorio"
-import { classeAcao, classeLink } from "../lib/estilo"
+import { classeAcao, classeLink, caixaSutilAdmin, celulaNumeroAdmin } from "../lib/estilo"
 
 function baixar(nome: string, csv: string) {
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }))
@@ -30,7 +31,7 @@ function baixar(nome: string, csv: string) {
 function Linhas({ linhas, extra, liquido }: { linhas: LinhaRel[]; extra?: (l: LinhaRel) => ReactNode; liquido?: boolean }) {
   const t = useT()
   const lang = useIdioma()
-  if (linhas.length === 0) return <p className="text-corpo-p text-nevoa">{t("admin.rel.semLinhas")}</p>
+  if (linhas.length === 0) return <p className="text-corpo-p text-cinza">{t("admin.rel.semLinhas")}</p>
   return (
     <Tabela
       legenda={t("admin.rel.linhas")} linhas={linhas} id={(l) => `${l.fonte}-${l.ref_id}`}
@@ -52,21 +53,24 @@ function Linhas({ linhas, extra, liquido }: { linhas: LinhaRel[]; extra?: (l: Li
   )
 }
 
+// Molde Intercom 0d71c83b: células de número lado a lado (rótulo 14 em cinza, número 24/600 tabular; o total, `forte`, em 32).
+// Colunas automáticas de no mínimo 13rem: "€ 12.345,67" em 32px não cabe em 1/3 de 640px.
 function Numero({ rotulo, valor, forte }: { rotulo: Chave; valor: ReactNode; forte?: boolean }) {
   const t = useT()
   return (
-    <div className={`flex items-baseline justify-between gap-4 border-b border-grafite py-2 ${forte ? "text-base font-semibold" : "text-corpo-p"}`}>
-      <dt>{t(rotulo)}</dt>
-      <dd className="tabular-nums">{valor}</dd>
+    <div className={`min-w-0 ${celulaNumeroAdmin}`}>
+      <dt className="text-corpo-p font-semibold text-cinza">{t(rotulo)}</dt>
+      <dd className={`mt-1 font-semibold break-words tabular-nums ${forte ? "text-titulo" : "text-titulo-p"}`}>{valor}</dd>
     </div>
   )
 }
+// "Como foi calculado": detalhe em cinza abaixo das células.
 function Como({ children }: { children: ReactNode }) {
   const t = useT()
   return (
     <details className="mt-3">
-      <summary className="min-h-9 cursor-pointer py-2 text-corpo-p font-medium text-bruma pointer-coarse:min-h-11">{t("admin.rel.como")}</summary>
-      <div className="mt-2">{children}</div>
+      <summary className={`min-h-10 cursor-pointer rounded-sm py-2 text-corpo-p font-semibold text-cinza pointer-coarse:min-h-11 hover:text-creme ${focoApp}`}>{t("admin.rel.como")}</summary>
+      <div className="mt-2 text-corpo-p text-cinza">{children}</div>
     </details>
   )
 }
@@ -107,16 +111,16 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
     <div className="space-y-8">
       <div className="flex flex-wrap items-center gap-3">
         <Selo tom={fechado ? "destaque" : "neutro"}>{t(fechado ? "admin.rel.fechado" : "admin.rel.rascunho")}</Selo>
-        {fechado && versao ? <span className="text-corpo-p text-nevoa">v{versao.versao} · SHA-256 <code className="break-all">{versao.csv_sha256}</code></span> : null}
+        {fechado && versao ? <span className="text-corpo-p text-cinza">v{versao.versao} · SHA-256 <code className="break-all">{versao.csv_sha256}</code></span> : null}
         {fechado && versao?.enviado_em ? <Selo tom="destaque">{t("admin.rel.enviado")} {dataCurta(versao.enviado_em)}</Selo> : null}
       </div>
-      {!fechado ? <p className="text-corpo-p text-nevoa">{t("admin.rel.previa")}</p> : null}
+      {!fechado ? <p className="text-corpo-p text-cinza">{t("admin.rel.previa")}</p> : null}
       {rel.pendencias.some(bloqueante) ? (
         <Aviso tipo="erro">
           {t("admin.rel.pendencias")}: {rel.pendencias.filter(bloqueante).map(pendTexto).join(" · ")}
         </Aviso>
       ) : null}
-      {rel.pendencias.some((p) => p.tipo === "faixa_percentuais_indefinidos") ? <p className="rounded-md bg-creme/2 px-4 py-3 text-base shadow-borda">{t("admin.rel.avisoFaixa")}</p> : null}
+      {rel.pendencias.some((p) => p.tipo === "faixa_percentuais_indefinidos") ? <p className={`text-corpo ${caixaSutilAdmin}`}>{t("admin.rel.avisoFaixa")}</p> : null}
       {super_ && !fechado && rel.pendencias.some((x) => x.tipo === "item_sem_plano" && x.item_id) ? (
         <ul className="max-w-md space-y-4 max-md:hidden">
           {rel.pendencias.filter((x) => x.tipo === "item_sem_plano" && x.item_id).map((x) => <ClassificarItem key={x.item_id} itemId={x.item_id!} planos={planos} aoFeito={aoMudar} />)}
@@ -124,7 +128,7 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
       ) : null}
 
       <Secao titulo="admin.rel.s1">
-        <dl>
+        <dl className="grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]">
           <Numero rotulo="admin.rel.stripe" valor={m(rel.receita.stripe)} />
           <Numero rotulo="admin.rel.foraStripe" valor={m(rel.receita.externa)} />
           <Numero rotulo="admin.rel.receitaBruta" valor={m(rel.receita.bruta)} forte />
@@ -142,23 +146,23 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
           </Como>
         ) : null}
         <AvisoDe aviso={acao.aviso} />
-        {editar ? <div className="mt-4 max-md:hidden"><h3 className="mb-3 text-base font-semibold">{t("admin.rel.lancarTitulo")}</h3><LancarReceita ciclo={{ inicio: rel.ciclo.inicio, fim: cicloFim(rel.ciclo.inicio) }} planos={planos} aoFeito={aoMudar} /></div> : null}
+        {editar ? <div className="mt-4 max-md:hidden"><h3 className="mb-3 text-corpo font-semibold">{t("admin.rel.lancarTitulo")}</h3><LancarReceita ciclo={{ inicio: rel.ciclo.inicio, fim: cicloFim(rel.ciclo.inicio) }} planos={planos} aoFeito={aoMudar} /></div> : null}
       </Secao>
 
       <Secao titulo="admin.rel.s2">
-        <dl>
+        <dl className="grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]">
           <Numero rotulo="admin.rel.vatRecolhido" valor={m(rel.deducoes.vat)} />
           <Numero rotulo="admin.rel.estornos" valor={m(rel.deducoes.estornos - rel.deducoes.estornos_vat)} />
           <Numero rotulo="admin.rel.deducoesTotal" valor={m(rel.deducoes.total)} forte />
         </dl>
         <Como><Linhas linhas={estornos} liquido /></Como>
-        {editar ? <div className="mt-4 max-md:hidden"><h3 className="mb-3 text-base font-semibold">{t("admin.rel.estornoTitulo")}</h3><LancarEstorno receitas={receitas} aoFeito={aoMudar} /></div> : null}
+        {editar ? <div className="mt-4 max-md:hidden"><h3 className="mb-3 text-corpo font-semibold">{t("admin.rel.estornoTitulo")}</h3><LancarEstorno receitas={receitas} aoFeito={aoMudar} /></div> : null}
       </Secao>
 
       <Secao titulo="admin.rel.s3">
         <p>{t("admin.rel.taxaEm")} {dataCurta(rel.cambio.data_referencia)}</p>
         {rel.cambio.taxas.length === 0 ? (
-          <p className="mt-2 text-corpo-p text-nevoa">{t("admin.rel.soEur")}</p>
+          <p className="mt-2 text-corpo-p text-cinza">{t("admin.rel.soEur")}</p>
         ) : (
           <ul className="mt-2 space-y-1">
             {rel.cambio.taxas.map((x) => (
@@ -169,24 +173,24 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
             ))}
           </ul>
         )}
-        {editar ? <div className="mt-4 max-md:hidden"><h3 className="mb-3 text-base font-semibold">{t("admin.rel.cadastrarCambio")}</h3><Cambio aoFeito={aoMudar} /></div> : null}
+        {editar ? <div className="mt-4 max-md:hidden"><h3 className="mb-3 text-corpo font-semibold">{t("admin.rel.cadastrarCambio")}</h3><Cambio aoFeito={aoMudar} /></div> : null}
       </Secao>
 
       <Secao titulo="admin.rel.s4">
-        <dl><Numero rotulo="admin.rel.receitaBase" valor={m(rel.receita_base)} forte /></dl>
+        <dl className="grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]"><Numero rotulo="admin.rel.receitaBase" valor={m(rel.receita_base)} forte /></dl>
       </Secao>
 
       <Secao titulo="admin.rel.s5">
-        <dl><Numero rotulo="admin.rel.clientesAtivos" valor={rel.clientes_ativos.quantidade} forte /></dl>
+        <dl className="grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]"><Numero rotulo="admin.rel.clientesAtivos" valor={rel.clientes_ativos.quantidade} forte /></dl>
         <Como>
-          {rel.clientes_ativos.lista.length === 0 ? <p className="text-corpo-p text-nevoa">{t("admin.rel.semLinhas")}</p> : (
+          {rel.clientes_ativos.lista.length === 0 ? <p className="text-corpo-p text-cinza">{t("admin.rel.semLinhas")}</p> : (
             <ul className="text-corpo-p">{rel.clientes_ativos.lista.map((c) => <li key={c.chave}>{c.chave} · {c.origem}</li>)}</ul>
           )}
         </Como>
       </Secao>
 
       <Secao titulo="admin.rel.s6">
-        <dl>
+        <dl className="grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]">
           <Numero rotulo="admin.rel.iaAvulsa" valor={m(rel.ia.avulsa)} />
           <Numero rotulo="admin.rel.iaRateio" valor={m(rel.ia.rateio)} />
           <Numero rotulo="admin.rel.iaTotal" valor={m(rel.ia.total)} forte />
@@ -201,7 +205,7 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
       </Secao>
 
       <Secao titulo="admin.rel.s7">
-        <dl>
+        <dl className="grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]">
           <Numero rotulo="admin.rel.faixa" valor={`${rel.faixa.faixa} / 3 (${rel.faixa.limites.join(" · ")})`} />
           <Numero rotulo="admin.rel.percentual" valor={rel.faixa.percentual === null ? t("admin.rel.aDefinir") : `${rel.faixa.percentual}%`} />
           <Numero rotulo="admin.rel.valores" valor={rel.faixa.valor === null ? t("admin.rel.aDefinir") : m(rel.faixa.valor)} />
@@ -226,19 +230,19 @@ export function Corpo({ rel, versao, versoes, super_, financeiro, aoMudar, hoje,
       {super_ ? <div className="max-md:hidden"><Secao titulo="admin.rel.acessoTitulo"><ConcederAcesso receitas={receitas} planos={planos} aoFeito={aoMudar} /></Secao></div> : null}
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-3">
-        <Botao type="button" variante="contorno" className="sm:w-auto" onClick={() => baixar(nome, rel.csv)}>{t("admin.rel.baixarCsv")}</Botao>
+        <Botao type="button" variante="secundario" className="sm:w-auto" onClick={() => baixar(nome, rel.csv)}>{t("admin.rel.baixarCsv")}</Botao>
         {super_ && !fechado ? <Botao type="button" ocupado={acao.ocupado} disabled={!terminou || bloqueia(rel)} onClick={() => setFechar(true)} className="max-md:hidden sm:w-auto">{t("admin.rel.fechar")}</Botao> : null}
         {super_ && fechado && versao && !versao.enviado_em ? (
-          <Botao type="button" variante="contorno" ocupado={acao.ocupado} className="max-md:hidden sm:w-auto" onClick={() => void acao.rodar(async () => { exigirSemDados(await supabase.rpc("marcar_relatorio_enviado", { ciclo_inicio: rel.ciclo.inicio, versao: versao.versao })); aoMudar() }, "admin.rel.marcadoEnviado")}>{t("admin.rel.marcarEnviado")}</Botao>
+          <Botao type="button" variante="secundario" ocupado={acao.ocupado} className="max-md:hidden sm:w-auto" onClick={() => void acao.rodar(async () => { exigirSemDados(await supabase.rpc("marcar_relatorio_enviado", { ciclo_inicio: rel.ciclo.inicio, versao: versao.versao })); aoMudar() }, "admin.rel.marcadoEnviado")}>{t("admin.rel.marcarEnviado")}</Botao>
         ) : null}
       </div>
-      {super_ && !fechado && (!terminou || bloqueia(rel)) ? <p className="text-corpo-p text-nevoa">{!terminou ? t("admin.rel.cicloEmAndamento") : t("admin.rel.fecharBloqueado")}</p> : null}
-      <p className="text-corpo-p text-nevoa md:hidden">{t("admin.rel.soLeituraCelular")}</p>
+      {super_ && !fechado && (!terminou || bloqueia(rel)) ? <p className="text-corpo-p text-cinza">{!terminou ? t("admin.rel.cicloEmAndamento") : t("admin.rel.fecharBloqueado")}</p> : null}
+      <p className="text-corpo-p text-cinza md:hidden">{t("admin.rel.soLeituraCelular")}</p>
       {super_ && fechado ? (
         <div className="max-w-xl space-y-3 max-md:hidden">
-          <h3 className="text-base font-semibold">{t("admin.rel.reabrirTitulo")}</h3>
+          <h3 className="text-corpo font-semibold">{t("admin.rel.reabrirTitulo")}</h3>
           <AreaTexto rotulo={t("admin.rel.motivoReabertura")} rows={2} value={motivo} onChange={(e) => setMotivo(e.target.value)} />
-          <Botao type="button" variante="contorno" disabled={acao.ocupado || motivo.trim().length < 5} className="sm:w-auto" onClick={() => void acao.rodar(async () => { exigirSemDados(await supabase.rpc("reabrir_ciclo", { ciclo_inicio: rel.ciclo.inicio, motivo: motivo.trim() })); setMotivo(""); aoMudar() }, "admin.rel.reaberto")}>{t("admin.rel.reabrir")}</Botao>
+          <Botao type="button" variante="secundario" disabled={acao.ocupado || motivo.trim().length < 5} className="sm:w-auto" onClick={() => void acao.rodar(async () => { exigirSemDados(await supabase.rpc("reabrir_ciclo", { ciclo_inicio: rel.ciclo.inicio, motivo: motivo.trim() })); setMotivo(""); aoMudar() }, "admin.rel.reaberto")}>{t("admin.rel.reabrir")}</Botao>
         </div>
       ) : null}
       <DialogoConfirmar

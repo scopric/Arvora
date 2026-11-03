@@ -76,7 +76,7 @@ function Indicados({ edicaoId, pode }: { edicaoId: number; pode: boolean }) {
             <ConsentimentoHof id={ultimo} aoRegistrar={async (id) => setUltimo(id)} aoMudar={() => setVersao((v) => v + 1)} />
             {ultimo ? <p className="text-corpo-p">{t("admin.edicao.useId")} <strong>{ultimo}</strong></p> : null}
             <CrudTabela
-              variante="contorno"
+              variante="secundario"
               key={versao} tabela="indicados" colunas="id, edicao_id, categoria_id, nome, empresa_id, foto_path, resumo, consentimento_id, publicado_em" campos={campos} ordem={[{ coluna: "nome" }]}
               filtro={{ coluna: "edicao_id", valor: edicaoId }} fixos={{ edicao_id: edicaoId }} podeEditar={pode} podeApagar legenda="admin.edicao.indicados" vazio="admin.edicao.semIndicados"
             />
@@ -97,7 +97,7 @@ export function Edicao() {
   const pode = usePode(EDITA)
   const carga = useCarga(async () => (edicaoId === null ? null : exigir(await supabase.from("edicoes").select(COLUNAS).eq("id", edicaoId).maybeSingle())), [id])
   const filha = (tabela: string, colunas: string, campos: CampoDef[], legenda: "admin.edicao.categorias" | "admin.edicao.patrocinadores" | "admin.edicao.agenda", vazio: "admin.edicao.semCategorias" | "admin.edicao.semPatrocinadores" | "admin.edicao.semAgenda", ordem: string) => (
-    <CrudTabela variante="contorno" tabela={tabela} colunas={colunas} campos={campos} ordem={[{ coluna: ordem }]} filtro={{ coluna: "edicao_id", valor: edicaoId! }} fixos={{ edicao_id: edicaoId }} podeEditar={pode} podeApagar legenda={legenda} vazio={vazio} />
+    <CrudTabela variante="secundario" tabela={tabela} colunas={colunas} campos={campos} ordem={[{ coluna: ordem }]} filtro={{ coluna: "edicao_id", valor: edicaoId! }} fixos={{ edicao_id: edicaoId }} podeEditar={pode} podeApagar legenda={legenda} vazio={vazio} />
   )
   return (
     <Pagina titulo={edicaoId === null ? "admin.edicaoNova.titulo" : "admin.edicao.titulo"} voltar={{ para: caminho("/admin/edicoes"), rotulo: t("admin.comum.voltar") }}>
@@ -105,7 +105,7 @@ export function Edicao() {
         {(ed) => (
           <>
             <Secao titulo="admin.edicao.dados">
-              {ed ? <p className="mb-4 text-corpo-p text-nevoa">{t("admin.edicoes.fase")}: {t(`admin.edicoes.fase.${faseDe(ed)}`)}</p> : null}
+              {ed ? <p className="mb-4 text-corpo-p text-cinza">{t("admin.edicoes.fase")}: {t(`admin.edicoes.fase.${faseDe(ed)}`)}</p> : null}
               {pode ? (
                 <FormularioRegistro
                   campos={EDICAO} linha={ed}

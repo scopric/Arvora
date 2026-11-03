@@ -20,8 +20,8 @@ export function FormularioRegistro({
   aoSalvar: (carga: Linha) => Promise<void>
   salvar?: Chave
   aoCancelar?: () => void
-  // "contorno" nos formulários secundários da tela: só um botão dourado por tela.
-  variante?: "primario" | "contorno"
+  // "secundario" (cinza cheio) nos formulários secundários da tela: só um botão dourado por tela.
+  variante?: "primario" | "secundario"
 }) {
   const t = useT()
   const [v, setV] = useState<Valores>(() => paraValores(campos, linha))
@@ -74,12 +74,12 @@ function CampoImagem({ rotulo, pasta, valor, aoMudar }: { rotulo: string; pasta:
   const acao = useAcao()
   return (
     <div>
-      <label className="mb-1.5 block text-corpo-p font-medium text-bruma">
+      <label className="mb-1.5 block text-corpo-p font-semibold text-creme">
         {rotulo}
         <input
           type="file"
           accept="image/png,image/jpeg,image/webp"
-          className="mt-2 block w-full text-corpo-p text-bruma"
+          className="mt-2 block w-full text-corpo-p text-cinza"
           onChange={(e) => {
             const arq = e.target.files?.[0]
             if (arq) void acao.rodar(async () => aoMudar(await enviarArquivo("imagens", pasta, arq)), "admin.comum.enviado")
@@ -87,8 +87,8 @@ function CampoImagem({ rotulo, pasta, valor, aoMudar }: { rotulo: string; pasta:
         />
       </label>
       {valor ? (
-        <p className="mt-2 flex items-center gap-3 text-corpo-p text-nevoa">
-          <img src={supabase.storage.from("imagens").getPublicUrl(valor).data.publicUrl} alt="" className="size-12 rounded object-cover" />
+        <p className="mt-2 flex items-center gap-3 text-corpo-p text-cinza">
+          <img src={supabase.storage.from("imagens").getPublicUrl(valor).data.publicUrl} alt="" className="size-12 rounded-sm object-cover" />
           <span className="break-all">{valor}</span>
           <button type="button" className={classeLink} onClick={() => aoMudar("")}>{t("admin.comum.remover")}</button>
         </p>
