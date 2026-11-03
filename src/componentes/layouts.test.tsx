@@ -64,7 +64,7 @@ describe("LayoutMembro", () => {
   it("barra superior tem as 4 áreas e acende a área pelo prefixo da rota", () => {
     montar({ nivel: "clube" }, "/pt/academy", <LayoutMembro />, "academy")
     const topo = screen.getByRole("navigation", { name: "Menu do membro" })
-    expect(within(topo).getAllByRole("link").map((l) => l.textContent)).toEqual(["Início", "Aprender", "Rede", "Awards"])
+    expect(within(topo).getAllByRole("link").map((l) => l.textContent)).toEqual(["Grupo Árvora", "Início", "Aprender", "Rede", "Awards"])
     expect(within(topo).getByRole("link", { name: "Aprender" }).getAttribute("aria-current")).toBe("page")
     expect(within(topo).getByRole("link", { name: "Início" }).getAttribute("aria-current")).toBeNull()
     expect(screen.getByRole("heading", { name: "Tela de dentro" })).toBeTruthy()

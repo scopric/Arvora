@@ -19,7 +19,7 @@ export function Bloqueado({ previa, frase, minimo = "grupo" }: { previa?: ReactN
     // App (MasterClass): bloco carvão; o véu é uma faixa sólida em ardósia no rodapé com hairline em cima, sem degradê.
     // O CTA do cadeado é secundário (cinza): o único dourado da tela continua sendo a ação principal dela (Decisão 70).
     return (
-      <section aria-label={rotulo} className="relative overflow-hidden rounded-lg bg-carvao">
+      <section aria-label={rotulo} className="relative overflow-hidden rounded-lg vidro-fundo">
         {previa ? (
           <div aria-hidden="true" inert className="pointer-events-none max-h-72 overflow-hidden p-6 blur-sm select-none">
             {previa}

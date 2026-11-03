@@ -17,7 +17,7 @@ const publico = {
 // App (molde Attio sobre os tokens do MasterClass): bloco carvão sem borda, cabeçalho 14px/600 cinza sem fundo,
 // divisórias em placa, hover sutil, números tabulares.
 const app = {
-  regiao: "overflow-x-auto rounded-lg bg-carvao focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado",
+  regiao: "overflow-x-auto rounded-lg vidro-fundo focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado",
   tabela: "w-full min-w-max text-left text-corpo-p",
   cabecalho: "border-b border-placa",
   th: "px-4 py-3 text-corpo-p font-semibold text-cinza",

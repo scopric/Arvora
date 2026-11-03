@@ -39,7 +39,7 @@ export function DialogoConfirmar({ aberto, titulo, texto, confirmar, perigo, des
       }}
       className={
         app
-          ? "m-auto w-[calc(100%-2rem)] max-w-md rounded-xl bg-placa p-6 text-creme shadow-borda-placa backdrop:bg-breu/80"
+          ? "m-auto w-[calc(100%-2rem)] max-w-md rounded-xl p-6 text-creme vidro backdrop:bg-breu/70 backdrop:backdrop-blur-sm"
           : "m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-creme/20 bg-painel p-6 text-creme backdrop:bg-black/60"
       }
     >

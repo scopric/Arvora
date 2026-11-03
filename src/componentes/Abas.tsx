@@ -10,7 +10,7 @@ const publico = {
 }
 
 // App (MasterClass "All Lessons / My Notes"): abas em texto com sublinhado dourado de 2px na ativa (menuApp).
-const app = { lista: "flex gap-6 overflow-x-auto border-b border-placa", aba: abaApp }
+const app = { lista: "flex gap-6 overflow-x-auto shadow-[inset_0_-1px_0_var(--color-placa)]", aba: abaApp }
 
 // Abas no padrão WAI-ARIA: setas esquerda/direita, Home e End movem e ativam; só a aba ativa entra na ordem de tab.
 export function Abas({ abas, rotulo, inicial }: { abas: Aba[]; rotulo: string; inicial?: string }) {

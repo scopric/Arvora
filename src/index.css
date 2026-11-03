@@ -103,9 +103,39 @@
   .app :is(b, strong) {
     font-weight: var(--font-weight-semibold);
   }
+  /* Palco do app (Decisão 70, camada "vidro"): breu com luz ambiente verde-floresta, estática. Os painéis de vidro
+     ficam por cima. Sem WebGL aqui (o da home pública não entra no app). */
   body:has(.app) {
     background-color: var(--color-breu);
+    background-image:
+      radial-gradient(70% 55% at 12% 0%, #1b3528 0%, transparent 65%),
+      radial-gradient(55% 45% at 92% 100%, #12291e 0%, transparent 65%);
+    background-attachment: fixed;
   }
+  /* Sem transparência (preferência do sistema) ou sem suporte a backdrop-filter: os painéis ficam opacos. */
+  @media (prefers-reduced-transparency: reduce) {
+    .vidro { background-color: var(--color-placa); backdrop-filter: none; }
+    .vidro-fundo { background-color: var(--color-carvao); backdrop-filter: none; }
+  }
+  @supports not (backdrop-filter: blur(1px)) {
+    .vidro { background-color: var(--color-placa); }
+    .vidro-fundo { background-color: var(--color-carvao); }
+  }
+}
+
+/* Vidro (Decisão 70, desvio consciente do MasterClass, que usa superfícies opacas): só em contêiner (cartão, barra,
+   trilho, popover, diálogo, folha), nunca em texto. Placa a 62% com desfoque, brilho de 1px no topo e hairline creme/7%.
+   Contraste medido contra o ponto mais claro do fundo (#1b3528): cinza 5,0 · creme 12,1. `vidro-fundo` é o vidro
+   mais escuro (carvão a 72%) para barra, trilho, tab bar, painel de filtros e tabela. */
+@utility vidro {
+  background-color: color-mix(in oklab, var(--color-placa) 62%, transparent);
+  backdrop-filter: blur(20px) saturate(1.15);
+  box-shadow: inset 0 1px 0 0 rgb(244 244 239 / 0.1), inset 0 0 0 1px rgb(244 244 239 / 0.07);
+}
+@utility vidro-fundo {
+  background-color: color-mix(in oklab, var(--color-carvao) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(1.15);
+  box-shadow: inset 0 1px 0 0 rgb(244 244 239 / 0.08), inset 0 0 0 1px rgb(244 244 239 / 0.06);
 }
 
 @keyframes subir {

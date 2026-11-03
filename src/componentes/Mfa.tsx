@@ -98,7 +98,7 @@ export function Mfa({ children }: { children: ReactNode }) {
   const formulario = (fator: string) => (
     <form onSubmit={(e) => verificar(e, fator)} noValidate className="mt-6 space-y-5">
       {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
-      <Campo rotulo={t("mfa.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" maxLength={7} className="text-center text-titulo-p tracking-[0.3em] tabular-nums" />
+      <Campo rotulo={t("mfa.codigo")} name="codigo" inputMode="numeric" autoComplete="one-time-code" maxLength={7} className="text-center text-titulo-p tracking-[0.3em] indent-[0.3em] tabular-nums" />
       <Botao type="submit" ocupado={ocupado}>{t("mfa.botao")}</Botao>
     </form>
   )

@@ -28,8 +28,8 @@ export const AREAS: Area[] = [
     icone: "aprender",
     secoes: "menu.secoesAprender",
     itens: [
-      { rotulo: "menu.academy", rota: "/academy", icone: "aprender" },
       { rotulo: "menu.aulas", rota: "/aulas", icone: "video", minimo: "grupo" },
+      { rotulo: "menu.academy", rota: "/academy", icone: "aprender" },
       { rotulo: "menu.bemEstar", rota: "/bem-estar", icone: "folha", minimo: "grupo" },
       { rotulo: "menu.tarefas", rota: "/tarefas", icone: "check", minimo: "grupo" },
     ],
