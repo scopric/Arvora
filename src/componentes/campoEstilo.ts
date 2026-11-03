@@ -18,8 +18,9 @@ const app = {
   ajuda: "mt-1.5 text-legenda text-nevoa",
 }
 
-// Um só lugar decide o visual de campo: Campo/Selecao e AreaTexto/Caixa do admin. Os campos soltos das áreas
-// (campoBase em aprender/util.ts, campoTexto em rede/componentes.tsx) copiam a string do app, porque essas áreas só existem no app.
+// Um só lugar decide o visual de campo: Campo/Selecao e AreaTexto/Caixa do admin.
 export function useEstiloCampo() {
   return useApp() ? app : publico
 }
+// Campo solto (textarea sem Campo) das áreas que só existem no app (aprender, rede): a mesma string do app, com a borda normal.
+export const campoApp = `${app.campo} ${app.bordaOk}`

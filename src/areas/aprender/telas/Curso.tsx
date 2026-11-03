@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
+import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone } from "../../../componentes/Icone"
@@ -11,7 +12,7 @@ import { carregarCurso, urlCapa } from "../curso"
 import { Pagina } from "../componentes/Pagina"
 import { nomeVertical } from "../tipos"
 import { useCarga } from "../useCarga"
-import { barraProgresso, botaoContorno, botaoLink, linkTexto } from "../util"
+import { barraProgresso, linkTexto } from "../util"
 
 // Curso: capa, descrição, módulos e aulas com progresso (ACA-01, ACA-03). O nível vale por aula: o Clube vê a amostra
 // (aulas de nível Clube) e o cadeado nas demais. Molde MasterClass (página da classe): herói com capa + título + CTA,
@@ -56,7 +57,7 @@ export function Curso() {
             {aulas.length ? (
               <div className="flex flex-wrap items-center gap-5">
                 {continuar ? (
-                  <Link to={caminho(`/academy/${curso.slug}/${continuar.slug}`)} className={algumBloqueio ? botaoContorno : botaoLink}>
+                  <Link to={caminho(`/academy/${curso.slug}/${continuar.slug}`)} className={algumBloqueio ? botaoContornoApp : botaoPrimarioApp}>
                     {progresso.has(continuar.id) ? t("aprender.curso.continuar") : t("aprender.curso.comecar")}
                   </Link>
                 ) : null}

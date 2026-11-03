@@ -6,6 +6,7 @@ import { Campo, Selecao } from "../../../componentes/Campo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Bloqueado } from "../../../componentes/Bloqueado"
+import { botaoContornoApp } from "../../../componentes/botaoEstilo"
 import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
 import { temNivel, useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
@@ -16,7 +17,7 @@ import { Pagina } from "../componentes/Pagina"
 import { QuandoAula } from "../componentes/QuandoAula"
 import { COLUNAS_AULA, type AulaLinha } from "../tipos"
 import { useCarga } from "../useCarga"
-import { botaoContorno, cartao, dados, linhas, linkTexto } from "../util"
+import { cartao, dados, linhas, linkTexto } from "../util"
 
 // No onboarding só os campos de perfil que importam já; o resto o membro completa em Meu perfil (mesmo schema).
 const passo1 = perfilSchema.pick({ nome: true, empresa_nome: true, setor_id: true, cidade: true, pais: true, visibilidade: true })
@@ -186,7 +187,7 @@ export function BemVindo() {
             </>
           )}
           <div className="flex flex-wrap items-center gap-4">
-            <button type="button" onClick={() => setEtapa(1)} className={botaoContorno}>{t("aprender.bemVindo.voltar")}</button>
+            <button type="button" onClick={() => setEtapa(1)} className={botaoContornoApp}>{t("aprender.bemVindo.voltar")}</button>
             <Botao ocupado={ocupado} className="sm:w-auto" onClick={() => (grupo ? void salvarRede() : setEtapa(3))}>{t("aprender.bemVindo.continuar")}</Botao>
             <button type="button" onClick={() => setEtapa(3)} className={linkTexto}>{t("aprender.bemVindo.pular")}</button>
           </div>
@@ -210,7 +211,7 @@ export function BemVindo() {
             <Bloqueado frase={t("aprender.aulas.bloqueado")} minimo="grupo" />
           )}
           <div className="flex flex-wrap items-center gap-4">
-            <button type="button" onClick={() => setEtapa(2)} className={botaoContorno}>{t("aprender.bemVindo.voltar")}</button>
+            <button type="button" onClick={() => setEtapa(2)} className={botaoContornoApp}>{t("aprender.bemVindo.voltar")}</button>
             <Botao variante={grupo ? "primario" : "contorno"} ocupado={ocupado} className="sm:w-auto" onClick={() => void concluir()}>{t("aprender.bemVindo.concluir")}</Botao>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { Link } from "react-router"
 import { Bloqueado } from "../../../componentes/Bloqueado"
+import { botaoContornoApp, botaoPrimarioApp } from "../../../componentes/botaoEstilo"
 import { Erro } from "../../../componentes/Erro"
 import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Icone, type NomeIcone } from "../../../componentes/Icone"
@@ -13,7 +14,7 @@ import { Pagina } from "../componentes/Pagina"
 import { QuandoAula } from "../componentes/QuandoAula"
 import { COLUNAS_AULA, type AulaLinha } from "../tipos"
 import { useCarga } from "../useCarga"
-import { botaoContorno, botaoLink, dados, foco, linhas, linkTexto } from "../util"
+import { dados, foco, linhas, linkTexto } from "../util"
 
 type Continua = { percentual: number; aulas: { slug: string; titulo: string; modulos: { cursos: { slug: string } | null } | null } | null }
 type Salvo = { id: number; aulas: { slug: string; titulo: string } | null; videos: { slug: string; titulo: string } | null }
@@ -100,7 +101,7 @@ export function Inicio() {
               <li>{t("aprender.inicio.passo3")}</li>
             </ol>
             {/* Um primário por tela: para o Clube o dourado é o do Bloqueado logo abaixo. */}
-            <Link to={caminho("/bem-vindo")} className={`${grupo ? botaoLink : botaoContorno} mt-5`}>{t("aprender.inicio.comecar")}</Link>
+            <Link to={caminho("/bem-vindo")} className={`${grupo ? botaoPrimarioApp : botaoContornoApp} mt-5`}>{t("aprender.inicio.comecar")}</Link>
           </section>
         ) : null}
 

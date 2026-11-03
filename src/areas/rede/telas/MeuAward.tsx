@@ -8,13 +8,12 @@ import { Esqueleto } from "../../../componentes/Esqueleto"
 import { Selo } from "../../../componentes/Selo"
 import { Vazio } from "../../../componentes/Vazio"
 import { useCaminho, useIdioma, useT, type Chave } from "../../../i18n"
-import { useEstiloCampo } from "../../../componentes/campoEstilo"
+import { campoApp, useEstiloCampo } from "../../../componentes/campoEstilo"
 import { linkTextoApp } from "../../../componentes/menuApp"
 import { PaginaApp } from "../../../componentes/PaginaApp"
 import { useAcesso } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
-import { campoTexto } from "../componentes"
 import { ok, quando, useCarga } from "../lib"
 
 type Pendente = { alteracao_pendente: { historia?: string; materia_url?: string; foto_path?: string; redes?: unknown } | null; alteracao_em: string | null }
@@ -108,7 +107,7 @@ function Premio({ p, edicao, categoria, pendente, aoMudar, primario }: {
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
           <div>
             <label htmlFor={`hi-${p.id}`} className={campo.rotulo}>{t("rede.meuAward.historia")}</label>
-            <textarea id={`hi-${p.id}`} name="historia" rows={6} maxLength={10000} defaultValue={pend?.historia ?? p.historia ?? ""} className={campoTexto} />
+            <textarea id={`hi-${p.id}`} name="historia" rows={6} maxLength={10000} defaultValue={pend?.historia ?? p.historia ?? ""} className={campoApp} />
           </div>
           <Campo rotulo={t("rede.meuAward.materia")} name="materia_url" type="url" maxLength={500} defaultValue={pend?.materia_url ?? p.materia_url ?? ""} placeholder="https://" ajuda={t("rede.meuAward.materiaAjuda")} />
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
