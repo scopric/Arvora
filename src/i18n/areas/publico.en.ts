@@ -190,5 +190,8 @@ export const publicoEn: Record<keyof typeof publicoPt, string> = {
   "publico.evento.assistir": "Watch the broadcast",
   "publico.evento.gravacao": "Ceremony recording",
   "publico.evento.premiados": "Winners",
+  "publico.hof.vazio": "Winners will appear here once they are published.",
+  "publico.hof.voltar": "Back to the Hall of Fame",
+  "publico.hof.materia": "Read the article",
   "publico.evento.convite": "The conversation continues inside Grupo Árvora. See the plans.",
 }

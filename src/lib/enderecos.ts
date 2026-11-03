@@ -7,7 +7,7 @@ const DO_APP = new Set([
   "notificacoes", "configuracoes", "checkout", "cadastrar-empresa",
 ])
 // Conteúdo que o visitante vê no site e o membro vê no app, com a sessão (COM_CASCA_DO_MEMBRO em LayoutPublico).
-const NOS_DOIS = new Set(["awards", "biblioteca", "originals", "directory", "evento", "suporte", "planos"])
+const NOS_DOIS = new Set(["awards", "biblioteca", "originals", "directory", "hall-of-fame", "evento", "suporte", "planos"])
 
 type Enderecos = { site: string; app: string; admin: string }
 const OFICIAIS: Enderecos = { site: SITE_URL, app: APP_URL, admin: ADMIN_URL }

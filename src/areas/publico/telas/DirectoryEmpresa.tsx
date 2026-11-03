@@ -81,7 +81,7 @@ function Conteudo({ e, logado }: { e: Empresa; logado: boolean }) {
       )}
       {p?.edicoes ? (
         <p className="mt-6">
-          <a href={caminho(`/hall-of-fame/${p.edicoes.slug}/${p.slug}`)} className={linkContorno}>{t("publico.directoryEmpresa.verPremiado")}</a>
+          <Link to={caminho(`/hall-of-fame/${p.edicoes.slug}/${p.slug}`)} className={linkContorno}>{t("publico.directoryEmpresa.verPremiado")}</Link>
         </p>
       ) : null}
       {parecidas.erro ? (

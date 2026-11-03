@@ -8,7 +8,8 @@ import { useCaminho, useIdioma, useT } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
 import { Barra, Mostrar, Pagina } from "../componentes/Pagina"
 import { exigir, useCarga } from "../lib/consulta"
-import { classeAcaoPrimaria, classeLink, contagem } from "../lib/estilo"
+import { botaoPrimarioApp } from "../../../componentes/botaoEstilo"
+import { classeLink, contagem } from "../lib/estilo"
 import { dataHora } from "../lib/formato"
 import { EDITA, usePode } from "../lib/papel"
 import { estadoAula } from "../lib/regras"
@@ -33,7 +34,7 @@ export function Aulas() {
   return (
     <Pagina titulo="admin.aulas.titulo" intro="admin.aulas.intro">
       {/* A barra fica fora do Mostrar: "Nova aula" continua à vista enquanto a lista carrega ou falha. */}
-      <Barra acoes={pode ? <Link className={classeAcaoPrimaria} to={caminho("/admin/aulas/nova")}>{t("admin.aulas.nova")}</Link> : null}>
+      <Barra acoes={pode ? <Link className={botaoPrimarioApp} to={caminho("/admin/aulas/nova")}>{t("admin.aulas.nova")}</Link> : null}>
         <div className="w-56">
           <Selecao rotulo={t("admin.aulas.filtroEstado")} value={filtro} onChange={(e) => setFiltro(e.target.value)}>
             <option value="">{t("admin.comum.todos")}</option>

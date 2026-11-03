@@ -8,13 +8,14 @@ import { CheckoutSucesso } from "./telas/CheckoutSucesso"
 import { Directory } from "./telas/Directory"
 import { DirectoryEmpresa } from "./telas/DirectoryEmpresa"
 import { Evento } from "./telas/Evento"
+import { HallOfFame, Premiado } from "./telas/HallOfFame"
 import { Legal } from "./telas/Legal"
 import { Originals } from "./telas/Originals"
 import { OriginalsEpisodio } from "./telas/OriginalsEpisodio"
 import { Planos } from "./telas/Planos"
 import { Suporte } from "./telas/Suporte"
 
-// Rotas da área publico (caminhos relativos a /:lang). Hall of Fame é pré-renderizado e não passa por aqui.
+// Rotas da área publico (caminhos relativos a /:lang).
 export function rotasPublico() {
   return (
     <>
@@ -32,6 +33,8 @@ export function rotasPublico() {
       <Route path="directory" element={<Directory />} />
       <Route path="directory/:slug" element={<DirectoryEmpresa />} />
       <Route path="cadastrar-empresa" element={<CadastrarEmpresa />} />
+      <Route path="hall-of-fame" element={<HallOfFame />} />
+      <Route path="hall-of-fame/:edicao/:slug" element={<Premiado />} />
       <Route path="evento/:edicao" element={<Evento />} />
     </>
   )

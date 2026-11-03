@@ -1,10 +1,11 @@
 import { useId, useState, type SubmitEvent } from "react"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
+import { campoApp } from "../../../componentes/campoEstilo"
 import { Selo } from "../../../componentes/Selo"
 import { useIdioma, useT, type Chave } from "../../../i18n"
 import { supabase } from "../../../lib/supabase"
-import { campoBase, cartao, dataCurta, linkTexto } from "../util"
+import { cartao, dataCurta, linkTexto } from "../util"
 import type { EntregaLinha, ExercicioLinha } from "../tipos"
 
 // Mesmos limites do bucket `entregas` (migration f2_03). PROVISÓRIO no banco; se mudarem lá, mudam aqui.
@@ -145,7 +146,7 @@ export function Exercicio({ exercicio, entrega, uid, podeEnviar, doGrupo = true,
             <label htmlFor={`${id}-t`} className="mb-1.5 block text-legenda font-medium text-bruma">
               {reenvio ? t("aprender.exercicio.novaResposta") : t("aprender.exercicio.suaResposta")}
             </label>
-            <textarea id={`${id}-t`} rows={6} value={texto} onChange={(e) => setTexto(e.target.value)} className={campoBase} />
+            <textarea id={`${id}-t`} rows={6} value={texto} onChange={(e) => setTexto(e.target.value)} className={campoApp} />
           </div>
           {exercicio.aceita_arquivo ? (
             <div>

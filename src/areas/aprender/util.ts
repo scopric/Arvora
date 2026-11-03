@@ -1,5 +1,4 @@
-import { botaoContornoApp, botaoPrimarioApp } from "../../componentes/botaoEstilo"
-import { linkTextoApp } from "../../componentes/menuApp"
+import { focoApp, linkTextoApp } from "../../componentes/menuApp"
 import { APP_URL } from "../../site"
 import { supabase } from "../../lib/supabase"
 
@@ -132,14 +131,9 @@ export function linhas<T>(r: { data: T[] | null; error: unknown }): T[] {
   return r.data ?? []
 }
 
-export const foco = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
-// Botões e link de texto desta área (só existe no app): mesmo spec do Botao (botaoEstilo.ts); o link sublinha em cinza e acende no hover.
-export const botaoLink = botaoPrimarioApp
-export const botaoContorno = botaoContornoApp
+// Foco e link de texto desta área (só existe no app): os mesmos do app (menuApp.ts). Botões-link usam botaoEstilo.ts direto.
+export const foco = focoApp
 export const linkTexto = linkTextoApp
-// Mesmo spec do Campo no app (campoEstilo.ts): esta área só existe dentro do escopo do app.
-export const campoBase =
-  "w-full rounded-md border border-cinza bg-creme/2 px-3.5 py-3 text-base text-creme placeholder:text-nevoa outline-none transition-colors focus-visible:border-bruma"
 // Cartão, caixa sutil e barra de progresso do app (molde Linear). <progress> nativo pintado: trilho fumaça, valor dourado.
 export const cartao = "rounded-xl p-5 shadow-borda"
 export const caixaSutil = "rounded-md bg-creme/2 px-4 py-3 text-base shadow-borda"
