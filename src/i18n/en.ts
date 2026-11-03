@@ -203,7 +203,7 @@ export const en: Record<keyof typeof pt, string> = {
   "perfil.setor.selecione": "Select",
   "perfil.cidade": "City",
   "perfil.pais": "Country",
-  "perfil.pais.ajuda": "2 letters",
+  "perfil.pais.selecione": "Select",
   "perfil.linkedin.exemplo": "https://linkedin.com/in/your-name",
   "perfil.instagram.exemplo": "your.username",
   "perfil.bio": "About you",

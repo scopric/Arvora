@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react"
+import { cleanup, render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter, Route, Routes } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -92,15 +92,22 @@ describe("Perfil em /en", () => {
 })
 
 describe("setor no select", () => {
-  const opcoes = () => screen.getAllByRole("option").map((o) => o.textContent)
+  const opcoes = async (nome: string) => within(await screen.findByRole("combobox", { name: nome })).getAllByRole("option").map((o) => o.textContent)
   it("EN mostra nome_en e cai em nome quando nome_en é nulo", async () => {
     ir("en")
-    await screen.findByRole("combobox")
-    expect(opcoes()).toEqual(["Select", "Education", "Outro"])
+    expect(await opcoes("Industry")).toEqual(["Select", "Education", "Outro"])
   })
   it("PT mostra nome", async () => {
     ir("pt")
-    await screen.findByRole("combobox")
-    expect(opcoes()).toEqual(["Selecione", "Educação", "Outro"])
+    expect(await opcoes("Setor")).toEqual(["Selecione", "Educação", "Outro"])
+  })
+})
+
+describe("país no select", () => {
+  it("nome no idioma da tela", async () => {
+    ir("en")
+    const pais = await screen.findByRole("combobox", { name: "Country" })
+    expect(within(pais).getByRole("option", { name: "Ireland" }).getAttribute("value")).toBe("IE")
+    expect(within(pais).getAllByRole("option")[0].textContent).toBe("Select")
   })
 })

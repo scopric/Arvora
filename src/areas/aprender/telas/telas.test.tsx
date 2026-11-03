@@ -343,6 +343,16 @@ describe("/bem-vindo", () => {
     expect((await screen.findAllByRole("alert"))[0].textContent).toMatch(/não conseguimos salvar/i)
     expect(screen.queryByText(/escolha o que faz sentido/i)).toBeNull()
   })
+  it("país é lista: escolher Irlanda grava IE", async () => {
+    falso.atual = criarFalso(base({ "perfis.update": ok([{ id: "u1" }]) }))
+    montar("bem-vindo", <BemVindo />, "/pt/bem-vindo")
+    const pais = await screen.findByRole("combobox", { name: "País" })
+    expect(pais.getAttribute("autocomplete")).toBe("country")
+    await userEvent.selectOptions(pais, "Irlanda")
+    await userEvent.click(screen.getByRole("button", { name: "Continuar" }))
+    await waitFor(() => expect(chamadas.some((c) => c.tabela === "perfis" && c.metodo === "update")).toBe(true))
+    expect(chamadas.find((c) => c.tabela === "perfis" && c.metodo === "update")?.args[0]).toMatchObject({ pais: "IE" })
+  })
   it("Grupo: percorre os 3 passos, grava procura/oferece e marca o onboarding", async () => {
     // Antes do upsert network_itens está vazio; depois dele, a leitura de conferência devolve o que ficou gravado.
     falso.atual = criarFalso(base({
