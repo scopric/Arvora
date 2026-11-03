@@ -11,7 +11,7 @@ import { useTituloNome } from "../tituloAba"
 import { useConsulta } from "../usarConsulta"
 
 // Só premiados publicados (a policy do banco já esconde o resto; o filtro explícito deixa a intenção escrita).
-// Os dados vêm do banco no navegador: o Hall of Fame não é mais pré-renderizado (Decisão 67).
+// Os dados vêm do banco no navegador: o Hall of Fame não é mais pré-renderizado.
 export function HallOfFame() {
   const t = useT()
   const caminho = useCaminho()
