@@ -63,6 +63,7 @@ export const publicoPt = {
   "publico.planos.aceite.falta": "Marque as duas confirmações para continuar.",
   "publico.planos.erroCheckout": "Não conseguimos abrir o pagamento agora. Tente de novo em instantes; se persistir, fale com o suporte.",
   "publico.planos.erroLimite": "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.",
+  "publico.planos.erroIdade": "Antes de assinar, confirme que tem 18 anos ou mais: abra a sua área de membro.",
   "publico.planos.erroJaAssina": "Você já tem uma assinatura. Para trocar de plano, use \"Gerenciar assinatura\" no seu perfil.",
   "publico.planos.faq.titulo": "Perguntas sobre cobrança",
   "publico.planos.faq.q1": "Quando sou cobrado?",  // PROVISÓRIO: validar com o cliente/solicitor

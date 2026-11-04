@@ -58,12 +58,14 @@ select is((select nome from public.perfis where id = '00000000-0000-0000-0000-00
           'perfil criado pelo gatilho com o nome do cadastro');
 select ok((select maior_18_em is not null from public.perfis where id = '00000000-0000-0000-0000-00000000000a'),
           'maioridade registrada');
-select throws_ok($$insert into auth.users (id, email, raw_user_meta_data)
-                   values (gen_random_uuid(), 'x@t.test', '{"nome":"X"}')$$,
-                 'P0001', 'maior_18_obrigatorio', 'cadastro sem declarar 18 anos e recusado');
-select throws_ok($$insert into auth.users (id, email, raw_user_meta_data)
-                   values (gen_random_uuid(), 'y@t.test', '{"nome":"Y","maior_18":"false"}')$$,
-                 'P0001', 'maior_18_obrigatorio', 'maior_18 diferente de true e recusado');
+-- Desde a f4_10 (Entrar com Google) a conta nasce sem a data e a pessoa declara depois (teste 240).
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000e8', 'x@t.test', '{"nome":"X"}'),
+  ('00000000-0000-0000-0000-0000000000e9', 'y@t.test', '{"nome":"Y","maior_18":"false"}');
+select ok((select maior_18_em is null from public.perfis where id = '00000000-0000-0000-0000-0000000000e8'),
+          'cadastro sem declarar 18 anos nasce sem a data');
+select ok((select maior_18_em is null from public.perfis where id = '00000000-0000-0000-0000-0000000000e9'),
+          'maior_18 diferente de true nao registra a data');
 
 -- 3) perfis: dono e terceiros ----------------------------------------------------------------
 select tt.como('00000000-0000-0000-0000-00000000000a');

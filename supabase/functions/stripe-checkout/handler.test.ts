@@ -1,5 +1,11 @@
 import { deepEqual, equal, ok } from "node:assert/strict";
-import { type Consultas, type Deps, handle, type Plano } from "./handler.ts";
+import {
+  type Consultas,
+  type Deps,
+  handle,
+  MaioridadePendente,
+  type Plano,
+} from "./handler.ts";
 
 const SITE = "https://site.exemplo";
 const CHAVE = "chave_falsa_conta_1";
@@ -10,7 +16,7 @@ function montar(o: {
   customer?: string | null;
   vigente?: boolean;
   limite?: boolean | "erro";
-  aceite?: "erro";
+  aceite?: "erro" | "idade";
   env?: Record<string, string>;
   stripe?: () => Response;
 } = {}) {
@@ -42,6 +48,7 @@ function montar(o: {
     temAssinaturaVigente: () => Promise.resolve(o.vigente ?? false),
     registrarAceite: (id, v) => {
       if (o.aceite === "erro") return Promise.reject(new Error("rpc"));
+      if (o.aceite === "idade") return Promise.reject(new MaioridadePendente());
       aceites.push([id, v]);
       return Promise.resolve();
     },
@@ -196,6 +203,14 @@ Deno.test("checkout: já assinante (em qualquer conta) é 409", async () => {
   const r = await handle(post({ plano_id: 7 }), deps);
   equal(r.status, 409);
   deepEqual(await r.json(), { erro: "assinatura_existente" });
+  equal(chamadas.length, 0);
+});
+
+Deno.test("checkout: sem a declaração de 18 anos é 403 sem chamar o Stripe", async () => {
+  const { deps, chamadas } = montar({ aceite: "idade" });
+  const r = await handle(post({ plano_id: 7 }), deps);
+  equal(r.status, 403);
+  deepEqual(await r.json(), { erro: "maior_18_pendente" });
   equal(chamadas.length, 0);
 });
 

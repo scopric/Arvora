@@ -112,6 +112,8 @@ const CODIGOS: Record<string, Chave> = {
   receita_obrigatoria: "admin.cod.receita_obrigatoria",
   membro_obrigatorio: "admin.cod.membro_obrigatorio",
   valor_maior_que_receita: "admin.cod.valor_maior_que_receita",
+  meet_nao_configurado: "admin.cod.meet_nao_configurado",
+  google: "admin.cod.meet_google",
 }
 
 export function textoErro(e: unknown, t: (c: Chave) => string): string {

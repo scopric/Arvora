@@ -165,6 +165,8 @@ export const contaPt = {
   "conta.dados.excluir.dialogoTitulo": "Excluir a conta?",
   "conta.dados.excluir.dialogoTexto": "A exclusão é definitiva e não pode ser desfeita. No próximo passo pedimos seu e-mail e sua senha para confirmar.",
   "conta.dados.excluir.continuar": "Continuar",
+  "conta.dados.excluir.semSenha": "Se você entra só pelo Google e ainda não criou uma senha, crie uma antes de excluir a conta:",
+  "conta.dados.excluir.criarSenha": "criar senha",
   "conta.dados.excluir.etapa2": "Último passo: confirme com o e-mail e a senha da conta.",
   "conta.notificacoes.hoje": "Hoje",
   "conta.notificacoes.semana": "Últimos 7 dias",

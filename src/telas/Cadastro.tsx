@@ -2,6 +2,7 @@ import { useState, type SubmitEvent } from "react"
 import { Link, Navigate } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
+import { BotaoGoogle } from "../componentes/BotaoGoogle"
 import { Campo } from "../componentes/Campo"
 import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
@@ -113,6 +114,11 @@ export function Cadastro() {
           {t("cadastro.botao")}
         </Botao>
       </form>
+      {/* Pelo Google a declaração de 18 anos é pedida no primeiro acesso (RotaProtegida). */}
+      <div className="mt-5 space-y-5">
+        <p className="text-center text-sm text-creme/70">{t("auth.ou")}</p>
+        <BotaoGoogle aoFalhar={() => setAviso("auth.googleFalhou")} />
+      </div>
       <p className="mt-6 text-sm text-creme/70">
         {t("cadastro.jaTemConta")}{" "}
         <Link to={caminho("/entrar")} className="underline decoration-dourado underline-offset-4">

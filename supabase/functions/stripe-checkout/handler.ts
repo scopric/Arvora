@@ -8,6 +8,9 @@ import {
   stripePost,
 } from "../_shared/stripe-api.ts";
 
+// Conta do Google que ainda não declarou 18 anos (f4_10): o banco recusa o aceite; não é erro interno.
+export class MaioridadePendente extends Error {}
+
 export type Plano = {
   conta_stripe_id: number;
   stripe_price_id: string;
@@ -134,6 +137,9 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     }
     return json({ url: sessao.url }, 200, site);
   } catch (e) {
+    if (e instanceof MaioridadePendente) {
+      return json({ erro: "maior_18_pendente" }, 403, site);
+    }
     if (e instanceof ErroStripe) {
       console.error(`stripe-checkout: ${e.message}`);
       return json({ erro: "stripe" }, 502, site);

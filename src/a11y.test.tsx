@@ -51,7 +51,7 @@ const telas: [string, () => void][] = [
 ]
 
 // Layouts: público (visitante), membro (Clube e Grupo) e admin (equipe em aal2), nos dois idiomas.
-const logado = { user: { id: "u1", email: "ana@exemplo.invalid" } }
+const logado = { user: { id: "u1", email: "ana@exemplo.invalid", user_metadata: { maior_18: "true" } } }
 const comAcesso = (acesso: object, url: string) => {
   estado.sessao = logado
   render(

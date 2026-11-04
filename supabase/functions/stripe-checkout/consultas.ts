@@ -4,7 +4,7 @@ import {
   type Sb,
   usuarioDoJwt,
 } from "../_shared/supabase-usuario.ts";
-import type { Consultas } from "./handler.ts";
+import { type Consultas, MaioridadePendente } from "./handler.ts";
 
 export const consultas = (sb: Sb): Consultas => ({
   usuario: () => usuarioDoJwt(sb),
@@ -31,6 +31,13 @@ export const consultas = (sb: Sb): Consultas => ({
       p_plano_id: planoId,
       p_versao: versao,
     });
+    if (
+      String((error as { message?: unknown } | null)?.message).includes(
+        "maior_18_pendente",
+      )
+    ) {
+      throw new MaioridadePendente();
+    }
     if (error) throw new Error("aceite falhou");
   },
   temAssinaturaVigente: async (uid) =>

@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { renderiza } from "../testeUtil"
 import { Entrar } from "./Entrar"
 
-const auth = vi.hoisted(() => ({ signInWithPassword: vi.fn(), resend: vi.fn() }))
+const auth = vi.hoisted(() => ({ signInWithPassword: vi.fn(), resend: vi.fn(), signInWithOAuth: vi.fn() }))
 const estado = vi.hoisted(() => ({ sessao: null as object | null }))
 vi.mock("../lib/sessao", () => ({ useAuth: () => ({ sessao: estado.sessao, carregando: false }) }))
 vi.mock("../lib/supabase", () => ({ supabase: { auth } }))
@@ -54,5 +54,27 @@ describe("Entrar: destino", () => {
       </MemoryRouter>,
     )
     expect(await screen.findByText("tela inicio")).toBeTruthy()
+  })
+})
+
+describe("Entrar: Google", () => {
+  it("chama o OAuth do Google voltando para /entrar com o destino", async () => {
+    auth.signInWithOAuth.mockResolvedValue({ error: null })
+    renderiza(<Entrar />, "/pt/entrar?de=/pt/aulas")
+    await userEvent.click(screen.getByRole("button", { name: "Continuar com o Google" }))
+    const volta = new URL(auth.signInWithOAuth.mock.calls[0][0].options.redirectTo)
+    expect(auth.signInWithOAuth.mock.calls[0][0].provider).toBe("google")
+    expect(volta.pathname).toBe("/pt/entrar")
+    expect(volta.searchParams.get("de")).toBe("/pt/aulas")
+  })
+
+  it("volta do Google com ?code= sem sessão (troca falhou) mostra o aviso", async () => {
+    renderiza(<Entrar />, "/pt/entrar?code=abc")
+    expect(await screen.findByText(/Não foi possível entrar com o Google/)).toBeTruthy()
+  })
+
+  it("volta do Google com ?error= mostra o aviso", async () => {
+    renderiza(<Entrar />, "/pt/entrar?error=access_denied")
+    expect(await screen.findByText(/Não foi possível entrar com o Google/)).toBeTruthy()
   })
 })

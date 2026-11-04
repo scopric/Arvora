@@ -20,6 +20,7 @@ export async function iniciarCheckoutComAceite(planoId: number, idioma: Idioma):
     const { status } = error.context
     if (status === 429) return "publico.planos.erroLimite"
     if (status === 409) return "publico.planos.erroJaAssina"
+    if (status === 403) return "publico.planos.erroIdade"
   }
   const url = typeof data?.url === "string" && URL.canParse(data.url) ? new URL(data.url) : null
   if (error || url?.protocol !== "https:" || !HOSTS.includes(url.hostname)) return "publico.planos.erroCheckout"

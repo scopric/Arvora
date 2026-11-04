@@ -2,6 +2,7 @@ import { useState, type SubmitEvent } from "react"
 import { Link, Navigate, useLocation, useNavigate } from "react-router"
 import { Aviso } from "../componentes/Aviso"
 import { Botao } from "../componentes/Botao"
+import { BotaoGoogle } from "../componentes/BotaoGoogle"
 import { Campo } from "../componentes/Campo"
 import { Turnstile } from "../componentes/Turnstile"
 import { LayoutAuth } from "../componentes/LayoutAuth"
@@ -13,7 +14,7 @@ import { supabase } from "../lib/supabase"
 import { errosPorCampo, loginSchema, mensagemDeErroAuth, type CamposDeErro } from "../lib/validacao"
 
 export function Entrar() {
-  const { sessao } = useAuth()
+  const { sessao, carregando } = useAuth()
   const caminho = useCaminho()
   const t = useT()
   useTitulo("titulo.entrar", true)
@@ -25,9 +26,12 @@ export function Entrar() {
   const origem = caminhoInterno(de) ?? caminho(inicioDepoisDoLogin(window.location.origin))
   const [erros, setErros] = useState<CamposDeErro>({})
   // Conta de membro que tentou o painel volta aqui com ?motivo=membro (Decisão 67).
-  const [aviso, setAviso] = useState<Chave | null>(() =>
-    ehPainel(window.location.origin) && new URLSearchParams(local.search).get("motivo") === "membro" ? "entrar.contaDeMembro" : null,
-  )
+  // ?error= é a volta do Google com falha (recusou o acesso, ou o Auth não criou a conta).
+  const [aviso, setAviso] = useState<Chave | null>(() => {
+    const busca = new URLSearchParams(local.search)
+    if (busca.has("error")) return "auth.googleFalhou"
+    return ehPainel(window.location.origin) && busca.get("motivo") === "membro" ? "entrar.contaDeMembro" : null
+  })
   const [ocupado, setOcupado] = useState(false)
   // E-mail da última tentativa recusada por falta de confirmação: habilita o reenvio do link.
   const [semConfirmar, setSemConfirmar] = useState<string | null>(null)
@@ -35,6 +39,8 @@ export function Entrar() {
   const captcha = useCaptcha()
 
   if (sessao) return <Navigate to={origem} replace />
+  // Voltou do Google com ?code= e a troca pela sessão falhou (código vencido, aberto em outro navegador): avisa.
+  const trocaFalhou = !carregando && new URLSearchParams(local.search).has("code")
 
   async function enviar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -68,7 +74,7 @@ export function Entrar() {
   return (
     <LayoutAuth titulo={t("entrar.titulo")} subtitulo={t("entrar.subtitulo")}>
       <form onSubmit={enviar} noValidate className="space-y-5">
-        {aviso ? <Aviso tipo="erro">{t(aviso)}</Aviso> : null}
+        {aviso || trocaFalhou ? <Aviso tipo="erro">{t(aviso ?? "auth.googleFalhou")}</Aviso> : null}
         {semConfirmar ? (
           <div className="space-y-3">
             {reenvio ? <Aviso tipo={reenvio === "entrar.reenviado" ? "ok" : "erro"}>{t(reenvio)}</Aviso> : null}
@@ -84,6 +90,13 @@ export function Entrar() {
           {t("entrar.botao")}
         </Botao>
       </form>
+      {/* No painel só a equipe entra, com e-mail, senha e 2FA (Decisão 67). */}
+      {ehPainel(window.location.origin) ? null : (
+        <div className="mt-5 space-y-5">
+          <p className="text-center text-sm text-creme/70">{t("auth.ou")}</p>
+          <BotaoGoogle destino={de ? origem : undefined} aoFalhar={() => setAviso("auth.googleFalhou")} />
+        </div>
+      )}
       <p className="mt-6 text-sm text-creme/70">
         <Link to={caminho("/recuperar-senha")} className="underline decoration-dourado underline-offset-4">
           {t("entrar.esqueci")}
