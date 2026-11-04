@@ -380,7 +380,7 @@ export const adminPt = {
   "admin.equipe.enviarConvite": "Enviar convite",
   "admin.equipe.convidado": "Convite enviado. A pessoa aparece na lista com o papel escolhido.",
   "admin.cod.conta_existe": "Este e-mail já tem conta. Adicione a pessoa pela busca por nome.",
-  "admin.cod.conta_pendente": "Este e-mail tem um cadastro ainda não confirmado. Peça à pessoa para confirmar o e-mail dela e depois adicione pela busca por nome.",
+  "admin.cod.conta_pendente": "Não foi possível convidar este e-mail agora. Tente de novo em instantes; se repetir, fale com o suporte técnico.",
   "admin.cod.limite_email": "Limite de envio de e-mails atingido. Tente de novo mais tarde.",
   "admin.cod.convite_papel": "O e-mail saiu, mas o papel não foi gravado. Envie o convite de novo.",
   "admin.cod.convite_entrada": "Confira o nome, o e-mail e o papel.",

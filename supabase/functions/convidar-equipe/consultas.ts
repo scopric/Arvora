@@ -19,13 +19,14 @@ export const consultas = (sb: Sb): Consultas => ({
   },
 });
 
-// Cadastro não confirmado com senha (public.email_cadastro_pendente, só service_role). Erro lança: nunca convida sem saber.
+// id de cadastro não confirmado com senha (public.email_cadastro_pendente, só service_role), ou null.
+// Erro lança: nunca convida sem saber.
 // deno-lint-ignore no-explicit-any
-async function pendente(admin: any, email: string): Promise<boolean> {
+async function pendente(admin: any, email: string): Promise<string | null> {
   const { data, error } = await admin.rpc("email_cadastro_pendente", {
     p_email: email,
   });
-  if (error || typeof data !== "boolean") {
+  if (error || (data !== null && typeof data !== "string")) {
     throw new Error("checagem do cadastro falhou");
   }
   return data;
@@ -35,7 +36,15 @@ async function pendente(admin: any, email: string): Promise<boolean> {
 // deno-lint-ignore no-explicit-any
 export const convidarNoAuth =
   (admin: any): Deps["convidar"] => async ({ email, nome, idioma }) => {
-    if (await pendente(admin, email)) return "pendente";
+    // Cadastro com senha e sem confirmar: a conta nunca entrou (confirmação obrigatória) e a senha pode ser de
+    // quem usou o e-mail alheio. Apaga e convida do zero; confirmar esse cadastro entregaria a conta a essa pessoa.
+    const antigo = await pendente(admin, email);
+    if (antigo) {
+      const { error: e } = await admin.auth.admin.deleteUser(antigo);
+      if (e) {
+        throw new Error(`cadastro pendente não apagado (${e.status ?? "?"})`);
+      }
+    }
     // nome e idioma vão ao metadado: o gatilho criar_perfil usa o nome e o modelo do e-mail usa o idioma.
     const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
       data: { nome, idioma },

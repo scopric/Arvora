@@ -3,8 +3,9 @@
 // (SMTP do Resend, modelo supabase/templates/invite.html); o perfil nasce pelo gatilho criar_perfil e o papel
 // entra em `equipe` com o JWT de quem convida, então o RLS confere de novo.
 // Conta já confirmada não recebe convite: 409 conta_existe, e a tela manda usar a busca por nome.
-// Cadastro não confirmado COM senha: 409 conta_pendente. O convite reaproveitaria a conta e a senha de quem se
-// cadastrou com o e-mail continuaria valendo (tomada de conta com papel). Ela confirma o próprio e-mail e entra pela busca.
+// Cadastro não confirmado COM senha: o convite reaproveitaria a conta e a senha de quem se cadastrou com o e-mail
+// continuaria valendo (tomada de conta com papel). convidarNoAuth apaga esse cadastro e convida do zero; se um
+// cadastro com senha aparecer de novo logo depois do convite (corrida), 409 conta_pendente e nenhum papel.
 // Convite ainda pendente (sem senha) reenvia o e-mail e regrava o papel (upsert).
 // Nada de e-mail ou nome no log.
 import { aalDoJwt } from "../_shared/jwt.ts";
@@ -19,7 +20,7 @@ export type Convite = { email: string; nome: string; idioma: "pt" | "en" };
 export type Deps = {
   env: (nome: string) => string | undefined;
   db: (authorization: string) => Consultas;
-  // id da conta convidada; "existe" = conta confirmada; "pendente" = cadastro não confirmado com senha;
+  // id da conta convidada; "existe" = conta confirmada; "pendente" = cadastro com senha surgiu durante o convite;
   // "limite" = limite de envio de e-mails do Auth
   convidar: (
     c: Convite,
