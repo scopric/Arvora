@@ -56,6 +56,11 @@ export const convidarNoAuth =
     }
     // De novo depois do convite: fecha a janela de um cadastro com senha feito entre a 1ª checagem e o convite
     // (cadastro depois do convite não grava senha).
-    if (await pendente(admin, email)) return "pendente";
+    // Se a conta convidada for de quem se cadastrou nesse meio-tempo, apaga: o convite da vítima morre com ela.
+    const corrida = await pendente(admin, email);
+    if (corrida) {
+      await admin.auth.admin.deleteUser(corrida);
+      return "pendente";
+    }
     return { id: data.user.id };
   };
