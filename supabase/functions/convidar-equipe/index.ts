@@ -13,11 +13,20 @@ Deno.serve((req) =>
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
         { auth: { persistSession: false, autoRefreshToken: false } },
       );
+      const { data: pendente, error: e } = await admin.rpc(
+        "email_cadastro_pendente",
+        { p_email: email },
+      );
+      if (e || typeof pendente !== "boolean") {
+        throw new Error("checagem do cadastro falhou");
+      }
+      if (pendente) return "pendente";
       // nome e idioma vão ao metadado: o gatilho criar_perfil usa o nome e o modelo do e-mail usa o idioma.
       const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
         data: { nome, idioma },
       });
       if (error?.code === "email_exists") return "existe";
+      if (error?.code === "over_email_send_rate_limit") return "limite";
       if (error || !data.user) {
         throw new Error(`convite falhou (${error?.status ?? "?"})`);
       }

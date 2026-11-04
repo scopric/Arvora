@@ -1431,6 +1431,9 @@ isOneToOne: false
 "declarar_maior_18":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
+"email_cadastro_pendente":
+{ Args: { "p_email": string }; Returns: boolean
+                           },
 "email_do_membro":
 { Args: { "perfil": string }; Returns: string
                            },

@@ -16,7 +16,7 @@ const req = (corpo: unknown = CORPO, aal = "aal2") =>
 function montar(
   o: {
     papel?: string | null;
-    convite?: { id: string } | "existe";
+    convite?: { id: string } | "existe" | "pendente" | "limite";
     gravar?: () => Promise<void>;
   } = {},
 ) {
@@ -85,6 +85,22 @@ Deno.test("conta já confirmada: 409 conta_existe, sem gravar papel", async () =
   const r = await handle(req(), deps);
   equal(r.status, 409);
   deepEqual(await r.json(), { erro: "conta_existe" });
+  equal(gravados.length, 0);
+});
+
+Deno.test("cadastro pendente com senha: 409 conta_pendente, sem gravar papel", async () => {
+  const { deps, gravados } = montar({ convite: "pendente" });
+  const r = await handle(req(), deps);
+  equal(r.status, 409);
+  deepEqual(await r.json(), { erro: "conta_pendente" });
+  equal(gravados.length, 0);
+});
+
+Deno.test("limite de e-mails do Auth: 429 limite_email", async () => {
+  const { deps, gravados } = montar({ convite: "limite" });
+  const r = await handle(req(), deps);
+  equal(r.status, 429);
+  deepEqual(await r.json(), { erro: "limite_email" });
   equal(gravados.length, 0);
 });
 

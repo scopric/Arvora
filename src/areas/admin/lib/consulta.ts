@@ -115,6 +115,8 @@ const CODIGOS: Record<string, Chave> = {
   meet_nao_configurado: "admin.cod.meet_nao_configurado",
   google: "admin.cod.meet_google",
   conta_existe: "admin.cod.conta_existe",
+  conta_pendente: "admin.cod.conta_pendente",
+  limite_email: "admin.cod.limite_email",
   papel: "admin.cod.convite_papel",
   entrada: "admin.cod.convite_entrada",
 }

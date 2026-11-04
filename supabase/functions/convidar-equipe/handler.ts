@@ -3,7 +3,9 @@
 // (SMTP do Resend, modelo supabase/templates/invite.html); o perfil nasce pelo gatilho criar_perfil e o papel
 // entra em `equipe` com o JWT de quem convida, então o RLS confere de novo.
 // Conta já confirmada não recebe convite: 409 conta_existe, e a tela manda usar a busca por nome.
-// Convite de conta ainda não confirmada reenvia o e-mail e regrava o papel (upsert).
+// Cadastro não confirmado COM senha: 409 conta_pendente. O convite reaproveitaria a conta e a senha de quem se
+// cadastrou com o e-mail continuaria valendo (tomada de conta com papel). Ela confirma o próprio e-mail e entra pela busca.
+// Convite ainda pendente (sem senha) reenvia o e-mail e regrava o papel (upsert).
 // Nada de e-mail ou nome no log.
 import { aalDoJwt } from "../_shared/jwt.ts";
 import { cors, json } from "../_shared/stripe-api.ts";
@@ -17,8 +19,11 @@ export type Convite = { email: string; nome: string; idioma: "pt" | "en" };
 export type Deps = {
   env: (nome: string) => string | undefined;
   db: (authorization: string) => Consultas;
-  // id da conta convidada, ou "existe" se o e-mail já tem conta confirmada
-  convidar: (c: Convite) => Promise<{ id: string } | "existe">;
+  // id da conta convidada; "existe" = conta confirmada; "pendente" = cadastro não confirmado com senha;
+  // "limite" = limite de envio de e-mails do Auth
+  convidar: (
+    c: Convite,
+  ) => Promise<{ id: string } | "existe" | "pendente" | "limite">;
 };
 
 const PAPEIS = ["super_admin", "editor", "corretor", "moderador", "auditor"];
@@ -68,6 +73,8 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     const { papel, ...dados } = convite;
     const r = await deps.convidar(dados);
     if (r === "existe") return json({ erro: "conta_existe" }, 409, site);
+    if (r === "pendente") return json({ erro: "conta_pendente" }, 409, site);
+    if (r === "limite") return json({ erro: "limite_email" }, 429, site);
     try {
       await db.gravarPapel(r.id, papel);
     } catch {

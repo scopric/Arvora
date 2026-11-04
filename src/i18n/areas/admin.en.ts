@@ -382,6 +382,8 @@ export const adminEn: Record<keyof typeof adminPt, string> = {
   "admin.equipe.enviarConvite": "Send invite",
   "admin.equipe.convidado": "Invite sent. The person shows up in the list with the chosen role.",
   "admin.cod.conta_existe": "This email already has an account. Add the person by name search.",
+  "admin.cod.conta_pendente": "This email has a sign-up that was never confirmed. Ask the person to confirm their email, then add them by name search.",
+  "admin.cod.limite_email": "Email sending limit reached. Try again later.",
   "admin.cod.convite_papel": "The email went out, but the role was not saved. Send the invite again.",
   "admin.cod.convite_entrada": "Check the name, email and role.",
   "admin.papel.super_admin": "Super admin",
