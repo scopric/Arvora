@@ -40,6 +40,12 @@ describe("tela Confirmar", () => {
     await userEvent.click(screen.getByRole("button", { name: "Confirmar" }))
     expect(await screen.findByText("tela redefinir")).toBeTruthy()
   })
+  it("invite: convite da equipe leva a criar a senha", async () => {
+    verifyOtp.mockResolvedValue({ data: { session: {} }, error: null })
+    abrir("?token_hash=abc&type=invite")
+    await userEvent.click(screen.getByRole("button", { name: "Confirmar" }))
+    expect(await screen.findByText("tela redefinir")).toBeTruthy()
+  })
 
   it("token ausente ou tipo desconhecido: link inválido, sem chamar o servidor", () => {
     abrir("?type=signup")

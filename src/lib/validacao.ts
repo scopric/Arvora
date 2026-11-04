@@ -99,5 +99,5 @@ export function mensagemDeErroAuth(erro: { message?: string; code?: string; stat
 // Parâmetros do link enviado por e-mail (/confirmar): só os tipos que os modelos de e-mail geram.
 export const confirmarSchema = z.object({
   token_hash: z.string().min(1),
-  type: z.enum(["signup", "recovery", "email_change"]),
+  type: z.enum(["signup", "recovery", "email_change", "invite"]),
 })

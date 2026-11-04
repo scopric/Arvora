@@ -251,6 +251,10 @@ content_path = "./supabase/templates/confirmation.html"
 subject = "Redefinir sua senha · Reset your password"
 content_path = "./supabase/templates/recovery.html"
 
+[auth.email.template.invite]
+subject = "Convite para a equipe · Team invite"
+content_path = "./supabase/templates/invite.html"
+
 [auth.email.template.email_change]
 subject = "Confirme a troca de e-mail · Confirm your email change"
 content_path = "./supabase/templates/email_change.html"

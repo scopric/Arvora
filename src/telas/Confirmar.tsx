@@ -28,7 +28,8 @@ export function Confirmar() {
       if (error) return setAviso(mensagemDeErroAuth(error))
       // Com confirmação dupla, o 1º link da troca de e-mail só registra o aceite (resposta sem sessão); o 2º conclui.
       if (dados.data.type === "email_change" && !data?.session) return setRegistrado(true)
-      navegar(caminho(dados.data.type === "recovery" ? "/redefinir-senha" : "/inicio"), { replace: true })
+      // Convite da equipe: a conta nasce sem senha, então segue para criar uma.
+      navegar(caminho(dados.data.type === "recovery" || dados.data.type === "invite" ? "/redefinir-senha" : "/inicio"), { replace: true })
     } catch {
       setAviso("confirmar.erro")
     } finally {
