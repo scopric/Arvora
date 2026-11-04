@@ -83,6 +83,18 @@ export const quando = (iso: string, idioma: string) =>
 export const dia = (iso: string, idioma: string) =>
   new Intl.DateTimeFormat(local(idioma), { dateStyle: "medium", timeZone: "Europe/Dublin" }).format(new Date(iso))
 
+// Tempo relativo do feed ("há 9 minutos"), como no Nextdoor; depois de 7 dias vira a data. A data e hora cheias vão no `title`.
+export function ha(iso: string, idioma: string, agora = Date.now()) {
+  const s = (new Date(iso).getTime() - agora) / 1000
+  const rtf = new Intl.RelativeTimeFormat(local(idioma), { numeric: "auto" })
+  const a = Math.abs(s)
+  if (a < 60) return rtf.format(0, "second") // "agora" / "now"
+  if (a < 3600) return rtf.format(Math.round(s / 60), "minute")
+  if (a < 86_400) return rtf.format(Math.round(s / 3600), "hour")
+  if (a < 7 * 86_400) return rtf.format(Math.round(s / 86_400), "day")
+  return dia(iso, idioma)
+}
+
 // Data a partir da qual um pedido recusado/cancelado pode ser refeito.
 export const podePedirDe = (c: Conexao): Date => new Date(new Date(c.respondida_em ?? c.pedida_em).getTime() + DIAS_NOVO_PEDIDO * 86_400_000)
 

@@ -17,7 +17,7 @@ const OK_ESCRITA: R = { data: [{ id: 1 }], error: null }
 function consulta(tabela: string) {
   let escrita: string | null = null
   const q: Record<string, unknown> = {}
-  for (const m of ["select", "eq", "neq", "in", "lte", "or", "order", "limit"]) q[m] = () => q
+  for (const m of ["select", "eq", "neq", "in", "is", "lte", "or", "order", "limit"]) q[m] = () => q
   for (const op of ["insert", "update", "delete"]) q[op] = (args: unknown) => ((escrita = op), resp.chamadas.push({ onde: `${tabela}.${op}`, args }), q)
   const valor = () => (escrita ? (resp.escritas[`${tabela}.${escrita}`] ?? OK_ESCRITA) : (resp.tabelas[tabela] ?? { data: [], error: null }))
   q.maybeSingle = () => {
