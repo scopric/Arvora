@@ -203,8 +203,12 @@ function Caixa({ rotulo, convite, botao, maximo, aoEnviar, primario, autor, id: 
   )
 }
 
-// `aoContar`: informa ao post quantos comentários a conversa aberta tem (a contagem acompanha comentar e apagar sem reler o feed).
-function Comentarios({ postId, uid, aoContar }: { postId: number; uid: string; aoContar: (n: number | null) => void }) {
+type Ultimo = { autor_id: string | null; autor: string | null; corpo: string; criado_em: string }
+type Conversa = { n: number | null; ultimo: Ultimo | null }
+
+// `aoContar`: informa ao post a contagem e o comentário mais recente da conversa aberta, para a pílula e a prévia
+// acompanharem comentar e apagar sem reler o feed.
+function Comentarios({ postId, uid, aoContar }: { postId: number; uid: string; aoContar: (c: Conversa) => void }) {
   const t = useT()
   const { estado, recarregar } = useCarga(async () => {
     // ponytail: os 100 mais recentes (desc + limite) e inverte para ler do mais antigo; paginar comentários antigos se algum post passar disso.
@@ -212,11 +216,13 @@ function Comentarios({ postId, uid, aoContar }: { postId: number; uid: string; a
     const lista = [...recentes].reverse()
     return { lista, autores: await vitrinesPorId(lista.map((c) => c.autor_id)) }
   }, postId)
-  const total = estado.fase === "pronto" ? estado.dados.lista.length : null
-  // ponytail: no limite de 100 a lista não sabe o total; fica a contagem do feed.
+  // ponytail: no limite de 100 a lista não sabe o total; fica a contagem do feed (n = null).
   useEffect(() => {
-    if (total !== null) aoContar(total < 100 ? total : null)
-  }, [total, aoContar])
+    if (estado.fase !== "pronto") return
+    const { lista, autores } = estado.dados
+    const u = lista.findLast((c) => !c.oculto_em)
+    aoContar({ n: lista.length < 100 ? lista.length : null, ultimo: u ? { autor_id: u.autor_id, autor: autores.get(u.autor_id ?? "")?.nome ?? null, corpo: u.corpo, criado_em: u.criado_em } : null })
+  }, [estado, aoContar])
   if (estado.fase === "carregando") return <Esqueleto linhas={2} />
   if (estado.fase === "erro") return <Erro aoTentar={recarregar}>{t("rede.comunidade.erroComentarios")}</Erro>
   return (
@@ -240,37 +246,42 @@ function Comentarios({ postId, uid, aoContar }: { postId: number; uid: string; a
 }
 
 // Post do feed: a conversa abre dentro do cartão, sob o texto (Peerlist), com a contagem no botão (Nextdoor).
-type Ultimo = { autor: string | null; corpo: string; criado_em: string }
-
 function Post({ item, autor, ultimo, uid, aoMudar }: { item: Item; autor: string | null; ultimo?: Ultimo; uid: string; aoMudar: () => void }) {
   const t = useT()
   const idioma = useIdioma()
   const [aberto, setAberto] = useState(false)
   const doFeed = item.comentarios?.[0]?.count ?? 0
   // A contagem da conversa aberta vale enquanto a do feed for a mesma; se o feed for relido com outro número, ele manda.
-  const [contados, setContados] = useState<{ base: number; n: number } | null>(null)
-  const n = contados && contados.base === doFeed ? contados.n : doFeed
+  const [contados, setContados] = useState<(Conversa & { base: number }) | null>(null)
+  const vale = contados && contados.base === doFeed ? contados : null
+  const n = vale?.n ?? doFeed
+  const previa = vale ? vale.ultimo : ultimo
+  const pilula = useRef<HTMLButtonElement>(null)
   // Estável (useCallback): uma função nova a cada render dispararia o efeito de Comentarios em laço.
-  const contar = useCallback((c: number | null) => setContados(c === null ? null : { base: doFeed, n: c }), [doFeed])
+  const contar = useCallback((c: Conversa) => setContados({ ...c, base: doFeed }), [doFeed])
 
   return (
     <li>
       <Mensagem tipo="posts" item={item} autor={autor} uid={uid} aoMudar={aoMudar} conversa={aberto ? <div className="mt-4"><Comentarios postId={item.id} uid={uid} aoContar={contar} /></div> : null}>
-        {!item.oculto_em && !aberto && ultimo ? (
+        {!item.oculto_em && !aberto && previa ? (
           // Prévia do comentário mais recente, numa caixa com borda dentro do post (Nextdoor 2d126e87); abre a conversa.
-          <button type="button" onClick={() => setAberto(true)} className={`mb-3 flex w-full gap-3 rounded-lg border border-placa p-3 text-left transition-colors hover:bg-fumaca/20 ${focoApp}`}>
-            <Avatar nome={ultimo.autor} />
+          <button
+            type="button"
+            // A prévia some ao abrir: o foco vai para a pílula, que continua no lugar.
+            onClick={() => (setAberto(true), pilula.current?.focus())}
+            className={`mb-3 flex w-full gap-3 rounded-lg border border-placa p-3 text-left transition-colors hover:bg-fumaca/20 ${focoApp}`}>
+            <Avatar nome={previa.autor} />
             <span className="min-w-0 flex-1">
               <span className="sr-only">{t("rede.comunidade.verConversa")}: </span>
-              <span className="block text-corpo-p font-semibold text-creme">{ultimo.autor ?? t("rede.comunidade.membro")}</span>
-              <span className="block text-corpo-p text-cinza">{ha(ultimo.criado_em, idioma)}</span>
-              <span className="mt-1 line-clamp-3 block text-corpo-p text-creme">{ultimo.corpo}</span>
+              <span className="block text-corpo-p font-semibold text-creme">{previa.autor ?? t(previa.autor_id ? "rede.comunidade.membro" : "rede.comunidade.exMembro")}</span>
+              <span className="block text-corpo-p text-cinza">{ha(previa.criado_em, idioma)}</span>
+              <span className="mt-1 line-clamp-3 block text-corpo-p text-creme">{previa.corpo}</span>
             </span>
           </button>
         ) : null}
         {!item.oculto_em ? (
           // Pílula do Nextdoor: balão + contagem; o nome acessível diz o que é (o número sozinho não diz).
-          <button type="button" aria-expanded={aberto} onClick={() => setAberto(!aberto)} className={`inline-flex min-h-10 items-center gap-2 rounded-full bg-fumaca/40 px-3.5 text-corpo-p font-semibold text-cinza tabular-nums transition-colors pointer-coarse:min-h-11 hover:bg-fumaca/70 hover:text-creme aria-expanded:bg-fumaca/70 aria-expanded:text-creme ${focoApp}`}>
+          <button ref={pilula} type="button" aria-expanded={aberto} onClick={() => setAberto(!aberto)} className={`inline-flex min-h-10 items-center gap-2 rounded-full bg-fumaca/40 px-3.5 text-corpo-p font-semibold text-cinza tabular-nums transition-colors pointer-coarse:min-h-11 hover:bg-fumaca/70 hover:text-creme aria-expanded:bg-fumaca/70 aria-expanded:text-creme ${focoApp}`}>
             <Icone nome="balao" className="size-5" />
             {/* O nome falado é "Comentários: N" e contém o número visível (WCAG 2.5.3); com 0 só o balão aparece. */}
             <span className="sr-only">{`${t("rede.comunidade.comentarios")}: ${n}`}</span>
@@ -297,7 +308,9 @@ function Feed({ espaco, uid }: { espaco: EspacoLinha; uid: string }) {
   const { estado, recarregar } = useCarga(async () => {
     const lista: Item[] = ok(await supabase.from("posts").select("id, autor_id, corpo, oculto_em, editado_em, criado_em, comentarios(count)").eq("espaco_id", espaco.id).order("criado_em", { ascending: false }).limit(50))
     const ids = lista.map((p) => p.id)
-    const recentes = ids.length ? ok(await supabase.from("comentarios").select("post_id, autor_id, corpo, criado_em").in("post_id", ids).is("oculto_em", null).order("criado_em", { ascending: false }).limit(200)) : []
+    // A prévia é enfeite: se a consulta falhar, o feed aparece sem ela (não vira erro).
+    const r = ids.length ? await supabase.from("comentarios").select("post_id, autor_id, corpo, criado_em").in("post_id", ids).is("oculto_em", null).order("criado_em", { ascending: false }).limit(200) : null
+    const recentes = r && !r.error ? (r.data ?? []) : []
     const ultimos = new Map<number, (typeof recentes)[number]>()
     for (const c of recentes) if (!ultimos.has(c.post_id)) ultimos.set(c.post_id, c)
     return { lista, ultimos, autores: await vitrinesPorId([uid, ...lista.map((p) => p.autor_id), ...recentes.map((c) => c.autor_id)]) }
@@ -323,10 +336,11 @@ function Feed({ espaco, uid }: { espaco: EspacoLinha; uid: string }) {
           return !error
         }}
       />
+      {/* ponytail: "Sem resposta" usa a contagem do feed; um post comentado agora sai do filtro só quando o feed for relido. */}
       {/* Filtros em pílula de contorno sob o composer (Nextdoor: For you · Recent · Nearby · Trending), sobre os posts já carregados. */}
       <div role="group" aria-label={t("rede.comunidade.filtros")} className="flex flex-wrap gap-2">
         {FILTROS.map(([f, rotulo]) => (
-          <button key={f} type="button" aria-pressed={filtro === f} onClick={() => setFiltro(f)} className={`inline-flex min-h-9 items-center rounded-full border border-fumaca px-3.5 text-corpo-p font-semibold text-cinza transition-colors pointer-coarse:min-h-11 hover:text-creme aria-pressed:border-creme aria-pressed:text-creme ${focoApp}`}>
+          <button key={f} type="button" aria-pressed={filtro === f} onClick={() => setFiltro(f)} className={`inline-flex min-h-9 items-center rounded-full border border-fumaca px-3.5 text-corpo-p font-normal text-cinza aria-pressed:font-semibold transition-colors pointer-coarse:min-h-11 hover:text-creme aria-pressed:border-creme aria-pressed:bg-fumaca/70 aria-pressed:text-creme ${focoApp}`}>
             {t(rotulo)}
           </button>
         ))}
@@ -334,12 +348,12 @@ function Feed({ espaco, uid }: { espaco: EspacoLinha; uid: string }) {
       {estado.fase === "carregando" ? <Esqueleto linhas={4} /> : null}
       {estado.fase === "erro" ? <Erro aoTentar={recarregar}>{t("rede.comunidade.erroPosts")}</Erro> : null}
       {estado.fase === "pronto" && estado.dados.lista.length === 0 ? <Vazio>{t("rede.comunidade.vazio")}</Vazio> : null}
-      {estado.fase === "pronto" && estado.dados.lista.length > 0 && visiveis.length === 0 ? <Vazio>{t("rede.comunidade.filtroVazio")}</Vazio> : null}
+      {estado.fase === "pronto" && estado.dados.lista.length > 0 && visiveis.length === 0 ? <div role="status"><Vazio>{t("rede.comunidade.filtroVazio")}</Vazio></div> : null}
       {visiveis.length > 0 && estado.fase === "pronto" ? (
         <ul className="space-y-4">
           {visiveis.map((p) => {
             const u = estado.dados.ultimos.get(p.id)
-            return <Post key={p.id} item={p} autor={nomeDo(p.autor_id)} ultimo={u ? { autor: nomeDo(u.autor_id), corpo: u.corpo, criado_em: u.criado_em } : undefined} uid={uid} aoMudar={recarregar} />
+            return <Post key={p.id} item={p} autor={nomeDo(p.autor_id)} ultimo={u ? { autor_id: u.autor_id, autor: nomeDo(u.autor_id), corpo: u.corpo, criado_em: u.criado_em } : undefined} uid={uid} aoMudar={recarregar} />
           })}
         </ul>
       ) : null}
@@ -424,8 +438,9 @@ export function Comunidade() {
             ) : null}
           </nav>
           <section aria-labelledby="espaco-atual" className="min-w-0 space-y-4">
+            <h2 id="espaco-atual" className="sr-only">{titulo}</h2>
             <header className="rounded-xl border border-placa bg-carvao p-4 lg:hidden">
-              <h2 id="espaco-atual" className="text-subtitulo font-semibold">{titulo}</h2>
+              <p aria-hidden="true" className="text-subtitulo font-semibold">{titulo}</p>
               {descricao ? <p className="mt-1 text-corpo-p text-cinza">{descricao}</p> : null}
             </header>
             <details className="rounded-xl border border-placa bg-carvao px-4 py-1 lg:hidden">
@@ -439,7 +454,7 @@ export function Comunidade() {
               <div className="flex items-start gap-3 p-4">
                 <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-fumaca/60 text-dourado"><Icone nome={bloqueado ? "cadeado" : "balao"} /></span>
                 <div className="min-w-0">
-                  <h2 className="text-corpo font-semibold">{titulo}</h2>
+                  <p className="text-corpo font-semibold">{titulo}</p>
                   <p className="text-corpo-p text-cinza">{descricao ?? t("rede.comunidade.espacoSub")}</p>
                 </div>
               </div>

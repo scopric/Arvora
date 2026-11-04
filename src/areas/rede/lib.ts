@@ -85,13 +85,13 @@ export const dia = (iso: string, idioma: string) =>
 
 // Tempo relativo do feed ("há 9 minutos"), como no Nextdoor; depois de 7 dias vira a data. A data e hora cheias vão no `title`.
 export function ha(iso: string, idioma: string, agora = Date.now()) {
-  const s = (new Date(iso).getTime() - agora) / 1000
+  const s = Math.min((new Date(iso).getTime() - agora) / 1000, 0) // relógio do aparelho atrasado não vira "daqui a 2 min"
   const rtf = new Intl.RelativeTimeFormat(local(idioma), { numeric: "auto" })
   const a = Math.abs(s)
   if (a < 60) return rtf.format(0, "second") // "agora" / "now"
-  if (a < 3600) return rtf.format(Math.round(s / 60), "minute")
-  if (a < 86_400) return rtf.format(Math.round(s / 3600), "hour")
-  if (a < 7 * 86_400) return rtf.format(Math.round(s / 86_400), "day")
+  if (a < 3600) return rtf.format(Math.trunc(s / 60), "minute")
+  if (a < 86_400) return rtf.format(Math.trunc(s / 3600), "hour")
+  if (a < 7 * 86_400) return rtf.format(Math.trunc(s / 86_400), "day")
   return dia(iso, idioma)
 }
 

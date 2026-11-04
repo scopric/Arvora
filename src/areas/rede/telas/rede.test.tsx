@@ -130,6 +130,15 @@ describe("Comunidade", () => {
     expect(document.querySelector("dialog[open]")).toBeTruthy()
   })
 
+  it("prévia do comentário mais recente; autor excluído aparece como Ex-membro; abrir leva o foco à pílula", async () => {
+    resp.tabelas.posts = ok([{ ...post, comentarios: [{ count: 1 }] }])
+    resp.tabelas.comentarios = ok([{ post_id: 10, autor_id: null, corpo: "Comentário antigo", criado_em: "2020-01-01T11:00:00Z" }])
+    mostra(<Comunidade />)
+    const previa = await screen.findByRole("button", { name: /Ver a conversa.*Ex-membro.*Comentário antigo/ })
+    await userEvent.click(previa)
+    expect(document.activeElement?.getAttribute("aria-expanded")).toBe("true")
+  })
+
   it("?espaco=grupo leva quem é Grupo ao espaço do Grupo, não ao cadeado", async () => {
     resp.tabelas.espacos = ok([espaco, { id: 2, titulo: "Grupo Árvora", titulo_en: null, descricao: null, nivel_minimo: "grupo" }])
     mostra(<Comunidade />, "/pt?espaco=grupo", { nivel: "grupo" })
