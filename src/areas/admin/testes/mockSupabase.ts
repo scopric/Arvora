@@ -43,6 +43,12 @@ export const supabase = {
     estado.chamadas.push({ tabela: `rpc:${nome}`, op: "rpc", args: [args] })
     return Promise.resolve(estado.respostas[`rpc:${nome}`] ?? { data: null, error: null }).then((r) => (typeof r === "function" ? r(estado.chamadas) : r))
   },
+  functions: {
+    invoke: (nome: string) => {
+      estado.chamadas.push({ tabela: `fn:${nome}`, op: "invoke", args: [] })
+      return Promise.resolve(estado.respostas[`fn:${nome}`] ?? { data: null, error: null })
+    },
+  },
   storage: {
     from: (bucket: string) => ({
       upload: async (caminho: string) => {

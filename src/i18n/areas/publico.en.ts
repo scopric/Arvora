@@ -64,6 +64,7 @@ export const publicoEn: Record<keyof typeof publicoPt, string> = {
   "publico.planos.aceite.falta": "Tick both confirmations to continue.",
   "publico.planos.erroCheckout": "We could not open payment right now. Try again shortly; if it persists, talk to support.",
   "publico.planos.erroLimite": "Too many attempts in a short time. Wait a few minutes and try again.",
+  "publico.planos.erroIdade": "Before subscribing, confirm you are 18 or older: open your member area.",
   "publico.planos.erroJaAssina": "You already have a subscription. To change plan, use \"Manage subscription\" in your profile.",
   "publico.planos.faq.titulo": "Billing questions",
   "publico.planos.faq.q1": "When am I charged?",

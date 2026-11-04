@@ -11,7 +11,7 @@
 //   falhar depois, a assinatura já está cancelada no Stripe: aceitável e visível (500 "exclusao").
 //   Todas as chaves Stripe são conferidas ANTES do primeiro cancelamento (sem cancelamento pela metade).
 //
-// Limites conhecidos: (a) conta sem senha (magic link/OAuth, hoje inexistentes) precisa de atendimento manual;
+// Limites conhecidos: (a) conta só do Google (f4_10) não tem senha: cria uma pela recuperação de senha antes (a tela Dados avisa);
 // (b) limite de tentativas de senha por usuário: ação excluir_senha no banco (5 por hora), consumida logo
 // antes de cada conferência de senha, certa ou errada. Quem roubar só o JWT consegue bloquear a exclusão da
 // vítima por 1 h (risco aceito; o suporte atende).
@@ -20,6 +20,7 @@
 // Arquivos do titular no Storage: apagarUsuario (index.ts) remove antes do delete; o banco barra o delete se sobrar.
 // DADO RETIDO POR OBRIGAÇÃO LEGAL (retenção fiscal): assinaturas e clientes_stripe ficam, e clientes_stripe
 // guarda o e-mail do cliente. Item a validar pelo solicitor (prazo e se o e-mail pode ser anonimizado).
+import { aalDoJwt } from "../_shared/jwt.ts";
 import { cors, ErroStripe, json, stripeDelete } from "../_shared/stripe-api.ts";
 
 export type Assinatura = {
@@ -58,17 +59,6 @@ export type Deps = {
 
 // O apagarUsuario lança isto quando o usuário já não existe (outra aba apagou antes): conta como sucesso.
 export class UsuarioInexistente extends Error {}
-
-// Claim aal do JWT. Sem verificar assinatura: o getUser() já validou o token neste pedido.
-export function aalDoJwt(authorization: string): string | undefined {
-  try {
-    const p = authorization.replace(/^Bearer /i, "").split(".")[1];
-    const b = p.replace(/-/g, "+").replace(/_/g, "/");
-    return JSON.parse(atob(b + "=".repeat((4 - b.length % 4) % 4))).aal;
-  } catch {
-    return undefined;
-  }
-}
 
 // Cancelamento imediato SEM reembolso proporcional nem fatura final. Só vale depois dos 14 dias da
 // assinatura: antes disso o handler responde 409 arrependimento e o suporte trata o reembolso.

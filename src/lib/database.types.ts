@@ -886,13 +886,13 @@ isOneToOne: false
                   ]
                 },"perfis": {
                   Row: {
-                    "atualizado_em": string,"bio": string | null,"cidade": string | null,"criado_em": string,"empresa_nome": string | null,"foto_path": string | null,"id": string,"instagram": string | null,"linkedin_url": string | null,"maior_18_em": string,"nome": string,"onboarding_em": string | null,"pais": string | null,"publico_aprovado_em": string | null,"setor_id": number | null,"slug": string | null,"suspenso_em": string | null,"visibilidade": Database["public"]['Enums']["visibilidade_perfil"]
+                    "atualizado_em": string,"bio": string | null,"cidade": string | null,"criado_em": string,"empresa_nome": string | null,"foto_path": string | null,"id": string,"instagram": string | null,"linkedin_url": string | null,"maior_18_em": string | null,"nome": string,"onboarding_em": string | null,"pais": string | null,"publico_aprovado_em": string | null,"setor_id": number | null,"slug": string | null,"suspenso_em": string | null,"visibilidade": Database["public"]['Enums']["visibilidade_perfil"]
                   }
                   Insert: {
-                    "atualizado_em"?: string,"bio"?: string | null,"cidade"?: string | null,"criado_em"?: string,"empresa_nome"?: string | null,"foto_path"?: string | null,"id": string,"instagram"?: string | null,"linkedin_url"?: string | null,"maior_18_em": string,"nome": string,"onboarding_em"?: string | null,"pais"?: string | null,"publico_aprovado_em"?: string | null,"setor_id"?: number | null,"slug"?: string | null,"suspenso_em"?: string | null,"visibilidade"?: Database["public"]['Enums']["visibilidade_perfil"]
+                    "atualizado_em"?: string,"bio"?: string | null,"cidade"?: string | null,"criado_em"?: string,"empresa_nome"?: string | null,"foto_path"?: string | null,"id": string,"instagram"?: string | null,"linkedin_url"?: string | null,"maior_18_em"?: string | null,"nome": string,"onboarding_em"?: string | null,"pais"?: string | null,"publico_aprovado_em"?: string | null,"setor_id"?: number | null,"slug"?: string | null,"suspenso_em"?: string | null,"visibilidade"?: Database["public"]['Enums']["visibilidade_perfil"]
                   }
                   Update: {
-                    "atualizado_em"?: string,"bio"?: string | null,"cidade"?: string | null,"criado_em"?: string,"empresa_nome"?: string | null,"foto_path"?: string | null,"id"?: string,"instagram"?: string | null,"linkedin_url"?: string | null,"maior_18_em"?: string,"nome"?: string,"onboarding_em"?: string | null,"pais"?: string | null,"publico_aprovado_em"?: string | null,"setor_id"?: number | null,"slug"?: string | null,"suspenso_em"?: string | null,"visibilidade"?: Database["public"]['Enums']["visibilidade_perfil"]
+                    "atualizado_em"?: string,"bio"?: string | null,"cidade"?: string | null,"criado_em"?: string,"empresa_nome"?: string | null,"foto_path"?: string | null,"id"?: string,"instagram"?: string | null,"linkedin_url"?: string | null,"maior_18_em"?: string | null,"nome"?: string,"onboarding_em"?: string | null,"pais"?: string | null,"publico_aprovado_em"?: string | null,"setor_id"?: number | null,"slug"?: string | null,"suspenso_em"?: string | null,"visibilidade"?: Database["public"]['Enums']["visibilidade_perfil"]
                   }
                   Relationships: [
                     {
@@ -1428,6 +1428,9 @@ isOneToOne: false
 "corrigir_entrega":
 { Args: { "devolutiva": string,"entrega": number,"novo_status": Database["public"]['Enums']["status_entrega"] }; Returns: undefined
                            },
+"declarar_maior_18":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "email_do_membro":
 { Args: { "perfil": string }; Returns: string
                            },
@@ -1456,6 +1459,9 @@ isOneToOne: false
         isOneToOne: false
         isSetofReturn: true
       } },
+"excluir_conta_sem_declaracao":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "exportar_meus_dados":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
@@ -1486,6 +1492,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"idade_declarada":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
 "link_transmissao":
 { Args: { "aula": number }; Returns: string
                            },

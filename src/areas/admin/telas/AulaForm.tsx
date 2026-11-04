@@ -1,3 +1,4 @@
+import { FunctionsHttpError } from "@supabase/supabase-js"
 import { useState } from "react"
 import { useNavigate, useParams } from "react-router"
 import { Botao } from "../../../componentes/Botao"
@@ -29,6 +30,31 @@ const TRANSMISSAO: CampoDef[] = [
   { chave: "usar_reserva", rotulo: "admin.aula.usarReserva", tipo: "checkbox", ajuda: "admin.aula.usarReservaAjuda" },
   { chave: "abre_min_antes", rotulo: "admin.aula.abreMinAntes", tipo: "numero", obrigatorio: true },
 ]
+
+// Pede à função criar-sala-meet uma sala no Google Meet e devolve o link. Erro vira {message: código} para o textoErro traduzir.
+async function criarSalaMeet(): Promise<string> {
+  const { data, error } = await supabase.functions.invoke<{ url?: unknown }>("criar-sala-meet")
+  if (error) {
+    const erro = error instanceof FunctionsHttpError ? await error.context.json().then((j: { erro?: unknown }) => j?.erro, () => undefined) : undefined
+    throw { message: typeof erro === "string" ? erro : "meet_falhou" }
+  }
+  if (typeof data?.url !== "string") throw { message: "google" }
+  return data.url
+}
+
+// O Meet não embute (x-frame-options): o membro abre em aba nova. Aqui o admin só gera a sala e o link cai no campo.
+function BotaoMeet({ muda }: { muda: (chave: string, valor: string) => void }) {
+  const t = useT()
+  const acao = useAcao()
+  return (
+    <div className="space-y-3">
+      <Botao type="button" variante="contorno" ocupado={acao.ocupado} className="sm:w-auto" onClick={() => void acao.rodar(async () => muda("url", await criarSalaMeet()), "admin.aula.meetCriado")}>
+        {t("admin.aula.criarMeet")}
+      </Botao>
+      <AvisoDe aviso={acao.aviso} />
+    </div>
+  )
+}
 
 // Cadastro e publicação de aula (PRD §17.4.5): dados, transmissão principal/reserva, materiais, exercícios, Agendar e Publicar materiais.
 const secao = "py-6 first:pt-0 last:pb-0"
@@ -114,6 +140,7 @@ export function AulaForm() {
                         <FormularioRegistro
                           variante="secundario"
                           campos={TRANSMISSAO} linha={d.transmissao ?? { abre_min_antes: 15 }}
+                          extra={(muda) => <BotaoMeet muda={muda} />}
                           aoSalvar={async (c) => {
                             if (d.transmissao) exigirLinha(await supabase.from("transmissoes").update(c as never).eq("aula_id", aula.id).select("aula_id"))
                             else exigirLinha(await supabase.from("transmissoes").insert({ ...c, aula_id: aula.id } as never).select("aula_id"))

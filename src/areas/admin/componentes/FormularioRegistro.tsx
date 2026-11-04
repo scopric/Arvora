@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from "react"
+import { useState, type ReactNode, type SubmitEvent } from "react"
 import { Botao } from "../../../componentes/Botao"
 import { Campo, Selecao } from "../../../componentes/Campo"
 import { useT, type Chave } from "../../../i18n"
@@ -13,7 +13,7 @@ export type { CampoDef, OpcaoSel, Valores } from "../lib/campos"
 
 // Formulário genérico de um registro. `aoSalvar` faz a escrita (insert/update/RPC) e lança erro se falhar.
 export function FormularioRegistro({
-  campos, linha, aoSalvar, salvar, aoCancelar, variante = "primario",
+  campos, linha, aoSalvar, salvar, aoCancelar, variante = "primario", extra,
 }: {
   campos: CampoDef[]
   linha: Linha | null
@@ -22,6 +22,8 @@ export function FormularioRegistro({
   aoCancelar?: () => void
   // "secundario" (cinza cheio) nos formulários secundários da tela: só um botão dourado por tela.
   variante?: "primario" | "secundario"
+  // Ação própria da tela que preenche um campo (ex.: gerar o link da sala); recebe o setter do formulário.
+  extra?: (muda: (chave: string, valor: string | boolean) => void) => ReactNode
 }) {
   const t = useT()
   const [v, setV] = useState<Valores>(() => paraValores(campos, linha))
@@ -59,6 +61,7 @@ export function FormularioRegistro({
           return <Campo key={c.chave} rotulo={rotulo} erro={erro} ajuda={ajuda} type={tipoInput} step={c.tipo === "numero" ? "any" : undefined} value={v[c.chave] as string} onChange={(e) => muda(c.chave, e.target.value)} />
         })}
       </div>
+      {extra?.(muda)}
       <AvisoDe aviso={acao.aviso} />
       <div className="flex flex-wrap gap-3">
         <Botao type="submit" variante={variante} ocupado={acao.ocupado} className="sm:w-auto">{t(salvar ?? "admin.comum.salvar")}</Botao>

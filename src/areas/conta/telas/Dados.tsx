@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from "react"
-import { useNavigate } from "react-router"
+import { Link, useNavigate } from "react-router"
 import { Aviso } from "../../../componentes/Aviso"
 import { Botao } from "../../../componentes/Botao"
 import { Campo } from "../../../componentes/Campo"
@@ -153,6 +153,9 @@ function BlocoExcluir() {
   const navegar = useNavigate()
   const caminho = useCaminho()
   const { equipe } = useAcesso()
+  // Conta só do Google não tem senha e o excluir-conta exige uma: orienta a criar pela recuperação de senha antes.
+  const { sessao } = useAuth()
+  const semSenha = !((sessao?.user.app_metadata?.providers as string[] | undefined) ?? ["email"]).includes("email")
   const [dialogo, setDialogo] = useState(false)
   const [etapa2, setEtapa2] = useState(false)
   const [email, setEmail] = useState("")
@@ -191,6 +194,12 @@ function BlocoExcluir() {
       ) : (
         <form onSubmit={excluir} noValidate className="mt-5 space-y-5">
           <p className="text-corpo font-semibold">{t("conta.dados.excluir.etapa2")}</p>
+          {semSenha ? (
+            <p className="text-corpo-p text-cinza">
+              {t("conta.dados.excluir.semSenha")}{" "}
+              <Link to={caminho("/recuperar-senha")} className="underline decoration-dourado underline-offset-4">{t("conta.dados.excluir.criarSenha")}</Link>
+            </p>
+          ) : null}
           {erro ? <Aviso tipo="erro">{t(erro)}</Aviso> : null}
           <Campo rotulo={t("perfil.excluir.email")} name="confirmar_email" type="email" autoComplete="off" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
           <Campo rotulo={t("perfil.excluir.senha")} name="confirmar_senha" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />

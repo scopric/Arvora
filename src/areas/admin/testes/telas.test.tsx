@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { FunctionsHttpError } from "@supabase/supabase-js"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("../../../lib/supabase", async () => ({ supabase: (await import("./mockSupabase")).supabase }))
@@ -209,6 +210,17 @@ describe("Aula", () => {
     await userEvent.click(await screen.findByRole("button", { name: "Aprovar para publicar" }))
     await waitFor(() => expect(chamou("rpc:aprovar_material")).toHaveLength(1))
     expect(chamou("rpc:aprovar_material")[0].args[0]).toEqual({ material: 11 })
+  })
+  it("Criar sala no Google Meet preenche o link principal; função sem segredo mostra mensagem clara", async () => {
+    estado.respostas["aulas"] = { data: { ...aula, tipo: "ao_vivo" }, error: null }
+    estado.respostas["fn:criar-sala-meet"] = { data: { url: "https://meet.google.com/abc-defg-hij" }, error: null }
+    montar(<AulaForm />, "/aulas/:id", "/pt/admin/aulas/3")
+    await userEvent.click(await screen.findByRole("button", { name: "Criar sala no Google Meet" }))
+    await waitFor(() => expect((screen.getByLabelText(/Link principal/) as HTMLInputElement).value).toBe("https://meet.google.com/abc-defg-hij"))
+    expect(await screen.findByText(/Sala criada/)).toBeTruthy()
+    estado.respostas["fn:criar-sala-meet"] = { data: null, error: new FunctionsHttpError(new Response(JSON.stringify({ erro: "meet_nao_configurado" }), { status: 503 })) }
+    await userEvent.click(screen.getByRole("button", { name: "Criar sala no Google Meet" }))
+    expect((await screen.findAllByRole("alert")).map((a) => a.textContent).join(" ")).toMatch(/Google Meet ainda não está configurado/)
   })
   it("sem video_da_aula por erro de permissão a tela mostra erro e não um formulário vazio", async () => {
     estado.respostas["rpc:video_da_aula"] = { data: null, error: { code: "42501", message: "sem_acesso" } }
