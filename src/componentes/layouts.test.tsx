@@ -98,18 +98,18 @@ describe("LayoutMembro", () => {
     expect(within(secoes).getByRole("link", { name: /Conexões/ }).textContent).toContain("Bloqueado: parte do Grupo Árvora")
     const abas = screen.getByRole("navigation", { name: "Navegação rápida" })
     expect(within(abas).getByRole("link", { name: "Rede" }).getAttribute("aria-current")).toBe("page")
-    expect(within(abas).getByRole("link", { name: "Treinamentos" }).getAttribute("aria-current")).toBeNull()
+    expect(within(abas).getByRole("link", { name: "Treinos" }).getAttribute("aria-current")).toBeNull()
     cleanup()
     montar({ nivel: "grupo" }, "/pt/tarefas", <LayoutMembro />, "tarefas")
-    expect(within(screen.getByRole("navigation", { name: "Navegação rápida" })).getByRole("link", { name: "Treinamentos" }).getAttribute("aria-current")).toBe("page")
+    expect(within(screen.getByRole("navigation", { name: "Navegação rápida" })).getByRole("link", { name: "Treinos" }).getAttribute("aria-current")).toBe("page")
   })
 
   it("trilho e tab bar: o Clube entra em Aprender pelo Academy; o Grupo pelas Aulas; Awards fica em /awards", () => {
     montar({ nivel: "clube" }, "/pt/inicio", <LayoutMembro />)
     const trilho = screen.getByRole("navigation", { name: "Menu do membro" })
     const abas = screen.getByRole("navigation", { name: "Navegação rápida" })
-    for (const nav of [trilho, abas]) {
-      expect(within(nav).getByRole("link", { name: "Treinamentos" }).getAttribute("href")).toBe("/pt/academy")
+    for (const [nav, nome] of [[trilho, "Treinamentos"], [abas, "Treinos"]] as const) {
+      expect(within(nav).getByRole("link", { name: nome }).getAttribute("href")).toBe("/pt/academy")
       expect(within(nav).getByRole("link", { name: "Awards" }).getAttribute("href")).toBe("/pt/awards")
       expect(within(nav).getByRole("link", { name: "Rede" }).getAttribute("href")).toBe("/pt/network")
     }

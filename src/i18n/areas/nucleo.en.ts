@@ -44,6 +44,8 @@ export const nucleoEn: Record<keyof typeof nucleoPt, string> = {
   "menu.meuPlano": "My plan",
   "menu.sair": "Log out",
   "menu.aprender": "Training",
+  // Nome curto da área na tab bar do celular (o nome inteiro não cabe nas 5 colunas em 320–390 px).
+  "menu.aprenderAba": "Training",
   "menu.awardsAba": "Awards",
   "menu.rede": "Network",
   "menu.mais": "More",

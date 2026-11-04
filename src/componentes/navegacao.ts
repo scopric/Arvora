@@ -80,7 +80,7 @@ export type Aba = { rotulo: Chave; rota: string; icone: NomeIcone }
 // Bottom tab bar (PRD §17.3.2). "Mais" abre a folha e não está aqui.
 export const ABAS: Aba[] = [
   { rotulo: "menu.inicio", rota: "/inicio", icone: "casa" },
-  { rotulo: "menu.aprender", rota: "/aulas", icone: "aprender" },
+  { rotulo: "menu.aprenderAba", rota: "/aulas", icone: "aprender" },
   { rotulo: "menu.awardsAba", rota: "/awards", icone: "award" },
   { rotulo: "menu.rede", rota: "/network", icone: "rede" },
 ]
