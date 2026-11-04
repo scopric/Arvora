@@ -28,7 +28,8 @@ export function Confirmar() {
       if (error) return setAviso(mensagemDeErroAuth(error))
       // Com confirmação dupla, o 1º link da troca de e-mail só registra o aceite (resposta sem sessão); o 2º conclui.
       if (dados.data.type === "email_change" && !data?.session) return setRegistrado(true)
-      navegar(caminho(dados.data.type === "recovery" ? "/redefinir-senha" : "/inicio"), { replace: true })
+      // Convite da equipe: a conta nasce sem senha, então segue para criar uma.
+      navegar(caminho(dados.data.type === "recovery" || dados.data.type === "invite" ? "/redefinir-senha" : "/inicio"), { replace: true })
     } catch {
       setAviso("confirmar.erro")
     } finally {
@@ -70,8 +71,9 @@ export function Confirmar() {
         </Botao>
         {/* Link vencido ou já usado: na entrada a pessoa pede outro (o token_hash não traz o e-mail). */}
         {aviso ? (
-          <Link to={caminho(dados.data.type === "recovery" ? "/recuperar-senha" : "/entrar")} className="block underline decoration-dourado underline-offset-4">
-            {t(dados.data.type === "recovery" ? "entrar.esqueci" : "confirmar.irEntrar")}
+          // Convite vencido: a conta não tem senha, então o caminho é o "esqueci a senha" (cria uma).
+          <Link to={caminho(dados.data.type === "recovery" || dados.data.type === "invite" ? "/recuperar-senha" : "/entrar")} className="block underline decoration-dourado underline-offset-4">
+            {t(dados.data.type === "recovery" || dados.data.type === "invite" ? "entrar.esqueci" : "confirmar.irEntrar")}
           </Link>
         ) : null}
       </div>

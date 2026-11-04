@@ -1,10 +1,11 @@
 import { useState } from "react"
+import { FunctionsHttpError } from "@supabase/supabase-js"
 import { Botao } from "../../../componentes/Botao"
 import { Campo, Selecao } from "../../../componentes/Campo"
 import { DialogoConfirmar } from "../../../componentes/DialogoConfirmar"
 import { Tabela } from "../../../componentes/Tabela"
 import { Vazio } from "../../../componentes/Vazio"
-import { useT } from "../../../i18n"
+import { useIdioma, useT } from "../../../i18n"
 import { useAcesso, type PapelEquipe } from "../../../lib/acesso"
 import { useAuth } from "../../../lib/sessao"
 import { supabase } from "../../../lib/supabase"
@@ -14,6 +15,15 @@ import { SUPER, usePode } from "../lib/papel"
 import { classeAcao } from "../lib/estilo"
 
 const PAPEIS: PapelEquipe[] = ["super_admin", "editor", "corretor", "moderador", "auditor"]
+
+// Convite por e-mail (função convidar-equipe): cria a conta, manda o e-mail e grava o papel. Erro vira {message: código} para o textoErro traduzir.
+async function convidar(corpo: { email: string; nome: string; papel: PapelEquipe; idioma: string }) {
+  const { error } = await supabase.functions.invoke("convidar-equipe", { body: corpo })
+  if (error) {
+    const erro = error instanceof FunctionsHttpError ? await error.context.json().then((j: { erro?: unknown }) => j?.erro, () => undefined) : undefined
+    throw { message: typeof erro === "string" ? erro : "convite_falhou" }
+  }
+}
 
 // Papéis da equipe (ADM-08). Só o super_admin lê e escreve a tabela (RLS). Quem entra aqui já existe como perfil; a busca é pelo nome.
 export function Equipe() {
@@ -28,6 +38,9 @@ export function Equipe() {
   const [achados, setAchados] = useState<{ id: string; nome: string }[]>([])
   const [novoPapel, setNovoPapel] = useState<PapelEquipe>("editor")
   const [adicionando, setAdicionando] = useState<{ perfil: string; nome: string; papel: PapelEquipe } | null>(null)
+  const idioma = useIdioma()
+  const convite = useAcao()
+  const [conv, setConv] = useState({ nome: "", email: "", papel: "editor" as PapelEquipe })
   const carga = useCarga(async () => {
     const eq = exigir(await supabase.from("equipe").select("perfil_id, papel, criado_em").order("criado_em"))
     const nomes = eq.length ? exigir(await supabase.from("perfis").select("id, nome").in("id", eq.map((e) => e.perfil_id))) : []
@@ -98,6 +111,28 @@ export function Equipe() {
             </li>
           ))}
         </ul>
+      </Secao>
+      <Secao titulo="admin.equipe.convidar">
+        <p className="mb-4 max-w-2xl text-sm">{t("admin.equipe.convidarIntro")}</p>
+        <form
+          className="grid max-w-3xl gap-4 sm:grid-cols-[1fr_1fr_12rem_auto] sm:items-end"
+          onSubmit={(e) => {
+            e.preventDefault()
+            void convite.rodar(async () => {
+              await convidar({ ...conv, idioma })
+              setConv({ nome: "", email: "", papel: conv.papel })
+              carga.recarregar()
+            }, "admin.equipe.convidado")
+          }}
+        >
+          <Campo rotulo={t("admin.comum.nome")} required maxLength={120} value={conv.nome} onChange={(e) => setConv({ ...conv, nome: e.target.value })} />
+          <Campo rotulo={t("admin.equipe.email")} type="email" required autoComplete="off" value={conv.email} onChange={(e) => setConv({ ...conv, email: e.target.value })} />
+          <Selecao rotulo={t("admin.equipe.papelConvite")} value={conv.papel} onChange={(e) => setConv({ ...conv, papel: e.target.value as PapelEquipe })}>
+            {PAPEIS.map((p) => <option key={p} value={p}>{t(`admin.papel.${p}`)}</option>)}
+          </Selecao>
+          <Botao type="submit" ocupado={convite.ocupado} className="sm:w-auto">{t("admin.equipe.enviarConvite")}</Botao>
+        </form>
+        <div className="mt-4"><AvisoDe aviso={convite.aviso} /></div>
       </Secao>
       <DialogoConfirmar
         aberto={adicionando !== null} titulo={t("admin.equipe.adicionarTitulo")} texto={adicionando ? `${adicionando.nome}: ${t(`admin.papel.${adicionando.papel}`)}. ${t("admin.equipe.adicionarTexto")}` : ""} confirmar={t("admin.equipe.adicionarEste")}

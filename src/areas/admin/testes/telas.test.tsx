@@ -501,6 +501,24 @@ describe("Checkup (g): URL, confirmações e recusa GDPR", () => {
     expect(chamou("equipe", "insert")[0].args[0]).toEqual({ perfil_id: "p3", papel: "super_admin" })
   })
 
+  it("Equipe: convidar por e-mail chama convidar-equipe; conta existente mostra o caminho da busca", async () => {
+    estado.respostas["equipe:select"] = { data: [], error: null }
+    montar(<Equipe />, "/equipe", "/pt/admin/equipe")
+    await userEvent.type(await screen.findByLabelText("Nome"), "Duda Nova")
+    await userEvent.type(screen.getByLabelText("E-mail"), "duda@exemplo.invalid")
+    await userEvent.selectOptions(screen.getByLabelText("Papel do convidado"), "corretor")
+    await userEvent.click(screen.getByRole("button", { name: "Enviar convite" }))
+    await waitFor(() => expect(chamou("fn:convidar-equipe")).toHaveLength(1))
+    expect(chamou("fn:convidar-equipe")[0].args[0]).toEqual({ nome: "Duda Nova", email: "duda@exemplo.invalid", papel: "corretor", idioma: "pt" })
+    expect(await screen.findByText(/Convite enviado/)).toBeTruthy()
+    expect((screen.getByLabelText("E-mail") as HTMLInputElement).value).toBe("")
+    estado.respostas["fn:convidar-equipe"] = { data: null, error: new FunctionsHttpError(new Response(JSON.stringify({ erro: "conta_existe" }), { status: 409 })) }
+    await userEvent.type(screen.getByLabelText("Nome"), "Eva")
+    await userEvent.type(screen.getByLabelText("E-mail"), "eva@exemplo.invalid")
+    await userEvent.click(screen.getByRole("button", { name: "Enviar convite" }))
+    expect((await screen.findAllByRole("alert")).map((a) => a.textContent).join(" ")).toMatch(/já tem conta/)
+  })
+
   it("Consentimento: revogar pede confirmação (perigo) avisando da despublicação; cancelar não grava", async () => {
     estado.respostas["documentos_legais"] = { data: [{ id: 1, versao: "1", idioma: "pt", vigente_desde: "2026-01-01" }], error: null }
     estado.respostas["consentimentos:select"] = { data: [{ id: 7, documento_id: 1, titular_email: "t@exemplo.invalid", titular_nome: null, aceito_em: "2026-10-01T10:00:00Z", revogado_em: null }], error: null }
