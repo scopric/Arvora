@@ -19,13 +19,14 @@ export function Bloqueado({ previa, frase, minimo = "grupo" }: { previa?: ReactN
     // App (MasterClass): bloco carvão; o véu é uma faixa sólida em ardósia no rodapé com hairline em cima, sem degradê.
     // O CTA do cadeado é secundário (cinza): o único dourado da tela continua sendo a ação principal dela (Decisão 70).
     return (
-      <section aria-label={rotulo} className="relative overflow-hidden rounded-lg vidro-fundo">
+      <section aria-label={rotulo} className="grid overflow-hidden rounded-lg vidro-fundo">
+        {/* Prévia e faixa dividem a mesma célula do grid: o bloco cresce até a faixa caber, mesmo com prévia baixa. */}
         {previa ? (
-          <div aria-hidden="true" inert className="pointer-events-none max-h-72 overflow-hidden p-6 blur-sm select-none">
+          <div aria-hidden="true" inert className="pointer-events-none [grid-area:1/1] max-h-72 overflow-hidden p-6 blur-sm select-none">
             {previa}
           </div>
         ) : null}
-        <div className={`flex flex-col items-start gap-4 p-6 ${previa ? "absolute inset-x-0 bottom-0 border-t border-placa bg-ardosia" : ""}`}>
+        <div className={`flex flex-col items-start gap-4 p-6 ${previa ? "relative [grid-area:1/1] self-end border-t border-placa bg-ardosia" : ""}`}>
           <p className="flex items-center gap-2 text-corpo-p font-semibold text-cinza">
             <Icone nome="cadeado" className="size-4" />
             {rotulo}
